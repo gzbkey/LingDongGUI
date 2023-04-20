@@ -52,5 +52,5 @@ Mkfile.old
 dkms.conf
 
 #keil
-/Listings/
-/Objects/
+Listings/
+Objects/
