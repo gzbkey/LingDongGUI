@@ -1,4 +1,7 @@
 # 使用前准备
+0、重要信息
+MDK是Professional License，可以使用CM4模拟
+
 1、安装好keil
 
 2、安装对应模拟芯片的pack
