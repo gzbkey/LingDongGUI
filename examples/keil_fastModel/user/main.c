@@ -1,4 +1,3 @@
-#include "CMSDK_CM4_FP.h"
 #include <stdio.h>
 #include "Board_GLCD.h"
 #include "perf_counter.h"

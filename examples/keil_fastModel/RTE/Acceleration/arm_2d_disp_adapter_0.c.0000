@@ -21,7 +21,7 @@
 
 #include "arm_2d.h"
 
-#ifdef RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
+#ifdef __RTE_ACCELERATION_ARM_2D_HELPER_DISP_ADAPTER0__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,9 +53,6 @@
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wformat="
 #   pragma GCC diagnostic ignored "-Wpedantic"
-#   pragma GCC diagnostic ignored "-Wunused-function"
-#   pragma GCC diagnostic ignored "-Wunused-variable"
-#   pragma GCC diagnostic ignored "-Wunused-value"
 #endif
 
 /*============================ MACROS ========================================*/
@@ -306,28 +303,16 @@ static bool __on_each_frame_complete(void *ptTarget)
 {
     ARM_2D_UNUSED(ptTarget);
     
-#if __DISP0_CFG_FPS_CACULATION_MODE__ == ARM_2D_FPS_MODE_REAL
-    static int64_t s_lLastTimeStamp = 0;
-    int64_t lTimeStamp = arm_2d_helper_get_system_timestamp();
-    int32_t nElapsed = 0;
-    if (0 != s_lLastTimeStamp) {
-        nElapsed = (int32_t)(arm_2d_helper_get_system_timestamp() - s_lLastTimeStamp);
-    }
-    s_lLastTimeStamp = lTimeStamp;
-    
-#else /* __DISP0_CFG_FPS_CACULATION_MODE__ == ARM_2D_FPS_MODE_RENDER_ONLY */
-    int32_t nElapsed = DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t.Statistics.nTotalCycle;
-#endif
-
+    int32_t nTotalCyclCount = DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t.Statistics.nTotalCycle;
     int32_t nTotalLCDCycCount = DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t.Statistics.nRenderingCycle;
     BENCHMARK.wLCDLatency = nTotalLCDCycCount;
 
     /* calculate real-time FPS */
     if (__DISP0_CFG_ITERATION_CNT__) {
         if (BENCHMARK.wIterations) {
-            BENCHMARK.wMin = MIN((uint32_t)nElapsed, BENCHMARK.wMin);
-            BENCHMARK.wMax = MAX(nElapsed, (int32_t)BENCHMARK.wMax);
-            BENCHMARK.dwTotal += nElapsed;
+            BENCHMARK.wMin = MIN((uint32_t)nTotalCyclCount, BENCHMARK.wMin);
+            BENCHMARK.wMax = MAX(nTotalCyclCount, (int32_t)BENCHMARK.wMax);
+            BENCHMARK.dwTotal += nTotalCyclCount;
             BENCHMARK.wIterations--;
 
             if (0 == BENCHMARK.wIterations) {
@@ -376,14 +361,8 @@ static void __user_scene_player_init(void)
                 .fnHandler = &__on_each_frame_complete,
             },
         },
-#if __DISP0_CFG_SWAP_RGB16_HIGH_AND_LOW_BYTES__
-        .FrameBuffer.bSwapRGB16 = true,
-#endif
-#if __DISP0_CFG_DEBUG_DIRTY_REGIONS__
-        .FrameBuffer.bDebugDirtyRegions = true,
-#endif
-        .FrameBuffer.u3PixelWidthAlign = __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__,
-        .FrameBuffer.u3PixelHeightAlign = __DISP0_CFG_PFB_PIXEL_ALIGN_HEIGHT__,
+        //.FrameBuffer.bSwapRGB16 = true,
+
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
         .FrameBuffer.u4PoolReserve = 3,                                         // reserve 3 PFB blocks for the virtual resource service

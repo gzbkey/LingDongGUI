@@ -1,0 +1,420 @@
+/******************************************************************************
+ * @file     startup_CMSDK_CM4.S
+ * @brief    CMSIS Startup File for CMSDK_CM4 Device
+ ******************************************************************************/
+/* Copyright (c) 2022 ARM LIMITED
+
+   All rights reserved.
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+   - Neither the name of ARM nor the names of its contributors may be used
+     to endorse or promote products derived from this software without
+     specific prior written permission.
+   *
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+   ---------------------------------------------------------------------------*/
+
+
+                .syntax  unified
+                .arch    armv7-m
+
+                #define __INITIAL_SP     Image$$ARM_LIB_STACK$$ZI$$Limit
+                #define __STACK_LIMIT    Image$$ARM_LIB_STACK$$ZI$$Base
+
+                .section RESET
+                .align   2
+                .globl   __Vectors
+                .globl   __Vectors_End
+                .globl   __Vectors_Size
+__Vectors:
+                .long    __INITIAL_SP                       /*     Initial Stack Pointer */
+                .long    Reset_Handler                      /*     Reset Handler */
+                .long    NMI_Handler                        /* -14 NMI Handler */
+                .long    HardFault_Handler                  /* -13 Hard Fault Handler */
+                .long    MemManage_Handler                  /* -12 MPU Fault Handler */
+                .long    BusFault_Handler                   /* -11 Bus Fault Handler */
+                .long    UsageFault_Handler                 /* -10 Usage Fault Handler */
+                .long    0                                  /*     Reserved */
+                .long    0                                  /*     Reserved */
+                .long    0                                  /*     Reserved */
+                .long    0                                  /*     Reserved */
+                .long    SVC_Handler                        /*  -5 SVC Handler */
+                .long    DebugMon_Handler                   /*  -4 Debug Monitor Handler */
+                .long    0                                  /*     Reserved */
+                .long    PendSV_Handler                     /*  -2 PendSV Handler */
+                .long    SysTick_Handler                    /*  -1 SysTick Handler */
+
+                /* Interrupts */
+                .long    UART0RX_Handler                    /*   0 UART 0 receive interrupt */
+                .long    UART0TX_Handler                    /*   1 UART 0 transmit interrupt */
+                .long    UART1RX_Handler                    /*   2 UART 1 receive interrupt */
+                .long    UART1TX_Handler                    /*   3 UART 1 transmit interrupt */
+                .long    UART2RX_Handler                    /*   4 UART 2 receive interrupt */
+                .long    UART2TX_Handler                    /*   5 UART 2 transmit interrupt */
+                .long    GPIO0ALL_Handler                   /*   6 GPIO 0 combined interrupt */
+                .long    GPIO1ALL_Handler                   /*   7 GPIO 1 combined interrupt */
+                .long    TIMER0_Handler                     /*   8 Timer 0 interrupt */
+                .long    TIMER1_Handler                     /*   9 Timer 1 interrupt */
+                .long    DUALTIMER_Handler                  /*  10 Dual Timer interrupt */
+                .long    SPI_0_1_Handler                    /*  11 SPI 0, 1 interrupt */
+                .long    UART_0_1_2_OVF_Handler             /*  12 UART overflow (0, 1 & 2) interrupt */
+                .long    ETHERNET_Handler                   /*  13 Ethernet interrupt */
+                .long    I2S_Handler                        /*  14 Audio I2S interrupt */
+                .long    TOUCHSCREEN_Handler                /*  15 Touch Screen interrupt */
+                .long    GPIO2_Handler                      /*  16 GPIO 2 combined interrupt */
+                .long    GPIO3_Handler                      /*  17 GPIO 3 combined interrupt */
+                .long    UART3RX_Handler                    /*  18 UART 3 receive interrupt */
+                .long    UART3TX_Handler                    /*  19 UART 3 transmit interrupt */
+                .long    UART4RX_Handler                    /*  20 UART 4 receive interrupt */
+                .long    UART4TX_Handler                    /*  21 UART 4 transmit interrupt */
+                .long    SPI_2_Handler                      /*  22 SPI 2 interrupt */
+                .long    SPI_3_4_Handler                    /*  23 SPI 3, 4 interrupt */
+                .long    GPIO0_0_Handler                    /*  24 GPIO 0 individual interrupt ( 0) */
+                .long    GPIO0_1_Handler                    /*  25 GPIO 0 individual interrupt ( 1) */
+                .long    GPIO0_2_Handler                    /*  26 GPIO 0 individual interrupt ( 2) */
+                .long    GPIO0_3_Handler                    /*  27 GPIO 0 individual interrupt ( 3) */
+                .long    GPIO0_4_Handler                    /*  28 GPIO 0 individual interrupt ( 4) */
+                .long    GPIO0_5_Handler                    /*  29 GPIO 0 individual interrupt ( 5) */
+                .long    GPIO0_6_Handler                    /*  30 GPIO 0 individual interrupt ( 6) */
+                .long    GPIO0_7_Handler                    /*  31 GPIO 0 individual interrupt ( 7) */
+                .long    0                                  /*  32 Reserved */
+                .long    0                                  /*  33 Reserved */
+                .long    0                                  /*  34 Reserved */
+                .long    0                                  /*  35 Reserved */
+                .long    0                                  /*  36 Reserved */
+                .long    0                                  /*  37 Reserved */
+                .long    0                                  /*  38 Reserved */
+                .long    0                                  /*  39 Reserved */
+                .long    0                                  /*  40 Reserved */
+                .long    0                                  /*  41 Reserved */
+                .long    0                                  /*  42 Reserved */
+                .long    0                                  /*  43 Reserved */
+                .long    0                                  /*  44 Reserved */
+                .long    0                                  /*  45 Reserved */
+                .long    0                                  /*  46 Reserved */
+                .long    0                                  /*  47 Reserved */
+                .long    0                                  /*  48 Reserved */
+                .long    0                                  /*  49 Reserved */
+                .long    0                                  /*  50 Reserved */
+                .long    0                                  /*  51 Reserved */
+                .long    0                                  /*  52 Reserved */
+                .long    0                                  /*  53 Reserved */
+                .long    0                                  /*  54 Reserved */
+                .long    0                                  /*  55 Reserved */
+                .long    0                                  /*  56 Reserved */
+                .long    0                                  /*  57 Reserved */
+                .long    0                                  /*  58 Reserved */
+                .long    0                                  /*  59 Reserved */
+                .long    0                                  /*  60 Reserved */
+                .long    0                                  /*  61 Reserved */
+                .long    0                                  /*  62 Reserved */
+                .long    0                                  /*  63 Reserved */
+                .long    0                                  /*  64 Reserved */
+                .long    0                                  /*  65 Reserved */
+                .long    0                                  /*  66 Reserved */
+                .long    0                                  /*  67 Reserved */
+                .long    0                                  /*  68 Reserved */
+                .long    0                                  /*  69 Reserved */
+                .long    0                                  /*  70 Reserved */
+                .long    0                                  /*  71 Reserved */
+                .long    0                                  /*  72 Reserved */
+                .long    0                                  /*  73 Reserved */
+                .long    0                                  /*  74 Reserved */
+                .long    0                                  /*  75 Reserved */
+                .long    0                                  /*  76 Reserved */
+                .long    0                                  /*  77 Reserved */
+                .long    0                                  /*  78 Reserved */
+                .long    0                                  /*  79 Reserved */
+                .long    0                                  /*  80 Reserved */
+                .long    0                                  /*  81 Reserved */
+                .long    0                                  /*  82 Reserved */
+                .long    0                                  /*  83 Reserved */
+                .long    0                                  /*  84 Reserved */
+                .long    0                                  /*  85 Reserved */
+                .long    0                                  /*  86 Reserved */
+                .long    0                                  /*  87 Reserved */
+                .long    0                                  /*  88 Reserved */
+                .long    0                                  /*  89 Reserved */
+                .long    0                                  /*  90 Reserved */
+                .long    0                                  /*  91 Reserved */
+                .long    0                                  /*  92 Reserved */
+                .long    0                                  /*  93 Reserved */
+                .long    0                                  /*  94 Reserved */
+                .long    0                                  /*  95 Reserved */
+                .long    0                                  /*  96 Reserved */
+                .long    0                                  /*  97 Reserved */
+                .long    0                                  /*  98 Reserved */
+                .long    0                                  /*  99 Reserved */
+                .long    0                                  /* 100 Reserved */
+                .long    0                                  /* 101 Reserved */
+                .long    0                                  /* 102 Reserved */
+                .long    0                                  /* 103 Reserved */
+                .long    0                                  /* 104 Reserved */
+                .long    0                                  /* 105 Reserved */
+                .long    0                                  /* 106 Reserved */
+                .long    0                                  /* 107 Reserved */
+                .long    0                                  /* 108 Reserved */
+                .long    0                                  /* 109 Reserved */
+                .long    0                                  /* 110 Reserved */
+                .long    0                                  /* 111 Reserved */
+                .long    0                                  /* 112 Reserved */
+                .long    0                                  /* 113 Reserved */
+                .long    0                                  /* 114 Reserved */
+                .long    0                                  /* 115 Reserved */
+                .long    0                                  /* 116 Reserved */
+                .long    0                                  /* 117 Reserved */
+                .long    0                                  /* 118 Reserved */
+                .long    0                                  /* 119 Reserved */
+                .long    0                                  /* 120 Reserved */
+                .long    0                                  /* 121 Reserved */
+                .long    0                                  /* 122 Reserved */
+                .long    0                                  /* 123 Reserved */
+                .long    0                                  /* 124 Reserved */
+                .long    0                                  /* 125 Reserved */
+                .long    0                                  /* 126 Reserved */
+                .long    0                                  /* 127 Reserved */
+                .long    0                                  /* 128 Reserved */
+                .long    0                                  /* 129 Reserved */
+                .long    0                                  /* 130 Reserved */
+                .long    0                                  /* 131 Reserved */
+                .long    0                                  /* 132 Reserved */
+                .long    0                                  /* 133 Reserved */
+                .long    0                                  /* 134 Reserved */
+                .long    0                                  /* 135 Reserved */
+                .long    0                                  /* 136 Reserved */
+                .long    0                                  /* 137 Reserved */
+                .long    0                                  /* 138 Reserved */
+                .long    0                                  /* 139 Reserved */
+                .long    0                                  /* 140 Reserved */
+                .long    0                                  /* 141 Reserved */
+                .long    0                                  /* 142 Reserved */
+                .long    0                                  /* 143 Reserved */
+                .long    0                                  /* 144 Reserved */
+                .long    0                                  /* 145 Reserved */
+                .long    0                                  /* 146 Reserved */
+                .long    0                                  /* 147 Reserved */
+                .long    0                                  /* 148 Reserved */
+                .long    0                                  /* 149 Reserved */
+                .long    0                                  /* 150 Reserved */
+                .long    0                                  /* 151 Reserved */
+                .long    0                                  /* 152 Reserved */
+                .long    0                                  /* 153 Reserved */
+                .long    0                                  /* 154 Reserved */
+                .long    0                                  /* 155 Reserved */
+                .long    0                                  /* 156 Reserved */
+                .long    0                                  /* 157 Reserved */
+                .long    0                                  /* 158 Reserved */
+                .long    0                                  /* 159 Reserved */
+                .long    0                                  /* 160 Reserved */
+                .long    0                                  /* 161 Reserved */
+                .long    0                                  /* 162 Reserved */
+                .long    0                                  /* 163 Reserved */
+                .long    0                                  /* 164 Reserved */
+                .long    0                                  /* 165 Reserved */
+                .long    0                                  /* 166 Reserved */
+                .long    0                                  /* 167 Reserved */
+                .long    0                                  /* 168 Reserved */
+                .long    0                                  /* 169 Reserved */
+                .long    0                                  /* 170 Reserved */
+                .long    0                                  /* 171 Reserved */
+                .long    0                                  /* 172 Reserved */
+                .long    0                                  /* 173 Reserved */
+                .long    0                                  /* 174 Reserved */
+                .long    0                                  /* 175 Reserved */
+                .long    0                                  /* 176 Reserved */
+                .long    0                                  /* 177 Reserved */
+                .long    0                                  /* 178 Reserved */
+                .long    0                                  /* 179 Reserved */
+                .long    0                                  /* 180 Reserved */
+                .long    0                                  /* 181 Reserved */
+                .long    0                                  /* 182 Reserved */
+                .long    0                                  /* 183 Reserved */
+                .long    0                                  /* 184 Reserved */
+                .long    0                                  /* 185 Reserved */
+                .long    0                                  /* 186 Reserved */
+                .long    0                                  /* 187 Reserved */
+                .long    0                                  /* 188 Reserved */
+                .long    0                                  /* 189 Reserved */
+                .long    0                                  /* 190 Reserved */
+                .long    0                                  /* 191 Reserved */
+                .long    0                                  /* 192 Reserved */
+                .long    0                                  /* 193 Reserved */
+                .long    0                                  /* 194 Reserved */
+                .long    0                                  /* 195 Reserved */
+                .long    0                                  /* 196 Reserved */
+                .long    0                                  /* 197 Reserved */
+                .long    0                                  /* 198 Reserved */
+                .long    0                                  /* 199 Reserved */
+                .long    0                                  /* 200 Reserved */
+                .long    0                                  /* 201 Reserved */
+                .long    0                                  /* 202 Reserved */
+                .long    0                                  /* 203 Reserved */
+                .long    0                                  /* 204 Reserved */
+                .long    0                                  /* 205 Reserved */
+                .long    0                                  /* 206 Reserved */
+                .long    0                                  /* 207 Reserved */
+                .long    0                                  /* 208 Reserved */
+                .long    0                                  /* 209 Reserved */
+                .long    0                                  /* 210 Reserved */
+                .long    0                                  /* 211 Reserved */
+                .long    0                                  /* 212 Reserved */
+                .long    0                                  /* 213 Reserved */
+                .long    0                                  /* 214 Reserved */
+                .long    0                                  /* 215 Reserved */
+                .long    0                                  /* 216 Reserved */
+                .long    0                                  /* 217 Reserved */
+                .long    0                                  /* 218 Reserved */
+                .long    0                                  /* 219 Reserved */
+                .long    0                                  /* 220 Reserved */
+                .long    0                                  /* 221 Reserved */
+                .long    0                                  /* 222 Reserved */
+                .long    0                                  /* 223 Reserved */
+                #if defined CMSDK_CM4_VHT || defined CMSDK_CM4_FP_VHT
+                .long    ARM_VSI0_Handler                   /* 224 VSI 0 interrupt */
+                .long    ARM_VSI1_Handler                   /* 225 VSI 1 interrupt */
+                .long    ARM_VSI2_Handler                   /* 226 VSI 2 interrupt */
+                .long    ARM_VSI3_Handler                   /* 227 VSI 3 interrupt */
+                .long    ARM_VSI4_Handler                   /* 228 VSI 4 interrupt */
+                .long    ARM_VSI5_Handler                   /* 229 VSI 5 interrupt */
+                .long    ARM_VSI6_Handler                   /* 230 VSI 6 interrupt */
+                .long    ARM_VSI7_Handler                   /* 231 VSI 7 interrupt */
+                #else
+                .long    0                                  /* 224 reserved */
+                .long    0                                  /* 225 reserved */
+                .long    0                                  /* 226 reserved */
+                .long    0                                  /* 227 reserved */
+                .long    0                                  /* 228 reserved */
+                .long    0                                  /* 229 reserved */
+                .long    0                                  /* 230 reserved */
+                .long    0                                  /* 231 reserved */
+                #endif
+                .long    0                                  /* 232 reserved */
+                .long    0                                  /* 233 reserved */
+                .long    0                                  /* 234 reserved */
+                .long    0                                  /* 235 reserved */
+                .long    0                                  /* 236 reserved */
+                .long    0                                  /* 237 reserved */
+                .long    0                                  /* 238 reserved */
+                .long    0                                  /* 239 reserved */
+__Vectors_End:
+                .equ     __Vectors_Size, __Vectors_End - __Vectors
+                .size    __Vectors, . - __Vectors
+
+
+                .thumb
+                .section .text
+                .align   2
+
+                .thumb_func
+                .type    Reset_Handler, %function
+                .globl   Reset_Handler
+                .fnstart
+Reset_Handler:
+                bl       SystemInit
+                bl       __main
+
+                .fnend
+                .size    Reset_Handler, . - Reset_Handler
+
+
+/* The default macro is not used for HardFault_Handler
+ * because this results in a poor debug illusion.
+ */
+                .thumb_func
+                .type    HardFault_Handler, %function
+                .weak    HardFault_Handler
+                .fnstart
+HardFault_Handler:
+                b        .
+                .fnend
+                .size    HardFault_Handler, . - HardFault_Handler
+
+                .thumb_func
+                .type    Default_Handler, %function
+                .weak    Default_Handler
+                .fnstart
+Default_Handler:
+                b        .
+                .fnend
+                .size    Default_Handler, . - Default_Handler
+
+/* Macro to define default exception/interrupt handlers.
+ * Default handler are weak symbols with an endless loop.
+ * They can be overwritten by real handlers.
+ */
+                .macro   Set_Default_Handler  Handler_Name
+                .weak    \Handler_Name
+                .set     \Handler_Name, Default_Handler
+                .endm
+
+
+/* Default exception/interrupt handler */
+
+                Set_Default_Handler  NMI_Handler
+                Set_Default_Handler  MemManage_Handler
+                Set_Default_Handler  BusFault_Handler
+                Set_Default_Handler  UsageFault_Handler
+                Set_Default_Handler  SVC_Handler
+                Set_Default_Handler  DebugMon_Handler
+                Set_Default_Handler  PendSV_Handler
+                Set_Default_Handler  SysTick_Handler
+
+                Set_Default_Handler  UART0RX_Handler
+                Set_Default_Handler  UART0TX_Handler
+                Set_Default_Handler  UART1RX_Handler
+                Set_Default_Handler  UART1TX_Handler
+                Set_Default_Handler  UART2RX_Handler
+                Set_Default_Handler  UART2TX_Handler
+                Set_Default_Handler  GPIO0ALL_Handler
+                Set_Default_Handler  GPIO1ALL_Handler
+                Set_Default_Handler  TIMER0_Handler
+                Set_Default_Handler  TIMER1_Handler
+                Set_Default_Handler  DUALTIMER_Handler
+                Set_Default_Handler  SPI_0_1_Handler
+                Set_Default_Handler  UART_0_1_2_OVF_Handler
+                Set_Default_Handler  ETHERNET_Handler
+                Set_Default_Handler  I2S_Handler
+                Set_Default_Handler  TOUCHSCREEN_Handler
+                Set_Default_Handler  GPIO2_Handler
+                Set_Default_Handler  GPIO3_Handler
+                Set_Default_Handler  UART3RX_Handler
+                Set_Default_Handler  UART3TX_Handler
+                Set_Default_Handler  UART4RX_Handler
+                Set_Default_Handler  UART4TX_Handler
+                Set_Default_Handler  SPI_2_Handler
+                Set_Default_Handler  SPI_3_4_Handler
+                Set_Default_Handler  GPIO0_0_Handler
+                Set_Default_Handler  GPIO0_1_Handler
+                Set_Default_Handler  GPIO0_2_Handler
+                Set_Default_Handler  GPIO0_3_Handler
+                Set_Default_Handler  GPIO0_4_Handler
+                Set_Default_Handler  GPIO0_5_Handler
+                Set_Default_Handler  GPIO0_6_Handler
+                Set_Default_Handler  GPIO0_7_Handler
+                #if defined CMSDK_CM4_VHT || defined CMSDK_CM4_FP_VHT
+                Set_Default_Handler  ARM_VSI0_Handler
+                Set_Default_Handler  ARM_VSI1_Handler
+                Set_Default_Handler  ARM_VSI2_Handler
+                Set_Default_Handler  ARM_VSI3_Handler
+                Set_Default_Handler  ARM_VSI4_Handler
+                Set_Default_Handler  ARM_VSI5_Handler
+                Set_Default_Handler  ARM_VSI6_Handler
+                Set_Default_Handler  ARM_VSI7_Handler
+                #endif
+
+                .end
