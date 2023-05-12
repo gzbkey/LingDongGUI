@@ -940,7 +940,7 @@
               <MiscControls></MiscControls>
               <Define>NDEBUG,LCD_MIRROR_X=1,GLCD_MIRROR_Y=0,__USE_AN547__,__ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__=1</Define>
               <Undefine></Undefine>
-              <IncludePath>.\user;.\user\drivers;.\user\drivers\mps3</IncludePath>
+              <IncludePath>.\user;.\user\drivers;.\user\drivers\mps3;..\..\src\gui;..\..\src\misc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
