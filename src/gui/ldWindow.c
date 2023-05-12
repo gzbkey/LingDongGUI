@@ -1,0 +1,87 @@
+#include "ldWindow.h"
+
+//#include "global.h"
+//#include "jfif_parser.h"
+
+#if defined(__clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunknown-warning-option"
+#   pragma clang diagnostic ignored "-Wreserved-identifier"
+#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#   pragma clang diagnostic ignored "-Wpadded"
+#   pragma clang diagnostic ignored "-Wcast-qual"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#   pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#   pragma clang diagnostic ignored "-Wmissing-braces"
+#   pragma clang diagnostic ignored "-Wunused-const-variable"
+#   pragma clang diagnostic ignored "-Wmissing-declarations"
+#   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+
+//static bool _imageDel(xListInfo* pEachInfo,void* pTarget)
+//{
+//    if(pEachInfo->info==pTarget)
+//                {
+//                    xListDelete((xListNode *)pEachInfo);
+//                    ldFree(pEachInfo);
+//                    
+//                    ldFree(((ldImage *)pTarget)->imgList);
+//                    ldFree(((ldImage *)pTarget));
+//                }
+//    return false;
+//}
+
+void pWindowDel(ldWindow *widget)
+{
+//    xListInfo *listInfo;
+//    
+//    listInfo=ldGetWidgetInfoById(widget->nameId);
+//    
+//    if(listInfo!=NULL)
+//    {
+//        if((ldCommon*)widget->parentWidget==NULL)
+//        {
+//            //自身是根控件
+//            xListInfoPrevTraverse(&ldWidgetLink,widget,_imageDel);
+//        }
+//        else
+//        {
+//            xListInfoPrevTraverse(&listInfo->parentNode,widget,_imageDel);
+//        }
+//    }
+}
+
+ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isWithMask,bool isTransparent,bool isHidden)
+{
+    ldWindow * pNewWidget = NULL;
+    
+        pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isWithMask,0,0);
+        if(pNewWidget!=NULL)
+        {            
+            if(xListNewNode(&pNewWidget->childList)!=NULL)
+            {
+                pNewWidget->isTransparent=isTransparent;
+                pNewWidget->widgetType=widgetTypeWindow;
+            }
+            else
+            {
+                ldFree(pNewWidget->childList);
+                pImageDel(pNewWidget);
+                pNewWidget=NULL;
+            }
+        }
+    return pNewWidget;
+}
+
+void ldWindowLoop(ldWindow *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+{
+    ldImageLoop(info,ptParent,bIsNewFrame);
+}
+
+
+#if defined(__clang__)
+#   pragma clang diagnostic pop
+#endif
+

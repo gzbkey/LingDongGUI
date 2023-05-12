@@ -16,7 +16,7 @@
  */
 #define CMSIS_device_header "CMSDK_CM4_FP.h"
 
-/* ARM::Acceleration:Arm-2D Extras:Controls:1.4.1 */
+/* ARM::Acceleration:Arm-2D Extras:Controls:1.4.2 */
 #define RTE_Acceleration_Arm_2D_Extra_Controls
 /* ARM::Acceleration:Arm-2D Extras:LCD ASCII Printf:1.3.1 */
 #define RTE_Acceleration_Arm_2D_Extra_LCD_printf__
@@ -24,14 +24,14 @@
 #define RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
     #define __RTE_ACCELERATION_ARM_2D_HELPER_DISP_ADAPTER0__  /* this macro is deprecated, please use the macro above in your code */
 
-/* ARM::Acceleration:Arm-2D Helper:PFB:1.6.6 */
+/* ARM::Acceleration:Arm-2D Helper:PFB:1.6.7 */
 #define RTE_Acceleration_Arm_2D_Helper_PFB
-/* ARM::Acceleration:Arm-2D:Alpha-Blending:1.1.2-dev */
+/* ARM::Acceleration:Arm-2D:Alpha-Blending:1.1.3 */
 #define RTE_Acceleration_Arm_2D_Alpha_Blending
-/* ARM::Acceleration:Arm-2D:Core:1.1.2-dev */
+/* ARM::Acceleration:Arm-2D:Core:1.1.3 */
 #define RTE_Acceleration_Arm_2D
 #define __RTE_ACCELERATION_ARM_2D__     /* this macro is deprecated, please use the macro above in your code */
-/* ARM::Acceleration:Arm-2D:Transform:1.1.2-dev */
+/* ARM::Acceleration:Arm-2D:Transform:1.1.3 */
 #define RTE_Acceleration_Arm_2D_Transform
 /* GorgonMeducer::Utilities:perf_counter:Core:Source:2.1.0 */
 #define __PERF_COUNTER__ 1
