@@ -19,7 +19,7 @@ extern "C" {
 #include "xString.h"
 #include "xList.h"
 
-void ldGuiInit(void);
+
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame);
     
     

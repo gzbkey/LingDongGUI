@@ -4,14 +4,14 @@
 #include "ldCommon.h"
 
 
-xQueue_t *emitQueue;
+xQueue_t *emitQueue=NULL;
 NEW_LIST(listConnect);
 
 #define X_CONNECT_ADD(pInfo)    xListInfoAdd(&listConnect,pInfo)
 
-bool xConnectInit(void)
+static bool xEmitInit(void)
 {
-    emitQueue=xQueueCreate(16,sizeof (emitInfo_t));
+    emitQueue=xQueueCreate(EMIT_QUEUE_SIZE,sizeof (emitInfo_t));
     if(emitQueue)
     {
         return true;
@@ -22,12 +22,13 @@ bool xConnectInit(void)
 bool xEmit(void *widget,uint8_t signal)
 {
     emitInfo_t emitInfo;
+    
     emitInfo.pSender=widget;
     emitInfo.signalType=signal;
     return xQueueEnqueue(emitQueue,&emitInfo,sizeof (emitInfo_t));
 }
 
-static bool _isConnectSame(xListInfo* pEachInfo,void* pRelationInfo)
+static bool _isConnectSame(xListNode* pEachInfo,void* pRelationInfo)
 {
     if(((((relationInfo_t*)(pEachInfo->info))->pSender) ==((relationInfo_t*)pRelationInfo)->pSender)&&
        (((relationInfo_t*)(pEachInfo->info))->signalType ==((relationInfo_t*)pRelationInfo)->signalType)&&
@@ -46,6 +47,14 @@ bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc f
 {
     relationInfo_t* pRelation;
 
+    if(emitQueue==NULL)//自动申请信号储存空间
+    {
+        if(xEmitInit()==false)
+        {
+            return false;
+        }
+    }
+    
     pRelation=XMALLOC(sizeof(relationInfo_t));
     
     if(pRelation!=NULL)
@@ -89,16 +98,15 @@ bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc f
     
 }
 
-static bool _disconnect(xListInfo* pEachInfo,void* pRelationInfo)
+static bool _disconnect(xListNode* pEachInfo,void* pRelationInfo)
 {
     if(((((relationInfo_t*)(pEachInfo->info))->pSender) ==((relationInfo_t*)pRelationInfo)->pSender)&&
        (((relationInfo_t*)(pEachInfo->info))->signalType ==((relationInfo_t*)pRelationInfo)->signalType)&&
        ((((relationInfo_t*)(pEachInfo->info))->pReceiver) ==((relationInfo_t*)pRelationInfo)->pReceiver)&&
        (((relationInfo_t*)(pEachInfo->info))->receiverFunc ==((relationInfo_t*)pRelationInfo)->receiverFunc))
     {
-        xListDelete((xListNode*)pEachInfo);
         XFREE((pEachInfo->info));
-        XFREE((pEachInfo));
+        xListInfoDel(pEachInfo);
         return true;
     }
      
@@ -117,14 +125,13 @@ bool xDisconnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFun
     return xListInfoPrevTraverse(&listConnect,&info,_disconnect);
 }
 
-static bool _delConnect(xListInfo* pEachInfo,void* pRelationInfo)
+static bool _delConnect(xListNode* pEachInfo,void* pRelationInfo)
 {
     if(((((relationInfo_t*)(pEachInfo->info))->pSender) ==((relationInfo_t*)pRelationInfo)->pSender)||
        ((((relationInfo_t*)(pEachInfo->info))->pReceiver) ==((relationInfo_t*)pRelationInfo)->pReceiver))
     {
-        xListDelete((xListNode*)pEachInfo);
         XFREE((pEachInfo->info));
-        XFREE((pEachInfo));
+        xListInfoDel(pEachInfo);
     }
     //为了遍历所有对象，必须返回false
     return false;

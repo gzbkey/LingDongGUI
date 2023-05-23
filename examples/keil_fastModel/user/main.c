@@ -53,17 +53,13 @@ void *ldRealloc(void *ptr,uint32_t newSize)
 
 
 
-bool testFun(connectInfo_t connInfo)
-{
-    
-    return false;
-}
+
+ldImage *img;
+ldWindow *win;
 
 
+extern const uint16_t c_bmpCMSISLogoRGB565[163*65];
 
-
-bool ret=0;
-ldImage *pImg;
 int main (void)
 {
     init_cycle_counter(false);
@@ -76,10 +72,14 @@ int main (void)
 
     GLCD_Initialize();
 
-    ldWindowInit(0, 0, 0,0,320,240,0xFF00,0,0,0,0,0);
-    
-    ldImageInit(1, 0, 20,20,100,50,0xFF,0,0,0,0,0);
-    
+    win=ldWindowInit(0, 0, 0,0,320,240,0xFF00,0,0,0,0,0);
+
+    img=ldImageInit(1, 0, 20,20,163,65,0xFF,(uint32_t)&c_bmpCMSISLogoRGB565[0],1,0,0,0);
+
+//    pImageDel(img);
+
+//    pWindowDel(win);
+
     arm_irq_safe {
         arm_2d_init();
     }

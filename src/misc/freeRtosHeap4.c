@@ -88,7 +88,7 @@ task.h is included from an application file. */
 #include "stdio.h"
 
 #ifndef LD_MEM_SIZE
-#define LD_MEM_SIZE   1024
+#define LD_MEM_SIZE                                 (1024)
 #endif
 
 #define configSUPPORT_DYNAMIC_ALLOCATION            (1)

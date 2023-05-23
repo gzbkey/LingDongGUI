@@ -13,18 +13,12 @@ extern "C" {
 
 struct listNode {
     struct listNode *next, *prev;
+    void *info;//ldCommon*
 };
 
 typedef struct listNode xListNode;
 
-#define NEW_LIST(newLink)  xListNode newLink={ &(newLink), &(newLink) }
-
-typedef struct
-{
-    xListNode parentNode;
-    void *info;//ldCommon*
-}xListInfo;
-
+#define NEW_LIST(newLink)  xListNode newLink={ &(newLink), &(newLink), NULL }
 
 #define list_entry(ptr, type, member)    (type *)((char*)(ptr) - offsetof(type, member))
 
@@ -37,13 +31,13 @@ typedef struct
          pos != (head); \
          pos = n, n = pos->prev)
 
-#define XLIST_GET_ROOT(pList)  ((xListInfo*)(pList->next))->info;
-xListNode* xListNewNode(xListNode** pListChild);
-void xListDelete(xListNode *target);
-xListInfo* xListInfoAdd(xListNode* pList, void* pInfo);
+xListNode* xListMallocNode(xListNode** pListChild);
+void xListFreeNode(xListNode* pListChild);
+xListNode* xListInfoAdd(xListNode* pList, void* pInfo);
+void     * xListInfoDel(xListNode* pList);
 
 //bool xListInfoTraverse(xListNode *pList,bool (traverseFunc)(xListInfo*));//bool (traverseFunc)(xListInfo* pEachInfo)
-bool xListInfoPrevTraverse(xListNode *pList,void *pTarget,bool (traverseFunc)(xListInfo *,void*));//bool (traverseFunc)(xListInfo* pEachInfo,void* pTarget);
+bool xListInfoPrevTraverse(xListNode *pList,void *pTarget,bool (traverseFunc)(xListNode *,void*));//bool (traverseFunc)(xListInfo* pEachInfo,void* pTarget);
 
 #ifdef __cplusplus
 }

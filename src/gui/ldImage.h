@@ -8,25 +8,29 @@ extern "C" {
 #include "ldCommon.h"
 #include "xList.h"
 
+
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isInitEnd:1;
 //    bool isMaskColor:1;
     bool isPng:1;
-    bool isJpg:1;
+    bool isHwDec:1;
     bool isTransparent:1;//window专用
+    ldColor bgColor;
+    
+    //定时切换用
     uint32_t _timeUnit;
     int64_t _lastTimeLog;
     uint16_t speedMs;
     
-    //resource.pTarget  norAdddr
+    
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
     arm_2d_vres_t resource;
 #else
     arm_2d_tile_t resource;
 #endif
     
-    ldColor bgColor;
+    
     ldColor specialColor;//maskColor charColor
     
     uint32_t* imgList;
@@ -34,14 +38,10 @@ typedef struct {
     uint16_t imgCount;
     uint16_t imgNow;
     uint8_t textAlpha;
-    
-    
-    
 }ldImage;
 
-ldImage* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isJpg,bool isHidden);
+ldImage* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isHwDec,bool isHidden);
 void ldImageLoop(ldImage *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
-//void nImageDelete(uint16_t nameId);
 void pImageDel(ldImage *widget);
 
 void pImageSetAddr(ldImage *info,uint32_t addr);

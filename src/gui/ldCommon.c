@@ -1,5 +1,7 @@
 #include "ldCommon.h"
 #include "xList.h"
+#include "ldWindow.h"
+#include "ldImage.h"
 
 NEW_LIST(ldWidgetLink);
 
@@ -18,10 +20,9 @@ __WEAK void *ldRealloc(void *ptr,uint32_t newSize)
     return realloc(ptr,newSize);
 }
 
-static bool ldGetInfoByName(xListNode *inList,xListInfo ** out_info,uint16_t nameId)
+static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
     xListNode *tempPos,*safePos;
-    xListInfo *pListInfo;
     ldCommon *pTempWidgetInfo;
 
     if(inList==NULL)
@@ -34,21 +35,20 @@ static bool ldGetInfoByName(xListNode *inList,xListInfo ** out_info,uint16_t nam
     {
         list_for_each_prev_safe(tempPos,safePos, inList)
         {
-            pListInfo = list_entry(tempPos, xListInfo, parentNode);
-            if(pListInfo!=NULL)
+            if(tempPos->info!=NULL)
             {
-                pTempWidgetInfo=(ldCommon*)(pListInfo->info);
+                pTempWidgetInfo=(ldCommon*)(tempPos->info);
                 if(nameId==pTempWidgetInfo->nameId)
                 {
-                    *out_info=pListInfo;
+                    *out_info=tempPos;
                     return true;
                 }
                 else
                 {
-                        if(ldGetInfoByName(pTempWidgetInfo->childList,out_info,nameId)==true)
-                        {
-                            return true;
-                        }
+                    if(ldGetInfoByName(pTempWidgetInfo->childList,out_info,nameId)==true)
+                    {
+                        return true;
+                    }
                 }
 
             }
@@ -58,9 +58,9 @@ static bool ldGetInfoByName(xListNode *inList,xListInfo ** out_info,uint16_t nam
 }
 
 
-xListInfo* ldGetWidgetInfoById(uint16_t nameId)
+xListNode* ldGetWidgetInfoById(uint16_t nameId)
 {
-    xListInfo * pListInfo;
+    xListNode * pListInfo;
     if(ldGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
     {
         return pListInfo;
@@ -69,10 +69,10 @@ xListInfo* ldGetWidgetInfoById(uint16_t nameId)
 }
 
 
-static bool ldGetInfoByPos(xListNode *inList,xListInfo ** out_info,int16_t x,int16_t y)
+static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int16_t y)
 {
     xListNode *tempPos,*safePos;
-    xListInfo *pListInfo,*pListInfo2;
+    xListNode *pListInfo2;
     ldCommon *pTempWidgetInfo;
     ldPoint posT;
     int16_t widthT,heightT;
@@ -87,55 +87,53 @@ static bool ldGetInfoByPos(xListNode *inList,xListInfo ** out_info,int16_t x,int
     {
         list_for_each_prev_safe(tempPos,safePos, inList)
         {
-            pListInfo = list_entry(tempPos, xListInfo, parentNode);
-            if(pListInfo!=NULL)
+            if(tempPos->info!=NULL)
             {
-                pTempWidgetInfo=(ldCommon*)(pListInfo->info);
+                pTempWidgetInfo=(ldCommon*)(tempPos->info);
                 
                 //获取全局坐标，用绝对值坐标进行比较
-            posT= ldGetGlobalPos(pTempWidgetInfo);
-            widthT=pTempWidgetInfo->geometry.width;
-            heightT=pTempWidgetInfo->geometry.height;
-                
+                posT= ldGetGlobalPos(pTempWidgetInfo);
+                widthT=pTempWidgetInfo->geometry.width;
+                heightT=pTempWidgetInfo->geometry.height;
+                    
                 if(pTempWidgetInfo->childList==NULL)//无子控件
                 {
                     if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
                     {
-                       *out_info= pListInfo;//返回控件widget
+                       *out_info= tempPos;//返回控件widget
                        return true;
                     }
                 }
                 else//有子控件
                 {
-            if(pTempWidgetInfo->isHidden==false)//无隐藏
-            {
-                //判断在窗体范围内
-                if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
-                {
-                    if(ldGetInfoByPos(pTempWidgetInfo->childList,&pListInfo2,x,y)==true)
+                    if(pTempWidgetInfo->isHidden==false)//无隐藏
                     {
-                        *out_info= pListInfo2;
-                        return true;
-                    }
-                    else
-                    {
-                        *out_info=pListInfo;
-                        return true;
+                        //判断在窗体范围内
+                        if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
+                        {
+                            if(ldGetInfoByPos(pTempWidgetInfo->childList,&pListInfo2,x,y)==true)
+                            {
+                                *out_info= pListInfo2;
+                                return true;
+                            }
+                            else
+                            {
+                                *out_info=tempPos;
+                                return true;
+                            }
+                        }
                     }
                 }
             }
-            
-            }
-        }
         }
     }
     return false;
 }
 
 
-xListInfo* ldGetWidgetInfoByPos(int16_t x,int16_t y)
+xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
 {
-    xListInfo * pListInfo;
+    xListNode * pListInfo;
     if(ldGetInfoByPos(&ldWidgetLink,&pListInfo,x,y)==true)
     {
         return pListInfo;
@@ -214,3 +212,45 @@ bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset)
     return false;
 }
 
+/*
+    widgetTypeNone,
+    widgetTypeBackground,
+    widgetTypeWindow,
+    widgetTypeButton,
+    widgetTypeImage,
+    widgetTypeText,
+    widgetTypeLineEdit,
+    widgetTypeDashboardSimple,
+    widgetTypeGraph,
+    widgetTypeCheckBox,
+    widgetTypeSlider,
+    widgetTypeProgressBar,
+    widgetTypeGauge,
+    widgetTypeQRCode,
+    widgetTypeDateTime,
+    widgetTypeIconSlider,
+    widgetTypeComboBox,
+    widgetTypeIconRotateAround,
+    widgetTypeNumber,
+    widgetTypeStaticText,
+    widgetTypeStartupImage,
+    widgetTypeArc,
+*/
+void ldDelWidget(ldCommon *widget)
+{
+    switch(widget->widgetType)
+    {
+        case widgetTypeWindow:
+        {
+            pWindowDel((ldWindow*)widget);
+            break;
+        }
+        case widgetTypeImage:
+        {
+            pImageDel((ldImage*)widget);
+            break;
+        }
+        default:
+            break;
+    }
+}

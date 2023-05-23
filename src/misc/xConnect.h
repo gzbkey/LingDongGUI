@@ -29,7 +29,8 @@ typedef struct{
     connectFunc receiverFunc;
 }relationInfo_t;
 
-bool xConnectInit(void);
+#define EMIT_QUEUE_SIZE                 (4)
+
 bool xEmit(void *widget,uint8_t signal);
 bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func);
 bool xDisconnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func);

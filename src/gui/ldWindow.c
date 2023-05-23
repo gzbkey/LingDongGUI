@@ -20,58 +20,51 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-//static bool _imageDel(xListInfo* pEachInfo,void* pTarget)
-//{
-//    if(pEachInfo->info==pTarget)
-//                {
-//                    xListDelete((xListNode *)pEachInfo);
-//                    ldFree(pEachInfo);
-//                    
-//                    ldFree(((ldImage *)pTarget)->imgList);
-//                    ldFree(((ldImage *)pTarget));
-//                }
-//    return false;
-//}
+static bool _windowDel(xListNode* pEachInfo,void* pTarget)
+{
+    ldDelWidget(pEachInfo->info);
+    return false;
+}
 
 void pWindowDel(ldWindow *widget)
 {
-//    xListInfo *listInfo;
-//    
-//    listInfo=ldGetWidgetInfoById(widget->nameId);
-//    
-//    if(listInfo!=NULL)
-//    {
-//        if((ldCommon*)widget->parentWidget==NULL)
-//        {
-//            //自身是根控件
-//            xListInfoPrevTraverse(&ldWidgetLink,widget,_imageDel);
-//        }
-//        else
-//        {
-//            xListInfoPrevTraverse(&listInfo->parentNode,widget,_imageDel);
-//        }
-//    }
+    xListNode *listInfo;
+    
+    if(widget->widgetType!=widgetTypeWindow)
+    {
+        return;
+    }
+    listInfo=ldGetWidgetInfoById(widget->nameId);
+    
+    if(listInfo!=NULL)
+    {
+        xListInfoPrevTraverse(widget->childList,NULL,_windowDel);
+        xListFreeNode(widget->childList);
+        
+        pImageDel((ldImage *)widget);
+        
+    }
 }
 
-ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isWithMask,bool isTransparent,bool isHidden)
+ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isTransparent,bool isHidden)
 {
     ldWindow * pNewWidget = NULL;
     
-        pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isWithMask,0,0);
-        if(pNewWidget!=NULL)
-        {            
-            if(xListNewNode(&pNewWidget->childList)!=NULL)
-            {
-                pNewWidget->isTransparent=isTransparent;
-                pNewWidget->widgetType=widgetTypeWindow;
-            }
-            else
-            {
-                ldFree(pNewWidget->childList);
-                pImageDel(pNewWidget);
-                pNewWidget=NULL;
-            }
+    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isPng,0,0);
+    if(pNewWidget!=NULL)
+    {            
+        if(xListMallocNode(&pNewWidget->childList)!=NULL)
+        {
+            pNewWidget->isTransparent=isTransparent;
+            pNewWidget->widgetType=widgetTypeWindow;
         }
+        else
+        {
+            ldFree(pNewWidget->childList);
+            pImageDel(pNewWidget);
+            pNewWidget=NULL;
+        }
+    }
     return pNewWidget;
 }
 

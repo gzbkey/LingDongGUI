@@ -6,11 +6,6 @@
 
 
 
-void ldGuiInit(void)
-{
-    xConnectInit();
-}
-
 static void _widgetLoop(ldCommon *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     switch(info->widgetType)
@@ -29,21 +24,19 @@ static void _widgetLoop(ldCommon *info,const arm_2d_tile_t *ptParent,bool bIsNew
 static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     xListNode *temp_pos,*safePos;
-    xListInfo *link_info;
 
-        list_for_each_safe(temp_pos,safePos, pLink)
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
         {
-            link_info = list_entry(temp_pos, xListInfo, parentNode);
-            if(link_info!=NULL)
+            _widgetLoop(temp_pos->info,ptParent,bIsNewFrame);
+            
+            if(((ldCommon *)temp_pos->info)->childList!=NULL)
             {
-                _widgetLoop(link_info->info,ptParent,bIsNewFrame);
-                
-                if(((ldCommon *)link_info->info)->childList!=NULL)
-                {
-                    _ldGuiLoop(((ldCommon *)link_info->info)->childList,ptParent,bIsNewFrame);
-                }
+                _ldGuiLoop(((ldCommon *)temp_pos->info)->childList,ptParent,bIsNewFrame);
             }
         }
+    }
 }
 
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)

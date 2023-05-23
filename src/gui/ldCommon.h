@@ -253,10 +253,11 @@ void *ldRealloc(void *ptr,uint32_t newSize);
 
 ldPoint ldGetGlobalPos(ldCommon *widget);
 
-xListInfo* ldGetWidgetInfoById(uint16_t nameId);
-xListInfo* ldGetWidgetInfoByPos(int16_t x,int16_t y);
+xListNode* ldGetWidgetInfoById(uint16_t nameId);
+xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
 
 bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
+void ldDelWidget(ldCommon *widget);
 
 #ifdef __cplusplus
 }

@@ -19,43 +19,48 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-static bool _imageDel(xListInfo* pEachInfo,void* pTarget)
+static bool _imageDel(xListNode* pEachInfo,void* pTarget)
 {
     if(pEachInfo->info==pTarget)
-                {
-                    xListDelete((xListNode *)pEachInfo);
-                    ldFree(pEachInfo);
-                    
-                    ldFree(((ldImage *)pTarget)->imgList);
-                    ldFree(((ldImage *)pTarget));
-                }
+    {
+        ldFree(((ldImage *)pTarget)->imgList);
+        ldFree(((ldImage *)pTarget));
+        xListInfoDel(pEachInfo);
+    }
     return false;
 }
 
 void pImageDel(ldImage *widget)
 {
-    xListInfo *listInfo;
+    xListNode *listInfo;
     
-    listInfo=ldGetWidgetInfoById(widget->nameId);
+//    if(widget->widgetType!=widgetTypeImage)
+//    {
+//        return;
+//    }
+    
+    // 查找父链表
+    if((ldCommon*)widget->parentType==widgetTypeNone)
+    {
+        listInfo=&ldWidgetLink;
+    }
+    else
+    {
+        listInfo=ldGetWidgetInfoById(((ldCommon*)widget->parentWidget)->nameId);
+        listInfo=((ldCommon*)listInfo->info)->childList;
+    }
+    
     
     if(listInfo!=NULL)
     {
-        if((ldCommon*)widget->parentWidget==NULL)
-        {
-            //自身是根控件
-            xListInfoPrevTraverse(&ldWidgetLink,widget,_imageDel);
-        }
-        else
-        {
-            xListInfoPrevTraverse(&listInfo->parentNode,widget,_imageDel);
-        }
+        xListInfoPrevTraverse(listInfo,widget,_imageDel);
     }
 }
 
-ldImage* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isJpg,bool isHidden)
+ldImage* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isHwDec,bool isHidden)
 {
     ldImage * pNewWidget = NULL;
-    xListInfo *parentInfo;
+    xListNode *parentInfo;
     xListNode* parent_link;
     uint32_t *pImgList;
     uint32_t jpegAddr,jpegSize;
@@ -153,7 +158,7 @@ ldImage* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y
                 pNewWidget->RES_IMG_ADDR(resource)=(uint8_t*)imageAddr;
             }
 
-            pNewWidget->isJpg=isJpg;
+            pNewWidget->isHwDec=isHwDec;
             pNewWidget->bgColor=bgColor;
             pNewWidget->imgMax=maxImageNum;
             pNewWidget->imgCount=0;
@@ -400,7 +405,7 @@ void pImageSetAddr(ldImage *info,uint32_t addr)
 
 void nImageSetAddr(uint16_t nameId,uint32_t addr)
 {
-    xListInfo* pListInfo;
+    xListNode* pListInfo;
     pListInfo=ldGetWidgetInfoById(nameId);
     pImageSetAddr(pListInfo->info,addr);
 }
@@ -424,7 +429,7 @@ bool pImageAddList(ldImage *info,uint32_t addr,uint16_t speedMs)
 
 bool nImageAddList(uint16_t nameId,uint32_t addr,uint16_t speedMs)
 {
-    xListInfo* pListInfo;
+    xListNode* pListInfo;
     pListInfo=ldGetWidgetInfoById(nameId);
     return pImageAddList(pListInfo->info,addr,speedMs);
 }
@@ -442,7 +447,7 @@ void pImageSetColorType(ldImage *info,uint8_t colorType,ldColor writeColor)
 
 void nImageSetColorType(uint16_t nameId,uint8_t colorType,ldColor writeColor)
 {
-    xListInfo* pListInfo;
+    xListNode* pListInfo;
     pListInfo=ldGetWidgetInfoById(nameId);
     pImageSetColorType(pListInfo->info,colorType,writeColor);
 }
