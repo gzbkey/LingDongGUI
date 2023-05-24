@@ -19,10 +19,14 @@ extern "C" {
 #include "xString.h"
 #include "xList.h"
 
+extern uint8_t pageNumNow;
+extern uint8_t pageTarget;
 
+void ldGuiInit(void);
+void ldGuiLogicLoop(void);
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame);
-    
-    
+void ldGuiQuit(void);
+void ldGuiJumpPage(uint8_t pageNum);
     
 #ifdef __cplusplus
 }

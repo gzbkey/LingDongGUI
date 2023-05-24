@@ -3,8 +3,15 @@
 #include "xList.h"
 #include "xConnect.h"
 #include "ldImage.h"
+#include "ldUser.h"
 
+uint8_t pageNumNow=0;
+uint8_t pageTarget=0;
 
+void ldGuiInit(void)
+{
+    ldUserPageInitFunc[pageNumNow]();
+}
 
 static void _widgetLoop(ldCommon *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
@@ -39,9 +46,29 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
     }
 }
 
+
+void ldGuiLogicLoop(void)
+{
+    ldUserPageLoopFunc[pageNumNow]();
+}
+
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
 }
 
+void ldGuiQuit(void)
+{
+    printf("quit\n");
+    ldUserPageQuitFunc[pageNumNow]();
+}
+
+void ldGuiJumpPage(uint8_t pageNum)
+{
+    pageTarget=pageNum;
+//    if(pageNumNow!=pageNum)
+//    {
+//        
+//    }
+}

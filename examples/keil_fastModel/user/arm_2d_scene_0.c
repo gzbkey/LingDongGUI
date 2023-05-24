@@ -22,7 +22,7 @@
 
 #define __USER_SCENE0_IMPLEMENT__
 #include "arm_2d_scene_0.h"
-
+#include "arm_2d_scene_1.h"
 #include "arm_2d_helper.h"
 #include "arm_extra_controls.h"
 
@@ -118,8 +118,7 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
 static void __on_scene0_background_start(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
-    ARM_2D_UNUSED(ptThis);
-
+    ARM_2D_UNUSED(ptThis);    
 }
 
 static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
@@ -133,6 +132,8 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
+    
+    ldGuiLogicLoop();
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
@@ -140,9 +141,18 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
     
+    
+    if(pageNumNow!=pageTarget)
+    {
+        ldGuiQuit();
+        pageNumNow=pageTarget;
+        ldGuiInit();
+//        arm_2d_scene1_init(&DISP0_ADAPTER);
+//        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
+    }
     /* switch to next scene after 3s */
 //    if (arm_2d_helper_is_time_out(3000, &this.lTimestamp[0])) {
-//        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
+//        
 //    }
 }
 
@@ -151,6 +161,8 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
+//    ldGuiQuit();
+//    pageNumNow=pageTarget;
 }
 
 static
@@ -256,13 +268,15 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
             //.fnOnBGStart    = &__on_scene0_background_start,
             //.fnOnBGComplete = &__on_scene0_background_complete,
             .fnOnFrameStart = &__on_scene0_frame_start,
-            //.fnBeforeSwitchOut = &__before_scene0_switching_out,
+            .fnBeforeSwitchOut = &__before_scene0_switching_out,
             .fnOnFrameCPL   = &__on_scene0_frame_complete,
             .fnDepose       = &__on_scene0_depose,
         },
         .bUserAllocated = bUserAllocated,
     };
 
+    ldGuiInit();
+    
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 
                                         1);

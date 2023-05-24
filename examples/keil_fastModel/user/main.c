@@ -13,6 +13,7 @@
 #include "xConnect.h"
 #include "ldImage.h"
 #include "ldWindow.h"
+#include "ldCommon.h"
 
 void *ldMalloc(uint32_t size)
 {
@@ -54,11 +55,14 @@ void *ldRealloc(void *ptr,uint32_t newSize)
 
 
 
-ldImage *img;
-ldWindow *win;
 
 
-extern const uint16_t c_bmpCMSISLogoRGB565[163*65];
+
+
+
+
+
+
 
 int main (void)
 {
@@ -72,13 +76,7 @@ int main (void)
 
     GLCD_Initialize();
 
-    win=ldWindowInit(0, 0, 0,0,320,240,0xFF00,0,0,0,0,0);
-
-    img=ldImageInit(1, 0, 20,20,163,65,0xFF,(uint32_t)&c_bmpCMSISLogoRGB565[0],1,0,0,0);
-
-//    pImageDel(img);
-
-//    pWindowDel(win);
+    
 
     arm_irq_safe {
         arm_2d_init();
