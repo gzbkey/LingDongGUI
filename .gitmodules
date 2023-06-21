@@ -1,0 +1,3 @@
+[submodule "examples/qt_sdl/Arm-2D"]
+	path = examples/qt_sdl/Arm-2D
+	url = https://github.com/ARM-software/Arm-2D.git
