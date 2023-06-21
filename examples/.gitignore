@@ -1,0 +1,7 @@
+#qt
+build-*
+*.user
+
+#sdl
+!*.a
+!*.dll
