@@ -22,7 +22,6 @@
 
 #define __USER_SCENE0_IMPLEMENT__
 #include "arm_2d_scene_0.h"
-#include "arm_2d_scene_1.h"
 #include "arm_2d_helper.h"
 #include "arm_extra_controls.h"
 

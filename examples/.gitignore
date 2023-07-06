@@ -1,7 +1,19 @@
+#keil
+Listings
+Objects
+*@*
+*.c.00*
+*.h.00*
+*.py.00*
+*uvguix*
+
 #qt
-build-*
+build*
 *.user
 
 #sdl
 !*.a
 !*.dll
+
+#vscode
+settings.json
