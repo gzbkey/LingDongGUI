@@ -26,7 +26,7 @@ static bool _windowDel(xListNode* pEachInfo,void* pTarget)
     return false;
 }
 
-void pWindowDel(ldWindow *widget)
+void pWindowDel(ldWindow_t *widget)
 {
     xListNode *listInfo;
     
@@ -41,16 +41,16 @@ void pWindowDel(ldWindow *widget)
         xListInfoPrevTraverse(widget->childList,NULL,_windowDel);
         xListFreeNode(widget->childList);
         
-        pImageDel((ldImage *)widget);
+        pImageDel((ldImage_t *)widget);
         
     }
 }
 
-ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isTransparent,bool isHidden)
+ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isWithMask,bool isTransparent,bool isHidden)
 {
-    ldWindow * pNewWidget = NULL;
+    ldWindow_t * pNewWidget = NULL;
     
-    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isPng,0,0);
+    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isWithMask,0);
     if(pNewWidget!=NULL)
     {            
         if(xListMallocNode(&pNewWidget->childList)!=NULL)
@@ -68,11 +68,10 @@ ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t
     return pNewWidget;
 }
 
-void ldWindowLoop(ldWindow *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void pWindowSetHidden(bool isHidden)
 {
-    ldImageLoop(info,ptParent,bIsNewFrame);
+    
 }
-
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

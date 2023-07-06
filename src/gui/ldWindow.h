@@ -9,13 +9,13 @@ extern "C" {
 #include "xList.h"
 #include "ldImage.h"
 
-#define ldWindow ldImage
+#define ldWindow_t ldImage_t
 
 
-ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isTransparent,bool isHidden);
-void ldWindowLoop(ldWindow *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isTransparent,bool isHidden);
+//void ldWindowLoop(ldWindow *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
 //void nImageDelete(uint16_t nameId);
-void pWindowDel(ldWindow *widget);
+void pWindowDel(ldWindow_t *widget);
 
 //void pImageSetAddr(ldImage *info,uint32_t addr);
 //void nImageSetAddr(uint16_t nameId,uint32_t addr);

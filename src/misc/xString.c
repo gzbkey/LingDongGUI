@@ -36,7 +36,7 @@ static char *reverse(char *s)
     return s;
 }
 
-static char *_itoa(int value, char *string,int radix)
+static char *xItoa(int value, char *string,int radix)
 {
     int i = 0,isNegative = 0;
     if((isNegative = value) < 0) //如果是负数，先转为正数
@@ -64,7 +64,7 @@ int32_t xStrToI32(uint8_t * str)
 
 uint8_t* xI32ToStr(int32_t inInt32,uint8_t *buf)
 {
-    return (uint8_t*)_itoa(inInt32,(char*)buf,10);
+    return (uint8_t*)xItoa(inInt32,(char*)buf,10);
 //    sprintf((char*)buf,"%d",inInt32);
 //    return buf;
 }

@@ -4,6 +4,18 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+    ../../src/gui/ldButton.c \
+    ../../src/gui/ldCommon.c \
+    ../../src/gui/ldGui.c \
+    ../../src/gui/ldImage.c \
+    ../../src/gui/ldScene0.c \
+    ../../src/gui/ldWindow.c \
+    ../../src/misc/freeRtosHeap4.c \
+    ../../src/misc/xBtn.c \
+    ../../src/misc/xConnect.c \
+    ../../src/misc/xList.c \
+    ../../src/misc/xQueue.c \
+    ../../src/misc/xString.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_list.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_pfb.c \
@@ -59,6 +71,7 @@ SOURCES += \
     ../common/Arm-2D/examples/common/controls/battery_gasgauge.c \
     ../common/Arm-2D/examples/common/controls/busy_wheel.c \
     ../common/Arm-2D/examples/common/controls/controls.c \
+    ../common/Arm-2D/examples/common/controls/dynamic_nebula.c \
     ../common/Arm-2D/examples/common/controls/lcd_printf.c \
     ../common/Arm-2D/examples/common/controls/list_view.c \
     ../common/Arm-2D/examples/common/controls/number_list.c \
@@ -73,11 +86,25 @@ SOURCES += \
     math/arm_cos_q31.c \
     math/arm_sin_f32.c \
     math/arm_sin_q31.c \
+    user/ldConfig.c \
+    user/ldUser.c \
     user/main.c \
     user/Virtual_TFT_Port.c \
     user/arm_2d_disp_adapter_0.c
 
 HEADERS += \
+    ../../src/gui/ldButton.h \
+    ../../src/gui/ldCommon.h \
+    ../../src/gui/ldGui.h \
+    ../../src/gui/ldImage.h \
+    ../../src/gui/ldScene0.h \
+    ../../src/gui/ldWindow.h \
+    ../../src/misc/freeRtosHeap4.h \
+    ../../src/misc/xBtn.h \
+    ../../src/misc/xConnect.h \
+    ../../src/misc/xList.h \
+    ../../src/misc/xQueue.h \
+    ../../src/misc/xString.h \
     ../common/Arm-2D/Helper/Include/__arm_2d_helper_common.h \
     ../common/Arm-2D/Helper/Include/arm_2d_disp_adapters.h \
     ../common/Arm-2D/Helper/Include/arm_2d_helper.h \
@@ -138,6 +165,7 @@ HEADERS += \
     ../common/Arm-2D/examples/common/controls/arm_extra_lcd_printf.h \
     ../common/Arm-2D/examples/common/controls/battery_gasgauge.h \
     ../common/Arm-2D/examples/common/controls/busy_wheel.h \
+    ../common/Arm-2D/examples/common/controls/dynamic_nebula.h \
     ../common/Arm-2D/examples/common/controls/list_view.h \
     ../common/Arm-2D/examples/common/controls/number_list.h \
     ../common/Arm-2D/examples/common/controls/progress_bar_drill.h \
@@ -148,7 +176,9 @@ HEADERS += \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
-    user/arm_2d_disp_adapter_0.h
+    user/arm_2d_disp_adapter_0.h \
+    user/ldConfig.h \
+    user/ldUser.h
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
@@ -158,6 +188,9 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/benchmark
 
 INCLUDEPATH += $$PWD/user
 INCLUDEPATH += $$PWD/math
+
+INCLUDEPATH += $$PWD/../../src/gui
+INCLUDEPATH += $$PWD/../../src/misc
 
 contains(QT_ARCH, i386){
 INCLUDEPATH += $$PWD/../common/sdl2/32/include/SDL2

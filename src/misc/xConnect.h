@@ -1,5 +1,5 @@
-#ifndef _CONNECT_H_
-#define _CONNECT_H_
+#ifndef _X_CONNECT_H_
+#define _X_CONNECT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,34 +10,37 @@ extern "C" {
 
 
 typedef struct{
-    void *pSender;
+    uint16_t senderId;
     uint8_t signalType;
 }emitInfo_t;
 
 typedef struct{
-    void *pSender;
+    uint16_t senderId;
     uint8_t signalType;
-    void *pReceiver;
+    uint16_t receiverId;
 }connectInfo_t;
 
 typedef bool (*connectFunc)(connectInfo_t);
 
 typedef struct{
-    void *pSender;
+    uint16_t senderId;
     uint8_t signalType;
-    void *pReceiver;
+    uint16_t receiverId;
     connectFunc receiverFunc;
 }relationInfo_t;
 
 #define EMIT_QUEUE_SIZE                 (4)
 
-bool xEmit(void *widget,uint8_t signal);
+bool xEmitInit(void);
+bool xEmit(uint16_t senderId,uint8_t signal);
 bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func);
 bool xDisconnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func);
 void xDeleteConnect(uint16_t nameId);
+
+void xConnectProcess(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_CONNECT_H_
+#endif //_X_CONNECT_H_

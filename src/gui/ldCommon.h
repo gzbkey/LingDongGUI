@@ -67,7 +67,6 @@ extern "C" {
 
 typedef enum{
     widgetTypeNone,
-    widgetTypeBackground,
     widgetTypeWindow,
     widgetTypeButton,
     widgetTypeImage,
@@ -129,22 +128,23 @@ typedef enum{
     .pchBuffer = (uint8_t *)__IMG_ADDR,
 
     
-#if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#define RES_TILE(src)                          src.tTile
-#define RES_IMG_ADDR(src)                      src.pTarget
-#else
-#define RES_TILE(src)                          src
-#define RES_IMG_ADDR(src)                      src.pchBuffer
-#endif
+//#if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
+//#define RES_TILE(src)                          src.tTile
+//#define RES_IMG_ADDR(src)                      src.pTarget
+//#else
+//#define RES_TILE(src)                          src
+//#define RES_IMG_ADDR(src)                      src.pchBuffer
+//#endif
     
     
 #define LD_COMMON_ATTRIBUTES  ldWidgetType widgetType; \
-                             ldGeometry geometry; \
-                             uint16_t nameId; \
                               ldWidgetType parentType; \
+                              ldGeometry geometry; \
+                              uint16_t nameId; \
                              void * parentWidget; \
                              xListNode *childList; \
-                             bool isHidden:1
+                             bool isHidden:1; \
+                             bool isParentHidden:1
 
                              
                              
@@ -258,6 +258,12 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
 
 bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
 void ldDelWidget(ldCommon *widget);
+
+void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity);
+void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity);
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,const arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity);
+int ldBaseSetText(const char *format, ...);
 
 #ifdef __cplusplus
 }

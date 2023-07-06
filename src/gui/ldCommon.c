@@ -2,6 +2,7 @@
 #include "xList.h"
 #include "ldWindow.h"
 #include "ldImage.h"
+#include <stdarg.h>
 
 NEW_LIST(ldWidgetLink);
 
@@ -159,17 +160,14 @@ ldPoint ldGetGlobalPos(ldCommon *widget)
 
     if(widget->parentType!=widgetTypeNone)
     {
-        if(widget->parentType!=widgetTypeBackground)
-        {
-            posParent=ldGetGlobalPos(widget->parentWidget);
-        }
-        else
-        {
-            posParent.x=((ldCommon*)widget->parentWidget)->geometry.x;
-            posParent.y=((ldCommon*)widget->parentWidget)->geometry.y;
-        }
+        posParent=ldGetGlobalPos(widget->parentWidget);
     }
-
+    else
+    {
+        posParent.x=((ldCommon*)widget->parentWidget)->geometry.x;
+        posParent.y=((ldCommon*)widget->parentWidget)->geometry.y;
+    }
+        
     pos.x+=posParent.x;
     pos.y+=posParent.y;
 
@@ -180,7 +178,6 @@ ldPoint ldGetGlobalPos(ldCommon *widget)
 ARM_NONNULL(2)
 bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset)
 {
-    assert(NULL != plTimestamp);
     int64_t lPeriod;
     int64_t lTimestamp = arm_2d_helper_get_system_timestamp();
 
@@ -242,15 +239,204 @@ void ldDelWidget(ldCommon *widget)
     {
         case widgetTypeWindow:
         {
-            pWindowDel((ldWindow*)widget);
+            pWindowDel((ldWindow_t*)widget);
             break;
         }
         case widgetTypeImage:
         {
-            pImageDel((ldImage*)widget);
+            pImageDel((ldImage_t*)widget);
             break;
         }
         default:
             break;
     }
 }
+
+void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity)
+{
+#if USE_OPACITY == 1
+        arm_2d_fill_colour_with_opacity(ptTile, NULL,(__arm_2d_color_t)color, opacity);
+#else
+        arm_2d_fill_colour(ptTile, NULL, color);
+#endif
+}
+
+void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity)
+{
+    if (isWithMask)
+        {
+            arm_2d_tile_t srcTile, maskTile;
+
+            srcTile = *resource;
+            srcTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+            srcTile.pchBuffer += srcTile.tRegion.tSize.iWidth * srcTile.tRegion.tSize.iHeight;
+
+            maskTile = *resource;
+            maskTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
+
+            arm_2d_tile_copy_with_src_mask_only((arm_2d_tile_t *)&srcTile,
+                                                (arm_2d_tile_t *)&maskTile,
+                                                ptTile,
+                                                NULL);
+        }
+        else
+        {
+            arm_2d_region_t tDrawRegion =
+                {
+                    .tLocation =
+                        {
+                            .iX = 0,
+                            .iY = 0,
+                        },
+                    .tSize = (*resource).tRegion.tSize,
+                };
+
+            switch ((*resource).tInfo.tColourInfo.chScheme)
+            {
+            case ARM_2D_COLOUR_RGB565:
+            case ARM_2D_COLOUR_CCCA8888:
+            {
+#if USE_OPACITY == 1
+                arm_2d_tile_copy_with_opacity(&resource,
+                                      ptTile,
+                                      NULL,
+                                      opacity);
+                
+#else
+                arm_2d_tile_copy_only(resource,
+                                      ptTile,
+                                      NULL);
+#endif
+                break;
+            }
+            
+            default:
+                break;
+            }
+        }
+}
+
+void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity)
+{
+            arm_2d_region_t tDrawRegion =
+                {
+                    .tLocation =
+                        {
+                            .iX = 0,
+                            .iY = 0,
+                        },
+                    .tSize = resource.tRegion.tSize,
+                };
+
+            switch (resource.tInfo.tColourInfo.chScheme)
+            {
+            case ARM_2D_COLOUR_1BIT:
+            {
+#if USE_OPACITY == 1
+                arm_2d_draw_pattern(&resource,
+                                    ptTile,
+                                    &tDrawRegion,
+                                    ARM_2D_DRW_PATN_MODE_COPY,
+                                    textColor,
+                                    GLCD_COLOR_BLACK);
+#else
+                arm_2d_draw_pattern(&resource,
+                                    ptTile,
+                                    &tDrawRegion,
+                                    ARM_2D_DRW_PATN_MODE_COPY,
+                                    textColor,
+                                    GLCD_COLOR_BLACK);
+#endif
+
+                break;
+            }
+            case ARM_2D_COLOUR_MASK_A2:
+            {
+#if USE_OPACITY == 1
+                arm_2d_fill_colour_with_a2_mask_and_opacity(ptTile,
+                                                            &tDrawRegion,
+                                                            &resource,
+                                                            (__arm_2d_color_t){textColor},
+                                                            opacity);
+#else
+                arm_2d_fill_colour_with_a2_mask(ptTile,
+                                                &tDrawRegion,
+                                               &resource,
+                                               (__arm_2d_color_t){textColor});
+#endif
+                break;
+            }
+            case ARM_2D_COLOUR_MASK_A4:
+            {
+#if USE_OPACITY == 1
+                arm_2d_fill_colour_with_a4_mask_and_opacity(ptTile,
+                                                            &tDrawRegion,
+                                                            &resource,
+                                                            (__arm_2d_color_t){textColor},
+                                                            opacity);
+#else
+                arm_2d_fill_colour_with_a4_mask(ptTile,
+                                                &tDrawRegion,
+                                               &resource,
+                                               (__arm_2d_color_t){textColor});
+#endif
+                break;
+            }
+            case ARM_2D_COLOUR_MASK_A8:
+            {
+#if USE_OPACITY == 1
+                arm_2d_fill_colour_with_mask_and_opacity(ptTile,
+                                                         &tDrawRegion,
+                                                         (arm_2d_tile_t *)&info->resource,
+                                                         (__arm_2d_color_t){textColor},
+                                                         opacity);
+#else
+                arm_2d_fill_colour_with_mask(ptTile,
+                                             &tDrawRegion,
+                                            &resource,
+                                            (__arm_2d_color_t){textColor});
+#endif
+                break;
+            }
+            
+            
+            default:
+                break;
+            }
+}
+
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,const arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity)
+{
+    
+    arm_lcd_text_set_draw_region(&ptTile->tRegion);
+    arm_lcd_text_set_font(ptFont);
+    arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
+    arm_lcd_text_set_opacity(opacity);
+
+    arm_lcd_text_location(0,0);
+        
+    arm_lcd_puts("123");
+}
+
+#if defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__
+#define __va_list    va_list
+
+#endif
+
+int ldBaseSetText(const char *format, ...)
+{
+    int real_size;
+    static char s_chBuffer[__LCD_PRINTF_CFG_TEXT_BUFFER_SIZE__ + 1];
+    __va_list ap;
+    va_start(ap, format);
+        real_size = vsnprintf(s_chBuffer, sizeof(s_chBuffer)-1, format, ap);
+    va_end(ap);
+    real_size = MIN(sizeof(s_chBuffer)-1, real_size);
+    s_chBuffer[real_size] = '\0';
+    arm_lcd_puts(s_chBuffer);
+    return real_size;
+}
+
+//ldBaseSetTextInfo(&tTarget,&ARM_2D_FONT_6x8.use_as__arm_2d_font_t,GLCD_COLOR_RED,64);
+//        ldBaseSetText("123");
+

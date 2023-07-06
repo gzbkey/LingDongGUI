@@ -39,6 +39,7 @@ void VT_Set_Point(int32_t x, int32_t y, color_typedef color);
 color_typedef VT_Get_Point(int32_t x, int32_t y);
 void VT_Clear(color_typedef color);
 bool VT_Mouse_Get_Point(int16_t *x,int16_t *y);
+void lcd_flush(int32_t nMS);
 
 #ifdef __cplusplus
 } /* extern "C" */

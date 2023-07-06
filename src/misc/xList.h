@@ -1,5 +1,5 @@
-#ifndef _XLIST_H_
-#define _XLIST_H_
+#ifndef _X_LIST_H_
+#define _X_LIST_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,4 +43,4 @@ bool xListInfoPrevTraverse(xListNode *pList,void *pTarget,bool (traverseFunc)(xL
 }
 #endif
 
-#endif //_XLIST_H_
+#endif //_X_LIST_H_

@@ -3,7 +3,8 @@
 #undef main
 #include "Virtual_TFT_Port.h"
 #include "arm_2d.h"
-#include "arm_2d_benchmark.h"
+#include "arm_2d_disp_adapter_0.h"
+#include "ldScene0.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -26,7 +27,7 @@
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-extern void lcd_flush(int32_t nMS);
+
 int main (void) 
 {
     setbuf(stdout,NULL);//printf 马上输出
@@ -42,8 +43,7 @@ int main (void)
 
     disp_adapter0_init();
 
-    arm_2d_run_benchmark();
-//    arm_2d_scene0_init(&DISP0_ADAPTER);
+    arm_2d_scene0_init(&DISP0_ADAPTER);
 
     while (1) {
         if (arm_fsm_rt_cpl == disp_adapter0_task()) {
