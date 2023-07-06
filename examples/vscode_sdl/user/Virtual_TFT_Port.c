@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include "SDL.h"
+#include "arm_2d.h"
+#include <time.h>
+#include "arm_2d_disp_adapters.h"
+
 #undef main
 
 #define monochrome_2_RGB888(color)                (color?0x000000:0xffffff)
@@ -36,6 +40,7 @@ static SDL_Texture * texture;
 static uint32_t tft_fb[VT_WIDTH * VT_HEIGHT];
 static volatile bool sdl_inited = false;
 static volatile bool sdl_refr_qry = false;
+static volatile bool sdl_refr_cpl = false;
 static volatile bool sdl_quit_qry = false;
 
 static bool left_button_is_down = false;
@@ -111,13 +116,17 @@ static void monitor_sdl_refr_core(void)
 {
     if(sdl_refr_qry != false)
     {
-        sdl_refr_qry = false;
-        SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
-        SDL_RenderClear(renderer);
+        if (arm_2d_helper_is_time_out(1000/60)) 
+        {
+            sdl_refr_qry = false;
+            SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
+            SDL_RenderClear(renderer);
 
-        /*Update the renderer with the texture containing the rendered image*/
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
-        SDL_RenderPresent(renderer);
+            /*Update the renderer with the texture containing the rendered image*/
+            SDL_RenderCopy(renderer, texture, NULL, NULL);
+            SDL_RenderPresent(renderer);
+            sdl_refr_cpl = true;
+        }
     }
 
     SDL_Event event;
@@ -165,7 +174,7 @@ static void monitor_sdl_refr_core(void)
     }
 
     /*Sleep some time*/
-    SDL_Delay(50);
+    SDL_Delay(1);
 }
 
 static int monitor_sdl_refr_thread(void * param)
@@ -185,6 +194,59 @@ static int monitor_sdl_refr_thread(void * param)
 
     return 0;
 }
+
+uint32_t VT_timerCallback(uint32_t interval, void *param)
+{
+    return interval;
+}
+
+
+int32_t Disp0_DrawBitmap(int16_t x,int16_t y,int16_t width,int16_t height,const uint8_t *bitmap)
+{
+    VT_Fill_Multiple_Colors(x, y,x+width-1,y+height-1,(color_typedef*) bitmap);
+
+    return 0;
+}
+
+void lcd_flush(int32_t nMS)
+{
+    while(!sdl_refr_cpl) {
+        SDL_Delay(nMS);
+    }
+    sdl_refr_cpl = false;
+
+    nMS = MAX(1, nMS);
+    sdl_refr_qry = true;
+}
+
+#if 0
+void __disp_adapter0_request_async_flushing( 
+                                                    void *pTarget,
+                                                    bool bIsNewFrame,
+                                                    int16_t iX, 
+                                                    int16_t iY,
+                                                    int16_t iWidth,
+                                                    int16_t iHeight,
+                                                    const COLOUR_INT *pBuffer)
+{
+
+     VT_Fill_Multiple_Colors(iX, iY,iX+iWidth-1,iY+iHeight-1,(color_typedef*) pBuffer);
+     s_bRequestAsyncFlush = true;
+}
+#endif
+
+uint32_t SystemCoreClock=3600000000;
+
+int64_t arm_2d_helper_get_system_timestamp(void)
+{
+    return (int64_t)clock();
+}
+
+uint32_t arm_2d_helper_get_reference_clock_frequency(void)
+{
+    return 1000;
+}
+
 
 void VT_Init(void)
 {
@@ -214,8 +276,6 @@ void VT_Fill_Single_Color(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_
             tft_fb[y * VT_WIDTH + x] = 0xff000000|DEV_2_VT_RGB(color);
         }
     }
-
-    sdl_refr_qry = true;
 }
 
 void VT_Fill_Multiple_Colors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef * color_p)
@@ -243,8 +303,6 @@ void VT_Fill_Multiple_Colors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, col
 
         color_p += x2 - act_x2;
     }
-
-    sdl_refr_qry = true;
 }
 
 void VT_Set_Point(int32_t x, int32_t y, color_typedef color)
@@ -256,8 +314,6 @@ void VT_Set_Point(int32_t x, int32_t y, color_typedef color)
     if(y > VT_HEIGHT - 1) return;
 
     tft_fb[y * VT_WIDTH + x] = 0xff000000|DEV_2_VT_RGB(color);
-
-    sdl_refr_qry = true;
 }
 
 color_typedef VT_Get_Point(int32_t x, int32_t y)
@@ -270,8 +326,6 @@ color_typedef VT_Get_Point(int32_t x, int32_t y)
     if(y > VT_HEIGHT - 1) return 0;
 
     color=tft_fb[y * VT_WIDTH + x] ;
-
-    sdl_refr_qry = true;
     return VT_RGB_2_DEV(color);
 }
 

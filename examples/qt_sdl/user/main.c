@@ -3,36 +3,31 @@
 #undef main
 #include "Virtual_TFT_Port.h"
 #include "arm_2d.h"
-#include "arm_2d_disp_adapter_0.h"
-#include "arm_2d_scene_benchmark_watch_panel_cover.h"
-#include <time.h>
+#include "arm_2d_benchmark.h"
 
-uint32_t VT_timerCallback(uint32_t interval, void *param)//回调函数
-{
-    //    llTimer_ticks(10);
-    return interval;
-}
+#if defined(__clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunknown-warning-option"
+#   pragma clang diagnostic ignored "-Wreserved-identifier"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#   pragma clang diagnostic ignored "-Wpadded"
+#   pragma clang diagnostic ignored "-Wcast-qual"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#   pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#   pragma clang diagnostic ignored "-Wmissing-prototypes"
+#   pragma clang diagnostic ignored "-Wunused-variable"
+#   pragma clang diagnostic ignored "-Wunused-parameter"
+#   pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#elif __IS_COMPILER_ARM_COMPILER_5__
+#elif __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wformat="
+#   pragma GCC diagnostic ignored "-Wpedantic"
+#endif
 
-int32_t Disp0_DrawBitmap(int16_t x,int16_t y,int16_t width,int16_t height,const uint8_t *bitmap)
-{
-    VT_Fill_Multiple_Colors(x, y,x+width-1,y+height-1,(color_typedef*) bitmap);
-
-    return 0;
-}
-
-uint32_t SystemCoreClock=3600000000;
-
-int64_t arm_2d_helper_get_system_timestamp(void)
-{
-    return (int64_t)clock();
-}
-
-uint32_t arm_2d_helper_get_reference_clock_frequency(void)
-{
-    return SystemCoreClock;
-}
-
-int main()
+extern void lcd_flush(int32_t nMS);
+int main (void) 
 {
     setbuf(stdout,NULL);//printf 马上输出
     printf("arm-2d sdl\n");
@@ -50,10 +45,13 @@ int main()
     arm_2d_run_benchmark();
 //    arm_2d_scene0_init(&DISP0_ADAPTER);
 
-    while(1)
-    {
-        disp_adapter0_task();
-//        SDL_Delay(1);
+    while (1) {
+        if (arm_fsm_rt_cpl == disp_adapter0_task()) {
+            lcd_flush(1);
+        }
     }
 }
 
+#if defined(__clang__)
+#   pragma clang diagnostic pop
+#endif
