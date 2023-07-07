@@ -14,8 +14,8 @@
  * limitations under the License.
 */
 
-#ifndef _X_BTN_H_
-#define _X_BTN_H_
+#ifndef _X_BTN_ACTION_H_
+#define _X_BTN_ACTION_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -25,15 +25,15 @@
 #include "stdlib.h"
 #include "ldCommon.h"
 
-#define BTN_NO_OPERATION         0 //¼ì²â°´¼üÎŞ°´ÏÂĞÅºÅ
-#define BTN_PRESS                1 //¼ì²â°´¼ü°´ÏÂĞÅºÅ
-#define BTN_HOLD_DOWN            2 //¼ì²â°´¼ü°´×¡²»·ÅĞÅºÅ
-#define BTN_RELEASE              3 //¼ì²â°´¼üÊÍ·ÅĞÅºÅ
-#define BTN_DOUBLE_CLICK         4 //¼ì²â°´¼üË«»÷ĞÅºÅ
-#define BTN_REPEAT_COUNT         5 //»ñÈ¡Á¬»÷´ÎÊı
-#define BTN_HOLD_TIME            6 //»ñÈ¡°´¼ü°´×¡²»·ÅµÄÊ±¼ä
-#define BTN_LONG_START           7 //¼ì²â°´¼ü³¤°´´¥·¢Ò»´ÎµÄĞÅºÅ
-#define BTN_LONG_SHOOT           8 //¼ì²â°´¼ü³¤°´´¥·¢Ò»´ÎºÍÁ¬Ğø´¥·¢µÄĞÅºÅ
+#define BTN_NO_OPERATION         0 //æ£€æµ‹æŒ‰é”®æ— æŒ‰ä¸‹ä¿¡å·
+#define BTN_PRESS                1 //æ£€æµ‹æŒ‰é”®æŒ‰ä¸‹ä¿¡å·
+#define BTN_HOLD_DOWN            2 //æ£€æµ‹æŒ‰é”®æŒ‰ä½ä¸æ”¾ä¿¡å·
+#define BTN_RELEASE              3 //æ£€æµ‹æŒ‰é”®é‡Šæ”¾ä¿¡å·
+#define BTN_DOUBLE_CLICK         4 //æ£€æµ‹æŒ‰é”®åŒå‡»ä¿¡å·
+#define BTN_REPEAT_COUNT         5 //è·å–è¿å‡»æ¬¡æ•°
+#define BTN_HOLD_TIME            6 //è·å–æŒ‰é”®æŒ‰ä½ä¸æ”¾çš„æ—¶é—´
+#define BTN_LONG_START           7 //æ£€æµ‹æŒ‰é”®é•¿æŒ‰è§¦å‘ä¸€æ¬¡çš„ä¿¡å·
+#define BTN_LONG_SHOOT           8 //æ£€æµ‹æŒ‰é”®é•¿æŒ‰è§¦å‘ä¸€æ¬¡å’Œè¿ç»­è§¦å‘çš„ä¿¡å·
 
 #define BTN_MALLOC               ldMalloc
 #define BTN_FREE                 ldFree
@@ -73,4 +73,4 @@ void xBtnClean(void);
 
 
 
-#endif //_X_BTN_H_
+#endif //_X_BTN_ACTION_H_

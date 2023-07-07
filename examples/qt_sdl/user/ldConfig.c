@@ -1,13 +1,13 @@
 #include "ldConfig.h"
 #include "ldWindow.h"
 #include "ldGui.h"
-
+#include "Virtual_TFT_Port.h"
 
 /***************************************************************************//**
  * @fn         bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
- * @brief      »ñÈ¡´¥Ãş×ø±ê
- * @param      *x,*y  ´¥Ãş×ø±ê
- * @return     bool ÊÇ·ñÓĞ´¥Ãş
+ * @brief      è·å–è§¦æ‘¸åæ ‡
+ * @param      *x,*y  è§¦æ‘¸åæ ‡
+ * @return     bool æ˜¯å¦æœ‰è§¦æ‘¸
  * @version    V0.1
  * @date       
  * @details    
@@ -15,22 +15,22 @@
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
 {
     bool touchState=false;
-    uint16_t rx;
-    uint16_t ry;
+    int16_t rx;
+    int16_t ry;
     
-    //Ìí¼Ó´¥Ãşº¯Êı
-    //touchState=touch_scan(&rx,&ry);
+    //æ·»åŠ è§¦æ‘¸å‡½æ•°
+    touchState=VT_Mouse_Get_Point(&rx,&ry);
     *x=rx;
     *y=ry;
-    if((touchState!=0)&&(((rx!=0xffff)&&(ry!=0xffff))||((rx!=0)&&(ry!=0))))
+    if((touchState!=0)&&(((rx!=-1)&&(ry!=-1))||((rx!=0)&&(ry!=0))))
     {
         touchState=true;
     }
     else
     {
         touchState=false;
-        *x=0xffff;
-        *y=0xffff;
+        *x=-1;
+        *y=-1;
     }
     return touchState;
 }

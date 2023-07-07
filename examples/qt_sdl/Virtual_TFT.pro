@@ -11,7 +11,7 @@ SOURCES += \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldWindow.c \
     ../../src/misc/freeRtosHeap4.c \
-    ../../src/misc/xBtn.c \
+    ../../src/misc/xBtnAction.c \
     ../../src/misc/xConnect.c \
     ../../src/misc/xList.c \
     ../../src/misc/xQueue.c \
@@ -100,9 +100,10 @@ HEADERS += \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldWindow.h \
     ../../src/misc/freeRtosHeap4.h \
-    ../../src/misc/xBtn.h \
+    ../../src/misc/xBtnAction.h \
     ../../src/misc/xConnect.h \
     ../../src/misc/xList.h \
+    ../../src/misc/xLog.h \
     ../../src/misc/xQueue.h \
     ../../src/misc/xString.h \
     ../common/Arm-2D/Helper/Include/__arm_2d_helper_common.h \

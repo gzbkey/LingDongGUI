@@ -18,20 +18,20 @@ extern "C" {
 //#include "ldMemory.h"
 #include "xString.h"
 #include "xList.h"
-#include "xBtn.h"
+#include "xBtnAction.h"
 
 
-//btnÕ¼ÓÃ0-10
+//btnå ç”¨0-10
 
-#define SIGNAL_TOUCH_HOLD_MOVE      11 // °´ÏÂÒÆ¶¯
+#define SIGNAL_TOUCH_HOLD_MOVE      11 // æŒ‰ä¸‹ç§»åŠ¨
 
-//#define SIGNAL_TOUCH_CHECK_PRESSED      4 // µ¥×´Ì¬°´ÏÂ
-//#define SIGNAL_TOUCH_CHECK_RELEASED      5 // µ¥×´Ì¬ÊÍ·Å
+//#define SIGNAL_TOUCH_CHECK_PRESSED      4 // å•çŠ¶æ€æŒ‰ä¸‹
+//#define SIGNAL_TOUCH_CHECK_RELEASED      5 // å•çŠ¶æ€é‡Šæ”¾
 //
-//#define SIGNAL_VALUE_CHANGED           7 //Êı¾İ±ä»¯
-//#define SIGNAL_WIDGET_ACTIVE           8 //¼¤»î¿Ø¼ş
-//#define SIGNAL_EIDTING_FINISHED           9 //±à¼­½áÊø
-//#define SIGNAL_SYS_TIME_OUT             10//guiÈí¼ş¶¨Ê±Æ÷
+//#define SIGNAL_VALUE_CHANGED           7 //æ•°æ®å˜åŒ–
+//#define SIGNAL_WIDGET_ACTIVE           8 //æ¿€æ´»æ§ä»¶
+//#define SIGNAL_EIDTING_FINISHED           9 //ç¼–è¾‘ç»“æŸ
+//#define SIGNAL_SYS_TIME_OUT             10//guiè½¯ä»¶å®šæ—¶å™¨
 
 
 

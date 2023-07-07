@@ -18,6 +18,7 @@ extern "C" {
 //#include "ldMemory.h"
 #include "xString.h"
 #include "xList.h"
+#include "xLog.h"
 
 #ifndef SET_BITS
 #define   SET_BITS(data,value)          ((data)|=(value))
