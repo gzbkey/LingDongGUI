@@ -24,7 +24,7 @@ __WEAK void *ldRealloc(void *ptr,uint32_t newSize)
 static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
     xListNode *tempPos,*safePos;
-    ldCommon *pTempWidgetInfo;
+    ldCommon_t *pTempWidgetInfo;
 
     if(inList==NULL)
     {
@@ -38,7 +38,7 @@ static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nam
         {
             if(tempPos->info!=NULL)
             {
-                pTempWidgetInfo=(ldCommon*)(tempPos->info);
+                pTempWidgetInfo=(ldCommon_t*)(tempPos->info);
                 if(nameId==pTempWidgetInfo->nameId)
                 {
                     *out_info=tempPos;
@@ -74,8 +74,8 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
 {
     xListNode *tempPos,*safePos;
     xListNode *pListInfo2;
-    ldCommon *pTempWidgetInfo;
-    ldPoint posT;
+    ldCommon_t *pTempWidgetInfo;
+    ldPoint_t posT;
     int16_t widthT,heightT;
 
     if(inList==NULL)
@@ -90,12 +90,12 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
         {
             if(tempPos->info!=NULL)
             {
-                pTempWidgetInfo=(ldCommon*)(tempPos->info);
+                pTempWidgetInfo=(ldCommon_t*)(tempPos->info);
                 
                 //获取全局坐标，用绝对值坐标进行比较
                 posT= ldGetGlobalPos(pTempWidgetInfo);
-                widthT=pTempWidgetInfo->geometry.width;
-                heightT=pTempWidgetInfo->geometry.height;
+                widthT=pTempWidgetInfo->resource.tRegion.tSize.iWidth;
+                heightT=pTempWidgetInfo->resource.tRegion.tSize.iHeight;
                     
                 if(pTempWidgetInfo->childList==NULL)//无子控件
                 {
@@ -143,17 +143,17 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
 }
 
 //获取全局坐标
-ldPoint ldGetGlobalPos(ldCommon *widget)
+ldPoint_t ldGetGlobalPos(ldCommon_t *widget)
 {
-    ldPoint pos={0,0},posParent;
+    ldPoint_t pos={0,0},posParent;
 
     if(widget==NULL)
     {
         return pos;
     }
 
-    pos.x=widget->geometry.x;
-    pos.y=widget->geometry.y;
+    pos.x=widget->resource.tRegion.tLocation.iX;
+    pos.y=widget->resource.tRegion.tLocation.iY;
 
     posParent.x=0;
     posParent.y=0;
@@ -166,8 +166,8 @@ ldPoint ldGetGlobalPos(ldCommon *widget)
     }
     else
     {
-        posParent.x=((ldCommon*)widget->parentWidget)->geometry.x;
-        posParent.y=((ldCommon*)widget->parentWidget)->geometry.y;
+        posParent.x=((ldCommon_t*)widget->parentWidget)->resource.tRegion.tLocation.iX;
+        posParent.y=((ldCommon_t*)widget->parentWidget)->resource.tRegion.tLocation.iY;
     }
 	}
         
@@ -236,7 +236,7 @@ bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset)
     widgetTypeStartupImage,
     widgetTypeArc,
 */
-void ldDelWidget(ldCommon *widget)
+void ldDelWidget(ldCommon_t *widget)
 {
     switch(widget->widgetType)
     {

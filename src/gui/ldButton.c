@@ -1,7 +1,8 @@
 #include "ldButton.h"
+#include "xBtnAction.h"
+#include "xConnect.h"
 
-//#include "global.h"
-//#include "jfif_parser.h"
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -46,6 +47,25 @@
 //    }
 //}
 
+static bool slotButtonToggle(xConnectInfo_t info)
+{
+    ldButton_t *btn;
+
+    btn=ldGetWidgetInfoById(info.receiverId)->info;
+
+    if(info.signalType==BTN_PRESS)
+    {
+        btn->isPressed=true;
+    }
+    if(info.signalType==BTN_RELEASE)
+    {
+        btn->isPressed=false;
+    }
+
+    return false;
+}
+
+
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor releaseColor,ldColor pressColor,ldColor selectColor,uint32_t releaseImgAddr,uint32_t pressImgAddr,uint32_t selectMaskAddr,ldColor charColor,bool isWithMask,bool isTransparent,bool isHidden)
 {
     ldButton_t * pNewWidget = NULL;
@@ -63,8 +83,8 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     {
         pNewWidget->isParentHidden=false;
         
-            parent_link = ((ldCommon *)parentInfo->info)->childList;
-            if(((ldCommon *)parentInfo->info)->isHidden||((ldCommon *)parentInfo->info)->isParentHidden)
+            parent_link = ((ldCommon_t *)parentInfo->info)->childList;
+            if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
             {
                 pNewWidget->isParentHidden=true;
             }
@@ -73,72 +93,40 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->childList = NULL;
 
         pNewWidget->widgetType = widgetTypeButton;
-        pNewWidget->geometry.x = x;
-        pNewWidget->geometry.y = y;
-        pNewWidget->geometry.width = width;
-        pNewWidget->geometry.height = height;
+        pNewWidget->resource.tRegion.tLocation.iX=x;
+        pNewWidget->resource.tRegion.tLocation.iY=y;
+        pNewWidget->resource.tRegion.tSize.iWidth=width;
+        pNewWidget->resource.tRegion.tSize.iHeight=height;
 
         xListInfoAdd(parent_link, pNewWidget);
             
-        pNewWidget->parentType = ((ldCommon *)(parentInfo->info))->widgetType;
+        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         
-
-         pNewWidget->isCheckable=false;
-            pNewWidget->isChecked=false;
-            pNewWidget->isPressed=false;
-            pNewWidget->isSelected=false;
+        pNewWidget->isCheckable=false;
+        pNewWidget->isChecked=false;
+        pNewWidget->isPressed=false;
+        pNewWidget->isSelected=false;
             
         pNewWidget->releaseColor = releaseColor;
         pNewWidget->pressColor = pressColor;
         pNewWidget->selectColor = selectColor;
         pNewWidget->charColor=charColor;
         pNewWidget->keyValue=0;
-        
-            
-        pNewWidget->tReleaseImgRes.tRegion.tSize.iWidth = width;
-        pNewWidget->tReleaseImgRes.tRegion.tSize.iHeight = height;
-        pNewWidget->tReleaseImgRes.tInfo.bIsRoot = true;
-        pNewWidget->tReleaseImgRes.tInfo.bHasEnforcedColour = true;
-        pNewWidget->tReleaseImgRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        pNewWidget->tReleaseImgRes.pchBuffer = (uint8_t *)releaseImgAddr;
+        pNewWidget->releaseImgAddr=releaseImgAddr;
+        pNewWidget->pressImgAddr=pressImgAddr;
+        pNewWidget->selectMaskAddr=selectMaskAddr;
+
+        pNewWidget->resource.tInfo.bIsRoot = true;
+        pNewWidget->resource.tInfo.bHasEnforcedColour = true;
+        pNewWidget->resource.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+        pNewWidget->resource.pchBuffer = (uint8_t *)releaseImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-//        pNewWidget->tReleaseImgRes.pchBuffer=0;
         pNewWidget->tReleaseImgRes.tInfo.bVirtualResource = true;
         
         ((arm_2d_vres_t*)(&pNewWidget->tReleaseImgRes))->pTarget=releaseImgAddr;
         ((arm_2d_vres_t*)(&pNewWidget->tReleaseImgRes))->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)(&pNewWidget->tReleaseImgRes))->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-
-        pNewWidget->tPressImgRes.tRegion.tSize.iWidth = width;
-        pNewWidget->tPressImgRes.tRegion.tSize.iHeight = height;
-        pNewWidget->tPressImgRes.tInfo.bIsRoot = true;
-        pNewWidget->tPressImgRes.tInfo.bHasEnforcedColour = true;
-        pNewWidget->tPressImgRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        pNewWidget->tPressImgRes.pchBuffer = (uint8_t *)pressImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-//        pNewWidget->tPressImgRes.pchBuffer=0;
-        pNewWidget->tPressImgRes.tInfo.bVirtualResource = true;
-        
-        ((arm_2d_vres_t*)(&pNewWidget->tPressImgRes))->pTarget=pressImgAddr;
-        ((arm_2d_vres_t*)(&pNewWidget->tPressImgRes))->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)(&pNewWidget->tPressImgRes))->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-
-        pNewWidget->tSelectMaskRes.tRegion.tSize.iWidth = width;
-        pNewWidget->tSelectMaskRes.tRegion.tSize.iHeight = height;
-        pNewWidget->tSelectMaskRes.tInfo.bIsRoot = true;
-        pNewWidget->tSelectMaskRes.tInfo.bHasEnforcedColour = true;
-        pNewWidget->tSelectMaskRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        pNewWidget->tSelectMaskRes.pchBuffer = (uint8_t *)selectMaskAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-//        pNewWidget->tSelectMaskRes.pchBuffer=0;
-        pNewWidget->tSelectMaskRes.tInfo.bVirtualResource = true;
-        
-        ((arm_2d_vres_t*)(&pNewWidget->tSelectMaskRes))->pTarget=selectMaskAddr;
-        ((arm_2d_vres_t*)(&pNewWidget->tSelectMaskRes))->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)(&pNewWidget->tSelectMaskRes))->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
         
         pNewWidget->isWithMask = isWithMask;
@@ -147,6 +135,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 #if USE_IMAGE_OPACITY == 1
         pNewWidget->opacity = 255;
 #endif
+        //¶¯×÷
+        xConnect(nameId,BTN_PRESS,nameId,slotButtonToggle);
+        xConnect(nameId,BTN_RELEASE,nameId,slotButtonToggle);
+
     }
     else
     {
@@ -170,14 +162,13 @@ void ldButtonLoop(ldButton_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFram
         return;
     }
     
-    arm_2d_container(ptParent,tTarget , &info->tReleaseImgRes.tRegion)
+    arm_2d_container(ptParent,tTarget , &info->resource.tRegion)
     {
-        tTarget.tRegion.tLocation.iX = info->geometry.x;
-        tTarget.tRegion.tLocation.iY = info->geometry.y;
+        tTarget.tRegion.tLocation = info->resource.tRegion.tLocation;
         
         if(!info->isTransparent)
         {
-        if ((info->tReleaseImgRes.pchBuffer==0)&&(info->tPressImgRes.pchBuffer==0))//color
+        if ((info->releaseImgAddr==0)&&(info->pressImgAddr==0))//color
         {
             if(info->isSelected)
             {
@@ -199,18 +190,29 @@ void ldButtonLoop(ldButton_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFram
         {
             if(info->isSelected)
             {
-                ldBaseImage(&tTarget,&info->tSelectMaskRes,info->isWithMask,255);
+//                info->tResource.pchBuffer = (uint8_t *)info->selectMaskAddr;
+//#if USE_VIRTUAL_RESOURCE == 1
+//                ((arm_2d_vres_t*)(&info->tResource))->pTarget=info->selectMaskAddr;
+//#endif
+//                ldBaseImage(&tTarget,&info->tResource,info->isWithMask,255);
             }
             else
             {
                 if(info->isPressed)
                 {
-                    ldBaseImage(&tTarget,&info->tPressImgRes,info->isWithMask,255);
+                    info->resource.pchBuffer = (uint8_t *)info->pressImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                    ((arm_2d_vres_t*)(&info->tResource))->pTarget=info->pressImgAddr;
+#endif
                 }
                 else
                 {
-                    ldBaseImage(&tTarget,&info->tReleaseImgRes,info->isWithMask,255);
+                    info->resource.pchBuffer = (uint8_t *)info->releaseImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                    ((arm_2d_vres_t*)(&info->tResource))->pTarget=info->releaseImgAddr;
+#endif
                 }
+                ldBaseImage(&tTarget,&info->resource,info->isWithMask,255);
             }
         }
     }

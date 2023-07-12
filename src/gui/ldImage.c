@@ -37,14 +37,14 @@ void pImageDel(ldImage_t *widget)
     //    }
 
     // 查找父链表
-    if ((ldCommon *)widget->parentType == widgetTypeNone)
+    if ((ldCommon_t *)widget->parentType == widgetTypeNone)
     {
         listInfo = &ldWidgetLink;
     }
     else
     {
-        listInfo = ldGetWidgetInfoById(((ldCommon *)widget->parentWidget)->nameId);
-        listInfo = ((ldCommon *)listInfo->info)->childList;
+        listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
+        listInfo = ((ldCommon_t *)listInfo->info)->childList;
     }
 
     if (listInfo != NULL)
@@ -70,8 +70,8 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         
         if (parentInfo)
         {
-            parent_link = ((ldCommon *)parentInfo->info)->childList;
-            if(((ldCommon *)parentInfo->info)->isHidden||((ldCommon *)parentInfo->info)->isParentHidden)
+            parent_link = ((ldCommon_t *)parentInfo->info)->childList;
+            if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
             {
                 pNewWidget->isParentHidden=true;
             }
@@ -86,10 +86,10 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->childList = NULL;
 
         pNewWidget->widgetType = widgetTypeImage;
-        pNewWidget->geometry.x = x;
-        pNewWidget->geometry.y = y;
-        pNewWidget->geometry.width = width;
-        pNewWidget->geometry.height = height;
+        pNewWidget->resource.tRegion.tLocation.iX=x;
+        pNewWidget->resource.tRegion.tLocation.iY=y;
+        pNewWidget->resource.tRegion.tSize.iWidth=width;
+        pNewWidget->resource.tRegion.tSize.iHeight=height;
 
         xListInfoAdd(parent_link, pNewWidget);
         if (parent_link == &ldWidgetLink) // 自身为bg
@@ -99,12 +99,12 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         }
         else
         {
-            pNewWidget->parentType = ((ldCommon *)(parentInfo->info))->widgetType;
+            pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
             pNewWidget->parentWidget = parentInfo->info;
         }
 
-        pNewWidget->resource.tRegion.tSize.iWidth = width;
-        pNewWidget->resource.tRegion.tSize.iHeight = height;
+//        pNewWidget->resource.tRegion.tSize.iWidth = width;
+//        pNewWidget->resource.tRegion.tSize.iHeight = height;
         pNewWidget->resource.tInfo.bIsRoot = true;
         pNewWidget->resource.tInfo.bHasEnforcedColour = true;
         pNewWidget->resource.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
@@ -164,8 +164,8 @@ void ldImageLoop(ldImage_t *info, const arm_2d_tile_t *ptParent, bool bIsNewFram
     
     arm_2d_container(ptParent,tTarget , &info->resource.tRegion)
     {
-        tTarget.tRegion.tLocation.iX = info->geometry.x;
-        tTarget.tRegion.tLocation.iY = info->geometry.y;
+        tTarget.tRegion.tLocation = info->resource.tRegion.tLocation;
+
         if (info->isColor)
         {
             ldBaseColor(&tTarget,info->bgColor,IMG_OPACITY);

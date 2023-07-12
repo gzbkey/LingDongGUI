@@ -22,10 +22,10 @@ static void *prevWidget;
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
-    ldCommon *widget;
-    ldPoint globalPos;
-    ldPoint pos;
-    ldGeometry tempGeometry;
+    ldCommon_t *widget;
+    ldPoint_t globalPos;
+    ldPoint_t pos;
+//    ldGeometry tempGeometry;
     xListNode *pNode;
 
     switch(touchSignal)
@@ -137,7 +137,7 @@ void ldGuiTouchProcess(void)
 
 
 
-static void _widgetLoop(ldCommon *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+static void _widgetLoop(ldCommon_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     switch(info->widgetType)
     {
@@ -167,9 +167,9 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
         {
             _widgetLoop(temp_pos->info,ptParent,bIsNewFrame);
             
-            if(((ldCommon *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {
-                _ldGuiLoop(((ldCommon *)temp_pos->info)->childList,ptParent,bIsNewFrame);
+                _ldGuiLoop(((ldCommon_t *)temp_pos->info)->childList,ptParent,bIsNewFrame);
             }
         }
     }

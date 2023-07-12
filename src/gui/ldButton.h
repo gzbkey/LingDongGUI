@@ -22,25 +22,9 @@ typedef struct {
     bool isChecked:1;
     bool isPressed:1;
     bool isSelected:1;
-    arm_2d_tile_t tReleaseImgRes;
-#if USE_VIRTUAL_RESOURCE == 1
-    uintptr_t reserve1;
-    void      *reserve2;
-    void      *reserve3;
-#endif
-    arm_2d_tile_t tPressImgRes;
-#if USE_VIRTUAL_RESOURCE == 1
-    uintptr_t reserve4;
-    void      *reserve5;
-    void      *reserve6;
-#endif
-    arm_2d_tile_t tSelectMaskRes;
-#if USE_VIRTUAL_RESOURCE == 1
-    uintptr_t reserve4;
-    void      *reserve5;
-    void      *reserve6;
-#endif
-    
+    uint32_t releaseImgAddr;
+    uint32_t pressImgAddr;
+    uint32_t selectMaskAddr;
     ldChar_t *ptTextInfo;
     ldColor releaseColor;
     ldColor pressColor;

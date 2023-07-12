@@ -13,19 +13,12 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isWithMask:1;
-//    bool isHwDec:1;
     bool isTransparent:1;//window专用
     bool isColor:1;
     ldColor bgColor;
     ldColor specialColor;//maskColor charColor
 #if USE_IMAGE_OPACITY == 1
     uint8_t opacity;
-#endif
-    arm_2d_tile_t resource;
-#if USE_VIRTUAL_RESOURCE == 1
-    uintptr_t reserve1;
-    void      *reserve2;
-    void      *reserve3;
 #endif
 }ldImage_t;
 
