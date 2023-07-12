@@ -51,7 +51,9 @@ xQueue_t* xQueueCreate(uint32_t length, uint32_t itemSize)
 #if MCU_BITS == 32
         pNewQueue->pDataBase=(void *)( (uint32_t)pNewQueue + sizeof( xQueue_t )); //M3
 #endif
-        
+#if MCU_BITS == 64
+        pNewQueue->pDataBase=(void *)( (uint64_t)pNewQueue + sizeof( xQueue_t )); //M3
+#endif
     }
     return pNewQueue;
 }

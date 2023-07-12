@@ -131,7 +131,7 @@ void xConnectProcess(void)
     emitInfo_t emitInfo;
     xListNode *temp_pos,*safePos;
     relationInfo_t *pRelationInfo;
-    connectInfo_t connectInfo;
+    xConnectInfo_t connectInfo;
     bool ignoreSignal=false;//忽略相同信号的其他操作
     if(xQueueGetLength(emitQueue)>0)
     {

@@ -56,6 +56,7 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             if(pNode!=NULL)
             {
                 widget=pNode->info;
+                LOG_DEBUG("click widget id:%d\n",widget->nameId);
             }
         }
         prevX=x;
@@ -113,7 +114,6 @@ void ldGuiTouchProcess(void)
         if(prevState==TOUCH_NO_CLICK)//按下,                下降沿触发
         {
             touchSignal=BTN_PRESS;
-            LOG_DEBUG("press   x=%4d,y=%4d\n",x,y);
         }
         else// prevState==TOUCH_CLICK 按住                低电平
         {
@@ -129,7 +129,6 @@ void ldGuiTouchProcess(void)
         else// prevState==TOUCH_CLICK 按下,上升沿触发       上降沿触发
         {
             touchSignal=BTN_RELEASE;
-            LOG_DEBUG("release x=%4d,y=%4d\n",x,y);
         }
     }
     prevState=nowState;

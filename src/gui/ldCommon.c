@@ -160,6 +160,8 @@ ldPoint ldGetGlobalPos(ldCommon *widget)
 
     if(widget->parentType!=widgetTypeNone)
     {
+        if(widget->parentType!=widgetTypeWindow)
+        {
         posParent=ldGetGlobalPos(widget->parentWidget);
     }
     else
@@ -167,6 +169,7 @@ ldPoint ldGetGlobalPos(ldCommon *widget)
         posParent.x=((ldCommon*)widget->parentWidget)->geometry.x;
         posParent.y=((ldCommon*)widget->parentWidget)->geometry.y;
     }
+	}
         
     pos.x+=posParent.x;
     pos.y+=posParent.y;

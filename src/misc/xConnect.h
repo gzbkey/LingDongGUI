@@ -18,9 +18,9 @@ typedef struct{
     uint16_t senderId;
     uint8_t signalType;
     uint16_t receiverId;
-}connectInfo_t;
+}xConnectInfo_t;
 
-typedef bool (*connectFunc)(connectInfo_t);
+typedef bool (*connectFunc)(xConnectInfo_t);
 
 typedef struct{
     uint16_t senderId;
