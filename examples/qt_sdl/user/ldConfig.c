@@ -2,6 +2,9 @@
 #include "ldWindow.h"
 #include "ldGui.h"
 #include "Virtual_TFT_Port.h"
+#include "ldCommon.h"
+#include "xList.h"
+#include "ldImage.h"
 
 /***************************************************************************//**
  * @fn         bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)

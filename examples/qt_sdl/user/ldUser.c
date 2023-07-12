@@ -36,11 +36,11 @@ void userInit1(void)
 
 void userLoop(void)
 {
-    if( ldTimeOut(3000, &timer,true))
-    {
-        btn0->isPressed=!btn0->isPressed;
-//        ldGuiJumpPage(1);
-    }
+//    if( ldTimeOut(3000, &timer,true))
+//    {
+//        btn0->isPressed=!btn0->isPressed;
+////        ldGuiJumpPage(1);
+//    }
 }
 
 void userLoop1(void)

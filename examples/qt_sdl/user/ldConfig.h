@@ -5,9 +5,8 @@
 extern "C" {
 #endif
 
-#include "ldCommon.h"
-#include "xList.h"
-#include "ldImage.h"
+#include "stdint.h"
+#include "stdbool.h"
 
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 #define USE_VIRTUAL_RESOURCE                      1
