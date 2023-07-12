@@ -10,11 +10,14 @@ extern "C" {
 #include "ldImage.h"
 
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#define USE_VIRTUAL_RESOURCE                 1
+#define USE_VIRTUAL_RESOURCE                      1
 #else
-#define USE_VIRTUAL_RESOURCE                 0
+#define USE_VIRTUAL_RESOURCE                      0
 #endif
 
+#define LD_CFG_SCEEN_WIDTH                        480
+#define LD_CFG_SCEEN_HEIGHT                       272
+#define LD_CFG_COLOR_DEPTH                        16
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

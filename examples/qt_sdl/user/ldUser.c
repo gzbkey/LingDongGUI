@@ -2,7 +2,7 @@
 #include "ldButton.h"
 #include "ldWindow.h"
 #include "ldGui.h"
-
+#include "ldConfig.h"
 
 ldImage_t *img0;
 ldWindow_t *win0;
@@ -18,7 +18,7 @@ extern const uint16_t c_bmpCMSISLogoRGB565[163*65];
 
 void userInit(void)
 {
-    win0=ldWindowInit(0, 0, 0,0,320,240,0xFF00,0,0,0,0,0);
+    win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0xFF00,0,0,0,0,0);
     img0=ldImageInit(1, 0, 20,20,163,65,0,0,(uint32_t)&c_bmpCMSISLogoRGB565[0],0,0);
     
     
@@ -30,7 +30,7 @@ void userInit(void)
 
 void userInit1(void)
 {
-    win1=ldWindowInit(0, 0, 0,0,320,240,0xFF00,0,0,0,0,0);
+    win1=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0xFF00,0,0,0,0,0);
     img1=ldImageInit(1, 0, 100,120,163,65,0,0,(uint32_t)&c_bmpCMSISLogoRGB565[0],0,0);
 }
 
