@@ -602,16 +602,16 @@ static const uint8_t select[72*72] = {
 void userInit(void)
 {
     win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
-    ldWindowSetBgColor(win0,__RGB(0,0,255));
+    ldWindowSetBgColor(win0,__RGB(255,255,255));
     img0=ldImageInit(1, 0, 20,20,72,72,(uint32_t)&press[0],false);
     ldImageSetOpacity(img0,128);
     
     
     
     btn0=ldButtonInit(ID_BTN0, 0, 20,100,72,72);
-    ldButtonSetImage(ldGetWidgetById(ID_BTN0),(uint32_t)&release[0],(uint32_t)&press[0],false);
+//    ldButtonSetImage(ldGetWidgetById(ID_BTN0),(uint32_t)&release[0],(uint32_t)&press[0],false);
 
-    ldButtonSetSelectImage(ldGetWidgetById(ID_BTN0),(uint32_t)&select[0],__RGB(255,0,0));
+//    ldButtonSetSelectImage(ldGetWidgetById(ID_BTN0),(uint32_t)&select[0],__RGB(255,0,0));
 
     btn0->isSelected=true;
 }

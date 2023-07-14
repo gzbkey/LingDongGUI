@@ -263,9 +263,30 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
             }
             if(widget->isSelected)
             {
-                if ((widget->releaseImgAddr==0)&&(widget->pressImgAddr==0))//color
+                if (widget->selectMaskAddr==0)
                 {
-
+                    arm_2d_region_t tBarRegion = {
+                        .tLocation = {
+                           .iX = 0,
+                           .iY = 0,
+                        },
+                        .tSize = tTarget.tRegion.tSize,
+                    };
+                    arm_2d_draw_box(&tTarget,&tBarRegion,3,widget->selectColor,128);
+//                    draw_round_corner_box(&tTarget,&tBarRegion,widget->selectColor,128,bIsNewFrame);
+//                    arm_2d_border_opacity_t tBorderInfo={
+//                        .chLeft=2,
+//                        .chTop=2,
+//                        .chRight=tTarget.tRegion.tSize.iWidth,
+//                        .chBottom=tTarget.tRegion.tSize.iHeight,
+//                    };
+//                    arm_2d_corner_opacity_t tCornerInfo={
+//                        .chTopLeft=4,
+//                        .chTopRight=4,
+//                        .chBottomLeft=tTarget.tRegion.tSize.iWidth-2,
+//                        .chBottomRight=tTarget.tRegion.tSize.iHeight-2,
+//                    };
+//                    draw_round_corner_border(&tTarget,&tBarRegion,widget->selectColor,tBorderInfo,tCornerInfo);
                 }
                 else
                 {

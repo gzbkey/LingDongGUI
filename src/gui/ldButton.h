@@ -26,12 +26,12 @@ typedef struct {
     uint32_t releaseImgAddr;
     uint32_t pressImgAddr;
     uint32_t selectMaskAddr;
-    ldChar_t *ptTextInfo;
+    uint32_t keyValue;
     ldColor releaseColor;
     ldColor pressColor;
     ldColor selectColor;
     ldColor charColor;
-    uint32_t keyValue;
+    ldChar_t *ptTextInfo;
 }ldButton_t;
 
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
