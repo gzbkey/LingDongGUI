@@ -79,6 +79,7 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     ldButton_t * pNewWidget = NULL;
     xListNode *parentInfo;
     xListNode *parentList;
+    arm_2d_tile_t *tResTile;
 
     parentInfo = ldGetWidgetInfoById(parentNameId);
 
@@ -99,10 +100,6 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->childList = NULL;
 
         pNewWidget->widgetType = widgetTypeButton;
-        pNewWidget->resource.tRegion.tLocation.iX=x;
-        pNewWidget->resource.tRegion.tLocation.iY=y;
-        pNewWidget->resource.tRegion.tSize.iWidth=width;
-        pNewWidget->resource.tRegion.tSize.iHeight=height;
 
         xListInfoAdd(parentList, pNewWidget);
             
@@ -122,22 +119,28 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->releaseImgAddr=0;
         pNewWidget->pressImgAddr=0;
         pNewWidget->selectMaskAddr=0;
-
-        pNewWidget->resource.tInfo.bIsRoot = true;
-        pNewWidget->resource.tInfo.bHasEnforcedColour = true;
-        pNewWidget->resource.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        pNewWidget->resource.pchBuffer = (uint8_t *)0;
-#if USE_VIRTUAL_RESOURCE == 1
-        pNewWidget->tReleaseImgRes.tInfo.bVirtualResource = true;
-        
-        ((arm_2d_vres_t*)(&pNewWidget->tReleaseImgRes))->pTarget=releaseImgAddr;
-        ((arm_2d_vres_t*)(&pNewWidget->tReleaseImgRes))->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)(&pNewWidget->tReleaseImgRes))->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        
         pNewWidget->isWithMask = false;
         pNewWidget->isTransparent=false;
         pNewWidget->isHidden = false;
+
+        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
+
+        tResTile->tRegion.tLocation.iX=x;
+        tResTile->tRegion.tLocation.iY=y;
+        tResTile->tRegion.tSize.iWidth=width;
+        tResTile->tRegion.tSize.iHeight=height;
+
+        tResTile->tInfo.bIsRoot = true;
+        tResTile->tInfo.bHasEnforcedColour = true;
+        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+        tResTile->pchBuffer = 0;
+#if USE_VIRTUAL_RESOURCE == 1
+        tResTile->tInfo.bVirtualResource = true;
+        
+        ((arm_2d_vres_t*)tResTile)->pTarget=0;
+        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
+        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
+#endif
 
         //动作
         xConnect(nameId,BTN_PRESS,nameId,slotButtonToggle);
@@ -151,7 +154,6 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 
         LOG_INFO("create failed, button id:%d\n",nameId);
     }
-
     return pNewWidget;
 }
 
@@ -211,9 +213,30 @@ void ldButtonSetHidden(ldButton_t* widget,bool isHidden)
     widget->isHidden=isHidden;
 }
 
+void ldButtonSetRoundCorner(ldButton_t* widget,bool isCorner)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+    widget->isCorner=isCorner;
+}
+
+void ldButtonSetSelect(ldButton_t* widget,bool isSelected)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+    widget->isSelected=isSelected;
+}
+
 void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     uint32_t btnColor;
+    arm_2d_tile_t *tResTile=(arm_2d_tile_t*)&widget->resource;
+    arm_2d_region_t tRegion;
+
     if (widget == NULL)
     {
         return;
@@ -224,9 +247,9 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
         return;
     }
     
-    arm_2d_container(ptParent,tTarget , &widget->resource.tRegion)
+    arm_2d_container(ptParent,tTarget , &tResTile->tRegion)
     {
-        tTarget.tRegion.tLocation = widget->resource.tRegion.tLocation;
+        tTarget.tRegion.tLocation = tResTile->tRegion.tLocation;
         
         if(!widget->isTransparent)
         {
@@ -240,58 +263,64 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                 {
                     btnColor=widget->releaseColor;
                 }
-
-                ldBaseColor(&tTarget,btnColor,255);
+                if(widget->isCorner)
+                {
+                    tRegion.tLocation.iX=0;
+                    tRegion.tLocation.iY=0;
+                    tRegion.tSize = tTarget.tRegion.tSize;
+                    draw_round_corner_box(&tTarget,
+                                                &tRegion,
+                                                btnColor,
+                                                255,
+                                                bIsNewFrame);
+                }
+                else
+                {
+                    ldBaseColor(&tTarget,btnColor,255);
+                }
             }
             else
             {
                 if(widget->isPressed)
                 {
-                    widget->resource.pchBuffer = (uint8_t *)widget->pressImgAddr;
+                    tResTile->pchBuffer = (uint8_t *)widget->pressImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)(&widget->tResource))->pTarget=widget->pressImgAddr;
+                    ((arm_2d_vres_t*)tResTile)->pTarget=widget->pressImgAddr;
 #endif
                 }
                 else
                 {
-                    widget->resource.pchBuffer = (uint8_t *)widget->releaseImgAddr;
+                    tResTile->pchBuffer = (uint8_t *)widget->releaseImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)(&widget->tResource))->pTarget=widget->releaseImgAddr;
+                    ((arm_2d_vres_t*)tResTile)->pTarget=widget->releaseImgAddr;
 #endif
                 }
-                ldBaseImage(&tTarget,&widget->resource,widget->isWithMask,255);
+                ldBaseImage(&tTarget,tResTile,widget->isWithMask,255);
             }
             if(widget->isSelected)
             {
                 if (widget->selectMaskAddr==0)
                 {
-                    arm_2d_region_t tBarRegion = {
-                        .tLocation = {
-                           .iX = 0,
-                           .iY = 0,
-                        },
-                        .tSize = tTarget.tRegion.tSize,
-                    };
-                    arm_2d_draw_box(&tTarget,&tBarRegion,3,widget->selectColor,128);
-//                    draw_round_corner_box(&tTarget,&tBarRegion,widget->selectColor,128,bIsNewFrame);
-//                    arm_2d_border_opacity_t tBorderInfo={
-//                        .chLeft=2,
-//                        .chTop=2,
-//                        .chRight=tTarget.tRegion.tSize.iWidth,
-//                        .chBottom=tTarget.tRegion.tSize.iHeight,
-//                    };
-//                    arm_2d_corner_opacity_t tCornerInfo={
-//                        .chTopLeft=4,
-//                        .chTopRight=4,
-//                        .chBottomLeft=tTarget.tRegion.tSize.iWidth-2,
-//                        .chBottomRight=tTarget.tRegion.tSize.iHeight-2,
-//                    };
-//                    draw_round_corner_border(&tTarget,&tBarRegion,widget->selectColor,tBorderInfo,tCornerInfo);
+                    tRegion.tLocation.iX=0;
+                    tRegion.tLocation.iY=0;
+                    tRegion.tSize = tTarget.tRegion.tSize;
+
+                    if(widget->isCorner)
+                    {
+                        draw_round_corner_border(&tTarget,&tRegion,widget->selectColor,
+                                                 (arm_2d_border_opacity_t){128,128,128,128},
+                                                 (arm_2d_corner_opacity_t){128,128,128,128});
+                    }
+                    else
+                    {
+                        arm_2d_draw_box(&tTarget,&tRegion,3,widget->selectColor,128);
+
+                    }
                 }
                 else
                 {
                     arm_2d_vres_t maskRes;
-                    maskRes.tTile=widget->resource;
+                    maskRes.tTile=*tResTile;
                     maskRes.tTile.tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
                     ((arm_2d_tile_t*)&maskRes)->pchBuffer = (uint8_t *)widget->selectMaskAddr;
 #if USE_VIRTUAL_RESOURCE == 1

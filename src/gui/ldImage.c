@@ -63,6 +63,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     ldImage_t *pNewWidget = NULL;
     xListNode *parentInfo;
     xListNode *parent_link;
+    arm_2d_tile_t *tResTile;
 
     parentInfo = ldGetWidgetInfoById(parentNameId);
 
@@ -90,10 +91,6 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->childList = NULL;
 
         pNewWidget->widgetType = widgetTypeImage;
-        pNewWidget->resource.tRegion.tLocation.iX=x;
-        pNewWidget->resource.tRegion.tLocation.iY=y;
-        pNewWidget->resource.tRegion.tSize.iWidth=width;
-        pNewWidget->resource.tRegion.tSize.iHeight=height;
 
         xListInfoAdd(parent_link, pNewWidget);
         if (parent_link == &ldWidgetLink) // 自身为bg
@@ -106,23 +103,6 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
             pNewWidget->parentWidget = parentInfo->info;
         }
-
-//        pNewWidget->resource.tRegion.tSize.iWidth = width;
-//        pNewWidget->resource.tRegion.tSize.iHeight = height;
-        pNewWidget->resource.tInfo.bIsRoot = true;
-        pNewWidget->resource.tInfo.bHasEnforcedColour = true;
-        pNewWidget->resource.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        pNewWidget->resource.pchBuffer = (uint8_t *)imageAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-        pNewWidget->resource.pchBuffer=0;
-        pNewWidget->resource.tInfo.bVirtualResource = true;
-        
-        ((arm_2d_vres_t*)(&pNewWidget->resource))->pTarget=imageAddr;
-        ((arm_2d_vres_t*)(&pNewWidget->resource))->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)(&pNewWidget->resource))->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        
-//        pNewWidget->isHwDec = isHwDec;
         pNewWidget->bgColor = 0;
         pNewWidget->isColor = false;
         pNewWidget->isWithMask = isWithMask;
@@ -130,6 +110,26 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->isTransparent=false;
 #if USE_OPACITY == 1
         pNewWidget->opacity = 255;
+#endif
+
+        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
+
+        tResTile->tRegion.tLocation.iX=x;
+        tResTile->tRegion.tLocation.iY=y;
+        tResTile->tRegion.tSize.iWidth=width;
+        tResTile->tRegion.tSize.iHeight=height;
+
+        tResTile->tInfo.bIsRoot = true;
+        tResTile->tInfo.bHasEnforcedColour = true;
+        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+        tResTile->pchBuffer = (uint8_t *)imageAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+        tResTile->pchBuffer = 0;
+        tResTile->tInfo.bVirtualResource = true;
+        
+        ((arm_2d_vres_t*)tResTile)->pTarget=imageAddr;
+        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
+        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
     }
     else
@@ -168,6 +168,8 @@ void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFr
 #define IMG_OPACITY        255
 #endif
 
+    arm_2d_tile_t *tResTile=(arm_2d_tile_t*)&widget->resource;
+
     if (widget == NULL)
     {
         return;
@@ -178,9 +180,9 @@ void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFr
         return;
     }
     
-    arm_2d_container(ptParent,tTarget , &widget->resource.tRegion)
+    arm_2d_container(ptParent,tTarget , &tResTile->tRegion)
     {
-        tTarget.tRegion.tLocation = widget->resource.tRegion.tLocation;
+        tTarget.tRegion.tLocation = tResTile->tRegion.tLocation;
 
         if (widget->isColor)
         {
@@ -213,13 +215,13 @@ void ldImageSetImage(ldImage_t *widget, uint32_t imageAddr, bool isWithMask)
     }
     widget->isTransparent=false;
     widget->isWithMask=isWithMask;
-    if(widget->resource.tInfo.bVirtualResource)
+    if(((arm_2d_tile_t*)(&widget->resource))->tInfo.bVirtualResource)
     {
         ((arm_2d_vres_t*)(&widget->resource))->pTarget=imageAddr;
     }
     else
     {
-        widget->resource.pchBuffer = (uint8_t *)imageAddr;
+        ((arm_2d_tile_t*)(&widget->resource))->pchBuffer = (uint8_t *)imageAddr;
     }
 }
 
@@ -260,7 +262,7 @@ void ldImageSetGrayscale(ldImage_t *widget, uint8_t grayBit, ldColor writeColor)
         }
     }
     widget->isTransparent=false;
-    widget->resource.tColourInfo.chScheme = colorType;
+    ((arm_2d_tile_t*)(&widget->resource))->tColourInfo.chScheme = colorType;
     widget->specialColor = writeColor;
 }
 

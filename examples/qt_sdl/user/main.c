@@ -5,7 +5,7 @@
 #include "arm_2d.h"
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
-
+#include "xLog.h"
 #if defined(__clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wunknown-warning-option"

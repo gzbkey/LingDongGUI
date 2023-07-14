@@ -7,7 +7,7 @@ extern "C" {
 
 #include "stdbool.h"
 #include "stdint.h"
-#include "./arm_extra_controls.h"
+#include "arm_extra_controls.h"
 #include "xList.h"
 #include "xLog.h"
 
@@ -91,25 +91,25 @@ typedef enum{
     widgetTypeArc,
 }ldWidgetType;
     
+// ldWidgetType     4
+// arm_2d_tile_t  24
+
 #if USE_VIRTUAL_RESOURCE == 0
-#define LD_COMMON_ATTRIBUTES  ldWidgetType widgetType; \
+#define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
+                              ldWidgetType widgetType; \
                               ldWidgetType parentType; \
-                              uint16_t nameId; \
                               void * parentWidget; \
-                              arm_2d_tile_t resource; \
                               xListNode *childList; \
+                              uint16_t nameId; \
                               bool isHidden:1; \
                               bool isParentHidden:1
 #else
-#define LD_COMMON_ATTRIBUTES  ldWidgetType widgetType; \
+#define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
+                              ldWidgetType widgetType; \
                               ldWidgetType parentType; \
-                              uint16_t nameId; \
                               void * parentWidget; \
-                              arm_2d_tile_t resource; \
-                              uintptr_t reserve1; \
-                              void      *reserve2; \
-                              void      *reserve3; \
                               xListNode *childList; \
+                              uint16_t nameId; \
                               bool isHidden:1; \
                               bool isParentHidden:1
 #endif

@@ -614,6 +614,7 @@ void userInit(void)
 //    ldButtonSetSelectImage(ldGetWidgetById(ID_BTN0),(uint32_t)&select[0],__RGB(255,0,0));
 
     btn0->isSelected=true;
+    btn0->isCorner=true;
 }
 
 void userInit1(void)

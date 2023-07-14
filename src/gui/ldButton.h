@@ -23,6 +23,7 @@ typedef struct {
     bool isChecked:1;
     bool isPressed:1;
     bool isSelected:1;
+    bool isCorner:1;
     uint32_t releaseImgAddr;
     uint32_t pressImgAddr;
     uint32_t selectMaskAddr;
@@ -44,6 +45,8 @@ void ldButtonSetSelectImage(ldButton_t* widget,uint32_t selectMaskAddr,ldColor s
 void ldButtonSetCharColor(ldButton_t* widget,ldColor charColor);
 void ldButtonSetTransparent(ldButton_t* widget,bool isTransparent);
 void ldButtonSetHidden(ldButton_t* widget,bool isHidden);
+void ldButtonSetRoundCorner(ldButton_t* widget,bool isCorner);
+void ldButtonSetSelect(ldButton_t* widget,bool isSelected);
 
 #ifdef __cplusplus
 }

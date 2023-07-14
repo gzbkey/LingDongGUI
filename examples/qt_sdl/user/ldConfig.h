@@ -8,11 +8,11 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 
-#if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#define USE_VIRTUAL_RESOURCE                      1
-#else
+//#if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 #define USE_VIRTUAL_RESOURCE                      0
-#endif
+//#else
+//#define USE_VIRTUAL_RESOURCE                      0
+//#endif
 
 #define LD_CFG_SCEEN_WIDTH                        480
 #define LD_CFG_SCEEN_HEIGHT                       272
