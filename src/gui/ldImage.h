@@ -7,8 +7,7 @@ extern "C" {
 
 #include "ldCommon.h"
 #include "xList.h"
-
-#define USE_IMAGE_OPACITY        0
+#include "ldConfig.h"
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;
@@ -17,23 +16,20 @@ typedef struct {
     bool isColor:1;
     ldColor bgColor;
     ldColor specialColor;//maskColor charColor
-#if USE_IMAGE_OPACITY == 1
+#if USE_OPACITY == 1
     uint8_t opacity;
 #endif
 }ldImage_t;
 
-ldImage_t* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,bool isColor,ldColor bgColor,uint32_t imageAddr,bool isWithMask,bool isHidden);
-void ldImageLoop(ldImage_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
-void pImageDel(ldImage_t *widget);
+ldImage_t* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imageAddr,bool isWithMask);
+void ldImageLoop(ldImage_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldImageDel(ldImage_t *widget);
 
-void pImageSetOpacity(ldImage_t *info, uint8_t opacity);
-void nImageSetOpacity(uint16_t nameId, uint8_t opacity);
-
-void pImageSetAddr(ldImage_t *info,uint32_t addr);
-void nImageSetAddr(uint16_t nameId,uint32_t addr);
-
-void pImageSetGrayscale(ldImage_t *info, uint8_t grayBit, ldColor writeColor);
-void nImageSetGrayscale(uint16_t nameId, uint8_t grayBit, ldColor writeColor);
+void ldImageSetBgColor(ldImage_t *widget,ldColor bgColor);
+void ldImageSetHidden(ldImage_t *widget,bool isHidden);
+void ldImageSetOpacity(ldImage_t *widget, uint8_t opacity);
+void ldImageSetImage(ldImage_t *widget, uint32_t imageAddr, bool isWithMask);
+void ldImageSetGrayscale(ldImage_t *widget, uint8_t grayBit, ldColor writeColor);
 
 
 

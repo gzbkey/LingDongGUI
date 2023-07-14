@@ -7,18 +7,11 @@ extern "C" {
 
 #include "stdbool.h"
 #include "stdint.h"
-
-#include "arm_2d.h"
-#include <math.h>
-#include <assert.h>
-#include "arm_2d_helper.h"
 #include "./arm_extra_controls.h"
-#include "./__common.h"
-#include "arm_2d_disp_adapter_0.h"
-//#include "ldMemory.h"
-#include "xString.h"
 #include "xList.h"
 #include "xLog.h"
+
+
 
 #ifndef SET_BITS
 #define SET_BITS(data,value)                    ((data)|=(value))
@@ -186,13 +179,14 @@ ldPoint_t ldGetGlobalPos(ldCommon_t *widget);
 
 xListNode* ldGetWidgetInfoById(uint16_t nameId);
 xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
+void* ldGetWidgetById(uint16_t nameId);
 
 bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
 void ldDelWidget(ldCommon_t *widget);
 
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity);
-void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textColor,uint8_t opacity);
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,const arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity);
 int ldBaseSetText(const char *format, ...);
 

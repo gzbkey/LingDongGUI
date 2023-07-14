@@ -26,14 +26,20 @@ static bool _windowDel(xListNode* pEachInfo,void* pTarget)
     return false;
 }
 
-void pWindowDel(ldWindow_t *widget)
+void ldWindowDel(ldWindow_t *widget)
 {
     xListNode *listInfo;
     
+    if (widget == NULL)
+    {
+        return;
+    }
+
     if(widget->widgetType!=widgetTypeWindow)
     {
         return;
     }
+
     listInfo=ldGetWidgetInfoById(widget->nameId);
     
     if(listInfo!=NULL)
@@ -41,37 +47,43 @@ void pWindowDel(ldWindow_t *widget)
         xListInfoPrevTraverse(widget->childList,NULL,_windowDel);
         xListFreeNode(widget->childList);
         
-        pImageDel((ldImage_t *)widget);
+        ldImageDel((ldImage_t *)widget);
         
     }
 }
 
-ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isWithMask,bool isTransparent,bool isHidden)
+ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldWindow_t * pNewWidget = NULL;
     
-    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isWithMask,0);
+    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,0,false);
     if(pNewWidget!=NULL)
-    {            
+    {
         if(xListMallocNode(&pNewWidget->childList)!=NULL)
         {
-            pNewWidget->isTransparent=isTransparent;
+            pNewWidget->isTransparent=true;
             pNewWidget->widgetType=widgetTypeWindow;
         }
         else
         {
             ldFree(pNewWidget->childList);
-            pImageDel(pNewWidget);
+            ldImageDel(pNewWidget);
             pNewWidget=NULL;
         }
     }
     return pNewWidget;
 }
 
-void pWindowSetHidden(bool isHidden)
+void ldWindowSetTransparent(ldImage_t *widget,bool isTransparent)
 {
-    
+    if (widget == NULL)
+    {
+        return;
+    }
+    widget->isTransparent=isTransparent;
 }
+
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

@@ -1,8 +1,12 @@
 #include "ldCommon.h"
 #include "xList.h"
+#include <stdarg.h>
 #include "ldWindow.h"
 #include "ldImage.h"
-#include <stdarg.h>
+#include "ldButton.h"
+#include "ldConfig.h"
+
+
 
 NEW_LIST(ldWidgetLink);
 
@@ -69,6 +73,15 @@ xListNode* ldGetWidgetInfoById(uint16_t nameId)
     return NULL;
 }
 
+void* ldGetWidgetById(uint16_t nameId)
+{
+    xListNode * pListInfo;
+    if(ldGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
+    {
+        return pListInfo->info;
+    }
+    return NULL;
+}
 
 static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int16_t y)
 {
@@ -242,12 +255,17 @@ void ldDelWidget(ldCommon_t *widget)
     {
         case widgetTypeWindow:
         {
-            pWindowDel((ldWindow_t*)widget);
+            ldWindowDel((ldWindow_t*)widget);
             break;
         }
         case widgetTypeImage:
         {
-            pImageDel((ldImage_t*)widget);
+            ldImageDel((ldImage_t*)widget);
+            break;
+        }
+        case widgetTypeButton:
+        {
+            ldButtonDel((ldButton_t*)widget);
             break;
         }
         default:
@@ -284,23 +302,13 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,u
         }
         else
         {
-            arm_2d_region_t tDrawRegion =
-                {
-                    .tLocation =
-                        {
-                            .iX = 0,
-                            .iY = 0,
-                        },
-                    .tSize = (*resource).tRegion.tSize,
-                };
-
             switch ((*resource).tInfo.tColourInfo.chScheme)
             {
             case ARM_2D_COLOUR_RGB565:
             case ARM_2D_COLOUR_CCCA8888:
             {
 #if USE_OPACITY == 1
-                arm_2d_tile_copy_with_opacity(&resource,
+                arm_2d_tile_copy_with_opacity(resource,
                                       ptTile,
                                       NULL,
                                       opacity);
@@ -319,7 +327,7 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,u
         }
 }
 
-void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textColor,uint8_t opacity)
 {
             arm_2d_region_t tDrawRegion =
                 {
@@ -328,22 +336,22 @@ void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textCo
                             .iX = 0,
                             .iY = 0,
                         },
-                    .tSize = resource.tRegion.tSize,
+                    .tSize = resource->tRegion.tSize,
                 };
 
-            switch (resource.tInfo.tColourInfo.chScheme)
+            switch (resource->tInfo.tColourInfo.chScheme)
             {
             case ARM_2D_COLOUR_1BIT:
             {
 #if USE_OPACITY == 1
-                arm_2d_draw_pattern(&resource,
+                arm_2d_draw_pattern(resource,
                                     ptTile,
                                     &tDrawRegion,
                                     ARM_2D_DRW_PATN_MODE_COPY,
                                     textColor,
                                     GLCD_COLOR_BLACK);
 #else
-                arm_2d_draw_pattern(&resource,
+                arm_2d_draw_pattern(resource,
                                     ptTile,
                                     &tDrawRegion,
                                     ARM_2D_DRW_PATN_MODE_COPY,
@@ -358,13 +366,13 @@ void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textCo
 #if USE_OPACITY == 1
                 arm_2d_fill_colour_with_a2_mask_and_opacity(ptTile,
                                                             &tDrawRegion,
-                                                            &resource,
+                                                            resource,
                                                             (__arm_2d_color_t){textColor},
                                                             opacity);
 #else
                 arm_2d_fill_colour_with_a2_mask(ptTile,
                                                 &tDrawRegion,
-                                               &resource,
+                                               resource,
                                                (__arm_2d_color_t){textColor});
 #endif
                 break;
@@ -374,13 +382,13 @@ void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textCo
 #if USE_OPACITY == 1
                 arm_2d_fill_colour_with_a4_mask_and_opacity(ptTile,
                                                             &tDrawRegion,
-                                                            &resource,
+                                                            resource,
                                                             (__arm_2d_color_t){textColor},
                                                             opacity);
 #else
                 arm_2d_fill_colour_with_a4_mask(ptTile,
                                                 &tDrawRegion,
-                                               &resource,
+                                               resource,
                                                (__arm_2d_color_t){textColor});
 #endif
                 break;
@@ -390,13 +398,13 @@ void ldBaseTextImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textCo
 #if USE_OPACITY == 1
                 arm_2d_fill_colour_with_mask_and_opacity(ptTile,
                                                          &tDrawRegion,
-                                                         (arm_2d_tile_t *)&info->resource,
+                                                         resource,
                                                          (__arm_2d_color_t){textColor},
                                                          opacity);
 #else
                 arm_2d_fill_colour_with_mask(ptTile,
                                              &tDrawRegion,
-                                            &resource,
+                                            resource,
                                             (__arm_2d_color_t){textColor});
 #endif
                 break;
