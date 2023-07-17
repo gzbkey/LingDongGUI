@@ -22,6 +22,25 @@ extern "C" {
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 
+
+
+
+// user key num
+#define KEY_NUM_UP   0
+#define KEY_NUM_DOWN   1
+#define KEY_NUM_LEFT   2
+#define KEY_NUM_RIGHT   3
+#define KEY_NUM_ENTER   4
+#define KEY_NUM_ESC   5
+
+
+
+
+
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

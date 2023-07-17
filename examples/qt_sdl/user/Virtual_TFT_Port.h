@@ -29,17 +29,22 @@ typedef uint32_t color_typedef;
 #error "Invalid VT_COLOR_DEPTH in Virtual_TFT_Port.h"
 #endif
 
+extern bool keyUp;
+extern bool keyDown;
+extern bool keyLeft;
+extern bool keyRight;
+extern bool keyEnter;
+extern bool keyEsc;
 
 
-
-void VT_Init(void);
-void VT_Fill_Single_Color(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef color);
-void VT_Fill_Multiple_Colors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef * color_p);
-void VT_Set_Point(int32_t x, int32_t y, color_typedef color);
-color_typedef VT_Get_Point(int32_t x, int32_t y);
-void VT_Clear(color_typedef color);
-bool VT_Mouse_Get_Point(int16_t *x,int16_t *y);
-void lcd_flush(int32_t nMS);
+void vtInit(void);
+void vtFillSingleColor(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef color);
+void vtFillMultipleColors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef * color_p);
+void vtSetPoint(int32_t x, int32_t y, color_typedef color);
+color_typedef vtGetPoint(int32_t x, int32_t y);
+bool vtMouseGetPoint(int16_t *x,int16_t *y);
+void lcdFlush(int32_t nMS);
+bool vtGetKeyState(size_t value);
 
 #ifdef __cplusplus
 } /* extern "C" */

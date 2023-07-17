@@ -64,7 +64,8 @@ void xBtnTick(uint8_t cycleMs);
 uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state);
 void xBtnClean(void);
 
-
+#define X_BTN_WIDGET_INIT(pWidget,nameId,func)   xBtnInit(pWidget,nameId,func)
+#define X_BTN_KEY_INIT(keyNum,func)              xBtnInit(keyNum,0,func)
 
 
 

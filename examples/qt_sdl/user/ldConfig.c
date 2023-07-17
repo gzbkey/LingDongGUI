@@ -22,7 +22,7 @@ bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
     int16_t ry;
     
     //添加触摸函数
-    touchState=VT_Mouse_Get_Point(&rx,&ry);
+    touchState=vtMouseGetPoint(&rx,&ry);
     *x=rx;
     *y=ry;
     if((touchState!=0)&&(((rx!=-1)&&(ry!=-1))||((rx!=0)&&(ry!=0))))

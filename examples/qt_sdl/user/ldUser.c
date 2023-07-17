@@ -3,13 +3,13 @@
 #include "ldWindow.h"
 #include "ldGui.h"
 #include "ldConfig.h"
-
+#include "xBtnAction.h"
 ldImage_t *img0;
 ldWindow_t *win0;
 ldImage_t *img1;
 ldWindow_t *win1;
 
-ldButton_t *btn0;
+ldButton_t *btn0,*btn1,*targetBtn;
 int64_t timer=0;
 
 
@@ -599,6 +599,7 @@ static const uint8_t select[72*72] = {
 };
 
 #define ID_BTN0      2
+#define ID_BTN1      3
 void userInit(void)
 {
     win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
@@ -609,12 +610,13 @@ void userInit(void)
     
     
     btn0=ldButtonInit(ID_BTN0, 0, 20,100,72,72);
+    btn1=ldButtonInit(ID_BTN1, 0, 120,100,72,72);
 //    ldButtonSetImage(ldGetWidgetById(ID_BTN0),(uint32_t)&release[0],(uint32_t)&press[0],false);
 
 //    ldButtonSetSelectImage(ldGetWidgetById(ID_BTN0),(uint32_t)&select[0],__RGB(255,0,0));
 
-    btn0->isSelected=true;
-    btn0->isCorner=true;
+    targetBtn=btn1;
+    btn1->isSelected=true;
 }
 
 void userInit1(void)
@@ -630,6 +632,37 @@ void userLoop(void)
 //        btn0->isPressed=!btn0->isPressed;
 ////        ldGuiJumpPage(1);
 //    }
+
+    if(xBtnGetState(KEY_NUM_LEFT,BTN_PRESS))
+    {
+        if(targetBtn==btn1)
+        {
+            btn0->isSelected=true;
+            btn1->isSelected=false;
+            targetBtn=btn0;
+        }
+        else
+        {
+            btn0->isSelected=false;
+            btn1->isSelected=true;
+            targetBtn=btn1;
+        }
+    }
+    if(xBtnGetState(KEY_NUM_RIGHT,BTN_PRESS))
+    {
+        if(targetBtn==btn1)
+        {
+            btn0->isSelected=true;
+            btn1->isSelected=false;
+            targetBtn=btn0;
+        }
+        else
+        {
+            btn0->isSelected=false;
+            btn1->isSelected=true;
+            targetBtn=btn1;
+        }
+    }
 }
 
 void userLoop1(void)

@@ -290,10 +290,10 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,u
 
             srcTile = *resource;
             srcTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-            srcTile.pchBuffer += srcTile.tRegion.tSize.iWidth * srcTile.tRegion.tSize.iHeight;
 
             maskTile = *resource;
             maskTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
+            maskTile.pchBuffer += maskTile.tRegion.tSize.iWidth * maskTile.tRegion.tSize.iHeight;
 
             arm_2d_tile_copy_with_src_mask_only((arm_2d_tile_t *)&srcTile,
                                                 (arm_2d_tile_t *)&maskTile,

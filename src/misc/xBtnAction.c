@@ -41,9 +41,6 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
     btnClickTimeOut=clickTimeOutMs/btnDebounceMs;
 }
 
-#define X_BTN_WIDGET_INIT(pWidget,nameId,func)   xBtnInit(pWidget,nameId,func)
-#define X_BTN_KEY_INIT(keyNum,func)   xBtnInit(keyNum,0,func)
-
 void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t))
 {
     xBtnInfo_t * link = (xBtnInfo_t *)BTN_MALLOC(sizeof(xBtnInfo_t));

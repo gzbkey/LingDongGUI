@@ -190,7 +190,8 @@ void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
-    
+
+    //检查按键
     if(ldTimeOut(10,&sysTimer,true))
     {
         xBtnTick(10);
@@ -198,9 +199,6 @@ void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
     
     //检查触摸
     ldGuiTouchProcess();
-    
-    //检查按键
-//    _ldKeyLoop();
     
     xConnectProcess();
 }
