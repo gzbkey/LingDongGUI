@@ -416,17 +416,14 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textC
             }
 }
 
-void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,const arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity)
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity)
 {
-    
     arm_lcd_text_set_draw_region(&ptTile->tRegion);
     arm_lcd_text_set_font(ptFont);
     arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
     arm_lcd_text_set_opacity(opacity);
 
     arm_lcd_text_location(0,0);
-        
-    arm_lcd_puts("123");
 }
 
 #if defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__
@@ -448,6 +445,8 @@ int ldBaseSetText(const char *format, ...)
     return real_size;
 }
 
-//ldBaseSetTextInfo(&tTarget,&ARM_2D_FONT_6x8.use_as__arm_2d_font_t,GLCD_COLOR_RED,64);
-//        ldBaseSetText("123");
+void ldBaseTextDel(ldChar_t *charInfo)
+{
+
+}
 

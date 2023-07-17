@@ -9,11 +9,7 @@ extern "C" {
 #include "xList.h"
 #include "ldConfig.h"
 
-typedef struct{
-    arm_2d_tile_t *ptRes;
-    arm_2d_font_t *ptFont;
-    uint8_t* pStr;
-}ldChar_t;
+
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;
@@ -31,7 +27,6 @@ typedef struct {
     ldColor releaseColor;
     ldColor pressColor;
     ldColor selectColor;
-    ldColor charColor;
     ldChar_t *ptTextInfo;
 }ldButton_t;
 
@@ -42,12 +37,15 @@ void ldButtonDel(ldButton_t *widget);
 void ldButtonSetColor(ldButton_t* widget, ldColor releaseColor, ldColor pressColor);
 void ldButtonSetImage(ldButton_t* widget,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isWithMask);
 void ldButtonSetSelectImage(ldButton_t* widget,uint32_t selectMaskAddr,ldColor selectColor);
-void ldButtonSetCharColor(ldButton_t* widget,ldColor charColor);
+
 void ldButtonSetTransparent(ldButton_t* widget,bool isTransparent);
 void ldButtonSetHidden(ldButton_t* widget,bool isHidden);
 void ldButtonSetRoundCorner(ldButton_t* widget,bool isCorner);
 void ldButtonSetSelect(ldButton_t* widget,bool isSelected);
 
+void ldButtonSetFont(ldButton_t* widget,arm_2d_font_t *ptFont);
+void ldButtonSetText(ldButton_t* widget,uint8_t *pStr);
+void ldButtonSetTextColor(ldButton_t* widget,ldColor charColor);
 #ifdef __cplusplus
 }
 #endif

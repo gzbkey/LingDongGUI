@@ -125,6 +125,14 @@ typedef struct{
     int16_t y;
 }ldPoint_t;
 
+typedef struct{
+    arm_2d_tile_t *ptRes;
+    arm_2d_font_t *ptFont;
+    ldColor charColor;
+    uint16_t len;
+    uint8_t* pStr;
+}ldChar_t;
+
 //typedef struct{
 //    int16_t width;
 //    int16_t height;
@@ -187,8 +195,11 @@ void ldDelWidget(ldCommon_t *widget);
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity);
 void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textColor,uint8_t opacity);
-void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,const arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity);
+
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity);
 int ldBaseSetText(const char *format, ...);
+
+void ldBaseTextDel(ldChar_t *charInfo);
 
 #ifdef __cplusplus
 }

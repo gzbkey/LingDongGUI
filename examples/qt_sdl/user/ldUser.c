@@ -610,7 +610,18 @@ void userInit(void)
     
     
     btn0=ldButtonInit(ID_BTN0, 0, 20,100,72,72);
+
+
+
     btn1=ldButtonInit(ID_BTN1, 0, 120,100,72,72);
+//    ldBaseSetTextInfo(btn1,,GLCD_COLOR_RED,64);
+
+    ldButtonSetFont(btn1,&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
+    ldButtonSetText(btn1,"123");
+    ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
+
+    //    ldBaseSetText("btn1");
+
 //    ldButtonSetImage(ldGetWidgetById(ID_BTN0),(uint32_t)&release[0],(uint32_t)&press[0],false);
 
 //    ldButtonSetSelectImage(ldGetWidgetById(ID_BTN0),(uint32_t)&select[0],__RGB(255,0,0));
