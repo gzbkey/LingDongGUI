@@ -30,7 +30,7 @@ static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
         if(btn->ptTextInfo!=NULL)
         {
             ldBaseTextDel(btn->ptTextInfo);
-            ldFree(btn->ptTextInfo);
+//            ldFree(btn->ptTextInfo);
         }
         ldFree(btn);
         xListInfoDel(pEachInfo);
@@ -171,15 +171,10 @@ void ldButtonSetFont(ldButton_t* widget,arm_2d_font_t *ptFont)
     {
         return;
     }
-    if(widget->ptTextInfo==NULL)
+    if(ldBaseCheckText(&widget->ptTextInfo))
     {
-        widget->ptTextInfo=ldMalloc(sizeof(ldChar_t));
-        if(widget->ptTextInfo==NULL)
-        {
-            return;
-        }
+        widget->ptTextInfo->ptFont=ptFont;
     }
-    widget->ptTextInfo->ptFont=ptFont;
 }
 
 void ldButtonSetText(ldButton_t* widget,uint8_t *pStr)
@@ -190,33 +185,29 @@ void ldButtonSetText(ldButton_t* widget,uint8_t *pStr)
         return;
     }
     newStrlen=strlen((char*)pStr)+1;
-    if(widget->ptTextInfo==NULL)
+    if(ldBaseCheckText(&widget->ptTextInfo))
     {
-        widget->ptTextInfo=ldMalloc(sizeof(ldChar_t));
-        if(widget->ptTextInfo==NULL)
+        if((newStrlen>widget->ptTextInfo->len)&&(widget->ptTextInfo->pStr!=NULL))
         {
-            return;
+            ldFree(widget->ptTextInfo->pStr);
+            widget->ptTextInfo->pStr=NULL;
+            widget->ptTextInfo->len=0;
         }
-    }
 
-    if(newStrlen>widget->ptTextInfo->len)
-    {
-        ldFree(widget->ptTextInfo->pStr);
-        widget->ptTextInfo->pStr=NULL;
-        widget->ptTextInfo->len=0;
-    }
-
-    if(widget->ptTextInfo->pStr==NULL)
-    {
-        widget->ptTextInfo->pStr=ldMalloc(newStrlen);
         if(widget->ptTextInfo->pStr==NULL)
         {
-            return;
+            widget->ptTextInfo->pStr=ldMalloc(newStrlen);
+            if(widget->ptTextInfo->pStr==NULL)
+            {
+                return;
+            }
+            widget->ptTextInfo->len=newStrlen;
         }
-        widget->ptTextInfo->len=newStrlen;
+
+        strcpy((char*)widget->ptTextInfo->pStr,(char*)pStr);
     }
 
-    strcpy((char*)widget->ptTextInfo->pStr,(char*)pStr);
+
 }
 
 void ldButtonSetColor(ldButton_t* widget,ldColor releaseColor,ldColor pressColor)
@@ -254,15 +245,10 @@ void ldButtonSetTextColor(ldButton_t* widget,ldColor charColor)
     {
         return;
     }
-    if(widget->ptTextInfo==NULL)
+    if(ldBaseCheckText(&widget->ptTextInfo))
     {
-        widget->ptTextInfo=ldMalloc(sizeof(ldChar_t));
-        if(widget->ptTextInfo==NULL)
-        {
-            return;
-        }
+        widget->ptTextInfo->charColor=charColor;
     }
-    widget->ptTextInfo->charColor=charColor;
 }
 
 void ldButtonSetTransparent(ldButton_t* widget,bool isTransparent)
@@ -367,6 +353,12 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                 }
                 ldBaseImage(&tTarget,tResTile,widget->isWithMask,255);
             }
+
+            if(widget->ptTextInfo!=NULL)
+            {
+                ldBaseSetTextInfo(&tTarget,widget->ptTextInfo,255);
+            }
+
             if(widget->isSelected)
             {
                 if (widget->selectMaskAddr==0)
@@ -403,16 +395,26 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
             }
         }
 
-        if(widget->ptTextInfo!=NULL)
-        {
-            ldBaseSetTextInfo(&tTarget,widget->ptTextInfo->ptFont,widget->ptTextInfo->charColor,255);
-            arm_lcd_puts(widget->ptTextInfo->pStr);
-        }
+
 
     }
 
 
     arm_2d_op_wait_async(NULL);
+}
+
+
+void ldButtonSetAlign(ldButton_t *widget,uint8_t align)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+
+    if(ldBaseCheckText(&widget->ptTextInfo))
+    {
+        widget->ptTextInfo->align=align;
+    }
 }
 
 #if defined(__clang__)

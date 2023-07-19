@@ -125,12 +125,18 @@ typedef struct{
     int16_t y;
 }ldPoint_t;
 
+#define LD_ALIGN_CENTER          0
+#define LD_ALIGN_TOP             _BV(0)
+#define LD_ALIGN_BOTTOM          _BV(1)
+#define LD_ALIGN_LEFT            _BV(2)
+#define LD_ALIGN_RIGHT           _BV(3)
+
 typedef struct{
-    arm_2d_tile_t *ptRes;
     arm_2d_font_t *ptFont;
     ldColor charColor;
     uint16_t len;
     uint8_t* pStr;
+    uint8_t align:4;
 }ldChar_t;
 
 //typedef struct{
@@ -196,10 +202,11 @@ void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity);
 void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textColor,uint8_t opacity);
 
-void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity);
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
 int ldBaseSetText(const char *format, ...);
 
 void ldBaseTextDel(ldChar_t *charInfo);
+ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
 
 #ifdef __cplusplus
 }

@@ -46,6 +46,7 @@ void ldButtonSetSelect(ldButton_t* widget,bool isSelected);
 void ldButtonSetFont(ldButton_t* widget,arm_2d_font_t *ptFont);
 void ldButtonSetText(ldButton_t* widget,uint8_t *pStr);
 void ldButtonSetTextColor(ldButton_t* widget,ldColor charColor);
+void ldButtonSetAlign(ldButton_t *widget,uint8_t align);
 #ifdef __cplusplus
 }
 #endif

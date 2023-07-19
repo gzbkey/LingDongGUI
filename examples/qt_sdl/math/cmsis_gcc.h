@@ -965,7 +965,7 @@ __STATIC_FORCEINLINE uint32_t __REV16(uint32_t value)
  */
 __STATIC_FORCEINLINE void __disable_irq(void)
 {
-    return 0;
+
 }
 
 

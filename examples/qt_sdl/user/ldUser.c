@@ -617,10 +617,10 @@ void userInit(void)
 //    ldBaseSetTextInfo(btn1,,GLCD_COLOR_RED,64);
 
     ldButtonSetFont(btn1,&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
-    ldButtonSetText(btn1,"123");
     ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
+    ldButtonSetText(btn1,"btn1");
 
-    //    ldBaseSetText("btn1");
+    ldButtonSetAlign(btn1,LD_ALIGN_LEFT|LD_ALIGN_BOTTOM);
 
 //    ldButtonSetImage(ldGetWidgetById(ID_BTN0),(uint32_t)&release[0],(uint32_t)&press[0],false);
 

@@ -6,23 +6,66 @@
 #include "ldButton.h"
 #include "ldConfig.h"
 
+#include "tlsf.h"
 
+#if defined(__clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunknown-warning-option"
+#   pragma clang diagnostic ignored "-Wreserved-identifier"
+#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#   pragma clang diagnostic ignored "-Wpadded"
+#   pragma clang diagnostic ignored "-Wcast-qual"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#   pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#   pragma clang diagnostic ignored "-Wmissing-braces"
+#   pragma clang diagnostic ignored "-Wunused-const-variable"
+#   pragma clang diagnostic ignored "-Wmissing-declarations"
+#   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
 
 NEW_LIST(ldWidgetLink);
 
+#if USE_TLSF == 1
+static void * pTlsfMem=NULL;
+static uint8_t tlsfMemBuf[TLSF_MEM_SIZE];
+#endif
+
 __WEAK void *ldMalloc(uint32_t size)
 {
-    return malloc(size);
+#if USE_TLSF == 1
+    if(pTlsfMem==NULL)
+    {
+        pTlsfMem = tlsf_create_with_pool((void *)tlsfMemBuf, TLSF_MEM_SIZE);
+    }
+    void* p=tlsf_malloc(pTlsfMem,size);
+    memset(p,0,size);
+    return p;
+
+#else
+    void* p=malloc(size);
+    memset(p,0,size);
+    return p;
+#endif
 }
 
 __WEAK void ldFree(void *p)
 {
+#if USE_TLSF == 1
+    tlsf_free(pTlsfMem, p);
+#else
     free(p);
+#endif
 }
 
 __WEAK void *ldRealloc(void *ptr,uint32_t newSize)
 {
+#if USE_TLSF == 1
+    return tlsf_realloc(pTlsfMem, ptr, newSize);
+#else
     return realloc(ptr,newSize);
+#endif
 }
 
 static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
@@ -416,14 +459,97 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textC
             }
 }
 
-void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,arm_2d_font_t *ptFont,ldColor textColor,uint8_t opacity)
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity)
 {
-    arm_lcd_text_set_draw_region(&ptTile->tRegion);
-    arm_lcd_text_set_font(ptFont);
-    arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
-    arm_lcd_text_set_opacity(opacity);
+    arm_2d_canvas(ptTile,newCavas)
+    {
+        switch (ptCharInfo->align)
+        {
+        case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
+        {
+            arm_2d_align_top_left(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__top_left_region);
+            }
+            break;
+        }
+        case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
+        {
+            arm_2d_align_top_centre(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__top_centre_region);
+            }
+            break;
+        }
+        case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
+        {
+            arm_2d_align_top_right(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__top_right_region);
+            }
+            break;
+        }
+        case LD_ALIGN_LEFT:
+        {
+            arm_2d_align_left(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__left_region);
+            }
+            break;
+        }
+        case LD_ALIGN_CENTER:
+        {
+            arm_2d_align_centre(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__centre_region);
+            }
+            break;
+        }
+        case LD_ALIGN_RIGHT:
+        {
+            arm_2d_align_right(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__right_region);
+            }
+            break;
+        }
+        case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
+        {
+            arm_2d_align_bottom_left(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__bottom_left_region);
+            }
+            break;
+        }
+        case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
+        {
+            arm_2d_align_bottom_centre(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__bottom_centre_region);
+            }
+            break;
+        }
+        case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
+        {
+            arm_2d_align_bottom_right(newCavas,arm_lcd_get_string_line_box((char*)ptCharInfo->pStr,ptCharInfo->ptFont))
+            {
+                arm_lcd_text_set_draw_region(&__bottom_right_region);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+            arm_lcd_text_set_target_framebuffer(ptTile);
+            arm_lcd_text_set_font(ptCharInfo->ptFont);
+            arm_lcd_text_set_colour(ptCharInfo->charColor, GLCD_COLOR_WHITE);
+            arm_lcd_text_set_opacity(opacity);
 
-    arm_lcd_text_location(0,0);
+            if(ptCharInfo->pStr!=NULL)
+            {
+                arm_lcd_puts((char*)ptCharInfo->pStr);
+            }
+    }
 }
 
 #if defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__
@@ -447,6 +573,25 @@ int ldBaseSetText(const char *format, ...)
 
 void ldBaseTextDel(ldChar_t *charInfo)
 {
-
+    ldFree(charInfo->ptFont);
+    ldFree(charInfo->pStr);
+    ldFree(charInfo);
 }
 
+ldChar_t * ldBaseCheckText(ldChar_t **charInfo)
+{
+    if(*charInfo==NULL)
+    {
+        *charInfo=ldMalloc(sizeof(ldChar_t));
+        if(*charInfo==NULL)
+        {
+            return NULL;
+        }
+        (*charInfo)->pStr=NULL;
+    }
+    return *charInfo;
+}
+
+#if defined(__clang__)
+#   pragma clang diagnostic pop
+#endif

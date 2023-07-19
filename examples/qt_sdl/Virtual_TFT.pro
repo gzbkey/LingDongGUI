@@ -10,7 +10,7 @@ SOURCES += \
     ../../src/gui/ldImage.c \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldWindow.c \
-    ../../src/misc/freeRtosHeap4.c \
+    ../../src/misc/tlsf.c \
     ../../src/misc/xBtnAction.c \
     ../../src/misc/xConnect.c \
     ../../src/misc/xList.c \
@@ -99,7 +99,7 @@ HEADERS += \
     ../../src/gui/ldImage.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldWindow.h \
-    ../../src/misc/freeRtosHeap4.h \
+    ../../src/misc/tlsf.h \
     ../../src/misc/xBtnAction.h \
     ../../src/misc/xConnect.h \
     ../../src/misc/xList.h \
@@ -210,6 +210,6 @@ OutLibFile = $$OUT_PWD/SDL2.dll
 OutLibFile = $$replace(OutLibFile, /, \\)
 QMAKE_PRE_LINK +=  copy $$SDL2_PATH $$OutLibFile /y
 
-DEFINES += ARM_SECTION(x)=  __va_list=va_list \
-           RTE_Acceleration_Arm_2D_Extra_Benchmark_Watch_Panel \
+DEFINES += ARM_SECTION(x)=  \
+           __va_list=va_list \
            RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
