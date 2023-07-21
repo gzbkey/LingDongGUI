@@ -190,7 +190,7 @@ void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFr
         }
         else
         {
-            ldBaseImage(&tTarget,&widget->resource,widget->isWithMask,IMG_OPACITY);
+            ldBaseImage(&tTarget,widget->resource,widget->isWithMask,IMG_OPACITY);
         }
     }
     arm_2d_op_wait_async(NULL);

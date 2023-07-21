@@ -199,8 +199,8 @@ bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
 void ldDelWidget(ldCommon_t *widget);
 
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
-void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity);
-void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textColor,uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,bool isWithMask,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity);
 
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
 int ldBaseSetText(const char *format, ...);

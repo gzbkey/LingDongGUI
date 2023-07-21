@@ -125,7 +125,8 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->releaseImgAddr=0;
         pNewWidget->pressImgAddr=0;
         pNewWidget->selectMaskAddr=0;
-        pNewWidget->isWithMask = false;
+        pNewWidget->isReleaseMask = false;
+        pNewWidget->isPressMask = false;
         pNewWidget->isTransparent=false;
         pNewWidget->isHidden = false;
 
@@ -218,7 +219,7 @@ void ldButtonSetColor(ldButton_t* widget,ldColor releaseColor,ldColor pressColor
     widget->pressImgAddr=0;
 }
 
-void ldButtonSetImage(ldButton_t* widget,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isWithMask)
+void ldButtonSetImage(ldButton_t* widget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask)
 {
     if(widget==NULL)
     {
@@ -226,7 +227,8 @@ void ldButtonSetImage(ldButton_t* widget,uint32_t releaseImgAddr,uint32_t pressI
     }
     widget->releaseImgAddr=releaseImgAddr;
     widget->pressImgAddr=pressImgAddr;
-    widget->isWithMask=isWithMask;
+    widget->isReleaseMask=isReleaseMask;
+    widget->isPressMask=isPressMask;
 }
 
 void ldButtonSetSelectImage(ldButton_t* widget,uint32_t selectMaskAddr,ldColor selectColor)
@@ -343,6 +345,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
 #if USE_VIRTUAL_RESOURCE == 1
                     ((arm_2d_vres_t*)tResTile)->pTarget=widget->pressImgAddr;
 #endif
+                    ldBaseImage(&tTarget,*tResTile,widget->isPressMask,255);
                 }
                 else
                 {
@@ -350,13 +353,14 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
 #if USE_VIRTUAL_RESOURCE == 1
                     ((arm_2d_vres_t*)tResTile)->pTarget=widget->releaseImgAddr;
 #endif
+                    ldBaseImage(&tTarget,*tResTile,widget->isReleaseMask,255);
                 }
-                ldBaseImage(&tTarget,tResTile,widget->isWithMask,255);
             }
-
+            arm_2d_op_wait_async(NULL);
             if(widget->ptTextInfo!=NULL)
             {
                 ldBaseSetTextInfo(&tTarget,widget->ptTextInfo,255);
+                arm_2d_op_wait_async(NULL);
             }
 
             if(widget->isSelected)
@@ -390,7 +394,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                     maskRes.Load = &__disp_adapter0_vres_asset_loader;
                     maskRes.Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-                    ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&maskRes,widget->selectColor,255);
+                    ldBaseMaskImage(&tTarget,*((arm_2d_tile_t*)&maskRes),widget->selectColor,255);
                 }
             }
         }

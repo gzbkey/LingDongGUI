@@ -319,144 +319,135 @@ void ldDelWidget(ldCommon_t *widget)
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity)
 {
 #if USE_OPACITY == 1
-        arm_2d_fill_colour_with_opacity(ptTile, NULL,(__arm_2d_color_t)color, opacity);
+    arm_2d_fill_colour_with_opacity(ptTile, NULL,(__arm_2d_color_t)color, opacity);
 #else
-        arm_2d_fill_colour(ptTile, NULL, color);
+    arm_2d_fill_colour(ptTile, NULL, color);
 #endif
 }
 
-void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,bool isWithMask,uint8_t opacity)
+void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,bool isWithMask,uint8_t opacity)
 {
+    //root tile init
+    resource.tRegion.tLocation.iX=0;
+    resource.tRegion.tLocation.iY=0;
     if (isWithMask)
+    {
+        arm_2d_tile_t maskTile;
+        maskTile = resource;
+        maskTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
+        maskTile.pchBuffer += maskTile.tRegion.tSize.iWidth * maskTile.tRegion.tSize.iHeight * 2;
+
+        arm_2d_tile_copy_with_src_mask_only((arm_2d_tile_t *)&resource,
+                                            (arm_2d_tile_t *)&maskTile,
+                                            ptTile,
+                                            NULL);
+    }
+    else
+    {
+        switch ((resource).tInfo.tColourInfo.chScheme)
         {
-            arm_2d_tile_t srcTile, maskTile;
-
-            srcTile = *resource;
-            srcTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-
-            maskTile = *resource;
-            maskTile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
-            maskTile.pchBuffer += maskTile.tRegion.tSize.iWidth * maskTile.tRegion.tSize.iHeight;
-
-            arm_2d_tile_copy_with_src_mask_only((arm_2d_tile_t *)&srcTile,
-                                                (arm_2d_tile_t *)&maskTile,
-                                                ptTile,
-                                                NULL);
-        }
-        else
+        case ARM_2D_COLOUR_RGB565:
+        case ARM_2D_COLOUR_CCCA8888:
         {
-            switch ((*resource).tInfo.tColourInfo.chScheme)
-            {
-            case ARM_2D_COLOUR_RGB565:
-            case ARM_2D_COLOUR_CCCA8888:
-            {
 #if USE_OPACITY == 1
-                arm_2d_tile_copy_with_opacity(resource,
-                                      ptTile,
-                                      NULL,
-                                      opacity);
-                
+            arm_2d_tile_copy_with_opacity(&resource,
+                                          ptTile,
+                                          NULL,
+                                          opacity);
+
 #else
-                arm_2d_tile_copy_only(resource,
-                                      ptTile,
-                                      NULL);
+            arm_2d_tile_copy_only(&resource,
+                                  ptTile,
+                                  NULL);
 #endif
-                break;
-            }
-            
-            default:
-                break;
-            }
+            break;
         }
+            
+        default:
+            break;
+        }
+    }
 }
 
-void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *resource,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity)
 {
-            arm_2d_region_t tDrawRegion =
-                {
-                    .tLocation =
-                        {
-                            .iX = 0,
-                            .iY = 0,
-                        },
-                    .tSize = resource->tRegion.tSize,
-                };
+    //root tile init
+    resource.tRegion.tLocation.iX=0;
+    resource.tRegion.tLocation.iY=0;
 
-            switch (resource->tInfo.tColourInfo.chScheme)
-            {
-            case ARM_2D_COLOUR_1BIT:
-            {
+    switch (resource.tInfo.tColourInfo.chScheme)
+    {
+    case ARM_2D_COLOUR_1BIT:
+    {
 #if USE_OPACITY == 1
-                arm_2d_draw_pattern(resource,
-                                    ptTile,
-                                    &tDrawRegion,
-                                    ARM_2D_DRW_PATN_MODE_COPY,
-                                    textColor,
-                                    GLCD_COLOR_BLACK);
+        arm_2d_draw_pattern(&resource,
+                            ptTile,
+                            &resource.tRegion,
+                            ARM_2D_DRW_PATN_MODE_COPY,
+                            textColor,
+                            GLCD_COLOR_BLACK);
 #else
-                arm_2d_draw_pattern(resource,
-                                    ptTile,
-                                    &tDrawRegion,
-                                    ARM_2D_DRW_PATN_MODE_COPY,
-                                    textColor,
-                                    GLCD_COLOR_BLACK);
+        arm_2d_draw_pattern(&resource,
+                            ptTile,
+                            &resource.tRegion,
+                            ARM_2D_DRW_PATN_MODE_COPY,
+                            textColor,
+                            GLCD_COLOR_BLACK);
 #endif
 
-                break;
-            }
-            case ARM_2D_COLOUR_MASK_A2:
-            {
+        break;
+    }
+    case ARM_2D_COLOUR_MASK_A2:
+    {
 #if USE_OPACITY == 1
-                arm_2d_fill_colour_with_a2_mask_and_opacity(ptTile,
-                                                            &tDrawRegion,
-                                                            resource,
-                                                            (__arm_2d_color_t){textColor},
-                                                            opacity);
+        arm_2d_fill_colour_with_a2_mask_and_opacity(ptTile,
+                                                    &resource.tRegion,
+                                                    &resource,
+                                                    (__arm_2d_color_t){textColor},
+                                                    opacity);
 #else
-                arm_2d_fill_colour_with_a2_mask(ptTile,
-                                                &tDrawRegion,
-                                               resource,
-                                               (__arm_2d_color_t){textColor});
+        arm_2d_fill_colour_with_a2_mask(ptTile,
+                                        &resource.tRegion,
+                                        &resource,
+                                        (__arm_2d_color_t){textColor});
 #endif
-                break;
-            }
-            case ARM_2D_COLOUR_MASK_A4:
-            {
+        break;
+    }
+    case ARM_2D_COLOUR_MASK_A4:
+    {
 #if USE_OPACITY == 1
-                arm_2d_fill_colour_with_a4_mask_and_opacity(ptTile,
-                                                            &tDrawRegion,
-                                                            resource,
-                                                            (__arm_2d_color_t){textColor},
-                                                            opacity);
+        arm_2d_fill_colour_with_a4_mask_and_opacity(ptTile,
+                                                    &resource.tRegion,
+                                                    &resource,
+                                                    (__arm_2d_color_t){textColor},
+                                                    opacity);
 #else
-                arm_2d_fill_colour_with_a4_mask(ptTile,
-                                                &tDrawRegion,
-                                               resource,
-                                               (__arm_2d_color_t){textColor});
+        arm_2d_fill_colour_with_a4_mask(ptTile,
+                                        &resource.tRegion,
+                                        &resource,
+                                        (__arm_2d_color_t){textColor});
 #endif
-                break;
-            }
-            case ARM_2D_COLOUR_MASK_A8:
-            {
+        break;
+    }
+    case ARM_2D_COLOUR_MASK_A8:
+    {
 #if USE_OPACITY == 1
-                arm_2d_fill_colour_with_mask_and_opacity(ptTile,
-                                                         &tDrawRegion,
-                                                         resource,
-                                                         (__arm_2d_color_t){textColor},
-                                                         opacity);
+        arm_2d_fill_colour_with_mask_and_opacity(ptTile,
+                                                 &resource.tRegion,
+                                                 &resource,
+                                                 (__arm_2d_color_t){textColor},
+                                                 opacity);
 #else
-                arm_2d_fill_colour_with_mask(ptTile,
-                                             &tDrawRegion,
-                                            resource,
-                                            (__arm_2d_color_t){textColor});
+        arm_2d_fill_colour_with_mask(ptTile,
+                                     &resource.tRegion,
+                                     &resource,
+                                     (__arm_2d_color_t){textColor});
 #endif
-                break;
-            }
-            
-            
-            default:
-                break;
-            }
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity)
