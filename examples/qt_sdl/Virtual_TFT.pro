@@ -86,6 +86,7 @@ SOURCES += \
     math/arm_cos_q31.c \
     math/arm_sin_f32.c \
     math/arm_sin_q31.c \
+    user/image.c \
     user/ldConfig.c \
     user/ldUser.c \
     user/main.c \
@@ -178,6 +179,7 @@ HEADERS += \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
     user/arm_2d_disp_adapter_0.h \
+    user/image.h \
     user/ldConfig.h \
     user/ldUser.h
 

@@ -166,18 +166,6 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
-void ldButtonSetFont(ldButton_t* widget,arm_2d_font_t *ptFont)
-{
-    if(widget==NULL)
-    {
-        return;
-    }
-    if(ldBaseCheckText(&widget->ptTextInfo))
-    {
-        widget->ptTextInfo->ptFont=ptFont;
-    }
-}
-
 void ldButtonSetText(ldButton_t* widget,uint8_t *pStr)
 {
     uint8_t newStrlen;
@@ -185,14 +173,15 @@ void ldButtonSetText(ldButton_t* widget,uint8_t *pStr)
     {
         return;
     }
-    newStrlen=strlen((char*)pStr)+1;
+    newStrlen=strlen((char*)pStr);
+
     if(ldBaseCheckText(&widget->ptTextInfo))
     {
-        if((newStrlen>widget->ptTextInfo->len)&&(widget->ptTextInfo->pStr!=NULL))
+        if((newStrlen>widget->ptTextInfo->strLen)&&(widget->ptTextInfo->pStr!=NULL))
         {
             ldFree(widget->ptTextInfo->pStr);
             widget->ptTextInfo->pStr=NULL;
-            widget->ptTextInfo->len=0;
+            widget->ptTextInfo->strLen=0;
         }
 
         if(widget->ptTextInfo->pStr==NULL)
@@ -202,7 +191,7 @@ void ldButtonSetText(ldButton_t* widget,uint8_t *pStr)
             {
                 return;
             }
-            widget->ptTextInfo->len=newStrlen;
+            widget->ptTextInfo-> strLen=newStrlen;
         }
 
         strcpy((char*)widget->ptTextInfo->pStr,(char*)pStr);
@@ -357,10 +346,10 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                 }
             }
             arm_2d_op_wait_async(NULL);
+
             if(widget->ptTextInfo!=NULL)
             {
-                ldBaseSetTextInfo(&tTarget,widget->ptTextInfo,255);
-                arm_2d_op_wait_async(NULL);
+                ldBaseShowText(tTarget,widget->ptTextInfo);
             }
 
             if(widget->isSelected)
@@ -396,6 +385,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
 #endif
                     ldBaseMaskImage(&tTarget,*((arm_2d_tile_t*)&maskRes),widget->selectColor,255);
                 }
+                arm_2d_op_wait_async(NULL);
             }
         }
 
@@ -404,7 +394,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
     }
 
 
-    arm_2d_op_wait_async(NULL);
+
 }
 
 
@@ -418,6 +408,19 @@ void ldButtonSetAlign(ldButton_t *widget,uint8_t align)
     if(ldBaseCheckText(&widget->ptTextInfo))
     {
         widget->ptTextInfo->align=align;
+    }
+}
+
+void ldButtonSetFont(ldButton_t *widget,uint8_t maskType,uint32_t fontDictAddr,uint32_t fontSrcAddr,uint16_t lineOffset,int16_t descender)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+
+    if(ldBaseCheckText(&widget->ptTextInfo))
+    {
+        ldBaseSetFont(widget->ptTextInfo,maskType,fontDictAddr,fontSrcAddr,lineOffset,descender);
     }
 }
 

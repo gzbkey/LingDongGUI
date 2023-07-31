@@ -103,6 +103,17 @@ typedef enum{
                               uint16_t nameId; \
                               bool isHidden:1; \
                               bool isParentHidden:1
+
+typedef struct{
+    arm_2d_tile_t tFontTile;//字库
+    uint32_t fontDictAddr;//字典(目录)
+    uint16_t lineOffset;
+    int16_t descender;
+    uint16_t strLen;
+    ldColor charColor;
+    uint8_t* pStr;
+    uint8_t align:4;
+}ldChar_t;
 #else
 #define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
                               ldWidgetType widgetType; \
@@ -112,6 +123,16 @@ typedef enum{
                               uint16_t nameId; \
                               bool isHidden:1; \
                               bool isParentHidden:1
+
+typedef struct{
+    arm_2d_vres_t tFontTile;//字库
+    uint16_t advWidth;
+    uint16_t advHeight;
+    uint16_t strLen;
+    ldColor charColor;
+    uint8_t* pStr;
+    uint8_t align:4;
+}ldChar_t;
 #endif
                              
                              
@@ -131,13 +152,7 @@ typedef struct{
 #define LD_ALIGN_LEFT            _BV(2)
 #define LD_ALIGN_RIGHT           _BV(3)
 
-typedef struct{
-    arm_2d_font_t *ptFont;
-    ldColor charColor;
-    uint16_t len;
-    uint8_t* pStr;
-    uint8_t align:4;
-}ldChar_t;
+
 
 //typedef struct{
 //    int16_t width;
@@ -204,9 +219,13 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textCo
 
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
 int ldBaseSetText(const char *format, ...);
+void ldBaseSetFont(ldChar_t *pCharInfo, uint8_t maskType, uint32_t fontDictAddr, uint32_t fontSrcAddr, uint16_t lineOffset, int16_t descender);
 
 void ldBaseTextDel(ldChar_t *charInfo);
 ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
+
+uint8_t ldBaseGetCharInfo(uint32_t dictAddr,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
+void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo);
 
 #ifdef __cplusplus
 }
