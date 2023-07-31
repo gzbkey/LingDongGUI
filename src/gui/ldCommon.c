@@ -677,7 +677,7 @@ arm_2d_region_t ldBaseAlign(arm_2d_tile_t *ptTile,arm_2d_size_t size,uint8_t ali
     return retRegion;
 }
 
-arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender)
+arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint16_t frameWidth)
 {
     arm_2d_size_t retSize;
     int16_t advWidth;
@@ -727,8 +727,18 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender)
 
         h1_max=MAX(h1_max,height+offsetY);
         h2_min=MIN(h2_min,offsetY);
+
+
+        if(lineWidth>frameWidth)//自动换行
+        {
+            sizeWidthMax=MAX(sizeWidthMax,lineWidth-advWidth);
+            lineWidth=0;
+            sizeHeightMax+=ptTextInfo->lineOffset;
+        }
+
         i+=len;
     }
+
     if(sizeWidthMax==0)//单行
     {
         retSize.iWidth=lineWidth;
@@ -761,11 +771,11 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
     int16_t textOffsetY=ptTextInfo->lineOffset+ptTextInfo->descender;
     int16_t bmpH1Max;
 
-    arm_2d_size_t testSize;
+    arm_2d_size_t textSize;
 
-    testSize= ldBaseGetStringSize(ptTextInfo,&bmpH1Max);
+    textSize= ldBaseGetStringSize(ptTextInfo,&bmpH1Max,tTile.tRegion.tSize.iWidth);
 
-    arm_2d_region_t alignSize= ldBaseAlign(&tTile,testSize,ptTextInfo->align);
+    arm_2d_region_t alignSize= ldBaseAlign(&tTile,textSize,ptTextInfo->align);
 
     arm_2d_tile_t fontTile;
 
@@ -804,8 +814,13 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
 
         int16_t tempHeight;
         //偏移坐标
-        if(testSize.iHeight>ptTextInfo->lineOffset)//多行
+        if(textSize.iHeight>ptTextInfo->lineOffset)//多行
         {
+            if((textOffsetX+advWidth)>textSize.iWidth)//自动换行
+            {
+                textOffsetX=0;
+                textOffsetY+=ptTextInfo->lineOffset;
+            }
             tempHeight=textOffsetY-(height+offsetY);
         }
         else
@@ -819,7 +834,7 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
         arm_2d_op_wait_async(NULL);
 
         textOffsetX+=advWidth;
-LOG_REGION("12",charTile.tRegion);
+
         i+=len;
     }
 }

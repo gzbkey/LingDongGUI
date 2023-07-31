@@ -37,7 +37,13 @@
 int main (void) 
 {
     setbuf(stdout,NULL);
-    printf("ldgui\n");
+    printf("\nldgui\n");
+    printf("====================\n");
+    LOG_ERROR("Error\n");
+    LOG_WARNING("Warning\n");
+    LOG_INFO("Info\n");
+    LOG_DEBUG("Debug\n");
+    printf("====================\n\n");
     vtInit();
 
     X_BTN_KEY_INIT(KEY_NUM_UP,vtGetKeyState);

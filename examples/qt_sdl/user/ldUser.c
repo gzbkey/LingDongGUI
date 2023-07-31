@@ -41,9 +41,9 @@ void userInit(void)
     ldButtonSetFont(btn1,8,fontDict,c_bmpUTF8UserFont,24,-3);
 //    ldButtonSetFont(btn1,&ARM_2D_FONT_testFont.use_as__arm_2d_user_font_t);
 //    ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
-    ldButtonSetText(btn1,"abg\n汉");
+    ldButtonSetText(btn1,"aaabg汉");
 
-//    ldButtonSetAlign(btn1,LD_ALIGN_TOP);
+    ldButtonSetAlign(btn1,LD_ALIGN_TOP|LD_ALIGN_LEFT);
 
 
 
