@@ -14,8 +14,8 @@
  * limitations under the License.
 */
 
-#ifndef _LL_STRING_H_
-#define _LL_STRING_H_
+#ifndef _X_STRING_H_
+#define _X_STRING_H_
 
 
 #include <stdbool.h>
@@ -34,4 +34,4 @@ uint8_t* xFloatToStr(float inFloat,uint8_t afterDecimalPointNum,uint8_t *buf);
 
 
 
-#endif //_LL_STRING_H_
+#endif //_X_STRING_H_

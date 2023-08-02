@@ -26,14 +26,20 @@ static bool _windowDel(xListNode* pEachInfo,void* pTarget)
     return false;
 }
 
-void pWindowDel(ldWindow *widget)
+void ldWindowDel(ldWindow_t *widget)
 {
     xListNode *listInfo;
     
+    if (widget == NULL)
+    {
+        return;
+    }
+
     if(widget->widgetType!=widgetTypeWindow)
     {
         return;
     }
+
     listInfo=ldGetWidgetInfoById(widget->nameId);
     
     if(listInfo!=NULL)
@@ -41,37 +47,42 @@ void pWindowDel(ldWindow *widget)
         xListInfoPrevTraverse(widget->childList,NULL,_windowDel);
         xListFreeNode(widget->childList);
         
-        pImageDel((ldImage *)widget);
+        ldImageDel((ldImage_t *)widget);
         
     }
 }
 
-ldWindow* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,ldColor bgColor,uint32_t imageAddr,uint16_t maxImageNum,bool isPng,bool isTransparent,bool isHidden)
+ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
-    ldWindow * pNewWidget = NULL;
+    ldWindow_t * pNewWidget = NULL;
     
-    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,bgColor,imageAddr,maxImageNum,isPng,0,0);
+    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,0,false);
     if(pNewWidget!=NULL)
-    {            
+    {
         if(xListMallocNode(&pNewWidget->childList)!=NULL)
         {
-            pNewWidget->isTransparent=isTransparent;
+            pNewWidget->isTransparent=true;
             pNewWidget->widgetType=widgetTypeWindow;
         }
         else
         {
             ldFree(pNewWidget->childList);
-            pImageDel(pNewWidget);
+            ldImageDel(pNewWidget);
             pNewWidget=NULL;
         }
     }
     return pNewWidget;
 }
 
-void ldWindowLoop(ldWindow *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldWindowSetTransparent(ldImage_t *widget,bool isTransparent)
 {
-    ldImageLoop(info,ptParent,bIsNewFrame);
+    if (widget == NULL)
+    {
+        return;
+    }
+    widget->isTransparent=isTransparent;
 }
+
 
 
 #if defined(__clang__)

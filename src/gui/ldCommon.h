@@ -7,67 +7,68 @@ extern "C" {
 
 #include "stdbool.h"
 #include "stdint.h"
-
-#include "arm_2d.h"
-#include <math.h>
-#include <assert.h>
-#include "arm_2d_helper.h"
-#include "./arm_extra_controls.h"
-#include "./__common.h"
-#include "arm_2d_disp_adapter_0.h"
-//#include "ldMemory.h"
-#include "xString.h"
+#include "arm_extra_controls.h"
 #include "xList.h"
+#include "xLog.h"
+
+
 
 #ifndef SET_BITS
-#define   SET_BITS(data,value)          ((data)|=(value))
+#define SET_BITS(data,value)                    ((data)|=(value))
 #endif
 #ifndef CLR_BITS
-#define   CLR_BITS(data,value)          ((data)&=~(value))
+#define CLR_BITS(data,value)                    ((data)&=~(value))
 #endif
 #ifndef SETBIT
-#define   SETBIT(data,move)          ((data)|=(1<<(move)))
+#define SETBIT(data,move)                       ((data)|=(1<<(move)))
 #endif
 #ifndef CLRBIT
-#define   CLRBIT(data,move)          ((data)&=~(1<<(move)))
+#define CLRBIT(data,move)                       ((data)&=~(1<<(move)))
 #endif
 #ifndef GETBIT
-#define   GETBIT(data,move)          (((data)>>(move))&0x01)
+#define GETBIT(data,move)                       (((data)>>(move))&0x01)
 #endif
 #ifndef PUTBIT
-#define   PUTBIT(data,value,move)    ((value)?SETBIT(data,move):CLRBIT(data,move))
+#define PUTBIT(data,value,move)                 ((value)?SETBIT(data,move):CLRBIT(data,move))
 #endif
 #ifndef GET16H
-#define   GET16H(data)              (((data)>>8)&0xFF)
+#define GET16H(data)                            (((data)>>8)&0xFF)
 #endif
 #ifndef GET16L
-#define   GET16L(data)              ((data)&0xFF)
+#define GET16L(data)                            ((data)&0xFF)
 #endif
 #ifndef CONNECT16
-#define   CONNECT16(H,L)            (((H)<<8)+(L))
+#define CONNECT16(H,L)                          (((H)<<8)+(L))
 #endif
 #ifndef GET32H
-#define   GET32H(data)              (((data)>>24)&0xFF)
+#define   GET32H(data)                          (((data)>>24)&0xFF)
 #endif
 #ifndef GET32MH
-#define   GET32MH(data)              (((data)>>16)&0xFF)
+#define GET32MH(data)                           (((data)>>16)&0xFF)
 #endif
 #ifndef GET32ML
-#define   GET32ML(data)              (((data)>>8)&0xFF)
+#define GET32ML(data)                           (((data)>>8)&0xFF)
 #endif
 #ifndef GET32L
-#define   GET32L(data)              ((data)&0xFF)
+#define GET32L(data)                            ((data)&0xFF)
 #endif
 #ifndef CONNECT32
-#define   CONNECT32(H,MH,ML,L)           (((H)<<24)+((MH)<<16)+((ML)<<8)+(L))
+#define CONNECT32(H,MH,ML,L)                    (((H)<<24)+((MH)<<16)+((ML)<<8)+(L))
 #endif
 #ifndef SWAP
-#define SWAP(x,y) ((x) = (x)+(y),(y)=(x)-(y),(x)=(x)-(y))
+#define SWAP(x,y)                               ((x) = (x)+(y),(y)=(x)-(y),(x)=(x)-(y))
 #endif
+
+#define ldColor                                 COLOUR_INT
+
+#define XMALLOC                                 ldMalloc
+#define XFREE                                   ldFree
+
+#define LD_MALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldMalloc(sizeof(widgetTypedef))
+#define LD_MALLOC_STRING(str)                   (uint8_t *)ldMalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
 typedef enum{
     widgetTypeNone,
-    widgetTypeBackground,
     widgetTypeWindow,
     widgetTypeButton,
     widgetTypeImage,
@@ -89,150 +90,108 @@ typedef enum{
     widgetTypeStartupImage,
     widgetTypeArc,
 }ldWidgetType;
+    
+// ldWidgetType     4
+// arm_2d_tile_t  24
 
-#define LD_IMPL_VERS(__COLOUR_FORMAT, __WIDTH, __HEIGHT,__IMG_ADDR)             \
-    .tTile = {                                                                  \
-        .tRegion = {                                                            \
-            .tSize = {                                                          \
-                .iWidth = (__WIDTH),                                            \
-                .iHeight =(__HEIGHT),                                           \
-            },                                                                  \
-        },                                                                      \
-        .tInfo = {                                                              \
-            .bIsRoot = true,                                                    \
-            .bHasEnforcedColour = true,                                         \
-            .bVirtualResource = true,                                           \
-            .tColourInfo = {                                                    \
-                .chScheme = (__COLOUR_FORMAT),                                  \
-            },                                                                  \
-        },                                                                      \
-    },                                                                          \
-    .Load       = &__disp_adapter0_vres_asset_loader,                  \
-    .Depose     = &__disp_adapter0_vres_buffer_deposer,                \
-    .pTarget    = __IMG_ADDR,
-
-    
-#define LD_IMPL_TILE(__COLOUR_FORMAT, __WIDTH, __HEIGHT,__IMG_ADDR)             \
-    .tRegion = {                                                                \
-        .tSize = {                                                              \
-            .iWidth = (__WIDTH),                                                \
-            .iHeight =(__HEIGHT),                                               \
-        },                                            \
-    },                                            \
-    .tInfo = {                                            \
-        .bIsRoot = true,                                            \
-        .bHasEnforcedColour = true,                                            \
-        .tColourInfo = {                                            \
-            .chScheme = (__COLOUR_FORMAT),                                            \
-        },                                            \
-    },                                            \
-    .pchBuffer = (uint8_t *)__IMG_ADDR,
-
-    
-#if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#define RES_TILE(src)                          src.tTile
-#define RES_IMG_ADDR(src)                      src.pTarget
-#else
-#define RES_TILE(src)                          src
-#define RES_IMG_ADDR(src)                      src.pchBuffer
-#endif
-    
-    
-#define LD_COMMON_ATTRIBUTES  ldWidgetType widgetType; \
-                             ldGeometry geometry; \
-                             uint16_t nameId; \
+#if USE_VIRTUAL_RESOURCE == 0
+#define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
+                              ldWidgetType widgetType; \
                               ldWidgetType parentType; \
-                             void * parentWidget; \
-                             xListNode *childList; \
-                             bool isHidden:1
+                              void * parentWidget; \
+                              xListNode *childList; \
+                              uint16_t nameId; \
+                              bool isHidden:1; \
+                              bool isParentHidden:1
 
-                             
-                             
 typedef struct{
-    int16_t x;
-    int16_t y;
-    int16_t width;
-    int16_t height;
-}ldGeometry;
+    arm_2d_tile_t tFontTile;//字库
+    uint32_t fontDictAddr;//字典(目录)
+    uint16_t lineOffset;
+    int16_t descender;
+    uint16_t strLen;
+    ldColor charColor;
+    uint8_t* pStr;
+    uint8_t align:4;
+}ldChar_t;
+#else
+#define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
+                              ldWidgetType widgetType; \
+                              ldWidgetType parentType; \
+                              void * parentWidget; \
+                              xListNode *childList; \
+                              uint16_t nameId; \
+                              bool isHidden:1; \
+                              bool isParentHidden:1
 
+typedef struct{
+    arm_2d_vres_t tFontTile;//字库
+    uint16_t advWidth;
+    uint16_t advHeight;
+    uint16_t strLen;
+    ldColor charColor;
+    uint8_t* pStr;
+    uint8_t align:4;
+}ldChar_t;
+#endif
+                             
+                             
 
 typedef struct{
     LD_COMMON_ATTRIBUTES;
-}ldCommon;
+}ldCommon_t;
 
 typedef struct{
     int16_t x;
     int16_t y;
-}ldPoint;
+}ldPoint_t;
 
-typedef struct{
-    int16_t width;
-    int16_t height;
-    uint32_t addr;
-    uint8_t ascii;
-}ldNumImgInfo;
+#define LD_ALIGN_CENTER          0
+#define LD_ALIGN_TOP             _BV(0)
+#define LD_ALIGN_BOTTOM          _BV(1)
+#define LD_ALIGN_LEFT            _BV(2)
+#define LD_ALIGN_RIGHT           _BV(3)
 
-typedef struct{
-    int16_t width;
-    int16_t height;
-    uint32_t addr;
-    uint8_t ascii;
-}ldDateTimeImgInfo;
 
-typedef enum
-{
-    hLeft,
-    hCenter,
-    hRight
-}ldHorizontalAlign;
 
-typedef enum
-{
-    vTop,
-    vCenter,
-    vBottom
-}ldVerticalAlign;
+//typedef struct{
+//    int16_t width;
+//    int16_t height;
+//    uint32_t addr;
+//    uint8_t ascii;
+//}ldNumImgInfo;
 
-#define ldColor    COLOUR_INT
+//typedef struct{
+//    int16_t width;
+//    int16_t height;
+//    uint32_t addr;
+//    uint8_t ascii;
+//}ldDateTimeImgInfo;
 
-extern uint16_t cfgMonitorWidth;
-extern uint16_t cfgMonitorHeight;
+//typedef enum
+//{
+//    hLeft,
+//    hCenter,
+//    hRight
+//}ldHorizontalAlign;
 
-extern volatile uint16_t gYear;
-extern volatile uint8_t gMonth,gDay,gHour,gMinute,gSecond,gWeek;
+//typedef enum
+//{
+//    vTop,
+//    vCenter,
+//    vBottom
+//}ldVerticalAlign;
 
-void ldCommonAutoLoop(ldCommon* pWidget,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
+
+//extern uint16_t cfgMonitorWidth;
+//extern uint16_t cfgMonitorHeight;
+
+
+void ldCommonAutoLoop(ldCommon_t* pWidget,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 void ldCommonWidgetHidRefresh(uint8_t *hidBuf);
-
-
-
-
 void ldCommonCmdRefreshNormal(uint8_t *dat);
 void ldCommonCmdRefreshFixed(uint8_t *dat);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 extern xListNode ldWidgetLink;
 
@@ -243,21 +202,30 @@ void ldFree(void *p);
 
 void *ldRealloc(void *ptr,uint32_t newSize);
 
-#define XMALLOC     ldMalloc
-#define XFREE       ldFree
-
-#define LD_MALLOC_WIDGET_INFO(widgetTypedef)      (widgetTypedef*)ldMalloc(sizeof(widgetTypedef))
-
-#define LD_MALLOC_STRING(str)      (uint8_t *)ldMalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
 
-ldPoint ldGetGlobalPos(ldCommon *widget);
+ldPoint_t ldGetGlobalPos(ldCommon_t *widget);
 
 xListNode* ldGetWidgetInfoById(uint16_t nameId);
 xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
+void* ldGetWidgetById(uint16_t nameId);
 
 bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
-void ldDelWidget(ldCommon *widget);
+void ldDelWidget(ldCommon_t *widget);
+
+void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,bool isWithMask,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity);
+
+void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
+int ldBaseSetText(const char *format, ...);
+void ldBaseSetFont(ldChar_t *pCharInfo, uint8_t maskType, uint32_t fontDictAddr, uint32_t fontSrcAddr, uint16_t lineOffset, int16_t descender);
+
+void ldBaseTextDel(ldChar_t *charInfo);
+ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
+
+uint8_t ldBaseGetCharInfo(uint32_t dictAddr,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
+void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo);
 
 #ifdef __cplusplus
 }

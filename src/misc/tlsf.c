@@ -9,8 +9,12 @@
 #include <string.h>
 
 #include "tlsf.h"
-//#include "LL_Config.h"
-#define LLPRINT
+#ifdef NDEBUG
+#define TLSF_PRINT
+#else
+#define TLSF_PRINT printf
+#endif
+
 #if defined(__cplusplus)
 #define tlsf_decl inline
 #else
@@ -902,7 +906,7 @@ int tlsf_check(tlsf_t tlsf)
 static void default_walker(void* ptr, size_t size, int used, void* user)
 {
 	(void)user;
-	LLPRINT("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, block_from_ptr(ptr));
+    TLSF_PRINT("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, block_from_ptr(ptr));
 }
 
 void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
@@ -991,7 +995,7 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 
 	if (((ptrdiff_t)mem % ALIGN_SIZE) != 0)
 	{
-		LLPRINT("tlsf_add_pool: Memory must be aligned by %u bytes.\n",
+        TLSF_PRINT("tlsf_add_pool: Memory must be aligned by %u bytes.\n",
 			(unsigned int)ALIGN_SIZE);
 		return 0;
 	}
@@ -999,11 +1003,11 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 	if (pool_bytes < block_size_min || pool_bytes > block_size_max)
 	{
 #if defined (TLSF_64BIT)
-		LLPRINT("tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n", 
+        TLSF_PRINT("tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n",
 			(unsigned int)(pool_overhead + block_size_min),
 			(unsigned int)((pool_overhead + block_size_max) / 256));
 #else
-		LLPRINT("tlsf_add_pool: Memory size must be between %u and %u bytes.\n", 
+        TLSF_PRINT("tlsf_add_pool: Memory size must be between %u and %u bytes.\n",
 			(unsigned int)(pool_overhead + block_size_min),
 			(unsigned int)(pool_overhead + block_size_max));
 #endif
@@ -1071,7 +1075,7 @@ int test_ffs_fls()
 
 	if (rv)
 	{
-		LLPRINT("test_ffs_fls: %x ffs/fls tests failed.\n", rv);
+        TLSF_PRINT("test_ffs_fls: %x ffs/fls tests failed.\n", rv);
 	}
 	return rv;
 }
@@ -1088,7 +1092,7 @@ tlsf_t tlsf_create(void* mem)
 
 	if (((tlsfptr_t)mem % ALIGN_SIZE) != 0)
 	{
-		LLPRINT("tlsf_create: Memory must be aligned to %u bytes.\n",
+        TLSF_PRINT("tlsf_create: Memory must be aligned to %u bytes.\n",
 			(unsigned int)ALIGN_SIZE);
 		return 0;
 	}

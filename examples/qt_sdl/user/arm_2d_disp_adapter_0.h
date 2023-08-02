@@ -25,6 +25,7 @@
 
 #include "arm_2d_helper_scene.h"
 #include "__common.h"
+#include "ldConfig.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -50,21 +51,21 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your screen
 #ifndef __DISP0_CFG_COLOUR_DEPTH__
-#   define __DISP0_CFG_COLOUR_DEPTH__                              16
+#   define __DISP0_CFG_COLOUR_DEPTH__                              LD_CFG_COLOR_DEPTH
 #endif
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               480
+#   define __DISP0_CFG_SCEEN_WIDTH__                               LD_CFG_SCEEN_WIDTH
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              272
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              LD_CFG_SCEEN_HEIGHT
 #endif
 
 // <o>Width of the PFB block
@@ -124,7 +125,7 @@ extern "C" {
 //     <1=>     Real FPS
 // <i> Decide the meaning of the real time FPS display
 #ifndef __DISP0_CFG_FPS_CACULATION_MODE__
-#   define __DISP0_CFG_FPS_CACULATION_MODE__                       1
+#   define __DISP0_CFG_FPS_CACULATION_MODE__                       0
 #endif
 
 // <q> Enable Dirty Region Debug Mode
@@ -154,7 +155,7 @@ extern "C" {
 // <q>Disable the navigation layer
 // <i> Remove the navigation layer for this display adapter. NOTE: Disable the navigation layer will also remove the real-time FPS display.
 #ifndef __DISP0_CFG_DISABLE_NAVIGATION_LAYER__
-#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  0
+#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  1
 #endif
 
 // <q>Enable the virtual resource helper service

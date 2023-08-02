@@ -3,7 +3,11 @@
 #undef main
 #include "Virtual_TFT_Port.h"
 #include "arm_2d.h"
-#include "arm_2d_benchmark.h"
+#include "arm_2d_disp_adapter_0.h"
+#include "ldScene0.h"
+#include "xLog.h"
+#include "xBtnAction.h"
+#include "stdbool.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -26,15 +30,28 @@
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-extern void lcd_flush(int32_t nMS);
+
+
+
+
 int main (void) 
 {
-    setbuf(stdout,NULL);//printf 马上输出
-    printf("arm-2d sdl\n");
-    VT_Init();
+    setbuf(stdout,NULL);
+    printf("\nldgui\n");
+    printf("====================\n");
+    LOG_ERROR("Error\n");
+    LOG_WARNING("Warning\n");
+    LOG_INFO("Info\n");
+    LOG_DEBUG("Debug\n");
+    printf("====================\n\n");
+    vtInit();
 
-//    SDL_GetTicks();//获取开始时间
-//    SDL_AddTimer(10, VT_timerCallback, NULL);//建立定时器timer
+    X_BTN_KEY_INIT(KEY_NUM_UP,vtGetKeyState);
+    X_BTN_KEY_INIT(KEY_NUM_DOWN,vtGetKeyState);
+    X_BTN_KEY_INIT(KEY_NUM_LEFT,vtGetKeyState);
+    X_BTN_KEY_INIT(KEY_NUM_RIGHT,vtGetKeyState);
+    X_BTN_KEY_INIT(KEY_NUM_ENTER,vtGetKeyState);
+    X_BTN_KEY_INIT(KEY_NUM_ESC,vtGetKeyState);
 
     arm_irq_safe {
         arm_2d_init();
@@ -42,12 +59,13 @@ int main (void)
 
     disp_adapter0_init();
 
-    arm_2d_run_benchmark();
-//    arm_2d_scene0_init(&DISP0_ADAPTER);
+    arm_2d_scene0_init(&DISP0_ADAPTER);
 
-    while (1) {
-        if (arm_fsm_rt_cpl == disp_adapter0_task()) {
-            lcd_flush(1);
+    while (1)
+    {
+        if (arm_fsm_rt_cpl == disp_adapter0_task())
+        {
+            lcdFlush(1);
         }
     }
 }

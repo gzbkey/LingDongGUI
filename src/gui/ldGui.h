@@ -9,15 +9,23 @@ extern "C" {
 #include "stdint.h"
 
 #include "arm_2d.h"
-#include <math.h>
-#include <assert.h>
-#include "arm_2d_helper.h"
-#include "./arm_extra_controls.h"
-#include "./__common.h"
-#include "arm_2d_disp_adapter_0.h"
-//#include "ldMemory.h"
-#include "xString.h"
-#include "xList.h"
+
+
+//btn占用0-10
+
+#define SIGNAL_TOUCH_HOLD_MOVE      11 // 按下移动
+
+//#define SIGNAL_TOUCH_CHECK_PRESSED      4 // 单状态按下
+//#define SIGNAL_TOUCH_CHECK_RELEASED      5 // 单状态释放
+//
+//#define SIGNAL_VALUE_CHANGED           7 //数据变化
+//#define SIGNAL_WIDGET_ACTIVE           8 //激活控件
+//#define SIGNAL_EIDTING_FINISHED           9 //编辑结束
+//#define SIGNAL_SYS_TIME_OUT             10//gui软件定时器
+
+
+
+
 
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;

@@ -4,23 +4,152 @@
 #include "xConnect.h"
 #include "ldImage.h"
 #include "ldUser.h"
+#include "xBtnAction.h"
+#include "ldConfig.h"
+#include "ldButton.h"
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
 
-void ldGuiInit(void)
+int64_t sysTimer=0;
+
+#define TOUCH_NO_CLICK           0
+#define TOUCH_CLICK              1
+
+
+static int16_t prevX,prevY,nowX,nowY;
+static void *prevWidget;
+
+void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
-    ldUserPageInitFunc[pageNumNow]();
+    ldCommon_t *widget;
+    ldPoint_t globalPos;
+    ldPoint_t pos;
+//    ldGeometry tempGeometry;
+    xListNode *pNode;
+
+    switch(touchSignal)
+    {
+    case BTN_NO_OPERATION:
+    {
+        break;
+    }
+    case BTN_PRESS:
+    {
+        widget=NULL;
+//        if(temporaryTopWidget!=NULL)
+//        {
+//            pos.x=x;
+//            pos.y=y;
+//            globalPos=llListGetGlobalPos(((llGeneral*)temporaryTopWidget)->parentWidget);
+//            tempGeometry=((llGeneral*)temporaryTopWidget)->geometry;
+//            tempGeometry.x+=globalPos.x;
+//            tempGeometry.y+=globalPos.y;
+//            if(llPointInRect(pos,tempGeometry))
+//            {
+//                widget=temporaryTopWidget;
+//            }
+//        }
+        if(widget==NULL)
+        {
+            pNode=ldGetWidgetInfoByPos(x,y);
+            if(pNode!=NULL)
+            {
+                widget=pNode->info;
+                LOG_DEBUG("click widget id:%d\n",widget->nameId);
+            }
+        }
+        prevX=x;
+        prevY=y;
+        prevWidget=widget;//准备数据,释放时候使用
+
+        if(widget!=NULL)
+        {
+            xEmit(widget->nameId,touchSignal);
+        }
+        break;
+    }
+    case BTN_HOLD_DOWN:
+    {
+        if((prevX!=x)||(prevY!=y))
+        {
+            widget=prevWidget;//不可以把static变量作为函数变量调用
+            if(widget!=NULL)
+            {
+                nowX=x;
+                nowY=y;
+                xEmit(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE);
+            }
+            prevX=x;
+            prevY=y;
+        }
+        break;
+    }
+    case BTN_RELEASE:
+    {
+        widget=prevWidget;
+        if(widget!=NULL)
+        {
+            xEmit(widget->nameId,touchSignal);
+        }
+        break;
+    }
+    default:
+        break;
+    }
 }
 
-static void _widgetLoop(ldCommon *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldGuiTouchProcess(void)
+{
+    int16_t x;
+    int16_t y;
+    bool nowState;
+    static bool prevState=TOUCH_NO_CLICK;
+    uint8_t touchSignal=BTN_NO_OPERATION;
+
+    nowState = ldCfgTouchGetPoint(&x,&y);
+
+    if(nowState==TOUCH_CLICK)
+    {
+        if(prevState==TOUCH_NO_CLICK)//按下,                下降沿触发
+        {
+            touchSignal=BTN_PRESS;
+        }
+        else// prevState==TOUCH_CLICK 按住                低电平
+        {
+            touchSignal=BTN_HOLD_DOWN;
+        }
+    }
+    else// nowState==TOUCH_NO_CLICK 无按下
+    {
+        if(prevState==TOUCH_NO_CLICK)//无按下                高电平
+        {
+            touchSignal=BTN_NO_OPERATION;
+        }
+        else// prevState==TOUCH_CLICK 按下,上升沿触发       上降沿触发
+        {
+            touchSignal=BTN_RELEASE;
+        }
+    }
+    prevState=nowState;
+    ldGuiClickedAction(touchSignal,x,y);
+}
+
+
+
+static void _widgetLoop(ldCommon_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     switch(info->widgetType)
     {
         case widgetTypeWindow:
         case widgetTypeImage:
         {
-            ldImageLoop((ldImage*)info,ptParent,bIsNewFrame);
+            ldImageLoop((ldImage_t*)info,ptParent,bIsNewFrame);
+            break;
+        }
+        case widgetTypeButton:
+        {
+            ldButtonLoop((ldButton_t*)info,ptParent,bIsNewFrame);
             break;
         }
         default:
@@ -38,14 +167,19 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
         {
             _widgetLoop(temp_pos->info,ptParent,bIsNewFrame);
             
-            if(((ldCommon *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {
-                _ldGuiLoop(((ldCommon *)temp_pos->info)->childList,ptParent,bIsNewFrame);
+                _ldGuiLoop(((ldCommon_t *)temp_pos->info)->childList,ptParent,bIsNewFrame);
             }
         }
     }
 }
 
+void ldGuiInit(void)
+{
+    xEmitInit();
+    ldUserPageInitFunc[pageNumNow]();
+}
 
 void ldGuiLogicLoop(void)
 {
@@ -56,6 +190,17 @@ void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
+
+    //检查按键
+    if(ldTimeOut(10,&sysTimer,true))
+    {
+        xBtnTick(10);
+    }
+    
+    //检查触摸
+    ldGuiTouchProcess();
+    
+    xConnectProcess();
 }
 
 void ldGuiQuit(void)
@@ -67,8 +212,4 @@ void ldGuiQuit(void)
 void ldGuiJumpPage(uint8_t pageNum)
 {
     pageTarget=pageNum;
-//    if(pageNumNow!=pageNum)
-//    {
-//        
-//    }
 }
