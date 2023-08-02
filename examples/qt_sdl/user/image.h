@@ -13,8 +13,8 @@ extern const uint8_t press_bmp[];
 extern const uint8_t release_bmp[];
 extern const uint8_t release_png[];
 
-extern const uint8_t fontDict[];
-extern const uint8_t c_bmpUTF8UserFont[];
+extern const uint8_t dict_Microsoft_YaHei_Light_16[];
+extern const uint8_t src_Microsoft_YaHei_Light_16[];
 
 #ifdef __cplusplus
 }

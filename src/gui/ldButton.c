@@ -118,8 +118,8 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->isPressed=false;
         pNewWidget->isSelected=false;
             
-        pNewWidget->releaseColor = __RGB(0,0,255);
-        pNewWidget->pressColor = __RGB(255,255,0);
+        pNewWidget->releaseColor = __RGB(217,225,244);
+        pNewWidget->pressColor = __RGB(255,243,202);
         pNewWidget->selectColor = __RGB(255,0,0);
         pNewWidget->keyValue=0;
         pNewWidget->releaseImgAddr=0;

@@ -38,12 +38,12 @@ void userInit(void)
     ldButtonSetTextColor(btn1,0x0);
 //    ldBaseSetTextInfo(btn1,,GLCD_COLOR_RED,64);
 
-    ldButtonSetFont(btn1,8,fontDict,c_bmpUTF8UserFont,24,-3);
+    ldButtonSetFont(btn1,8,dict_Microsoft_YaHei_Light_16,src_Microsoft_YaHei_Light_16,21,-5);
 //    ldButtonSetFont(btn1,&ARM_2D_FONT_testFont.use_as__arm_2d_user_font_t);
 //    ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
-    ldButtonSetText(btn1,"aaabg汉");
+    ldButtonSetText(btn1,"栟𨭉");
 
-    ldButtonSetAlign(btn1,LD_ALIGN_TOP|LD_ALIGN_LEFT);
+//    ldButtonSetAlign(btn1,LD_ALIGN_TOP|LD_ALIGN_LEFT);
 
 
 
