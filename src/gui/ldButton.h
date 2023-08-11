@@ -44,7 +44,7 @@ void ldButtonSetHidden(ldButton_t* widget,bool isHidden);
 void ldButtonSetRoundCorner(ldButton_t* widget,bool isCorner);
 void ldButtonSetSelect(ldButton_t* widget,bool isSelected);
 
-void ldButtonSetFont(ldButton_t *widget, uint8_t maskType, uint32_t fontDictAddr, uint32_t fontSrcAddr, uint16_t lineOffset, int16_t descender);
+void ldButtonSetFont(ldButton_t *widget, ldFontDict_t *pFontDict);
 void ldButtonSetText(ldButton_t* widget,uint8_t *pStr);
 void ldButtonSetTextColor(ldButton_t* widget,ldColor charColor);
 void ldButtonSetAlign(ldButton_t *widget,uint8_t align);

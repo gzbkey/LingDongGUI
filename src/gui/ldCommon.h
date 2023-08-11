@@ -67,6 +67,12 @@ extern "C" {
 #define LD_MALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldMalloc(sizeof(widgetTypedef))
 #define LD_MALLOC_STRING(str)                   (uint8_t *)ldMalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
+#define LD_ALIGN_CENTER          0
+#define LD_ALIGN_TOP             _BV(0)
+#define LD_ALIGN_BOTTOM          _BV(1)
+#define LD_ALIGN_LEFT            _BV(2)
+#define LD_ALIGN_RIGHT           _BV(3)
+
 typedef enum{
     widgetTypeNone,
     widgetTypeWindow,
@@ -105,8 +111,27 @@ typedef enum{
                               bool isParentHidden:1
 
 typedef struct{
+    uint8_t utf8[4];
+    uint8_t advW[2];
+    uint8_t offsetX[2];
+    uint8_t offsetY[2];
+    uint8_t width[2];
+    uint8_t height[2];
+    uint8_t addr[4];
+}ldFontInfo_t;
+
+typedef struct{
+    uint8_t maskType;
+    uint32_t count;
+    uint16_t lineOffset;
+    int16_t descender;
+    const ldFontInfo_t *pInfoList;
+    const uint8_t *pFontSrc;
+}ldFontDict_t;
+
+typedef struct{
     arm_2d_tile_t tFontTile;//字库
-    uint32_t fontDictAddr;//字典(目录)
+    ldFontDict_t* pFontDict;//字典(目录)
     uint16_t lineOffset;
     int16_t descender;
     uint16_t strLen;
@@ -126,16 +151,15 @@ typedef struct{
 
 typedef struct{
     arm_2d_vres_t tFontTile;//字库
-    uint16_t advWidth;
-    uint16_t advHeight;
+    uint32_t fontDictAddr;//字典(目录)
+    uint16_t lineOffset;
+    int16_t descender;
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
     uint8_t align:4;
 }ldChar_t;
 #endif
-                             
-                             
 
 typedef struct{
     LD_COMMON_ATTRIBUTES;
@@ -146,46 +170,8 @@ typedef struct{
     int16_t y;
 }ldPoint_t;
 
-#define LD_ALIGN_CENTER          0
-#define LD_ALIGN_TOP             _BV(0)
-#define LD_ALIGN_BOTTOM          _BV(1)
-#define LD_ALIGN_LEFT            _BV(2)
-#define LD_ALIGN_RIGHT           _BV(3)
 
 
-
-//typedef struct{
-//    int16_t width;
-//    int16_t height;
-//    uint32_t addr;
-//    uint8_t ascii;
-//}ldNumImgInfo;
-
-//typedef struct{
-//    int16_t width;
-//    int16_t height;
-//    uint32_t addr;
-//    uint8_t ascii;
-//}ldDateTimeImgInfo;
-
-//typedef enum
-//{
-//    hLeft,
-//    hCenter,
-//    hRight
-//}ldHorizontalAlign;
-
-//typedef enum
-//{
-//    vTop,
-//    vCenter,
-//    vBottom
-//}ldVerticalAlign;
-
-
-
-//extern uint16_t cfgMonitorWidth;
-//extern uint16_t cfgMonitorHeight;
 
 
 void ldCommonAutoLoop(ldCommon_t* pWidget,arm_2d_tile_t *ptTile,bool bIsNewFrame);
@@ -214,17 +200,17 @@ bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
 void ldDelWidget(ldCommon_t *widget);
 
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
-void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,bool isWithMask,uint8_t opacity);
-void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t resource,ldColor textColor,uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,bool isWithMask,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* ptTile, arm_2d_tile_t *ptResource, ldColor textColor, uint8_t opacity);
 
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
 int ldBaseSetText(const char *format, ...);
-void ldBaseSetFont(ldChar_t *pCharInfo, uint8_t maskType, uint32_t fontDictAddr, uint32_t fontSrcAddr, uint16_t lineOffset, int16_t descender);
+void ldBaseSetFont(ldChar_t *pCharInfo, ldFontDict_t *fontDictAddr);
 
 void ldBaseTextDel(ldChar_t *charInfo);
 ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
 
-uint8_t ldBaseGetCharInfo(uint32_t dictAddr,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
+uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
 void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo);
 
 #ifdef __cplusplus

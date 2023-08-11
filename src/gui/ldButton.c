@@ -281,7 +281,7 @@ void ldButtonSetSelect(ldButton_t* widget,bool isSelected)
 void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     uint32_t btnColor;
-    arm_2d_tile_t *tResTile=(arm_2d_tile_t*)&widget->resource;
+    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&widget->resource;
     arm_2d_region_t tRegion;
 
     if (widget == NULL)
@@ -294,9 +294,9 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
         return;
     }
     
-    arm_2d_container(ptParent,tTarget , &tResTile->tRegion)
+    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
     {
-        tTarget.tRegion.tLocation = tResTile->tRegion.tLocation;
+        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
         
         if(!widget->isTransparent)
         {
@@ -330,19 +330,19 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
             {
                 if(widget->isPressed)
                 {
-                    tResTile->pchBuffer = (uint8_t *)widget->pressImgAddr;
+                    ptResTile->pchBuffer = (uint8_t *)widget->pressImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)tResTile)->pTarget=widget->pressImgAddr;
+                    ((arm_2d_vres_t*)ptResTile)->pTarget=widget->pressImgAddr;
 #endif
-                    ldBaseImage(&tTarget,*tResTile,widget->isPressMask,255);
+                    ldBaseImage(&tTarget,ptResTile,widget->isPressMask,255);
                 }
                 else
                 {
-                    tResTile->pchBuffer = (uint8_t *)widget->releaseImgAddr;
+                    ptResTile->pchBuffer = (uint8_t *)widget->releaseImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)tResTile)->pTarget=widget->releaseImgAddr;
+                    ((arm_2d_vres_t*)ptResTile)->pTarget=widget->releaseImgAddr;
 #endif
-                    ldBaseImage(&tTarget,*tResTile,widget->isReleaseMask,255);
+                    ldBaseImage(&tTarget,ptResTile,widget->isReleaseMask,255);
                 }
             }
             arm_2d_op_wait_async(NULL);
@@ -374,16 +374,20 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                 }
                 else
                 {
+#if USE_VIRTUAL_RESOURCE == 0
+                    arm_2d_tile_t maskRes;
+#else
                     arm_2d_vres_t maskRes;
-                    maskRes.tTile=*tResTile;
-                    maskRes.tTile.tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+#endif
+                    (*((arm_2d_tile_t*)&maskRes))=*ptResTile;
+                    (*((arm_2d_tile_t*)&maskRes)).tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
                     ((arm_2d_tile_t*)&maskRes)->pchBuffer = (uint8_t *)widget->selectMaskAddr;
 #if USE_VIRTUAL_RESOURCE == 1
                     maskRes.pTarget=widget->selectMaskAddr;
                     maskRes.Load = &__disp_adapter0_vres_asset_loader;
                     maskRes.Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-                    ldBaseMaskImage(&tTarget,*((arm_2d_tile_t*)&maskRes),widget->selectColor,255);
+                    ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&maskRes,widget->selectColor,255);
                 }
                 arm_2d_op_wait_async(NULL);
             }
@@ -411,7 +415,7 @@ void ldButtonSetAlign(ldButton_t *widget,uint8_t align)
     }
 }
 
-void ldButtonSetFont(ldButton_t *widget,uint8_t maskType,uint32_t fontDictAddr,uint32_t fontSrcAddr,uint16_t lineOffset,int16_t descender)
+void ldButtonSetFont(ldButton_t *widget,ldFontDict_t *pFontDict)
 {
     if(widget==NULL)
     {
@@ -420,7 +424,7 @@ void ldButtonSetFont(ldButton_t *widget,uint8_t maskType,uint32_t fontDictAddr,u
 
     if(ldBaseCheckText(&widget->ptTextInfo))
     {
-        ldBaseSetFont(widget->ptTextInfo,maskType,fontDictAddr,fontSrcAddr,lineOffset,descender);
+        ldBaseSetFont(widget->ptTextInfo,pFontDict);
     }
 }
 

@@ -161,8 +161,14 @@ extern "C" {
 // <q>Enable the virtual resource helper service
 // <i> Introduce a helper service for loading virtual resources.
 // <i> This feature is disabled by default.
+#if USE_VIRTUAL_RESOURCE == 0
 #ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 #   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   0
+#endif
+#else
+#ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
+#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   1
+#endif
 #endif
 
 // <q>Use heap to allocate buffer in the virtual resource helper service

@@ -124,7 +124,6 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
         tResTile->pchBuffer = (uint8_t *)imageAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-        tResTile->pchBuffer = 0;
         tResTile->tInfo.bVirtualResource = true;
         
         ((arm_2d_vres_t*)tResTile)->pTarget=imageAddr;
@@ -190,7 +189,7 @@ void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFr
         }
         else
         {
-            ldBaseImage(&tTarget,widget->resource,widget->isWithMask,IMG_OPACITY);
+            ldBaseImage(&tTarget,(arm_2d_tile_t*)(&widget->resource),widget->isWithMask,IMG_OPACITY);
         }
     }
     arm_2d_op_wait_async(NULL);

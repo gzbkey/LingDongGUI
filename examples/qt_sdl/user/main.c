@@ -8,6 +8,7 @@
 #include "xLog.h"
 #include "xBtnAction.h"
 #include "stdbool.h"
+#include "virtualNor.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -31,6 +32,22 @@
 #endif
 
 
+
+void __disp_adapter0_vres_read_memory( intptr_t pObj,
+                                       void *pBuffer,
+                                       uintptr_t pAddress,
+                                       size_t nSizeInByte)
+{
+    ARM_2D_UNUSED(pObj);
+    norRead(pBuffer,pAddress,nSizeInByte);
+}
+
+uintptr_t __disp_adapter0_vres_get_asset_address(
+    uintptr_t pObj,
+    arm_2d_vres_t *ptVRES)
+{
+    return pObj;
+}
 
 
 
