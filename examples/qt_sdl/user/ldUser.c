@@ -34,19 +34,16 @@ void userInit(void)
 
 
     btn1=ldButtonInit(ID_BTN1, 0, 120,100,72,72);
-//    ldButtonSetTextColor(btn1,0x0);
-//    ldBaseSetTextInfo(btn1,,GLCD_COLOR_RED,64);
-
-    ldButtonSetFont(btn1,MICROSOFT_YAHEI_UI_BOLD_20);
+    ldButtonSetFont(btn1,MICROSOFT_YAHEI_REGULAR_20);
 //    ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
+//    ldButtonSetText(btn1,(uint8_t*)"");
     ldButtonSetText(btn1,(uint8_t*)"栟𨭉");
-
 //    ldButtonSetAlign(btn1,LD_ALIGN_TOP|LD_ALIGN_LEFT);
 
 
 
 //    targetBtn=btn1;
-//    btn1->isSelected=true;
+    btn1->isSelected=true;
 }
 
 void userInit1(void)

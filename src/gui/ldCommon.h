@@ -132,8 +132,6 @@ typedef struct{
 typedef struct{
     arm_2d_tile_t tFontTile;//字库
     ldFontDict_t* pFontDict;//字典(目录)
-    uint16_t lineOffset;
-    int16_t descender;
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
@@ -150,10 +148,27 @@ typedef struct{
                               bool isParentHidden:1
 
 typedef struct{
-    arm_2d_vres_t tFontTile;//字库
-    uint32_t fontDictAddr;//字典(目录)
+    uint8_t utf8[4];
+    uint8_t advW[2];
+    uint8_t offsetX[2];
+    uint8_t offsetY[2];
+    uint8_t width[2];
+    uint8_t height[2];
+    uint8_t addr[4];
+}ldFontInfo_t;
+
+typedef struct{
+    uint8_t maskType;
+    uint32_t count;
     uint16_t lineOffset;
     int16_t descender;
+    const ldFontInfo_t *pInfoList;
+    uint32_t pFontSrc;
+}ldFontDict_t;
+
+typedef struct{
+    arm_2d_vres_t tFontTile;//字库
+    ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
@@ -204,7 +219,6 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,bool isWithMask
 void ldBaseMaskImage(arm_2d_tile_t* ptTile, arm_2d_tile_t *ptResource, ldColor textColor, uint8_t opacity);
 
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
-int ldBaseSetText(const char *format, ...);
 void ldBaseSetFont(ldChar_t *pCharInfo, ldFontDict_t *fontDictAddr);
 
 void ldBaseTextDel(ldChar_t *charInfo);

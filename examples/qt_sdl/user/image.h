@@ -19,8 +19,8 @@ extern const uint8_t release_bmp[];
 extern const uint8_t release_png[];
 #define RELEASE_PNG (uint32_t)&release_png[0]
 
-extern ldFontDict_t dict_Microsoft_YaHei_UI_Bold_20;
-#define MICROSOFT_YAHEI_UI_BOLD_20 (&dict_Microsoft_YaHei_UI_Bold_20)
+#define MICROSOFT_YAHEI_REGULAR_20 (&dict_Microsoft_YaHei_Regular_20)
+extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
 
 #ifdef __cplusplus
 }

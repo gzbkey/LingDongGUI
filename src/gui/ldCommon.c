@@ -381,32 +381,35 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,bool isWithMask
     }
 }
 
-void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,ldColor textColor,uint8_t opacity)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*ptResource;
+    arm_2d_tile_t *pRes;
 #else
     arm_2d_vres_t resource =*((arm_2d_vres_t*)ptResource);
+    arm_2d_vres_t *pRes;
 #endif
+    pRes=&resource;
     //root tile init
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iX=0;
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iY=0;
+    ((arm_2d_tile_t*)pRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)pRes)->tRegion.tLocation.iY=0;
 
-    switch ((*(arm_2d_tile_t*)(&resource)).tInfo.tColourInfo.chScheme)
+    switch (((arm_2d_tile_t*)pRes)->tInfo.tColourInfo.chScheme)
     {
     case ARM_2D_COLOUR_1BIT:
     {
 #if USE_OPACITY == 1
-        arm_2d_draw_pattern((arm_2d_tile_t*)(&resource),
+        arm_2d_draw_pattern((arm_2d_tile_t*)pRes,
                             ptTile,
-                            &(((arm_2d_tile_t*)(&resource))->tRegion),
+                            &((arm_2d_tile_t*)pRes)->tRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
                             GLCD_COLOR_BLACK);
 #else
-        arm_2d_draw_pattern((arm_2d_tile_t*)(&resource),
+        arm_2d_draw_pattern((arm_2d_tile_t*)pRes,
                             ptTile,
-                            &(((arm_2d_tile_t*)(&resource))->tRegion),
+                            &(((arm_2d_tile_t*)pRes)->tRegion),
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
                             GLCD_COLOR_BLACK);
@@ -418,14 +421,14 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,ldColor tex
     {
 #if USE_OPACITY == 1
         arm_2d_fill_colour_with_a2_mask_and_opacity(ptTile,
-                                                    &(((arm_2d_tile_t*)(&resource))->tRegion),
-                                                    (arm_2d_tile_t*)(&resource),
+                                                    &((arm_2d_tile_t*)pRes)->tRegion,
+                                                    (arm_2d_tile_t*)pRes,
                                                     (__arm_2d_color_t){textColor},
                                                     opacity);
 #else
         arm_2d_fill_colour_with_a2_mask(ptTile,
-                                        &(((arm_2d_tile_t*)(&resource))->tRegion),
-                                        (arm_2d_tile_t*)(&resource),
+                                        &(((arm_2d_tile_t*)pRes)->tRegion),
+                                        (arm_2d_tile_t*)pRes,
                                         (__arm_2d_color_t){textColor});
 #endif
         break;
@@ -434,14 +437,14 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,ldColor tex
     {
 #if USE_OPACITY == 1
         arm_2d_fill_colour_with_a4_mask_and_opacity(ptTile,
-                                                    &(((arm_2d_tile_t*)(&resource))->tRegion),
-                                                    (arm_2d_tile_t*)(&resource),
+                                                    &((arm_2d_tile_t*)pRes)->tRegion,
+                                                    (arm_2d_tile_t*)pRes,
                                                     (__arm_2d_color_t){textColor},
                                                     opacity);
 #else
         arm_2d_fill_colour_with_a4_mask(ptTile,
-                                        &(((arm_2d_tile_t*)(&resource))->tRegion),
-                                        (arm_2d_tile_t*)(&resource),
+                                        &(((arm_2d_tile_t*)pRes)->tRegion),
+                                        (arm_2d_tile_t*)pRes,
                                         (__arm_2d_color_t){textColor});
 #endif
         break;
@@ -450,14 +453,14 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,ldColor tex
     {
 #if USE_OPACITY == 1
         arm_2d_fill_colour_with_mask_and_opacity(ptTile,
-                                                 &(((arm_2d_tile_t*)(&resource))->tRegion),
-                                                 (arm_2d_tile_t*)(&resource),
+                                                 &((arm_2d_tile_t*)pRes)->tRegion,
+                                                 (arm_2d_tile_t*)pRes,
                                                  (__arm_2d_color_t){textColor},
                                                  opacity);
 #else
         arm_2d_fill_colour_with_mask(ptTile,
-                                     &(((arm_2d_tile_t*)(&resource))->tRegion),
-                                     (arm_2d_tile_t*)(&resource),
+                                     &(((arm_2d_tile_t*)pRes)->tRegion),
+                                     (arm_2d_tile_t*)pRes,
                                      (__arm_2d_color_t){textColor});
 #endif
         break;
@@ -465,25 +468,6 @@ void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,ldColor tex
     default:
         break;
     }
-}
-
-#if defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__
-#define __va_list    va_list
-
-#endif
-
-int ldBaseSetText(const char *format, ...)
-{
-    int real_size;
-    static char s_chBuffer[__LCD_PRINTF_CFG_TEXT_BUFFER_SIZE__ + 1];
-    __va_list ap;
-    va_start(ap, format);
-        real_size = vsnprintf(s_chBuffer, sizeof(s_chBuffer)-1, format, ap);
-    va_end(ap);
-    real_size = MIN(sizeof(s_chBuffer)-1, real_size);
-    s_chBuffer[real_size] = '\0';
-    arm_lcd_puts(s_chBuffer);
-    return real_size;
 }
 
 void ldBaseTextDel(ldChar_t *charInfo)
@@ -505,6 +489,12 @@ ldChar_t * ldBaseCheckText(ldChar_t **charInfo)
         (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).tInfo.bIsRoot=true;
         (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).tInfo.bHasEnforcedColour=true;
         (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+#if USE_VIRTUAL_RESOURCE == 1
+        (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).bVirtualResource=true;
+        (*charInfo)->tFontTile.pTarget=0;
+        (*charInfo)->tFontTile.Load = &__disp_adapter0_vres_asset_loader;
+        (*charInfo)->tFontTile.Depose = &__disp_adapter0_vres_buffer_deposer;
+#endif
     }
     return *charInfo;
 }
@@ -513,10 +503,8 @@ void ldBaseSetFont(ldChar_t *pCharInfo,ldFontDict_t* pFontDict)
 {
     (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).pchBuffer=(uint8_t *)pFontDict->pFontSrc;
 #if USE_VIRTUAL_RESOURCE == 1
-    pCharInfo->tFontTile.pTarget=fontSrcAddr;
+    pCharInfo->tFontTile.pTarget=pFontDict->pFontSrc;
 #endif
-    pCharInfo->lineOffset=pFontDict->lineOffset;
-    pCharInfo->descender=pFontDict->descender;
     pCharInfo->pFontDict=pFontDict;
 
     switch (pFontDict->maskType)
@@ -536,10 +524,14 @@ void ldBaseSetFont(ldChar_t *pCharInfo,ldFontDict_t* pFontDict)
         (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A4;
         break;
     }
-    case 5:
+    case 8:
     {
         (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
         break;
+    }
+    default:
+    {
+        (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
     }
     }
 }
@@ -706,7 +698,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
     int16_t h2_min=0;
     int16_t lineWidth=0;
     int16_t sizeWidthMax=0;
-    int16_t sizeHeightMax=ptTextInfo->lineOffset;
+    int16_t sizeHeightMax=ptTextInfo->pFontDict->lineOffset;
 
     for(int i=0;i<ptTextInfo->strLen;)
     {
@@ -725,7 +717,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         {
             sizeWidthMax=MAX(sizeWidthMax,lineWidth);
             lineWidth=0;
-            sizeHeightMax+=ptTextInfo->lineOffset;
+            sizeHeightMax+=ptTextInfo->pFontDict->lineOffset;
             break;
         }
             default:
@@ -746,7 +738,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         {
             sizeWidthMax=MAX(sizeWidthMax,lineWidth-advWidth);
             lineWidth=0;
-            sizeHeightMax+=ptTextInfo->lineOffset;
+            sizeHeightMax+=ptTextInfo->pFontDict->lineOffset;
         }
 
         i+=len;
@@ -764,7 +756,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         retSize.iWidth=sizeWidthMax;
         retSize.iHeight=sizeHeightMax;
 
-        *bmpAscender=ptTextInfo->lineOffset-ptTextInfo->descender;
+        *bmpAscender=ptTextInfo->pFontDict->lineOffset-ptTextInfo->pFontDict->descender;
     }
     return retSize;
 }
@@ -781,7 +773,7 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
     uint8_t len;
     int16_t offsetX=0,offsetY=0;
     int16_t textOffsetX=0;
-    int16_t textOffsetY=ptTextInfo->lineOffset+ptTextInfo->descender;
+    int16_t textOffsetY=ptTextInfo->pFontDict->lineOffset+ptTextInfo->pFontDict->descender;
     int16_t bmpH1Max;
 
     arm_2d_size_t textSize;
@@ -790,7 +782,11 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
 
     arm_2d_region_t alignSize= ldBaseAlign(&tTile,textSize,ptTextInfo->align);
 
+#if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t fontTile;
+#else
+    arm_2d_vres_t fontTile;
+#endif
 
     tTile.tRegion=alignSize;
 
@@ -809,7 +805,7 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
             case '\n':
             {
                 textOffsetX=0;
-                textOffsetY+=ptTextInfo->lineOffset;
+                textOffsetY+=ptTextInfo->pFontDict->lineOffset;
                 break;
             }
                 default:
@@ -819,19 +815,25 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
             continue;
         }
 
-        fontTile=(*(arm_2d_tile_t*)(&ptTextInfo->tFontTile));
+        fontTile=ptTextInfo->tFontTile;
+#if USE_VIRTUAL_RESOURCE == 0
         fontTile.tRegion.tSize.iWidth=width;
         fontTile.tRegion.tSize.iHeight=height;
         fontTile.pchBuffer+=imgAddr;
-
+#else
+        fontTile.tTile.tRegion.tSize.iWidth=width;
+        fontTile.tTile.tRegion.tSize.iHeight=height;
+        fontTile.tTile.pchBuffer=imgAddr;
+        fontTile.pTarget=imgAddr;
+#endif
         int16_t tempHeight;
         //偏移坐标
-        if(textSize.iHeight>ptTextInfo->lineOffset)//多行
+        if(textSize.iHeight>ptTextInfo->pFontDict->lineOffset)//多行
         {
             if((textOffsetX+advWidth)>textSize.iWidth)//自动换行
             {
                 textOffsetX=0;
-                textOffsetY+=ptTextInfo->lineOffset;
+                textOffsetY+=ptTextInfo->pFontDict->lineOffset;
             }
             tempHeight=textOffsetY-(height+offsetY);
         }
@@ -842,7 +844,7 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
 
         arm_2d_tile_t charTile=impl_child_tile(tTile,textOffsetX+offsetX,tempHeight,width,height);
 
-        ldBaseMaskImage(&charTile,&fontTile,ptTextInfo->charColor,255);
+        ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,ptTextInfo->charColor,255);
         arm_2d_op_wait_async(NULL);
 
         textOffsetX+=advWidth;
