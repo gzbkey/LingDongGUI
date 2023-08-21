@@ -66,9 +66,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldGetWidgetInfoById(parentNameId);
-
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldImage_t);
-    
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -84,14 +82,10 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         else
         {
             parent_link = &ldWidgetLink;
-        
         }
-        
         pNewWidget->nameId = nameId;
         pNewWidget->childList = NULL;
-
         pNewWidget->widgetType = widgetTypeImage;
-
         xListInfoAdd(parent_link, pNewWidget);
         if (parent_link == &ldWidgetLink) // 自身为bg
         {
@@ -111,14 +105,11 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 #if USE_OPACITY == 1
         pNewWidget->opacity = 255;
 #endif
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
         tResTile->tRegion.tSize.iWidth=width;
         tResTile->tRegion.tSize.iHeight=height;
-
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
@@ -130,10 +121,14 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
+
+        LOG_INFO("[image] new id:%d\n",nameId);
     }
     else
     {
         ldFree(pNewWidget);
+
+        LOG_ERROR("[image] create failed id:%d\n",nameId);
     }
 
     return pNewWidget;
@@ -152,11 +147,7 @@ void ldImageSetBgColor(ldImage_t *widget,ldColor bgColor)
 
 void ldImageSetHidden(ldImage_t *widget,bool isHidden)
 {
-    if (widget == NULL)
-    {
-        return;
-    }
-    widget->isHidden=isHidden;
+    ldBaseSetHidden((ldCommon_t*) widget,isHidden);
 }
 
 void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFrame)

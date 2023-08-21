@@ -9,7 +9,7 @@ extern "C" {
 #include "xList.h"
 #include "ldConfig.h"
 
-
+#define SELECT_COLOR_OPACITY     128
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;
@@ -25,10 +25,10 @@ typedef struct {
     uint32_t pressImgAddr;
     uint32_t selectMaskAddr;
     uint32_t keyValue;
+    ldChar_t *ptTextInfo;
     ldColor releaseColor;
     ldColor pressColor;
     ldColor selectColor;
-    ldChar_t *ptTextInfo;
 }ldButton_t;
 
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);

@@ -5,7 +5,7 @@
 #include "ldConfig.h"
 #include "xBtnAction.h"
 #include "image.h"
-
+#include "ldText.h"
 ldImage_t *img0;
 ldWindow_t *win0;
 ldImage_t *img1;
@@ -13,13 +13,13 @@ ldWindow_t *win1;
 
 ldButton_t *btn0,*btn1,*targetBtn;
 int64_t timer=0;
-
+ldText_t *txt0;
 #define ID_BTN0      2
 #define ID_BTN1      3
 void userInit(void)
 {
     win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
-    ldWindowSetBgColor(win0,__RGB(255,255,255));
+    ldWindowSetBgColor(win0,__RGB(220,220,220));
     img0=ldImageInit(1, 0, 20,20,72,72,RELEASE_PNG,true);
     ldImageSetOpacity(img0,128);
     
@@ -40,10 +40,19 @@ void userInit(void)
     ldButtonSetText(btn1,(uint8_t*)"栟𨭉");
 //    ldButtonSetAlign(btn1,LD_ALIGN_TOP|LD_ALIGN_LEFT);
 
+    ldButtonSetRoundCorner(btn1,true);
 
 
 //    targetBtn=btn1;
-    btn1->isSelected=true;
+
+    ldButtonSetSelect(btn1,true);
+
+    txt0=ldTextInit(4, 0, 200, 100, 50, 100,MICROSOFT_YAHEI_REGULAR_20);
+//    ldTextSetTransparent(txt0,true);
+    ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉");
+    ldTextSetAlign(ldGetWidgetById(4),LD_ALIGN_TOP|LD_ALIGN_LEFT);
+
+
 }
 
 void userInit1(void)
@@ -54,11 +63,12 @@ void userInit1(void)
 
 void userLoop(void)
 {
-//    if( ldTimeOut(3000, &timer,true))
-//    {
+    if( ldTimeOut(200, &timer,true))
+    {
 //        btn0->isPressed=!btn0->isPressed;
-////        ldGuiJumpPage(1);
-//    }
+//        ldGuiJumpPage(1);
+        ldTextAddScroll(txt0,-1);
+    }
 
 //    if(xBtnGetState(KEY_NUM_LEFT,BTN_PRESS))
 //    {

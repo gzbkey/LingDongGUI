@@ -131,7 +131,7 @@ typedef struct{
 
 typedef struct{
     arm_2d_tile_t tFontTile;//字库
-    ldFontDict_t* pFontDict;//字典(目录)
+    ldFontDict_t* ptFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
@@ -168,7 +168,7 @@ typedef struct{
 
 typedef struct{
     arm_2d_vres_t tFontTile;//字库
-    ldFontDict_t* pFontDict;//字典(目录)
+    ldFontDict_t* ptFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
@@ -219,13 +219,18 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,bool isWithMask
 void ldBaseMaskImage(arm_2d_tile_t* ptTile, arm_2d_tile_t *ptResource, ldColor textColor, uint8_t opacity);
 
 void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
-void ldBaseSetFont(ldChar_t *pCharInfo, ldFontDict_t *fontDictAddr);
+void ldBaseSetFont(ldChar_t **pptCharInfo, ldFontDict_t *fontDictAddr);
 
 void ldBaseTextDel(ldChar_t *charInfo);
 ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
 
-uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
-void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo);
+uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
+void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffset);
+
+void ldBaseSetHidden(ldCommon_t* widget,bool isHidden);
+void ldBaseSetText(ldChar_t **pptTextInfo, uint8_t *pStr);
+void ldBaseSetTextColor(ldChar_t **pptTextInfo, ldColor charColor);
+void ldBaseSetAlign(ldChar_t **pptTextInfo, uint8_t align);
 
 #ifdef __cplusplus
 }

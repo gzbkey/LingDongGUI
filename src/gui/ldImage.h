@@ -1,5 +1,5 @@
-#ifndef _LDIMAGE_H_
-#define _LDIMAGE_H_
+#ifndef _LD_IMAGE_H_
+#define _LD_IMAGE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ void ldImageSetGrayscale(ldImage_t *widget, uint8_t grayBit, ldColor writeColor)
 }
 #endif
 
-#endif //_LDIMAGE_H_
+#endif //_LD_IMAGE_H_

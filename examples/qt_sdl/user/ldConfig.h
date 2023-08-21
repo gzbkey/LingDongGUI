@@ -19,9 +19,8 @@ extern "C" {
 #if USE_TLSF == 1
 #define TLSF_MEM_SIZE                             (8*1024) //BYTE
 #endif
+
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
-
-
 
 
 // user key num

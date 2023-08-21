@@ -2,11 +2,12 @@
 #include "ldCommon.h"
 #include "xList.h"
 #include "xConnect.h"
-#include "ldImage.h"
 #include "ldUser.h"
 #include "xBtnAction.h"
 #include "ldConfig.h"
+#include "ldImage.h"
 #include "ldButton.h"
+#include "ldText.h"
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
@@ -141,19 +142,24 @@ static void _widgetLoop(ldCommon_t *info,const arm_2d_tile_t *ptParent,bool bIsN
 {
     switch(info->widgetType)
     {
-        case widgetTypeWindow:
-        case widgetTypeImage:
-        {
-            ldImageLoop((ldImage_t*)info,ptParent,bIsNewFrame);
-            break;
-        }
-        case widgetTypeButton:
-        {
-            ldButtonLoop((ldButton_t*)info,ptParent,bIsNewFrame);
-            break;
-        }
-        default:
-            break;
+    case widgetTypeWindow:
+    case widgetTypeImage:
+    {
+        ldImageLoop((ldImage_t*)info,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeButton:
+    {
+        ldButtonLoop((ldButton_t*)info,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeText:
+    {
+        ldTextLoop((ldText_t*)info,ptParent,bIsNewFrame);
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -179,6 +185,7 @@ void ldGuiInit(void)
 {
     xEmitInit();
     ldUserPageInitFunc[pageNumNow]();
+    LOG_INFO("[sys] page %d init\n",pageNumNow);
 }
 
 void ldGuiLogicLoop(void)
@@ -205,8 +212,8 @@ void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 
 void ldGuiQuit(void)
 {
-    printf("quit\n");
     ldUserPageQuitFunc[pageNumNow]();
+    LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 
 void ldGuiJumpPage(uint8_t pageNum)

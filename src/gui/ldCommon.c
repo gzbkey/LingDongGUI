@@ -40,9 +40,11 @@ __WEAK void *ldMalloc(uint32_t size)
         pTlsfMem = tlsf_create_with_pool((void *)tlsfMemBuf, TLSF_MEM_SIZE);
     }
     void* p=tlsf_malloc(pTlsfMem,size);
-    memset(p,0,size);
+    if(p!=NULL)
+    {
+        memset(p,0,size);
+    }
     return p;
-
 #else
     void* p=malloc(size);
     memset(p,0,size);
@@ -52,6 +54,10 @@ __WEAK void *ldMalloc(uint32_t size)
 
 __WEAK void ldFree(void *p)
 {
+    if(p==NULL)
+    {
+        return;
+    }
 #if USE_TLSF == 1
     tlsf_free(pTlsfMem, p);
 #else
@@ -268,30 +274,6 @@ bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset)
     return false;
 }
 
-/*
-    widgetTypeNone,
-    widgetTypeBackground,
-    widgetTypeWindow,
-    widgetTypeButton,
-    widgetTypeImage,
-    widgetTypeText,
-    widgetTypeLineEdit,
-    widgetTypeDashboardSimple,
-    widgetTypeGraph,
-    widgetTypeCheckBox,
-    widgetTypeSlider,
-    widgetTypeProgressBar,
-    widgetTypeGauge,
-    widgetTypeQRCode,
-    widgetTypeDateTime,
-    widgetTypeIconSlider,
-    widgetTypeComboBox,
-    widgetTypeIconRotateAround,
-    widgetTypeNumber,
-    widgetTypeStaticText,
-    widgetTypeStartupImage,
-    widgetTypeArc,
-*/
 void ldDelWidget(ldCommon_t *widget)
 {
     switch(widget->widgetType)
@@ -499,39 +481,43 @@ ldChar_t * ldBaseCheckText(ldChar_t **charInfo)
     return *charInfo;
 }
 
-void ldBaseSetFont(ldChar_t *pCharInfo,ldFontDict_t* pFontDict)
+void ldBaseSetFont(ldChar_t **pptCharInfo,ldFontDict_t* ptFontDict)
 {
-    (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).pchBuffer=(uint8_t *)pFontDict->pFontSrc;
-#if USE_VIRTUAL_RESOURCE == 1
-    pCharInfo->tFontTile.pTarget=pFontDict->pFontSrc;
-#endif
-    pCharInfo->pFontDict=pFontDict;
+    if(ldBaseCheckText(pptCharInfo))
+    {
 
-    switch (pFontDict->maskType)
+    (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).pchBuffer=(uint8_t *)ptFontDict->pFontSrc;
+#if USE_VIRTUAL_RESOURCE == 1
+    ptCharInfo->tFontTile.pTarget=ptFontDict->pFontSrc;
+#endif
+    (*pptCharInfo)->ptFontDict=ptFontDict;
+
+    switch (ptFontDict->maskType)
     {
     case 1:
     {
-        (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
+        (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
         break;
     }
     case 2:
     {
-        (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A2;
+        (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A2;
         break;
     }
     case 4:
     {
-        (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A4;
+        (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A4;
         break;
     }
     case 8:
     {
-        (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+        (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
         break;
     }
     default:
     {
-        (*(arm_2d_tile_t*)(&pCharInfo->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
+        (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
+    }
     }
     }
 }
@@ -558,13 +544,13 @@ static uint8_t _getUtf8Len(uint8_t dat)
     return retBytes;
 }
 
-uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr)
+uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr)
 {
     uint32_t dictCount=0;
     uint8_t retBytes=0;
     ldFontInfo_t *pInfoList;
-    dictCount=pFontDict->count;
-    pInfoList=pFontDict->pInfoList;
+    dictCount=ptFontDict->count;
+    pInfoList=ptFontDict->pInfoList;
 
     retBytes=_getUtf8Len(charUtf8[0]);
 
@@ -594,7 +580,7 @@ uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict,uint8_t *charUtf8,int16_t *adv
     return retBytes;
 }
 
-arm_2d_region_t ldBaseAlign(arm_2d_tile_t *ptTile,arm_2d_size_t size,uint8_t align)
+arm_2d_region_t ldBaseGetAlignRegion(arm_2d_tile_t *ptTile,arm_2d_size_t size,uint8_t align)
 {
     arm_2d_region_t retRegion;
 
@@ -678,8 +664,8 @@ arm_2d_region_t ldBaseAlign(arm_2d_tile_t *ptTile,arm_2d_size_t size,uint8_t ali
                 break;
             }
         }
-    retRegion.tLocation.iX+=ptTile->tRegion.tLocation.iX;
-    retRegion.tLocation.iY+=ptTile->tRegion.tLocation.iY;
+//    retRegion.tLocation.iX+=ptTile->tRegion.tLocation.iX;
+//    retRegion.tLocation.iY+=ptTile->tRegion.tLocation.iY;
     return retRegion;
 }
 
@@ -698,11 +684,11 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
     int16_t h2_min=0;
     int16_t lineWidth=0;
     int16_t sizeWidthMax=0;
-    int16_t sizeHeightMax=ptTextInfo->pFontDict->lineOffset;
+    int16_t sizeHeightMax=ptTextInfo->ptFontDict->lineOffset;
 
     for(int i=0;i<ptTextInfo->strLen;)
     {
-        len=ldBaseGetCharInfo(ptTextInfo->pFontDict,&ptTextInfo->pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
+        len=ldBaseGetCharInfo(ptTextInfo->ptFontDict,&ptTextInfo->pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
         if(width==0)
         {
         switch(ptTextInfo->pStr[i])
@@ -717,7 +703,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         {
             sizeWidthMax=MAX(sizeWidthMax,lineWidth);
             lineWidth=0;
-            sizeHeightMax+=ptTextInfo->pFontDict->lineOffset;
+            sizeHeightMax+=ptTextInfo->ptFontDict->lineOffset;
             break;
         }
             default:
@@ -738,7 +724,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         {
             sizeWidthMax=MAX(sizeWidthMax,lineWidth-advWidth);
             lineWidth=0;
-            sizeHeightMax+=ptTextInfo->pFontDict->lineOffset;
+            sizeHeightMax+=ptTextInfo->ptFontDict->lineOffset;
         }
 
         i+=len;
@@ -756,7 +742,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         retSize.iWidth=sizeWidthMax;
         retSize.iHeight=sizeHeightMax;
 
-        *bmpAscender=ptTextInfo->pFontDict->lineOffset-ptTextInfo->pFontDict->descender;
+        *bmpAscender=ptTextInfo->ptFontDict->lineOffset-ptTextInfo->ptFontDict->descender;
     }
     return retSize;
 }
@@ -764,7 +750,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
 
 
 
-void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
+void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffset)
 {
     int16_t advWidth;
     int16_t width;
@@ -773,14 +759,14 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
     uint8_t len;
     int16_t offsetX=0,offsetY=0;
     int16_t textOffsetX=0;
-    int16_t textOffsetY=ptTextInfo->pFontDict->lineOffset+ptTextInfo->pFontDict->descender;
+    int16_t textOffsetY=ptTextInfo->ptFontDict->lineOffset+ptTextInfo->ptFontDict->descender+scrollOffset;
     int16_t bmpH1Max;
 
     arm_2d_size_t textSize;
 
     textSize= ldBaseGetStringSize(ptTextInfo,&bmpH1Max,tTile.tRegion.tSize.iWidth);
 
-    arm_2d_region_t alignSize= ldBaseAlign(&tTile,textSize,ptTextInfo->align);
+    arm_2d_region_t alignSize= ldBaseGetAlignRegion(&tTile,textSize,ptTextInfo->align);
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t fontTile;
@@ -788,68 +774,122 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo)
     arm_2d_vres_t fontTile;
 #endif
 
-    tTile.tRegion=alignSize;
-
-    for(int i=0;i<ptTextInfo->strLen;)
+    arm_2d_container(&tTile,showTile,&alignSize)
     {
-        len=ldBaseGetCharInfo(ptTextInfo->pFontDict,&ptTextInfo->pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
-        if(width==0)
+        for(int i=0;i<ptTextInfo->strLen;)
         {
-            switch(ptTextInfo->pStr[i])
+            len=ldBaseGetCharInfo(ptTextInfo->ptFontDict,&ptTextInfo->pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
+            if(width==0)
             {
-            case '\r':
-            {
-                textOffsetX=0;
-                break;
-            }
-            case '\n':
-            {
-                textOffsetX=0;
-                textOffsetY+=ptTextInfo->pFontDict->lineOffset;
-                break;
-            }
+                switch(ptTextInfo->pStr[i])
+                {
+                case '\r':
+                {
+                    textOffsetX=0;
+                    break;
+                }
+                case '\n':
+                {
+                    textOffsetX=0;
+                    textOffsetY+=ptTextInfo->ptFontDict->lineOffset;
+                    break;
+                }
                 default:
                     break;
+                }
+                i+=len;
+                continue;
             }
-            i+=len;
-            continue;
-        }
 
-        fontTile=ptTextInfo->tFontTile;
+            fontTile=ptTextInfo->tFontTile;
 #if USE_VIRTUAL_RESOURCE == 0
-        fontTile.tRegion.tSize.iWidth=width;
-        fontTile.tRegion.tSize.iHeight=height;
-        fontTile.pchBuffer+=imgAddr;
+            fontTile.tRegion.tSize.iWidth=width;
+            fontTile.tRegion.tSize.iHeight=height;
+            fontTile.pchBuffer+=imgAddr;
 #else
-        fontTile.tTile.tRegion.tSize.iWidth=width;
-        fontTile.tTile.tRegion.tSize.iHeight=height;
-        fontTile.tTile.pchBuffer=imgAddr;
-        fontTile.pTarget=imgAddr;
+            fontTile.tTile.tRegion.tSize.iWidth=width;
+            fontTile.tTile.tRegion.tSize.iHeight=height;
+            fontTile.tTile.pchBuffer=imgAddr;
+            fontTile.pTarget=imgAddr;
 #endif
-        int16_t tempHeight;
-        //偏移坐标
-        if(textSize.iHeight>ptTextInfo->pFontDict->lineOffset)//多行
-        {
-            if((textOffsetX+advWidth)>textSize.iWidth)//自动换行
+            int16_t tempHeight;
+            //偏移坐标
+            if(textSize.iHeight>ptTextInfo->ptFontDict->lineOffset)//多行
             {
-                textOffsetX=0;
-                textOffsetY+=ptTextInfo->pFontDict->lineOffset;
+                if((textOffsetX+advWidth)>textSize.iWidth)//自动换行
+                {
+                    textOffsetX=0;
+                    textOffsetY+=ptTextInfo->ptFontDict->lineOffset;
+                }
+                tempHeight=textOffsetY-(height+offsetY);
             }
-            tempHeight=textOffsetY-(height+offsetY);
+            else
+            {
+                tempHeight=bmpH1Max-(height+offsetY);
+            }
+
+            arm_2d_tile_t charTile=impl_child_tile(showTile,textOffsetX+offsetX,tempHeight,width,height);
+
+            ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,ptTextInfo->charColor,255);
+            arm_2d_op_wait_async(NULL);
+
+            textOffsetX+=advWidth;
+
+            i+=len;
         }
-        else
+    }
+}
+
+void ldBaseSetHidden(ldCommon_t* widget,bool isHidden)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+    widget->isHidden=isHidden;
+}
+
+void ldBaseSetText(ldChar_t **pptTextInfo,uint8_t *pStr)
+{
+    uint8_t newStrlen;
+    newStrlen=strlen((char*)pStr);
+
+    if(ldBaseCheckText(pptTextInfo))
+    {
+        if((newStrlen>(*pptTextInfo)->strLen)&&((*pptTextInfo)->pStr!=NULL))
         {
-            tempHeight=bmpH1Max-(height+offsetY);
+            ldFree((*pptTextInfo)->pStr);
+            (*pptTextInfo)->pStr=NULL;
+            (*pptTextInfo)->strLen=0;
         }
 
-        arm_2d_tile_t charTile=impl_child_tile(tTile,textOffsetX+offsetX,tempHeight,width,height);
+        if((*pptTextInfo)->pStr==NULL)
+        {
+            (*pptTextInfo)->pStr=ldMalloc(newStrlen);
+            if((*pptTextInfo)->pStr==NULL)
+            {
+                return;
+            }
+            (*pptTextInfo)-> strLen=newStrlen;
+        }
 
-        ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,ptTextInfo->charColor,255);
-        arm_2d_op_wait_async(NULL);
+        strcpy((char*)(*pptTextInfo)->pStr,(char*)pStr);
+    }
+}
 
-        textOffsetX+=advWidth;
+void ldBaseSetTextColor(ldChar_t **pptTextInfo,ldColor charColor)
+{
+    if(ldBaseCheckText(pptTextInfo))
+    {
+        (*pptTextInfo)->charColor=charColor;
+    }
+}
 
-        i+=len;
+void ldBaseSetAlign(ldChar_t **pptTextInfo,uint8_t align)
+{
+    if(ldBaseCheckText(pptTextInfo))
+    {
+        (*pptTextInfo)->align=align;
     }
 }
 
