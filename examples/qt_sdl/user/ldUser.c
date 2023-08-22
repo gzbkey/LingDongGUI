@@ -20,10 +20,10 @@ void userInit(void)
 {
     win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(win0,__RGB(220,220,220));
+
     img0=ldImageInit(1, 0, 20,20,72,72,RELEASE_PNG,true);
     ldImageSetOpacity(img0,128);
-    
-    
+
 
     btn0=ldButtonInit(ID_BTN0, 0, 20,100,72,72);
 
@@ -32,26 +32,23 @@ void userInit(void)
     ldButtonSetSelectImage(btn0,FRAME_PNG,__RGB(255,0,0));
 
 
-
     btn1=ldButtonInit(ID_BTN1, 0, 120,100,72,72);
     ldButtonSetFont(btn1,MICROSOFT_YAHEI_REGULAR_20);
-//    ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
-//    ldButtonSetText(btn1,(uint8_t*)"");
+    ldButtonSetTextColor(btn1,GLCD_COLOR_RED);
+
     ldButtonSetText(btn1,(uint8_t*)"栟𨭉");
 //    ldButtonSetAlign(btn1,LD_ALIGN_TOP|LD_ALIGN_LEFT);
 
     ldButtonSetRoundCorner(btn1,true);
 
 
-//    targetBtn=btn1;
 
     ldButtonSetSelect(btn1,true);
 
     txt0=ldTextInit(4, 0, 200, 100, 50, 100,MICROSOFT_YAHEI_REGULAR_20);
-//    ldTextSetTransparent(txt0,true);
+    ldTextSetTransparent(txt0,true);
     ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉");
     ldTextSetAlign(ldGetWidgetById(4),LD_ALIGN_TOP|LD_ALIGN_LEFT);
-
 
 }
 

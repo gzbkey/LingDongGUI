@@ -23,16 +23,13 @@
 
 static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
 {
-    ldButton_t *btn;
     if (pEachInfo->info == pTarget)
     {
-        btn=pTarget;
-        if(btn->ptTextInfo!=NULL)
+        if(((ldButton_t*)pTarget)->ptTextInfo!=NULL)
         {
-            ldBaseTextDel(btn->ptTextInfo);
-//            ldFree(btn->ptTextInfo);
+            ldBaseTextDel(((ldButton_t*)pTarget)->ptTextInfo);
         }
-        ldFree(btn);
+        ldFree(((ldButton_t*)pTarget));
         xListInfoDel(pEachInfo);
     }
     return false;
@@ -51,6 +48,10 @@ void ldButtonDel(ldButton_t *widget)
     {
         return;
     }
+
+    LOG_DEBUG("[button] del,id:%d\n",widget->nameId);
+
+    xDeleteConnect(widget->nameId);
 
     // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
@@ -141,13 +142,13 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         xConnect(nameId,BTN_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,BTN_RELEASE,nameId,slotButtonToggle);
 
-        LOG_INFO("[button] new id:%d\n",nameId);
+        LOG_INFO("[button] init,id:%d\n",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[button] create failed id:%d\n",nameId);
+        LOG_ERROR("[button] init failed,id:%d\n",nameId);
     }
     return pNewWidget;
 }

@@ -43,6 +43,8 @@ void ldTemplateDel(ldTemplate_t *widget)
         return;
     }
 
+    LOG_DEBUG("[template] del,id:%d\n",widget->nameId);
+
     // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
@@ -97,13 +99,13 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
         // add user init
 
-        LOG_INFO("[template] new id:%d\n",nameId);
+        LOG_INFO("[text] init,id:%d\n",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[template] create failed id:%d\n",nameId);
+        LOG_ERROR("[template] init failed,id:%d\n",nameId);
     }
 
     return pNewWidget;
@@ -118,7 +120,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent))
+    if((widget->isParentHidden)||(widget->isHidden))
     {
         return;
     }

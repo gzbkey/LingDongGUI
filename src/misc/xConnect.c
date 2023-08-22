@@ -67,7 +67,7 @@ bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc f
         XFREE(pRelation);
         return false;
     }
-    
+
         return true;
     }
 
@@ -86,7 +86,7 @@ static bool _disconnect(xListNode* pEachInfo,void* pRelationInfo)
         xListInfoDel(pEachInfo);
         return true;
     }
-     
+
     return false;
 }
 
@@ -149,7 +149,7 @@ void xConnectProcess(void)
                         connectInfo.signalType=pRelationInfo->signalType;
                         connectInfo.receiverId=pRelationInfo->receiverId;
                         ignoreSignal=pRelationInfo->receiverFunc(connectInfo);
-                        
+
                         if(ignoreSignal==true)
                         {
                             break;

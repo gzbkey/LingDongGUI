@@ -16,9 +16,9 @@ extern "C" {
 
 #define USE_OPACITY                               1
 #define USE_TLSF                                  1
-#if USE_TLSF == 1
-#define TLSF_MEM_SIZE                             (8*1024) //BYTE
-#endif
+
+#define LD_MEM_SIZE                               (8*1024) //BYTE
+
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

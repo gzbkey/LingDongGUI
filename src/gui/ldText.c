@@ -21,8 +21,10 @@ static bool _textDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        //del other object
-
+        if(((ldText_t*)pTarget)->ptTextInfo!=NULL)
+        {
+            ldBaseTextDel(((ldText_t*)pTarget)->ptTextInfo);
+        }
         ldFree(((ldText_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -42,6 +44,8 @@ void ldTextDel(ldText_t *widget)
     {
         return;
     }
+
+    LOG_DEBUG("[text] del,id:%d\n",widget->nameId);
 
     // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
@@ -100,14 +104,13 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         ldBaseSetFont(&pNewWidget->ptTextInfo,pFontDict);
         pNewWidget->scrollOffset=0;
 
-
-        LOG_INFO("[Text] new id:%d\n",nameId);
+        LOG_INFO("[text] init,id:%d\n",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[Text] create failed id:%d\n",nameId);
+        LOG_ERROR("[text] init failed,id:%d\n",nameId);
     }
 
     return pNewWidget;
@@ -122,7 +125,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent))
+    if((widget->isParentHidden)||(widget->isHidden))
     {
         return;
     }
@@ -144,15 +147,13 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
                 ((arm_2d_vres_t*)ptResTile)->pTarget=widget->releaseImgAddr;
 #endif
                 ldBaseImage(&tTarget,ptResTile,false,255);
-
             }
             arm_2d_op_wait_async(NULL);
-
-            if(widget->ptTextInfo!=NULL)
-            {
-                ldBaseShowText(tTarget,widget->ptTextInfo,widget->scrollOffset);
-                arm_2d_op_wait_async(NULL);
-            }
+        }
+        if(widget->ptTextInfo!=NULL)
+        {
+            ldBaseShowText(tTarget,widget->ptTextInfo,widget->scrollOffset);
+            arm_2d_op_wait_async(NULL);
         }
     }
 }

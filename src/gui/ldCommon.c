@@ -1,12 +1,16 @@
 #include "ldCommon.h"
 #include "xList.h"
 #include <stdarg.h>
+#include "ldConfig.h"
 #include "ldWindow.h"
 #include "ldImage.h"
 #include "ldButton.h"
-#include "ldConfig.h"
-
+#include "ldText.h"
+#if USE_TLSF == 1
 #include "tlsf.h"
+#else
+#include "freeRtosHeap4.h"
+#endif
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -29,15 +33,15 @@ NEW_LIST(ldWidgetLink);
 
 #if USE_TLSF == 1
 static void * pTlsfMem=NULL;
-static uint8_t tlsfMemBuf[TLSF_MEM_SIZE];
+static uint8_t tlsfMemBuf[LD_MEM_SIZE];
 #endif
-
+extern size_t xFreeBytesRemaining;
 __WEAK void *ldMalloc(uint32_t size)
 {
 #if USE_TLSF == 1
     if(pTlsfMem==NULL)
     {
-        pTlsfMem = tlsf_create_with_pool((void *)tlsfMemBuf, TLSF_MEM_SIZE);
+        pTlsfMem = tlsf_create_with_pool((void *)tlsfMemBuf, sizeof (tlsfMemBuf));
     }
     void* p=tlsf_malloc(pTlsfMem,size);
     if(p!=NULL)
@@ -46,9 +50,12 @@ __WEAK void *ldMalloc(uint32_t size)
     }
     return p;
 #else
-    void* p=malloc(size);
-    memset(p,0,size);
-    return p;
+//    LOG_DEBUG("malloc:%d\n",size);
+//    LOG_DEBUG("before :%llu\n",xFreeBytesRemaining);
+    return pvPortMalloc(size);
+//    void* p=malloc(size);
+//    memset(p,0,size);
+//    return p;
 #endif
 }
 
@@ -61,7 +68,10 @@ __WEAK void ldFree(void *p)
 #if USE_TLSF == 1
     tlsf_free(pTlsfMem, p);
 #else
-    free(p);
+    vPortFree(p);
+//    LOG_DEBUG("free\n");
+//    LOG_DEBUG("remaining:%llu\n",xFreeBytesRemaining);
+//    free(p);
 #endif
 }
 
@@ -293,6 +303,10 @@ void ldDelWidget(ldCommon_t *widget)
             ldButtonDel((ldButton_t*)widget);
             break;
         }
+    case widgetTypeText:
+    {
+        ldTextDel((ldText_t*)widget);
+    }
         default:
             break;
     }

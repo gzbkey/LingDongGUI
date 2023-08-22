@@ -36,10 +36,12 @@ void ldImageDel(ldImage_t *widget)
         return;
     }
 
-    if((widget->widgetType!=widgetTypeImage)||(widget->widgetType!=widgetTypeWindow))
+    if((widget->widgetType!=widgetTypeImage)&&(widget->widgetType!=widgetTypeWindow))
     {
         return;
     }
+
+    LOG_DEBUG("[image] del,id:%d\n",widget->nameId);
 
     // 查找父链表
     if ((ldCommon_t *)widget->parentType == widgetTypeNone)
@@ -122,13 +124,13 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
 
-        LOG_INFO("[image] new id:%d\n",nameId);
+        LOG_INFO("[image] init,id:%d\n",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[image] create failed id:%d\n",nameId);
+        LOG_ERROR("[image] init failed,id:%d\n",nameId);
     }
 
     return pNewWidget;

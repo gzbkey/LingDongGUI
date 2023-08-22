@@ -20,8 +20,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "ldCommon.h"
 
-#define X_QUEUE_MALLOC    malloc
+#define X_QUEUE_MALLOC    XMALLOC
 //#define X_QUEUE_FREE      free
 
 typedef struct

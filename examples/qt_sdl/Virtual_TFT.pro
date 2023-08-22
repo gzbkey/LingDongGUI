@@ -11,6 +11,7 @@ SOURCES += \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldText.c \
     ../../src/gui/ldWindow.c \
+    ../../src/misc/freeRtosHeap4.c \
     ../../src/misc/tlsf.c \
     ../../src/misc/xBtnAction.c \
     ../../src/misc/xConnect.c \
@@ -103,6 +104,7 @@ HEADERS += \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldText.h \
     ../../src/gui/ldWindow.h \
+    ../../src/misc/freeRtosHeap4.h \
     ../../src/misc/tlsf.h \
     ../../src/misc/xBtnAction.h \
     ../../src/misc/xConnect.h \

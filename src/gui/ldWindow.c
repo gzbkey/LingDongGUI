@@ -40,22 +40,21 @@ void ldWindowDel(ldWindow_t *widget)
         return;
     }
 
+    LOG_DEBUG("[window] del,id:%d\n",widget->nameId);
+
     listInfo=ldGetWidgetInfoById(widget->nameId);
-    
+
     if(listInfo!=NULL)
     {
         xListInfoPrevTraverse(widget->childList,NULL,_windowDel);
         xListFreeNode(widget->childList);
-        
         ldImageDel((ldImage_t *)widget);
-        
     }
 }
 
 ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldWindow_t * pNewWidget = NULL;
-    
     pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,0,false);
     if(pNewWidget!=NULL)
     {
@@ -63,6 +62,7 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         {
             pNewWidget->isTransparent=true;
             pNewWidget->widgetType=widgetTypeWindow;
+            LOG_INFO("[window] init,id:%d\n",nameId);
         }
         else
         {
