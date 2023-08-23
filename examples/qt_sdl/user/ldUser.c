@@ -49,7 +49,7 @@ void userInit(void)
     ldTextSetTransparent(txt0,true);
     ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉");
     ldTextSetAlign(ldGetWidgetById(4),LD_ALIGN_TOP|LD_ALIGN_LEFT);
-
+    ldTextSetScroll(txt0,true);
 }
 
 void userInit1(void)
@@ -60,12 +60,12 @@ void userInit1(void)
 
 void userLoop(void)
 {
-    if( ldTimeOut(200, &timer,true))
-    {
-//        btn0->isPressed=!btn0->isPressed;
-//        ldGuiJumpPage(1);
-        ldTextAddScroll(txt0,-1);
-    }
+//    if( ldTimeOut(200, &timer,true))
+//    {
+////        btn0->isPressed=!btn0->isPressed;
+////        ldGuiJumpPage(1);
+//        ldTextScrollMove(txt0,-1);
+//    }
 
 //    if(xBtnGetState(KEY_NUM_LEFT,BTN_PRESS))
 //    {

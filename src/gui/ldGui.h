@@ -9,11 +9,12 @@ extern "C" {
 #include "stdint.h"
 
 #include "arm_2d.h"
+#include "ldCommon.h"
+#include "xBtnAction.h"
 
+//btn占用0-9
 
-//btn占用0-10
-
-#define SIGNAL_TOUCH_HOLD_MOVE      11 // 按下移动
+#define SIGNAL_TOUCH_HOLD_MOVE      10 // press and move
 
 //#define SIGNAL_TOUCH_CHECK_PRESSED      4 // 单状态按下
 //#define SIGNAL_TOUCH_CHECK_RELEASED      5 // 单状态释放
@@ -35,7 +36,7 @@ void ldGuiLogicLoop(void);
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame);
 void ldGuiQuit(void);
 void ldGuiJumpPage(uint8_t pageNum);
-    
+
 #ifdef __cplusplus
 }
 #endif

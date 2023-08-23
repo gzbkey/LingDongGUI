@@ -1,5 +1,4 @@
 #include "ldGui.h"
-#include "ldCommon.h"
 #include "xList.h"
 #include "xConnect.h"
 #include "ldUser.h"
@@ -18,14 +17,14 @@ int64_t sysTimer=0;
 #define TOUCH_CLICK              1
 
 
-static int16_t prevX,prevY,nowX,nowY;
+static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *widget;
-    ldPoint_t globalPos;
-    ldPoint_t pos;
+//    ldPoint_t globalPos;
+//    ldPoint_t pos;
 //    ldGeometry tempGeometry;
     xListNode *pNode;
 
@@ -77,8 +76,6 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             widget=prevWidget;//不可以把static变量作为函数变量调用
             if(widget!=NULL)
             {
-                nowX=x;
-                nowY=y;
                 xEmit(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE);
             }
             prevX=x;

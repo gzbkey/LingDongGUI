@@ -1,4 +1,5 @@
 #include "ldText.h"
+#include "xConnect.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -25,6 +26,7 @@ static bool _textDel(xListNode *pEachInfo, void *pTarget)
         {
             ldBaseTextDel(((ldText_t*)pTarget)->ptTextInfo);
         }
+        ldTextSetScroll((ldText_t*)pTarget,false);
         ldFree(((ldText_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -199,7 +201,7 @@ void ldTextSetAlign(ldText_t *widget,uint8_t align)
     ldBaseSetAlign(&widget->ptTextInfo,align);
 }
 
-void ldTextSetScroll(ldText_t *widget,int16_t offset)
+void ldTextScrollSeek(ldText_t *widget,int16_t offset)
 {
     if(widget==NULL)
     {
@@ -208,18 +210,67 @@ void ldTextSetScroll(ldText_t *widget,int16_t offset)
     widget->scrollOffset=offset;
 }
 
-void ldTextAddScroll(ldText_t *widget, int8_t add)
+void ldTextScrollMove(ldText_t *widget, int8_t moveValue)
 {
     if(widget==NULL)
     {
         return;
     }
-    widget->scrollOffset+=add;
-    if((add>0)&&(widget->scrollOffset<0))
+    widget->scrollOffset+=moveValue;
+    if((moveValue>0)&&(widget->scrollOffset<0))
     {
         if(widget->scrollOffset<0)
         {
             widget->scrollOffset=0;
+        }
+    }
+}
+
+static bool slotTextVerticalScroll(xConnectInfo_t info)
+{
+    ldText_t *txt;
+    int16_t x;int16_t y;
+
+    txt=ldGetWidgetById(info.receiverId);
+
+    ldCfgTouchGetPoint(&x,&y);
+    if(info.signalType==BTN_PRESS)
+    {
+        txt->touchMoveTemp=y;
+    }
+    else
+    if(info.signalType==SIGNAL_TOUCH_HOLD_MOVE)
+    {
+        if((y-txt->touchMoveTemp)<0)
+        {
+            txt->scrollOffset-=1;
+        }
+        else
+        {
+            txt->scrollOffset+=1;
+        }
+    }
+
+    return false;
+}
+
+void ldTextSetScroll(ldText_t *widget,bool isEnable)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+    if(widget->isScroll!=isEnable)
+    {
+        widget->isScroll=isEnable;
+        if(isEnable)
+        {
+            xConnect(widget->nameId,BTN_PRESS,widget->nameId,slotTextVerticalScroll);
+            xConnect(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE,widget->nameId,slotTextVerticalScroll);
+        }
+        else
+        {
+            xDisconnect(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE,widget->nameId,slotTextVerticalScroll);
         }
     }
 }
