@@ -99,7 +99,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
         // add user init
 
-        LOG_INFO("[text] init,id:%d\n",nameId);
+        LOG_INFO("[template] init,id:%d\n",nameId);
     }
     else
     {
@@ -111,7 +111,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldTemplateLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&widget->resource;
 
@@ -133,7 +133,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
     }
 }
 
-void ldTextSetHidden(ldText_t *widget,bool isHidden)
+void ldTemplateSetHidden(ldText_t *widget,bool isHidden)
 {
     ldBaseSetHidden((ldCommon_t*) widget,isHidden);
 }
