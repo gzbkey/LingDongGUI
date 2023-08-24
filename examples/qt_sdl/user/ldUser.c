@@ -46,8 +46,8 @@ void userInit(void)
     ldButtonSetSelect(btn1,true);
 
     txt0=ldTextInit(4, 0, 200, 100, 50, 100,MICROSOFT_YAHEI_REGULAR_20);
-    ldTextSetTransparent(txt0,true);
-    ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉");
+//    ldTextSetTransparent(txt0,true);
+    ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
     ldTextSetAlign(ldGetWidgetById(4),LD_ALIGN_TOP|LD_ALIGN_LEFT);
     ldTextSetScroll(txt0,true);
 }

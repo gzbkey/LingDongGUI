@@ -11,11 +11,12 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isTransparent:1;
     bool isScroll:1;
+    bool isRelease:1;
     uint32_t bgImgAddr;
     ldChar_t *ptTextInfo;
     ldColor bgColor;
     int16_t scrollOffset;
-    int16_t touchMoveTemp;
+    int16_t strHeight;
 }ldText_t;
 
 ldText_t* ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);

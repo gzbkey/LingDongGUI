@@ -218,6 +218,7 @@ void ldBaseSetHidden(ldCommon_t* widget,bool isHidden);
 void ldBaseSetText(ldChar_t **pptTextInfo, uint8_t *pStr);
 void ldBaseSetTextColor(ldChar_t **pptTextInfo, ldColor charColor);
 void ldBaseSetAlign(ldChar_t **pptTextInfo, uint8_t align);
+arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint16_t frameWidth);
 
 #ifdef __cplusplus
 }

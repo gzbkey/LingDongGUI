@@ -105,6 +105,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->bgColor=__RGB(255,255,255);
         ldBaseSetFont(&pNewWidget->ptTextInfo,pFontDict);
         pNewWidget->scrollOffset=0;
+        pNewWidget->isRelease=false;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
@@ -130,6 +131,23 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
     if((widget->isParentHidden)||(widget->isHidden))
     {
         return;
+    }
+
+    if(widget->isRelease)
+    {
+        if((widget->scrollOffset>0)||(widget->strHeight<=ptResTile->tRegion.tSize.iHeight))
+        {
+            widget->isRelease=false;
+            widget->scrollOffset=0;
+        }
+        else
+        {
+            if(widget->scrollOffset<(ptResTile->tRegion.tSize.iHeight-widget->strHeight))
+            {
+                widget->isRelease=false;
+                widget->scrollOffset=ptResTile->tRegion.tSize.iHeight-widget->strHeight;
+            }
+        }
     }
 
     arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
@@ -176,11 +194,15 @@ void ldTextSetHidden(ldText_t *widget,bool isHidden)
 
 void ldTextSetText(ldText_t* widget,uint8_t *pStr)
 {
+    int16_t bmpH1Max;
+    arm_2d_size_t textSize;
     if(widget==NULL)
     {
         return;
     }
     ldBaseSetText(&widget->ptTextInfo,pStr);
+    textSize= ldBaseGetStringSize(widget->ptTextInfo,&bmpH1Max,((arm_2d_tile_t*)&widget->resource)->tRegion.tSize.iWidth);
+    widget->strHeight=textSize.iHeight;
 }
 
 void ldTextSetTextColor(ldText_t* widget,ldColor charColor)
@@ -226,29 +248,37 @@ void ldTextScrollMove(ldText_t *widget, int8_t moveValue)
     }
 }
 
+static int16_t pressY,scrollTemp;
 static bool slotTextVerticalScroll(xConnectInfo_t info)
 {
     ldText_t *txt;
     int16_t x;int16_t y;
+    int16_t offset;
 
     txt=ldGetWidgetById(info.receiverId);
 
     ldCfgTouchGetPoint(&x,&y);
-    if(info.signalType==BTN_PRESS)
+
+    switch (info.signalType) {
+    case BTN_PRESS:
     {
-        txt->touchMoveTemp=y;
+        pressY=y;
+        scrollTemp=txt->scrollOffset;
+        break;
     }
-    else
-    if(info.signalType==SIGNAL_TOUCH_HOLD_MOVE)
+    case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        if((y-txt->touchMoveTemp)<0)
-        {
-            txt->scrollOffset-=1;
-        }
-        else
-        {
-            txt->scrollOffset+=1;
-        }
+        offset=y-pressY;
+        txt->scrollOffset=scrollTemp+offset;
+        break;
+    }
+    case BTN_RELEASE:
+    {
+        txt->isRelease=true;
+        break;
+    }
+    default:
+        break;
     }
 
     return false;
@@ -267,10 +297,13 @@ void ldTextSetScroll(ldText_t *widget,bool isEnable)
         {
             xConnect(widget->nameId,BTN_PRESS,widget->nameId,slotTextVerticalScroll);
             xConnect(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE,widget->nameId,slotTextVerticalScroll);
+            xConnect(widget->nameId,BTN_RELEASE,widget->nameId,slotTextVerticalScroll);
         }
         else
         {
+            xDisconnect(widget->nameId,BTN_PRESS,widget->nameId,slotTextVerticalScroll);
             xDisconnect(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE,widget->nameId,slotTextVerticalScroll);
+            xDisconnect(widget->nameId,BTN_RELEASE,widget->nameId,slotTextVerticalScroll);
         }
     }
 }

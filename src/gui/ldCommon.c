@@ -699,21 +699,21 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
         continue;
         }
 
+        i+=len;
 
         lineWidth+=advWidth;
-
         h1_max=MAX(h1_max,height+offsetY);
         h2_min=MIN(h2_min,offsetY);
 
 
-        if(lineWidth>frameWidth)//自动换行
+        if(((lineWidth+advWidth)>frameWidth)&&(i<ptTextInfo->strLen))//自动换行
         {
-            sizeWidthMax=MAX(sizeWidthMax,lineWidth-advWidth);
+            sizeWidthMax=MAX(sizeWidthMax,lineWidth);
             lineWidth=0;
             sizeHeightMax+=ptTextInfo->ptFontDict->lineOffset;
         }
 
-        i+=len;
+
     }
 
     if(sizeWidthMax==0)//单行
@@ -753,6 +753,11 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffse
     textSize= ldBaseGetStringSize(ptTextInfo,&bmpH1Max,tTile.tRegion.tSize.iWidth);
 
     arm_2d_region_t alignSize= ldBaseGetAlignRegion(&tTile,textSize,ptTextInfo->align);
+
+    if(ptTextInfo->align==(LD_ALIGN_TOP|LD_ALIGN_LEFT))
+    {
+        alignSize.tSize.iHeight=tTile.tRegion.tSize.iHeight;
+    }
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t fontTile;
