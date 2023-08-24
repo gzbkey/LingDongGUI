@@ -6,8 +6,6 @@ extern "C" {
 #endif
 
 #include "ldCommon.h"
-#include "xList.h"
-#include "ldConfig.h"
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;

@@ -1,7 +1,4 @@
 #include "ldButton.h"
-#include "xBtnAction.h"
-#include "xConnect.h"
-#include "xLog.h"
 
 
 #if defined(__clang__)

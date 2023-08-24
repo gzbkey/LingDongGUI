@@ -33,7 +33,7 @@ NEW_LIST(ldWidgetLink);
 
 #if USE_TLSF == 1
 static void * pTlsfMem=NULL;
-static uint8_t tlsfMemBuf[LD_MEM_SIZE];
+__attribute__((aligned (8))) static uint8_t tlsfMemBuf[LD_MEM_SIZE];
 #endif
 extern size_t xFreeBytesRemaining;
 __WEAK void *ldMalloc(uint32_t size)
@@ -282,34 +282,6 @@ bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset)
             return true;
     }
     return false;
-}
-
-void ldDelWidget(ldCommon_t *widget)
-{
-    switch(widget->widgetType)
-    {
-        case widgetTypeWindow:
-        {
-            ldWindowDel((ldWindow_t*)widget);
-            break;
-        }
-        case widgetTypeImage:
-        {
-            ldImageDel((ldImage_t*)widget);
-            break;
-        }
-        case widgetTypeButton:
-        {
-            ldButtonDel((ldButton_t*)widget);
-            break;
-        }
-    case widgetTypeText:
-    {
-        ldTextDel((ldText_t*)widget);
-    }
-        default:
-            break;
-    }
 }
 
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity)

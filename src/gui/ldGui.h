@@ -5,12 +5,9 @@
 extern "C" {
 #endif
 
-#include "stdbool.h"
-#include "stdint.h"
-
 #include "arm_2d.h"
 #include "ldCommon.h"
-#include "xBtnAction.h"
+
 
 //btn占用0-9
 
@@ -36,6 +33,7 @@ void ldGuiLogicLoop(void);
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame);
 void ldGuiQuit(void);
 void ldGuiJumpPage(uint8_t pageNum);
+void ldGuiDelWidget(ldCommon_t *widget);
 
 #ifdef __cplusplus
 }

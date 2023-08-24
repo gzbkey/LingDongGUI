@@ -1,12 +1,9 @@
 #include "ldGui.h"
-#include "xList.h"
-#include "xConnect.h"
 #include "ldUser.h"
-#include "xBtnAction.h"
-#include "ldConfig.h"
 #include "ldImage.h"
 #include "ldButton.h"
 #include "ldText.h"
+#include "ldWindow.h"
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
@@ -134,6 +131,33 @@ void ldGuiTouchProcess(void)
 }
 
 
+void ldGuiDelWidget(ldCommon_t *widget)
+{
+    switch(widget->widgetType)
+    {
+    case widgetTypeWindow:
+    {
+        ldWindowDel((ldWindow_t*)widget);
+        break;
+    }
+    case widgetTypeImage:
+    {
+        ldImageDel((ldImage_t*)widget);
+        break;
+    }
+    case widgetTypeButton:
+    {
+        ldButtonDel((ldButton_t*)widget);
+        break;
+    }
+    case widgetTypeText:
+    {
+        ldTextDel((ldText_t*)widget);
+    }
+    default:
+        break;
+    }
+}
 
 static void _widgetLoop(ldCommon_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {

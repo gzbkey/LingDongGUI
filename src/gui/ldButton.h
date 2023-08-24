@@ -6,8 +6,6 @@ extern "C" {
 #endif
 
 #include "ldCommon.h"
-#include "xList.h"
-#include "ldConfig.h"
 
 #define SELECT_COLOR_OPACITY     128
 

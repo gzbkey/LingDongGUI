@@ -8,10 +8,11 @@ extern "C" {
 #include "stdbool.h"
 #include "stdint.h"
 #include "arm_extra_controls.h"
+#include "xBtnAction.h"
+#include "xConnect.h"
 #include "xList.h"
 #include "xLog.h"
-#include "ldGui.h"
-
+#include "ldConfig.h"
 
 #ifndef SET_BITS
 #define SET_BITS(data,value)                    ((data)|=(value))
@@ -184,33 +185,21 @@ typedef struct{
 }ldPoint_t;
 
 
-
-
-
-void ldCommonAutoLoop(ldCommon_t* pWidget,arm_2d_tile_t *ptTile,bool bIsNewFrame);
-void ldCommonWidgetHidRefresh(uint8_t *hidBuf);
-void ldCommonCmdRefreshNormal(uint8_t *dat);
-void ldCommonCmdRefreshFixed(uint8_t *dat);
-
 extern xListNode ldWidgetLink;
 
 
 void *ldMalloc(uint32_t size);
-
 void ldFree(void *p);
-
 void *ldRealloc(void *ptr,uint32_t newSize);
 
 
-
+bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
+void* ldGetWidgetById(uint16_t nameId);
 ldPoint_t ldGetGlobalPos(ldCommon_t *widget);
-
 xListNode* ldGetWidgetInfoById(uint16_t nameId);
 xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
-void* ldGetWidgetById(uint16_t nameId);
 
-bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
-void ldDelWidget(ldCommon_t *widget);
+
 
 void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,bool isWithMask,uint8_t opacity);

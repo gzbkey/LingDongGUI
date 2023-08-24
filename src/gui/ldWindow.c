@@ -1,7 +1,5 @@
 #include "ldWindow.h"
-
-//#include "global.h"
-//#include "jfif_parser.h"
+#include "ldGui.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -22,7 +20,7 @@
 
 static bool _windowDel(xListNode* pEachInfo,void* pTarget)
 {
-    ldDelWidget(pEachInfo->info);
+    ldGuiDelWidget(pEachInfo->info);
     return false;
 }
 
@@ -74,7 +72,7 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
-void ldWindowSetTransparent(ldImage_t *widget,bool isTransparent)
+void ldWindowSetTransparent(ldWindow_t *widget,bool isTransparent)
 {
     if (widget == NULL)
     {
