@@ -20,6 +20,7 @@ SOURCES += \
     ../../src/misc/xString.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_list.c \
+    ../common/Arm-2D/Helper/Source/arm_2d_helper_map.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_pfb.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_scene.c \
     ../common/Arm-2D/Library/Source/__arm_2d_colour_filling_with_alpha.c \
@@ -29,6 +30,7 @@ SOURCES += \
     ../common/Arm-2D/Library/Source/__arm_2d_transform_helium.c \
     ../common/Arm-2D/Library/Source/arm_2d.c \
     ../common/Arm-2D/Library/Source/arm_2d_alpha_blending.c \
+    ../common/Arm-2D/Library/Source/arm_2d_async.c \
     ../common/Arm-2D/Library/Source/arm_2d_conversion.c \
     ../common/Arm-2D/Library/Source/arm_2d_draw.c \
     ../common/Arm-2D/Library/Source/arm_2d_helium.c \
@@ -66,9 +68,6 @@ SOURCES += \
     ../common/Arm-2D/examples/common/asset/wave.c \
     ../common/Arm-2D/examples/common/asset/white_dot.c \
     ../common/Arm-2D/examples/common/asset/wifi_signal.c \
-    ../common/Arm-2D/examples/common/benchmark/benchmark_watch_panel.c \
-    ../common/Arm-2D/examples/common/benchmark/arm_2d_scene_benchmark_watch_panel.c \
-    ../common/Arm-2D/examples/common/benchmark/arm_2d_scene_benchmark_watch_panel_cover.c \
     ../common/Arm-2D/examples/common/controls/GLCD_Fonts.c \
     ../common/Arm-2D/examples/common/controls/battery_gasgauge.c \
     ../common/Arm-2D/examples/common/controls/busy_wheel.c \
@@ -116,6 +115,7 @@ HEADERS += \
     ../common/Arm-2D/Helper/Include/arm_2d_disp_adapters.h \
     ../common/Arm-2D/Helper/Include/arm_2d_helper.h \
     ../common/Arm-2D/Helper/Include/arm_2d_helper_list.h \
+    ../common/Arm-2D/Helper/Include/arm_2d_helper_map.h \
     ../common/Arm-2D/Helper/Include/arm_2d_helper_pfb.h \
     ../common/Arm-2D/Helper/Include/arm_2d_helper_scene.h \
     ../common/Arm-2D/Helper/Include/arm_2d_scenes.h \
@@ -185,6 +185,7 @@ HEADERS += \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
     user/arm_2d_disp_adapter_0.h \
+    user/arm_2d_user_arch_port.h \
     user/image.h \
     user/ldConfig.h \
     user/ldUser.h
@@ -193,7 +194,6 @@ INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
 INCLUDEPATH += $$PWD/../common/Arm-2D/Library/Include
 INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
-INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/benchmark
 
 INCLUDEPATH += $$PWD/user
 INCLUDEPATH += $$PWD/math

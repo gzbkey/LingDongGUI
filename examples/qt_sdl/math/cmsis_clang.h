@@ -1,11 +1,11 @@
 /**************************************************************************//**
- * @file     cmsis_gcc.h
+ * @file     cmsis_clang.h
  * @brief    CMSIS compiler GCC header file
- * @version  V5.4.1
- * @date     27. May 2021
+ * @version  V0.1.0
+ * @date     29. June 2023
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2023 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -22,16 +22,19 @@
  * limitations under the License.
  */
 
-#ifndef __CMSIS_GCC_H
-#define __CMSIS_GCC_H
+#ifndef __CMSIS_CLANG_H
+#define __CMSIS_CLANG_H
 
 #include "stdint.h"
 
 /* ignore some GCC warnings */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
+#undef _MSC_VER
+#define __GNUC__ 1
 
 /* Fallback for __has_builtin */
 #ifndef __has_builtin
@@ -302,7 +305,6 @@
 //   return result;
 // #endif
 // }
-
 
 #if 0
 /**
@@ -2210,6 +2212,6 @@ __STATIC_FORCEINLINE void __set_PRIMASK(uint32_t priMask)
 // /*@} end of group CMSIS_SIMD_intrinsics */
 
 
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 #endif /* __CMSIS_GCC_H */
