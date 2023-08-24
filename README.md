@@ -5,4 +5,5 @@
 
 2、修改ldGui.c中的函数，ldGuiDelWidget，_widgetLoop
 
+3、修改ldCommon.h中的控件类型,ldWidgetType
 
