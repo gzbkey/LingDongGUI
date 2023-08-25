@@ -27,7 +27,7 @@
 #elif VT_COLOR_DEPTH == 16
 #define DEV_2_VT_RGB(color)                        RGB565_2_RGB888(color)
 #define VT_RGB_2_DEV(color)                        RGB888_2_RGB565(color)
-#elif VT_COLOR_DEPTH == 24
+#elif VT_COLOR_DEPTH == 24 || VT_COLOR_DEPTH == 32
 #define DEV_2_VT_RGB(color)                        (color)
 #define VT_RGB_2_DEV(color)                        (color)
 #endif
@@ -79,7 +79,7 @@ static void monitor_sdl_init(void)
 
     SDL_SetEventFilter(quit_filter, NULL);
 
-    window = SDL_CreateWindow("TFT Simulator",
+    window = SDL_CreateWindow("ldgui Simulator",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                               VT_WIDTH, VT_HEIGHT, 0); /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
@@ -99,7 +99,7 @@ static void monitor_sdl_init(void)
     sdl_inited = true;
 }
 
-static void monitor_sdl_refr_core(void)
+void vtSdlRefreshTask(void)
 {
     if (sdl_refr_qry != false)
     {
@@ -245,29 +245,19 @@ static void monitor_sdl_refr_core(void)
             break;
         }
     }
-
-    /*Sleep some time*/
-    SDL_Delay(1);
 }
 
-static int monitor_sdl_refr_thread(void *param)
+bool vtIsRequestQuit(void)
 {
-    (void)param;
+    return sdl_quit_qry;
+}
 
-    monitor_sdl_init();
-
-    /*Run until quit event not arrives*/
-    while (sdl_quit_qry == false)
-    {
-        /*Refresh handling*/
-        monitor_sdl_refr_core();
-    }
-
+void vtDeinit(void)
+{
     monitor_sdl_clean_up();
     exit(0);
-
-    return 0;
 }
+
 
 uint32_t vtTimerCallback(uint32_t interval, void *param)
 {
@@ -281,15 +271,14 @@ int32_t Disp0_DrawBitmap(int16_t x, int16_t y, int16_t width, int16_t height, co
     return 0;
 }
 
-void lcdFlush(int32_t nMS)
+void vtSdlFlush(int32_t nMS)
 {
+    nMS = MAX(1, nMS);
     while (!sdl_refr_cpl)
     {
         SDL_Delay(nMS);
     }
     sdl_refr_cpl = false;
-
-    nMS = MAX(1, nMS);
     sdl_refr_qry = true;
 }
 
@@ -309,7 +298,20 @@ void __disp_adapter0_request_async_flushing(
 }
 #endif
 
-uint32_t SystemCoreClock = 3600000000;
+#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
+int64_t arm_2d_helper_get_system_timestamp(void)
+{
+    struct timespec timestamp;
+    clock_gettime(CLOCK_MONOTONIC, &timestamp);
+
+    return 1000000ul * timestamp.tv_sec + timestamp.tv_nsec / 1000ul;
+}
+
+uint32_t arm_2d_helper_get_reference_clock_frequency(void)
+{
+    return 1000000ul;
+}
+#else
 
 int64_t arm_2d_helper_get_system_timestamp(void)
 {
@@ -318,14 +320,15 @@ int64_t arm_2d_helper_get_system_timestamp(void)
 
 uint32_t arm_2d_helper_get_reference_clock_frequency(void)
 {
-    return 1000;
+    return CLOCKS_PER_SEC;
 }
+#endif
 
 void vtInit(void)
 {
-    SDL_CreateThread(monitor_sdl_refr_thread, "sdl_refr", NULL);
-    while (sdl_inited == false)
-        ; // 等待线程中的初始化完成
+    monitor_sdl_init();
+
+    while(sdl_inited == false);
 }
 
 void vtFillSingleColor(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef color)

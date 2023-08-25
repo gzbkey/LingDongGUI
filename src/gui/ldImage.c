@@ -167,7 +167,7 @@ void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFr
         return;
     }
     
-    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent))
+    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent)||(bIsNewFrame==false))
     {
         return;
     }
