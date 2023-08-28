@@ -50,11 +50,67 @@ uintptr_t __disp_adapter0_vres_get_asset_address(
 }
 
 
+void scene0_loader(void)
+{
+    arm_2d_scene0_init(&DISP0_ADAPTER);
+}
+
+typedef void scene_loader_t(void);
+
+static scene_loader_t * const c_SceneLoaders[] = {
+    scene0_loader,
+//    scene1_loader,
+};
+
+/* load scene one by one */
+void before_scene_switching_handler(void *pTarget,
+                                    arm_2d_scene_player_t *ptPlayer,
+                                    arm_2d_scene_t *ptScene)
+{
+    static uint_fast8_t s_chIndex = 0;
+
+    if (s_chIndex >= dimof(c_SceneLoaders)) {
+        s_chIndex = 0;
+    }
+
+    /* call loader */
+    c_SceneLoaders[s_chIndex]();
+    s_chIndex++;
+}
+
+int app_2d_main_thread (void *argument)
+{
+    arm_2d_scene_player_register_before_switching_event_handler(
+            &DISP0_ADAPTER,
+            before_scene_switching_handler);
+
+    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
+                                            ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
+    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
+
+    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
+
+    while(1) {
+        if (arm_fsm_rt_cpl == disp_adapter0_task()) {
+            vtSdlFlush(1);
+        }
+    }
+
+    return 0;
+}
 
 int main (void) 
 {
     setbuf(stdout,NULL);
-    printf("\nldgui\n");
+
+    printf("  _       _____    _____  _    _  _____ \n"
+           " | |     |  __ \\  / ____|| |  | ||_   _|\n"
+           " | |     | |  | || |  __ | |  | |  | |  \n"
+           " | |     | |  | || | |_ || |  | |  | |  \n"
+           " | |____ | |__| || |__| || |__| | _| |_ \n"
+           " |______||_____/  \\_____| \\____/ |_____|\n\n"
+           );
+
     printf("====================\n");
     LOG_ERROR("Error\n");
     LOG_WARNING("Warning\n");
@@ -76,15 +132,19 @@ int main (void)
 
     disp_adapter0_init();
 
-    arm_2d_scene0_init(&DISP0_ADAPTER);
+    SDL_CreateThread(app_2d_main_thread, "arm-2d thread", NULL);
 
     while (1)
     {
-        if (arm_fsm_rt_cpl == disp_adapter0_task())
+        vtSdlRefreshTask();
+        if(vtIsRequestQuit())
         {
-            lcdFlush(1);
+            break;
         }
     }
+
+    vtDeinit();
+    return 0;
 }
 
 #if defined(__clang__)

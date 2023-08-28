@@ -12,6 +12,7 @@ typedef struct {
     bool isTransparent:1;
     bool isScroll:1;
     bool isRelease:1;
+    arm_2d_helper_pi_slider_t tPISlider;
     uint32_t bgImgAddr;
     ldChar_t *ptTextInfo;
     ldColor bgColor;

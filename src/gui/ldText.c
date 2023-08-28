@@ -18,6 +18,9 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+static int16_t _pressY,_scrollOffset;
+static bool _isTopScroll=false,_isBottomScroll=false;
+
 static bool _textDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -128,24 +131,39 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden))
+    if((widget->isParentHidden)||(widget->isHidden)||(bIsNewFrame==false))
     {
         return;
     }
 
     if(widget->isRelease)
     {
-        if((widget->scrollOffset>0)||(widget->strHeight<=ptResTile->tRegion.tSize.iHeight))
+        int32_t iResult;
+        bool isPiEnd;
+
+        isPiEnd=arm_2d_helper_pi_slider(&widget->tPISlider, _scrollOffset*100, &iResult);
+        if(_isTopScroll)
         {
-            widget->isRelease=false;
-            widget->scrollOffset=0;
+            if(isPiEnd)
+            {
+                widget->isRelease=false;
+                widget->scrollOffset=0;
+            }
+            else
+            {
+                widget->scrollOffset=_scrollOffset-iResult/100;
+            }
         }
-        else
+        if(_isBottomScroll)
         {
-            if(widget->scrollOffset<(ptResTile->tRegion.tSize.iHeight-widget->strHeight))
+            if(isPiEnd)
             {
                 widget->isRelease=false;
                 widget->scrollOffset=ptResTile->tRegion.tSize.iHeight-widget->strHeight;
+            }
+            else
+            {
+                widget->scrollOffset=(ptResTile->tRegion.tSize.iHeight-widget->strHeight)-(_scrollOffset-iResult/100);
             }
         }
     }
@@ -248,7 +266,7 @@ void ldTextScrollMove(ldText_t *widget, int8_t moveValue)
     }
 }
 
-static int16_t pressY,scrollTemp;
+
 static bool slotTextVerticalScroll(xConnectInfo_t info)
 {
     ldText_t *txt;
@@ -262,19 +280,52 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     switch (info.signalType) {
     case BTN_PRESS:
     {
-        pressY=y;
-        scrollTemp=txt->scrollOffset;
+        txt->isRelease=false;
+        _pressY=y;
+        _scrollOffset=txt->scrollOffset;
+        _isTopScroll=false;
+        _isBottomScroll=false;
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        offset=y-pressY;
-        txt->scrollOffset=scrollTemp+offset;
+        offset=y-_pressY;
+        txt->scrollOffset=_scrollOffset+offset;
         break;
     }
     case BTN_RELEASE:
     {
         txt->isRelease=true;
+
+        if(txt->scrollOffset>0)
+        {
+            _scrollOffset=txt->scrollOffset;
+            _isTopScroll=true;
+            _isBottomScroll=false;
+        }
+
+        if(((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight>(txt->strHeight+txt->scrollOffset))
+        {
+            _scrollOffset=((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight-(txt->strHeight+txt->scrollOffset);
+            _isTopScroll=false;
+            _isBottomScroll=true;
+        }
+
+        if(txt->strHeight<=((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight)
+        {
+            _scrollOffset=txt->scrollOffset;
+            _isTopScroll=true;
+            _isBottomScroll=false;
+        }
+
+        do {
+            static const arm_2d_helper_pi_slider_cfg_t tCFG = {
+                .fProportion = 0.2f,
+                .fIntegration = 0.05f,
+                .nInterval = 10,
+            };
+            arm_2d_helper_pi_slider_init(&txt->tPISlider, (arm_2d_helper_pi_slider_cfg_t *)&tCFG, 0);
+        } while(0);
         break;
     }
     default:
