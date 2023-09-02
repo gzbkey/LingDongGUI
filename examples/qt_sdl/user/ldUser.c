@@ -30,7 +30,7 @@ void userInit(void)
     ldButtonSetImage(btn0,RELEASE_PNG,true,PRESS_BMP,false);
 
     ldButtonSetSelectImage(btn0,FRAME_PNG,__RGB(255,0,0));
-
+    ldButtonSetRoundCorner(btn0,true);
 
     btn1=ldButtonInit(ID_BTN1, 0, 120,100,72,72);
     ldButtonSetFont(btn1,MICROSOFT_YAHEI_REGULAR_20);
