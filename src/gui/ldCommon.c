@@ -473,7 +473,7 @@ void ldBaseSetFont(ldChar_t **pptCharInfo,ldFontDict_t* ptFontDict)
 
     (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).pchBuffer=(uint8_t *)ptFontDict->pFontSrc;
 #if USE_VIRTUAL_RESOURCE == 1
-    ptCharInfo->tFontTile.pTarget=ptFontDict->pFontSrc;
+    (*pptCharInfo)->tFontTile.pTarget=ptFontDict->pFontSrc;
 #endif
     (*pptCharInfo)->ptFontDict=ptFontDict;
 
@@ -797,7 +797,7 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffse
             fontTile.tRegion.tSize.iHeight=height;
             fontTile.pchBuffer+=imgAddr;
 #else
-            fontTile = *((arm_2d_vres_t*)&ptTextInfo->tFontTile;
+            fontTile = *((arm_2d_vres_t*)&ptTextInfo->tFontTile);
             fontTile.tTile.tRegion.tSize.iWidth=width;
             fontTile.tTile.tRegion.tSize.iHeight=height;
             fontTile.tTile.pchBuffer=imgAddr;

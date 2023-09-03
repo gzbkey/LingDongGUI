@@ -268,11 +268,11 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                 }
                 if(widget->isCorner)
                 {
-                    tempRes.tRegion.tLocation.iX=0;
-                    tempRes.tRegion.tLocation.iY=0;
-                    tempRes.tRegion.tSize = tTarget.tRegion.tSize;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = tTarget.tRegion.tSize;
                     draw_round_corner_box(&tTarget,
-                                                &tempRes.tRegion,
+                                                &((arm_2d_tile_t*)&tempRes)->tRegion,
                                                 btnColor,
                                                 255,
                                                 bIsNewFrame);
@@ -313,11 +313,11 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
 #else
                     tempRes=*((arm_2d_vres_t*)ptResTile);
 #endif
-                    tempRes.tRegion.tLocation.iX=0;
-                    tempRes.tRegion.tLocation.iY=0;
-                    draw_round_corner_image(&tempRes,
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+                    draw_round_corner_image((arm_2d_tile_t*)&tempRes,
                                             &tTarget,
-                                            &tempRes.tRegion,
+                                            &((arm_2d_tile_t*)&tempRes)->tRegion,
                                             bIsNewFrame);
                 }
             }
@@ -333,19 +333,19 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
             {
                 if (widget->selectMaskAddr==0)
                 {
-                    tempRes.tRegion.tLocation.iX=0;
-                    tempRes.tRegion.tLocation.iY=0;
-                    tempRes.tRegion.tSize = tTarget.tRegion.tSize;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = tTarget.tRegion.tSize;
 
                     if(widget->isCorner)
                     {
-                        draw_round_corner_border(&tTarget,&tempRes.tRegion,widget->selectColor,
+                        draw_round_corner_border(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,widget->selectColor,
                                                  (arm_2d_border_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY},
                                                  (arm_2d_corner_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY});
                     }
                     else
                     {
-                        arm_2d_draw_box(&tTarget,&tempRes.tRegion,3,widget->selectColor,SELECT_COLOR_OPACITY);
+                        arm_2d_draw_box(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,3,widget->selectColor,SELECT_COLOR_OPACITY);
 
                     }
                 }
@@ -357,8 +357,8 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
                     tempRes.pchBuffer = (uint8_t *)widget->selectMaskAddr;
 #else
                     tempRes=*((arm_2d_vres_t*)ptResTile);
-                    tempRes.tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
-                    tempRes.pchBuffer = (uint8_t *)widget->selectMaskAddr;
+                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)widget->selectMaskAddr;
                     tempRes.pTarget=widget->selectMaskAddr;
                     tempRes.Load = &__disp_adapter0_vres_asset_loader;
                     tempRes.Depose = &__disp_adapter0_vres_buffer_deposer;
