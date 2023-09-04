@@ -110,9 +110,9 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->pressColor = __RGB(255,243,202);
         pNewWidget->selectColor = __RGB(255,0,0);
         pNewWidget->keyValue=0;
-        pNewWidget->releaseImgAddr=0;
-        pNewWidget->pressImgAddr=0;
-        pNewWidget->selectMaskAddr=0;
+        pNewWidget->releaseImgAddr=LD_ADDR_NONE;
+        pNewWidget->pressImgAddr=LD_ADDR_NONE;
+        pNewWidget->selectMaskAddr=LD_ADDR_NONE;
         pNewWidget->isReleaseMask = false;
         pNewWidget->isPressMask = false;
         pNewWidget->isTransparent=false;
@@ -162,8 +162,8 @@ void ldButtonSetColor(ldButton_t* widget,ldColor releaseColor,ldColor pressColor
 {
     widget->releaseColor=releaseColor;
     widget->pressColor=pressColor;
-    widget->releaseImgAddr=0;
-    widget->pressImgAddr=0;
+    widget->releaseImgAddr=LD_ADDR_NONE;
+    widget->pressImgAddr=LD_ADDR_NONE;
 }
 
 void ldButtonSetImage(ldButton_t* widget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask)
@@ -245,7 +245,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
         return;
     }
     
-    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent)||(bIsNewFrame==false))
+    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent))
     {
         return;
     }
@@ -256,7 +256,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
         
         if(!widget->isTransparent)
         {
-            if ((widget->releaseImgAddr==0)&&(widget->pressImgAddr==0))//color
+            if ((widget->releaseImgAddr==LD_ADDR_NONE)&&(widget->pressImgAddr==LD_ADDR_NONE))//color
             {
                 if(widget->isPressed)
                 {
@@ -331,7 +331,7 @@ void ldButtonLoop(ldButton_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFr
 
             if(widget->isSelected)
             {
-                if (widget->selectMaskAddr==0)
+                if (widget->selectMaskAddr==LD_ADDR_NONE)
                 {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;

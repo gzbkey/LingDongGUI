@@ -7,6 +7,9 @@ extern "C" {
 #include "stdint.h"
 #include "ldCommon.h"
 
+extern const uint8_t barFrame_png[];
+#define BARFRAME_PNG (uint32_t)&barFrame_png[0]
+
 extern const uint8_t frame_png[];
 #define FRAME_PNG (uint32_t)&frame_png[0]
 

@@ -8,6 +8,7 @@ SOURCES += \
     ../../src/gui/ldCommon.c \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldImage.c \
+    ../../src/gui/ldProgressBar.c \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldText.c \
     ../../src/gui/ldWindow.c \
@@ -100,6 +101,7 @@ HEADERS += \
     ../../src/gui/ldCommon.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldImage.h \
+    ../../src/gui/ldProgressBar.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldText.h \
     ../../src/gui/ldWindow.h \

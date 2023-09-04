@@ -4,6 +4,7 @@
 #include "ldButton.h"
 #include "ldText.h"
 #include "ldWindow.h"
+#include "ldProgressBar.h"
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
@@ -153,30 +154,41 @@ void ldGuiDelWidget(ldCommon_t *widget)
     case widgetTypeText:
     {
         ldTextDel((ldText_t*)widget);
+        break;
+    }
+    case widgetTypeProgressBar:
+    {
+        ldProgressBarDel((ldProgressBar_t*)widget);
+        break;
     }
     default:
         break;
     }
 }
 
-static void _widgetLoop(ldCommon_t *info,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+static void _widgetLoop(ldCommon_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    switch(info->widgetType)
+    switch(widget->widgetType)
     {
     case widgetTypeWindow:
     case widgetTypeImage:
     {
-        ldImageLoop((ldImage_t*)info,ptParent,bIsNewFrame);
+        ldImageLoop((ldImage_t*)widget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeButton:
     {
-        ldButtonLoop((ldButton_t*)info,ptParent,bIsNewFrame);
+        ldButtonLoop((ldButton_t*)widget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeText:
     {
-        ldTextLoop((ldText_t*)info,ptParent,bIsNewFrame);
+        ldTextLoop((ldText_t*)widget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeProgressBar:
+    {
+        ldProgressBarLoop((ldProgressBar_t*)widget,ptParent,bIsNewFrame);
         break;
     }
     default:

@@ -6,6 +6,8 @@
 #include "xBtnAction.h"
 #include "image.h"
 #include "ldText.h"
+#include "ldProgressBar.h"
+
 ldImage_t *img0;
 ldWindow_t *win0;
 ldImage_t *img1;
@@ -14,6 +16,8 @@ ldWindow_t *win1;
 ldButton_t *btn0,*btn1,*targetBtn;
 int64_t timer=0;
 ldText_t *txt0;
+ldProgressBar_t *bar;
+
 #define ID_BTN0      2
 #define ID_BTN1      3
 void userInit(void)
@@ -50,6 +54,13 @@ void userInit(void)
     ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
     ldTextSetAlign(ldGetWidgetById(4),LD_ALIGN_TOP|LD_ALIGN_LEFT);
     ldTextSetScroll(txt0,true);
+
+    bar=ldProgressBarInit(5,0,200,20,100,18);
+    ldProgressBarSetPercent(bar,50);
+    ldProgressBarSetBgImage(bar,PRESS_BMP,72,false);
+    ldProgressBarSetFgImage(bar,RELEASE_BMP,72,true);
+    ldProgressBarSetFrameImage(bar,BARFRAME_PNG);
+
 }
 
 void userInit1(void)

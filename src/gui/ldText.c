@@ -87,6 +87,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
+        pNewWidget->bgImgAddr=LD_ADDR_NONE;
 
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
@@ -131,7 +132,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden)||(bIsNewFrame==false))
+    if((widget->isParentHidden)||(widget->isHidden))
     {
         return;
     }
@@ -174,7 +175,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 
         if(!widget->isTransparent)
         {
-            if (widget->bgImgAddr==0)//color
+            if (widget->bgImgAddr==LD_ADDR_NONE)//color
             {
                 ldBaseColor(&tTarget,widget->bgColor,255);
             }
@@ -182,7 +183,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
             {
                 ptResTile->pchBuffer = (uint8_t *)widget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)ptResTile)->pTarget=widget->bgImgAddr;
+                ((arm_2d_vres_t*)ptResTile)->pTarget=widget->releaseImgAddr;
 #endif
                 ldBaseImage(&tTarget,ptResTile,false,255);
             }
@@ -357,6 +358,27 @@ void ldTextSetScroll(ldText_t *widget,bool isEnable)
             xDisconnect(widget->nameId,BTN_RELEASE,widget->nameId,slotTextVerticalScroll);
         }
     }
+}
+
+void ldTextSetBgImage(ldText_t *widget, uint32_t imageAddr)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+    widget->bgImgAddr=imageAddr;
+    widget->isTransparent=false;
+}
+
+void ldTextSetBgColor(ldText_t *widget, ldColor bgColor)
+{
+    if(widget==NULL)
+    {
+        return;
+    }
+    widget->bgColor=bgColor;
+    widget->isTransparent=false;
+    widget->bgImgAddr=LD_ADDR_NONE;
 }
 
 #if defined(__clang__)
