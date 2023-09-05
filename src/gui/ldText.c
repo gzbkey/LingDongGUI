@@ -183,7 +183,7 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
             {
                 ptResTile->pchBuffer = (uint8_t *)widget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)ptResTile)->pTarget=widget->releaseImgAddr;
+                ((arm_2d_vres_t*)ptResTile)->pTarget=widget->bgImgAddr;
 #endif
                 ldBaseImage(&tTarget,ptResTile,false,255);
             }

@@ -16,7 +16,7 @@ ldWindow_t *win1;
 ldButton_t *btn0,*btn1,*targetBtn;
 int64_t timer=0;
 ldText_t *txt0;
-ldProgressBar_t *bar;
+ldProgressBar_t *bar,*bar1,*bar2,*bar3;
 
 #define ID_BTN0      2
 #define ID_BTN1      3
@@ -61,6 +61,20 @@ void userInit(void)
     ldProgressBarSetFgImage(bar,RELEASE_BMP,72,true);
     ldProgressBarSetFrameImage(bar,BARFRAME_PNG);
 
+    bar1=ldProgressBarInit(6,0,200,50,100,18);
+    ldProgressBarSetPercent(bar1,50);
+    ldProgressBarSetBgImage(bar1,PRESS_BMP,72,true);
+    ldProgressBarSetFgImage(bar1,RELEASE_BMP,72,false);
+//    ldProgressBarSetFrameImage(bar1,BARFRAME_PNG);
+
+    bar2=ldProgressBarInit(7,0,200,80,100,18);
+    ldProgressBarSetPercent(bar2,50);
+    ldProgressBarSetBgImage(bar2,PRESS_BMP,72,false);
+    ldProgressBarSetFgImage(bar2,RELEASE_BMP,72,true);
+//    ldProgressBarSetFrameImage(bar2,BARFRAME_PNG);
+
+    bar3=ldProgressBarInit(8,0,310,80,100,18);
+    ldProgressBarSetPercent(bar3,50);
 }
 
 void userInit1(void)

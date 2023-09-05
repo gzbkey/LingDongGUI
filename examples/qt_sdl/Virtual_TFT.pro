@@ -224,3 +224,14 @@ QMAKE_PRE_LINK +=  copy $$SDL2_PATH $$OutLibFile /y
 DEFINES += ARM_SECTION(x)=  \
            __va_list=va_list \
            RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
+
+LIBS += -lpthread
+
+QMAKE_CFLAGS  +=  -std=gnu11 -MMD -g
+QMAKE_CFLAGS  +=  -ffunction-sections -fdata-sections
+QMAKE_CFLAGS  +=  -fno-ms-extensions
+QMAKE_CFLAGS  +=  -Wno-macro-redefined
+QMAKE_CFLAGS  +=  -Ofast
+QMAKE_CFLAGS  +=  -flto
+
+

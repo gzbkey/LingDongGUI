@@ -162,10 +162,14 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t tResTile=widget->resource;
+    tResTile.bIsRoot=true;
+    tResTile.bHasEnforcedColour=true;
     tResTile.tRegion.tLocation.iX=0;
     tResTile.tRegion.tLocation.iY=0;
 #else
     arm_2d_vres_t tResTile=*((arm_2d_vres_t*)(&widget->resource));
+    tResTile.tTile.bIsRoot=true;
+    tResTile.tTile.bHasEnforcedColour=true;
     tResTile.tTile.bVirtualResource=true;
     tResTile.tTile.tRegion.tLocation.iX=0;
     tResTile.tTile.tRegion.tLocation.iY=0;
@@ -184,6 +188,9 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
         //bg image
         ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=widget->bgWidth;
         ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)widget->bgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+        tResTile.pTarget=widget->bgAddr;
+#endif
         arm_2d_region_t tInnerRegion = {
             .tSize = {
                 .iWidth = tBarRegion.tSize.iWidth + ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth,
@@ -207,6 +214,9 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
             //fg image
             ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=widget->fgWidth;
             ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)widget->fgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+            tResTile.pTarget=widget->fgAddr;
+#endif
             arm_2d_region_t tInnerRegion = {
                 .tSize = {
                     .iWidth = tBarRegion.tSize.iWidth + ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth,
@@ -233,6 +243,9 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
             //frame image png
             ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=ptTarget->tRegion.tSize.iWidth;
             ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)widget->frameAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+            tResTile.pTarget=widget->frameAddr;
+#endif
             ldBaseImage(ptTarget,&tResTile,true,255);
             arm_2d_op_wait_async(NULL);
         } while (0);
