@@ -6,6 +6,8 @@
 #include "xBtnAction.h"
 #include "image.h"
 #include "ldText.h"
+#include "ldProgressBar.h"
+
 ldImage_t *img0;
 ldWindow_t *win0;
 ldImage_t *img1;
@@ -14,6 +16,8 @@ ldWindow_t *win1;
 ldButton_t *btn0,*btn1,*targetBtn;
 int64_t timer=0;
 ldText_t *txt0;
+ldProgressBar_t *bar,*bar1,*bar2,*bar3;
+
 #define ID_BTN0      2
 #define ID_BTN1      3
 void userInit(void)
@@ -30,7 +34,7 @@ void userInit(void)
     ldButtonSetImage(btn0,RELEASE_PNG,true,PRESS_BMP,false);
 
     ldButtonSetSelectImage(btn0,FRAME_PNG,__RGB(255,0,0));
-
+    ldButtonSetRoundCorner(btn0,true);
 
     btn1=ldButtonInit(ID_BTN1, 0, 120,100,72,72);
     ldButtonSetFont(btn1,MICROSOFT_YAHEI_REGULAR_20);
@@ -50,6 +54,27 @@ void userInit(void)
     ldTextSetText(ldGetWidgetById(4),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
     ldTextSetAlign(ldGetWidgetById(4),LD_ALIGN_TOP|LD_ALIGN_LEFT);
     ldTextSetScroll(txt0,true);
+
+    bar=ldProgressBarInit(5,0,200,20,100,18);
+    ldProgressBarSetPercent(bar,50);
+    ldProgressBarSetBgImage(bar,PRESS_BMP,72,false);
+    ldProgressBarSetFgImage(bar,RELEASE_BMP,72,true);
+    ldProgressBarSetFrameImage(bar,BARFRAME_PNG);
+
+    bar1=ldProgressBarInit(6,0,200,50,100,18);
+    ldProgressBarSetPercent(bar1,50);
+    ldProgressBarSetBgImage(bar1,PRESS_BMP,72,true);
+    ldProgressBarSetFgImage(bar1,RELEASE_BMP,72,false);
+//    ldProgressBarSetFrameImage(bar1,BARFRAME_PNG);
+
+    bar2=ldProgressBarInit(7,0,200,80,100,18);
+    ldProgressBarSetPercent(bar2,50);
+    ldProgressBarSetBgImage(bar2,PRESS_BMP,72,false);
+    ldProgressBarSetFgImage(bar2,RELEASE_BMP,72,true);
+//    ldProgressBarSetFrameImage(bar2,BARFRAME_PNG);
+
+    bar3=ldProgressBarInit(8,0,310,80,100,18);
+    ldProgressBarSetPercent(bar3,50);
 }
 
 void userInit1(void)

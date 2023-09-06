@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#define NOR_FILE_PATH  "./image.bin"
+#define NOR_FILE_PATH  "../qt_sdl/user/image.bin"
 
 #define NOR_PAGE_SIZE      4096
 

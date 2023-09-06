@@ -8,6 +8,7 @@ SOURCES += \
     ../../src/gui/ldCommon.c \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldImage.c \
+    ../../src/gui/ldProgressBar.c \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldText.c \
     ../../src/gui/ldWindow.c \
@@ -100,6 +101,7 @@ HEADERS += \
     ../../src/gui/ldCommon.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldImage.h \
+    ../../src/gui/ldProgressBar.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldText.h \
     ../../src/gui/ldWindow.h \
@@ -222,3 +224,14 @@ QMAKE_PRE_LINK +=  copy $$SDL2_PATH $$OutLibFile /y
 DEFINES += ARM_SECTION(x)=  \
            __va_list=va_list \
            RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
+
+LIBS += -lpthread
+
+QMAKE_CFLAGS  +=  -std=gnu11 -MMD -g
+QMAKE_CFLAGS  +=  -ffunction-sections -fdata-sections
+QMAKE_CFLAGS  +=  -fno-ms-extensions
+QMAKE_CFLAGS  +=  -Wno-macro-redefined
+QMAKE_CFLAGS  +=  -Ofast
+QMAKE_CFLAGS  +=  -flto
+
+

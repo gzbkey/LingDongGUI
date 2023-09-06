@@ -307,11 +307,10 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,bool isWithMask
     if (isWithMask)
     {
 #if USE_VIRTUAL_RESOURCE == 0
-        arm_2d_tile_t maskTile;
+        arm_2d_tile_t maskTile = resource;
 #else
-        arm_2d_vres_t maskTile;
+        arm_2d_vres_t maskTile = *((arm_2d_vres_t*)&resource);
 #endif
-        maskTile = resource;
         (*(arm_2d_tile_t*)(&maskTile)).tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
         (*(arm_2d_tile_t*)(&maskTile)).pchBuffer += (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iWidth * (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iHeight * 2;
 #if USE_VIRTUAL_RESOURCE == 1
@@ -474,7 +473,7 @@ void ldBaseSetFont(ldChar_t **pptCharInfo,ldFontDict_t* ptFontDict)
 
     (*(arm_2d_tile_t*)(&(*pptCharInfo)->tFontTile)).pchBuffer=(uint8_t *)ptFontDict->pFontSrc;
 #if USE_VIRTUAL_RESOURCE == 1
-    ptCharInfo->tFontTile.pTarget=ptFontDict->pFontSrc;
+    (*pptCharInfo)->tFontTile.pTarget=ptFontDict->pFontSrc;
 #endif
     (*pptCharInfo)->ptFontDict=ptFontDict;
 
@@ -792,12 +791,13 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffse
                 continue;
             }
 
-            fontTile=ptTextInfo->tFontTile;
 #if USE_VIRTUAL_RESOURCE == 0
+            fontTile = ptTextInfo->tFontTile;
             fontTile.tRegion.tSize.iWidth=width;
             fontTile.tRegion.tSize.iHeight=height;
             fontTile.pchBuffer+=imgAddr;
 #else
+            fontTile = *((arm_2d_vres_t*)&ptTextInfo->tFontTile);
             fontTile.tTile.tRegion.tSize.iWidth=width;
             fontTile.tTile.tRegion.tSize.iHeight=height;
             fontTile.tTile.pchBuffer=imgAddr;

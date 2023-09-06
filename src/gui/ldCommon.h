@@ -74,6 +74,8 @@ extern "C" {
 #define LD_ALIGN_LEFT            _BV(2)
 #define LD_ALIGN_RIGHT           _BV(3)
 
+#define LD_ADDR_NONE             0xffffffffu
+
 typedef enum{
     widgetTypeNone,
     widgetTypeWindow,
