@@ -36,29 +36,29 @@ static bool _textDel(xListNode *pEachInfo, void *pTarget)
     return false;
 }
 
-void ldTextDel(ldText_t *widget)
+void ldTextDel(ldText_t *pWidget)
 {
     xListNode *listInfo;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if(widget->widgetType!=widgetTypeText)
+    if(pWidget->widgetType!=widgetTypeText)
     {
         return;
     }
 
-    LOG_DEBUG("[text] del,id:%d\n",widget->nameId);
+    LOG_DEBUG("[text] del,id:%d\n",pWidget->nameId);
 
     // 查找父链表
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
+    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
     {
-        xListInfoPrevTraverse(listInfo, widget, _textDel);
+        xListInfoPrevTraverse(listInfo, pWidget, _textDel);
     }
 }
 
@@ -123,48 +123,48 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     return pNewWidget;
 }
 
-void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&widget->resource;
+    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden))
+    if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
         return;
     }
 
-    if(widget->isRelease)
+    if(pWidget->isRelease)
     {
         int32_t iResult;
         bool isPiEnd;
 
-        isPiEnd=arm_2d_helper_pi_slider(&widget->tPISlider, _scrollOffset*100, &iResult);
+        isPiEnd=arm_2d_helper_pi_slider(&pWidget->tPISlider, _scrollOffset*100, &iResult);
         if(_isTopScroll)
         {
             if(isPiEnd)
             {
-                widget->isRelease=false;
-                widget->scrollOffset=0;
+                pWidget->isRelease=false;
+                pWidget->scrollOffset=0;
             }
             else
             {
-                widget->scrollOffset=_scrollOffset-iResult/100;
+                pWidget->scrollOffset=_scrollOffset-iResult/100;
             }
         }
         if(_isBottomScroll)
         {
             if(isPiEnd)
             {
-                widget->isRelease=false;
-                widget->scrollOffset=ptResTile->tRegion.tSize.iHeight-widget->strHeight;
+                pWidget->isRelease=false;
+                pWidget->scrollOffset=ptResTile->tRegion.tSize.iHeight-pWidget->strHeight;
             }
             else
             {
-                widget->scrollOffset=(ptResTile->tRegion.tSize.iHeight-widget->strHeight)-(_scrollOffset-iResult/100);
+                pWidget->scrollOffset=(ptResTile->tRegion.tSize.iHeight-pWidget->strHeight)-(_scrollOffset-iResult/100);
             }
         }
     }
@@ -173,96 +173,96 @@ void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
     {
         tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
-        if(!widget->isTransparent)
+        if(!pWidget->isTransparent)
         {
-            if (widget->bgImgAddr==LD_ADDR_NONE)//color
+            if (pWidget->bgImgAddr==LD_ADDR_NONE)//color
             {
-                ldBaseColor(&tTarget,widget->bgColor,255);
+                ldBaseColor(&tTarget,pWidget->bgColor,255);
             }
             else
             {
-                ptResTile->pchBuffer = (uint8_t *)widget->bgImgAddr;
+                ptResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)ptResTile)->pTarget=widget->bgImgAddr;
+                ((arm_2d_vres_t*)ptResTile)->pTarget=pWidget->bgImgAddr;
 #endif
                 ldBaseImage(&tTarget,ptResTile,false,255);
             }
             arm_2d_op_wait_async(NULL);
         }
-        if(widget->ptTextInfo!=NULL)
+        if(pWidget->ptTextInfo!=NULL)
         {
-            ldBaseShowText(tTarget,widget->ptTextInfo,widget->scrollOffset);
+            ldBaseShowText(tTarget,pWidget->ptTextInfo,pWidget->scrollOffset);
             arm_2d_op_wait_async(NULL);
         }
     }
 }
 
-void ldTextSetTransparent(ldText_t* widget,bool isTransparent)
+void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->isTransparent=isTransparent;
+    pWidget->isTransparent=isTransparent;
 }
 
-void ldTextSetHidden(ldText_t *widget,bool isHidden)
+void ldTextSetHidden(ldText_t *pWidget,bool isHidden)
 {
-    ldBaseSetHidden((ldCommon_t*) widget,isHidden);
+    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
-void ldTextSetText(ldText_t* widget,uint8_t *pStr)
+void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
 {
     int16_t bmpH1Max;
     arm_2d_size_t textSize;
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetText(&widget->ptTextInfo,pStr);
-    textSize= ldBaseGetStringSize(widget->ptTextInfo,&bmpH1Max,((arm_2d_tile_t*)&widget->resource)->tRegion.tSize.iWidth);
-    widget->strHeight=textSize.iHeight;
+    ldBaseSetText(&pWidget->ptTextInfo,pStr);
+    textSize= ldBaseGetStringSize(pWidget->ptTextInfo,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
+    pWidget->strHeight=textSize.iHeight;
 }
 
-void ldTextSetTextColor(ldText_t* widget,ldColor charColor)
+void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetTextColor(&widget->ptTextInfo,charColor);
+    ldBaseSetTextColor(&pWidget->ptTextInfo,charColor);
 }
 
-void ldTextSetAlign(ldText_t *widget,uint8_t align)
+void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetAlign(&widget->ptTextInfo,align);
+    ldBaseSetAlign(&pWidget->ptTextInfo,align);
 }
 
-void ldTextScrollSeek(ldText_t *widget,int16_t offset)
+void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->scrollOffset=offset;
+    pWidget->scrollOffset=offset;
 }
 
-void ldTextScrollMove(ldText_t *widget, int8_t moveValue)
+void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->scrollOffset+=moveValue;
-    if((moveValue>0)&&(widget->scrollOffset<0))
+    pWidget->scrollOffset+=moveValue;
+    if((moveValue>0)&&(pWidget->scrollOffset<0))
     {
-        if(widget->scrollOffset<0)
+        if(pWidget->scrollOffset<0)
         {
-            widget->scrollOffset=0;
+            pWidget->scrollOffset=0;
         }
     }
 }
@@ -336,49 +336,49 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     return false;
 }
 
-void ldTextSetScroll(ldText_t *widget,bool isEnable)
+void ldTextSetScroll(ldText_t *pWidget,bool isEnable)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    if(widget->isScroll!=isEnable)
+    if(pWidget->isScroll!=isEnable)
     {
-        widget->isScroll=isEnable;
+        pWidget->isScroll=isEnable;
         if(isEnable)
         {
-            xConnect(widget->nameId,BTN_PRESS,widget->nameId,slotTextVerticalScroll);
-            xConnect(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE,widget->nameId,slotTextVerticalScroll);
-            xConnect(widget->nameId,BTN_RELEASE,widget->nameId,slotTextVerticalScroll);
+            xConnect(pWidget->nameId,BTN_PRESS,pWidget->nameId,slotTextVerticalScroll);
+            xConnect(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pWidget->nameId,slotTextVerticalScroll);
+            xConnect(pWidget->nameId,BTN_RELEASE,pWidget->nameId,slotTextVerticalScroll);
         }
         else
         {
-            xDisconnect(widget->nameId,BTN_PRESS,widget->nameId,slotTextVerticalScroll);
-            xDisconnect(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE,widget->nameId,slotTextVerticalScroll);
-            xDisconnect(widget->nameId,BTN_RELEASE,widget->nameId,slotTextVerticalScroll);
+            xDisconnect(pWidget->nameId,BTN_PRESS,pWidget->nameId,slotTextVerticalScroll);
+            xDisconnect(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pWidget->nameId,slotTextVerticalScroll);
+            xDisconnect(pWidget->nameId,BTN_RELEASE,pWidget->nameId,slotTextVerticalScroll);
         }
     }
 }
 
-void ldTextSetBgImage(ldText_t *widget, uint32_t imageAddr)
+void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->bgImgAddr=imageAddr;
-    widget->isTransparent=false;
+    pWidget->bgImgAddr=imageAddr;
+    pWidget->isTransparent=false;
 }
 
-void ldTextSetBgColor(ldText_t *widget, ldColor bgColor)
+void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->bgColor=bgColor;
-    widget->isTransparent=false;
-    widget->bgImgAddr=LD_ADDR_NONE;
+    pWidget->bgColor=bgColor;
+    pWidget->isTransparent=false;
+    pWidget->bgImgAddr=LD_ADDR_NONE;
 }
 
 #if defined(__clang__)

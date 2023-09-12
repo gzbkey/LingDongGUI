@@ -2,6 +2,8 @@
 
 当前项目使用Qt 5.14.2(32bit 64bit)编译通过
 
+https://download.qt.io/archive/qt/5.14/5.14.2/qt-opensource-windows-x86-5.14.2.exe
+
 # 下载子模块
 
 git submodule init

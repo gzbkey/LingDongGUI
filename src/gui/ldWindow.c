@@ -24,29 +24,29 @@ static bool _windowDel(xListNode* pEachInfo,void* pTarget)
     return false;
 }
 
-void ldWindowDel(ldWindow_t *widget)
+void ldWindowDel(ldWindow_t *pWidget)
 {
     xListNode *listInfo;
     
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if(widget->widgetType!=widgetTypeWindow)
+    if(pWidget->widgetType!=widgetTypeWindow)
     {
         return;
     }
 
-    LOG_DEBUG("[window] del,id:%d\n",widget->nameId);
+    LOG_DEBUG("[window] del,id:%d\n",pWidget->nameId);
 
-    listInfo=ldGetWidgetInfoById(widget->nameId);
+    listInfo=ldGetWidgetInfoById(pWidget->nameId);
 
     if(listInfo!=NULL)
     {
-        xListInfoPrevTraverse(widget->childList,NULL,_windowDel);
-        xListFreeNode(widget->childList);
-        ldImageDel((ldImage_t *)widget);
+        xListInfoPrevTraverse(pWidget->childList,NULL,_windowDel);
+        xListFreeNode(pWidget->childList);
+        ldImageDel((ldImage_t *)pWidget);
     }
 }
 
@@ -72,13 +72,13 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
-void ldWindowSetTransparent(ldWindow_t *widget,bool isTransparent)
+void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent)
 {
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
-    widget->isTransparent=isTransparent;
+    pWidget->isTransparent=isTransparent;
 }
 
 

@@ -215,31 +215,31 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
 }
 
 //获取全局坐标
-ldPoint_t ldGetGlobalPos(ldCommon_t *widget)
+ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
 {
     ldPoint_t pos={0,0},posParent;
 
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return pos;
     }
 
-    pos.x=(*(arm_2d_tile_t*)(&widget->resource)).tRegion.tLocation.iX;
-    pos.y=(*(arm_2d_tile_t*)(&widget->resource)).tRegion.tLocation.iY;
+    pos.x=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iX;
+    pos.y=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iY;
 
     posParent.x=0;
     posParent.y=0;
 
-    if(widget->parentType!=widgetTypeNone)
+    if(pWidget->parentType!=widgetTypeNone)
     {
-        if(widget->parentType!=widgetTypeWindow)
+        if(pWidget->parentType!=widgetTypeWindow)
         {
-        posParent=ldGetGlobalPos(widget->parentWidget);
+        posParent=ldGetGlobalPos(pWidget->parentWidget);
     }
     else
     {
-        posParent.x=(*(arm_2d_tile_t*)&(((ldCommon_t*)widget->parentWidget)->resource)).tRegion.tLocation.iX;
-        posParent.y=(*(arm_2d_tile_t*)&(((ldCommon_t*)widget->parentWidget)->resource)).tRegion.tLocation.iY;
+        posParent.x=(*(arm_2d_tile_t*)&(((ldCommon_t*)pWidget->parentWidget)->resource)).tRegion.tLocation.iX;
+        posParent.y=(*(arm_2d_tile_t*)&(((ldCommon_t*)pWidget->parentWidget)->resource)).tRegion.tLocation.iY;
     }
 	}
         
@@ -831,13 +831,13 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffse
     }
 }
 
-void ldBaseSetHidden(ldCommon_t* widget,bool isHidden)
+void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->isHidden=isHidden;
+    pWidget->isHidden=isHidden;
 }
 
 void ldBaseSetText(ldChar_t **pptTextInfo,uint8_t *pStr)

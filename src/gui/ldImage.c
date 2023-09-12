@@ -27,36 +27,36 @@ static bool _imageDel(xListNode *pEachInfo, void *pTarget)
     return false;
 }
 
-void ldImageDel(ldImage_t *widget)
+void ldImageDel(ldImage_t *pWidget)
 {
     xListNode *listInfo;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if((widget->widgetType!=widgetTypeImage)&&(widget->widgetType!=widgetTypeWindow))
+    if((pWidget->widgetType!=widgetTypeImage)&&(pWidget->widgetType!=widgetTypeWindow))
     {
         return;
     }
 
-    LOG_DEBUG("[image] del,id:%d\n",widget->nameId);
+    LOG_DEBUG("[image] del,id:%d\n",pWidget->nameId);
 
     // 查找父链表
-    if ((ldCommon_t *)widget->parentType == widgetTypeNone)
+    if ((ldCommon_t *)pWidget->parentType == widgetTypeNone)
     {
         listInfo = &ldWidgetLink;
     }
     else
     {
-        listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
+        listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
         listInfo = ((ldCommon_t *)listInfo->info)->childList;
     }
 
     if (listInfo != NULL)
     {
-        xListInfoPrevTraverse(listInfo, widget, _imageDel);
+        xListInfoPrevTraverse(listInfo, pWidget, _imageDel);
     }
 }
 
@@ -136,92 +136,92 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
-void ldImageSetBgColor(ldImage_t *widget,ldColor bgColor)
+void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
 {
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
-    widget->isTransparent=false;
-    widget->isColor=true;
-    widget->bgColor=bgColor;
+    pWidget->isTransparent=false;
+    pWidget->isColor=true;
+    pWidget->bgColor=bgColor;
 }
 
-void ldImageSetHidden(ldImage_t *widget,bool isHidden)
+void ldImageSetHidden(ldImage_t *pWidget,bool isHidden)
 {
-    ldBaseSetHidden((ldCommon_t*) widget,isHidden);
+    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
-void ldImageLoop(ldImage_t *widget, const arm_2d_tile_t *ptParent, bool bIsNewFrame)
+void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewFrame)
 {
 #if USE_OPACITY == 1
-#define IMG_OPACITY        widget->opacity
+#define IMG_OPACITY        pWidget->opacity
 #else
 #define IMG_OPACITY        255
 #endif
 
-    arm_2d_tile_t *tResTile=(arm_2d_tile_t*)&widget->resource;
+    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
     
-    if((widget->isParentHidden)||(widget->isHidden)||(widget->isTransparent))
+    if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
     {
         return;
     }
     
-    arm_2d_container(ptParent,tTarget , &tResTile->tRegion)
+    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
     {
-        tTarget.tRegion.tLocation = tResTile->tRegion.tLocation;
+        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
-        if (widget->isColor)
+        if (pWidget->isColor)
         {
-            ldBaseColor(&tTarget,widget->bgColor,IMG_OPACITY);
+            ldBaseColor(&tTarget,pWidget->bgColor,IMG_OPACITY);
         }
         else
         {
-            ldBaseImage(&tTarget,(arm_2d_tile_t*)(&widget->resource),widget->isWithMask,IMG_OPACITY);
+            ldBaseImage(&tTarget,ptResTile,pWidget->isWithMask,IMG_OPACITY);
         }
     }
     arm_2d_op_wait_async(NULL);
 }
 
-void ldImageSetOpacity(ldImage_t *widget, uint8_t opacity)
+void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity)
 {
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 #if USE_OPACITY == 1
-    widget->opacity=opacity;
+    pWidget->opacity=opacity;
 #endif
 }
 
-void ldImageSetImage(ldImage_t *widget, uint32_t imageAddr, bool isWithMask)
+void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask)
 {
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
-    widget->isTransparent=false;
-    widget->isWithMask=isWithMask;
-    if(((arm_2d_tile_t*)(&widget->resource))->tInfo.bVirtualResource)
+    pWidget->isTransparent=false;
+    pWidget->isWithMask=isWithMask;
+    if(((arm_2d_tile_t*)(&pWidget->resource))->tInfo.bVirtualResource)
     {
-        ((arm_2d_vres_t*)(&widget->resource))->pTarget=imageAddr;
+        ((arm_2d_vres_t*)(&pWidget->resource))->pTarget=imageAddr;
     }
     else
     {
-        ((arm_2d_tile_t*)(&widget->resource))->pchBuffer = (uint8_t *)imageAddr;
+        ((arm_2d_tile_t*)(&pWidget->resource))->pchBuffer = (uint8_t *)imageAddr;
     }
 }
 
 // grayBit :1 2 4 8
-void ldImageSetGrayscale(ldImage_t *widget, uint8_t grayBit, ldColor writeColor)
+void ldImageSetGrayscale(ldImage_t *pWidget, uint8_t grayBit, ldColor writeColor)
 {
     uint8_t colorType=0;
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
@@ -253,9 +253,9 @@ void ldImageSetGrayscale(ldImage_t *widget, uint8_t grayBit, ldColor writeColor)
             return ;
         }
     }
-    widget->isTransparent=false;
-    ((arm_2d_tile_t*)(&widget->resource))->tColourInfo.chScheme = colorType;
-    widget->specialColor = writeColor;
+    pWidget->isTransparent=false;
+    ((arm_2d_tile_t*)(&pWidget->resource))->tColourInfo.chScheme = colorType;
+    pWidget->specialColor = writeColor;
 }
 
 

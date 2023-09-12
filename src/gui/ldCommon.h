@@ -98,6 +98,7 @@ typedef enum{
     widgetTypeStaticText,
     widgetTypeStartupImage,
     widgetTypeArc,
+    widgetTypeRadialMenu,
 }ldWidgetType;
     
 
@@ -186,6 +187,10 @@ typedef struct{
     int16_t y;
 }ldPoint_t;
 
+typedef struct{
+    int16_t width;
+    int16_t height;
+}ldSize_t;
 
 extern xListNode ldWidgetLink;
 

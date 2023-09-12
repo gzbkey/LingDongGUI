@@ -5,7 +5,7 @@
 #include "ldText.h"
 #include "ldWindow.h"
 #include "ldProgressBar.h"
-
+#include "ldRadialMenu.h"
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
 
@@ -20,7 +20,7 @@ static void *prevWidget;
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
-    ldCommon_t *widget;
+    ldCommon_t *pWidget;
 //    ldPoint_t globalPos;
 //    ldPoint_t pos;
 //    ldGeometry tempGeometry;
@@ -34,7 +34,7 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
     }
     case BTN_PRESS:
     {
-        widget=NULL;
+        pWidget=NULL;
 //        if(temporaryTopWidget!=NULL)
 //        {
 //            pos.x=x;
@@ -48,22 +48,22 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 //                widget=temporaryTopWidget;
 //            }
 //        }
-        if(widget==NULL)
+        if(pWidget==NULL)
         {
             pNode=ldGetWidgetInfoByPos(x,y);
             if(pNode!=NULL)
             {
-                widget=pNode->info;
-                LOG_DEBUG("click widget id:%d\n",widget->nameId);
+                pWidget=pNode->info;
+                LOG_DEBUG("click widget id:%d\n",pWidget->nameId);
             }
         }
         prevX=x;
         prevY=y;
-        prevWidget=widget;//准备数据,释放时候使用
+        prevWidget=pWidget;//准备数据,释放时候使用
 
-        if(widget!=NULL)
+        if(pWidget!=NULL)
         {
-            xEmit(widget->nameId,touchSignal);
+            xEmit(pWidget->nameId,touchSignal);
         }
         break;
     }
@@ -71,10 +71,10 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
     {
         if((prevX!=x)||(prevY!=y))
         {
-            widget=prevWidget;//不可以把static变量作为函数变量调用
-            if(widget!=NULL)
+            pWidget=prevWidget;//不可以把static变量作为函数变量调用
+            if(pWidget!=NULL)
             {
-                xEmit(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE);
+                xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE);
             }
             prevX=x;
             prevY=y;
@@ -83,10 +83,10 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
     }
     case BTN_RELEASE:
     {
-        widget=prevWidget;
-        if(widget!=NULL)
+        pWidget=prevWidget;
+        if(pWidget!=NULL)
         {
-            xEmit(widget->nameId,touchSignal);
+            xEmit(pWidget->nameId,touchSignal);
         }
         break;
     }
@@ -132,33 +132,38 @@ void ldGuiTouchProcess(void)
 }
 
 
-void ldGuiDelWidget(ldCommon_t *widget)
+void ldGuiDelWidget(ldCommon_t *pWidget)
 {
-    switch(widget->widgetType)
+    switch(pWidget->widgetType)
     {
     case widgetTypeWindow:
     {
-        ldWindowDel((ldWindow_t*)widget);
+        ldWindowDel((ldWindow_t*)pWidget);
         break;
     }
     case widgetTypeImage:
     {
-        ldImageDel((ldImage_t*)widget);
+        ldImageDel((ldImage_t*)pWidget);
         break;
     }
     case widgetTypeButton:
     {
-        ldButtonDel((ldButton_t*)widget);
+        ldButtonDel((ldButton_t*)pWidget);
         break;
     }
     case widgetTypeText:
     {
-        ldTextDel((ldText_t*)widget);
+        ldTextDel((ldText_t*)pWidget);
         break;
     }
     case widgetTypeProgressBar:
     {
-        ldProgressBarDel((ldProgressBar_t*)widget);
+        ldProgressBarDel((ldProgressBar_t*)pWidget);
+        break;
+    }
+    case widgetTypeRadialMenu:
+    {
+        ldRadialMenuDel((ldRadialMenu_t*)pWidget);
         break;
     }
     default:
@@ -166,29 +171,34 @@ void ldGuiDelWidget(ldCommon_t *widget)
     }
 }
 
-static void _widgetLoop(ldCommon_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    switch(widget->widgetType)
+    switch(pWidget->widgetType)
     {
     case widgetTypeWindow:
     case widgetTypeImage:
     {
-        ldImageLoop((ldImage_t*)widget,ptParent,bIsNewFrame);
+        ldImageLoop((ldImage_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeButton:
     {
-        ldButtonLoop((ldButton_t*)widget,ptParent,bIsNewFrame);
+        ldButtonLoop((ldButton_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeText:
     {
-        ldTextLoop((ldText_t*)widget,ptParent,bIsNewFrame);
+        ldTextLoop((ldText_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeProgressBar:
     {
-        ldProgressBarLoop((ldProgressBar_t*)widget,ptParent,bIsNewFrame);
+        ldProgressBarLoop((ldProgressBar_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeRadialMenu:
+    {
+        ldRadialMenuLoop((ldRadialMenu_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     default:

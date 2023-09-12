@@ -29,29 +29,29 @@ static bool _progressBarDel(xListNode *pEachInfo, void *pTarget)
     return false;
 }
 
-void ldProgressBarDel(ldProgressBar_t *widget)
+void ldProgressBarDel(ldProgressBar_t *pWidget)
 {
     xListNode *listInfo;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if(widget->widgetType!=widgetTypeProgressBar)
+    if(pWidget->widgetType!=widgetTypeProgressBar)
     {
         return;
     }
 
-    LOG_DEBUG("[progressBar] del,id:%d\n",widget->nameId);
+    LOG_DEBUG("[progressBar] del,id:%d\n",pWidget->nameId);
 
     // 查找父链表
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
+    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
     {
-        xListInfoPrevTraverse(listInfo, widget, _progressBarDel);
+        xListInfoPrevTraverse(listInfo, pWidget, _progressBarDel);
     }
 }
 
@@ -158,16 +158,16 @@ static void _progressBarColorShow(arm_2d_tile_t *ptTarget,uint16_t iProgress,ldC
     }
 }
 
-static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarget,bool bIsNewFrame)
+static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarget,bool bIsNewFrame)
 {
 #if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tResTile=widget->resource;
+    arm_2d_tile_t tResTile=pWidget->resource;
     tResTile.bIsRoot=true;
     tResTile.bHasEnforcedColour=true;
     tResTile.tRegion.tLocation.iX=0;
     tResTile.tRegion.tLocation.iY=0;
 #else
-    arm_2d_vres_t tResTile=*((arm_2d_vres_t*)(&widget->resource));
+    arm_2d_vres_t tResTile=*((arm_2d_vres_t*)(&pWidget->resource));
     tResTile.tTile.bIsRoot=true;
     tResTile.tTile.bHasEnforcedColour=true;
     tResTile.tTile.bVirtualResource=true;
@@ -186,10 +186,10 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
     do {
 
         //bg image
-        ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=widget->bgWidth;
-        ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)widget->bgAddr;
+        ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=pWidget->bgWidth;
+        ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)pWidget->bgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-        tResTile.pTarget=widget->bgAddr;
+        tResTile.pTarget=pWidget->bgAddr;
 #endif
         arm_2d_region_t tInnerRegion = {
             .tSize = {
@@ -197,7 +197,7 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
                 .iHeight = tBarRegion.tSize.iHeight,
             },
             .tLocation = {
-                .iX = -widget->bgWidth + widget->bgOffset,
+                .iX = -pWidget->bgWidth + pWidget->bgOffset,
             },
         };
         arm_2d_tile_t tileInnerSlot;
@@ -208,14 +208,14 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
         arm_2d_op_wait_async(NULL);
     } while(0);
 
-    if (widget->permille > 0)
+    if (pWidget->permille > 0)
     {
         do {
             //fg image
-            ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=widget->fgWidth;
-            ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)widget->fgAddr;
+            ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=pWidget->fgWidth;
+            ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)pWidget->fgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-            tResTile.pTarget=widget->fgAddr;
+            tResTile.pTarget=pWidget->fgAddr;
 #endif
             arm_2d_region_t tInnerRegion = {
                 .tSize = {
@@ -223,10 +223,10 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
                     .iHeight = tBarRegion.tSize.iHeight,
                 },
                 .tLocation = {
-                    .iX = -widget->fgWidth + widget->fgOffset,
+                    .iX = -pWidget->fgWidth + pWidget->fgOffset,
                 },
             };
-            tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * widget->permille / 1000;
+            tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * pWidget->permille / 1000;
 
             arm_2d_tile_t tileInnerSlot;
             arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
@@ -237,14 +237,14 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
         } while(0);
     }
 
-    if(widget->frameAddr!=LD_ADDR_NONE)
+    if(pWidget->frameAddr!=LD_ADDR_NONE)
     {
         do {
             //frame image png
             ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=ptTarget->tRegion.tSize.iWidth;
-            ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)widget->frameAddr;
+            ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)pWidget->frameAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-            tResTile.pTarget=widget->frameAddr;
+            tResTile.pTarget=pWidget->frameAddr;
 #endif
             ldBaseImage(ptTarget,&tResTile,true,255);
             arm_2d_op_wait_async(NULL);
@@ -253,38 +253,38 @@ static void _progressBarImageShow(ldProgressBar_t *widget,arm_2d_tile_t *ptTarge
 
     //! update offset
     if (bIsNewFrame) {
-        if (arm_2d_helper_is_time_out(PROGRESS_BAR_SPEED, &widget->timer))
+        if (arm_2d_helper_is_time_out(PROGRESS_BAR_SPEED, &pWidget->timer))
         {
-            if(widget->isBgMove)
+            if(pWidget->isBgMove)
             {
-                widget->bgOffset++;
-                if (widget->bgOffset >= widget->bgWidth)
+                pWidget->bgOffset++;
+                if (pWidget->bgOffset >= pWidget->bgWidth)
                 {
-                    widget->bgOffset = 0;
+                    pWidget->bgOffset = 0;
                 }
             }
-            if(widget->isFgMove)
+            if(pWidget->isFgMove)
             {
-                widget->fgOffset++;
-                if (widget->fgOffset >= widget->fgWidth)
+                pWidget->fgOffset++;
+                if (pWidget->fgOffset >= pWidget->fgWidth)
                 {
-                    widget->fgOffset = 0;
+                    pWidget->fgOffset = 0;
                 }
             }
         }
     }
 }
 
-void ldProgressBarLoop(ldProgressBar_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&widget->resource;
+    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden))
+    if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
         return;
     }
@@ -293,26 +293,26 @@ void ldProgressBarLoop(ldProgressBar_t *widget,const arm_2d_tile_t *ptParent,boo
     {
         tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
-        if(widget->bgAddr==LD_ADDR_NONE&&widget->fgAddr==LD_ADDR_NONE)//color
+        if(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE)//color
         {
-            _progressBarColorShow(&tTarget,widget->permille,widget->bgColor,widget->fgColor,widget->frameColor);
+            _progressBarColorShow(&tTarget,pWidget->permille,pWidget->bgColor,pWidget->fgColor,pWidget->frameColor);
         }
         else
         {
-            _progressBarImageShow(widget,&tTarget,bIsNewFrame);
+            _progressBarImageShow(pWidget,&tTarget,bIsNewFrame);
         }
 
     }
 }
 
-void ldProgressBarSetHidden(ldProgressBar_t *widget,bool isHidden)
+void ldProgressBarSetHidden(ldProgressBar_t *pWidget,bool isHidden)
 {
-    ldBaseSetHidden((ldCommon_t*) widget,isHidden);
+    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
-void ldProgressBarSetPercent(ldProgressBar_t *widget,float percent)
+void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
@@ -322,7 +322,7 @@ void ldProgressBarSetPercent(ldProgressBar_t *widget,float percent)
         {
             percent=100;
         }
-        widget->permille=percent*10;
+        pWidget->permille=percent*10;
     }
     else
     {
@@ -330,52 +330,52 @@ void ldProgressBarSetPercent(ldProgressBar_t *widget,float percent)
         {
             percent=-100;
         }
-        widget->permille=1000+percent*10;
+        pWidget->permille=1000+percent*10;
     }
 }
 
-void ldProgressBarSetBgImage(ldProgressBar_t *widget,uint32_t bgAddr,uint16_t bgWidth,bool isMove)
+void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->bgAddr=bgAddr;
-    widget->bgWidth=bgWidth;
-    widget->isBgMove=isMove;
+    pWidget->bgAddr=bgAddr;
+    pWidget->bgWidth=bgWidth;
+    pWidget->isBgMove=isMove;
 }
 
-void ldProgressBarSetFgImage(ldProgressBar_t *widget,uint32_t fgAddr,uint16_t fgWidth,bool isMove)
+void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->fgAddr=fgAddr;
-    widget->fgWidth=fgWidth;
-    widget->isFgMove=isMove;
+    pWidget->fgAddr=fgAddr;
+    pWidget->fgWidth=fgWidth;
+    pWidget->isFgMove=isMove;
 }
 
-void ldProgressBarSetFrameImage(ldProgressBar_t *widget,uint32_t frameAddr)
+void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->frameAddr=frameAddr;
+    pWidget->frameAddr=frameAddr;
 }
 
-void ldProgressBarSetColor(ldProgressBar_t *widget,ldColor bgColor,ldColor fgColor,ldColor frameColor)
+void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor)
 {
-    if(widget==NULL)
+    if(pWidget==NULL)
     {
         return;
     }
-    widget->bgAddr=LD_ADDR_NONE;
-    widget->fgAddr=LD_ADDR_NONE;
-    widget->bgColor=bgColor;
-    widget->fgColor=fgColor;
-    widget->frameColor=frameColor;
+    pWidget->bgAddr=LD_ADDR_NONE;
+    pWidget->fgAddr=LD_ADDR_NONE;
+    pWidget->bgColor=bgColor;
+    pWidget->fgColor=fgColor;
+    pWidget->frameColor=frameColor;
 }
 
 #if defined(__clang__)
