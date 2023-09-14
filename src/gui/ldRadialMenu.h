@@ -13,6 +13,7 @@ typedef struct {
     uint8_t count;
     ldSize_t size;
     ldPoint_t pos;
+    uint16_t angle;
 }ldRadialMenuItem_t;
 
 typedef struct {

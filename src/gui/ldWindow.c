@@ -38,7 +38,7 @@ void ldWindowDel(ldWindow_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[window] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[window] del,id:%d\n",pWidget->nameId);
 
     listInfo=ldGetWidgetInfoById(pWidget->nameId);
 

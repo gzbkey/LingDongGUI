@@ -41,7 +41,7 @@ void ldImageDel(ldImage_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[image] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[image] del,id:%d\n",pWidget->nameId);
 
     // 查找父链表
     if ((ldCommon_t *)pWidget->parentType == widgetTypeNone)

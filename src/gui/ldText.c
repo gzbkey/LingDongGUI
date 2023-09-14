@@ -50,7 +50,7 @@ void ldTextDel(ldText_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[text] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[text] del,id:%d\n",pWidget->nameId);
 
     // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);

@@ -43,7 +43,7 @@ void ldTemplateDel(ldTemplate_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[template] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[template] del,id:%d\n",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 

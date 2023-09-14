@@ -45,7 +45,7 @@ void ldButtonDel(ldButton_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[button] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[button] del,id:%d\n",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 

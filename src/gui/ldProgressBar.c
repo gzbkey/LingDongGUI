@@ -43,7 +43,7 @@ void ldProgressBarDel(ldProgressBar_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[progressBar] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[progressBar] del,id:%d\n",pWidget->nameId);
 
     // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);

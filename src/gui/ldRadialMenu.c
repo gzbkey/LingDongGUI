@@ -18,9 +18,11 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-#define ITEM_0_ANGLE_OFFSET               90
-#define MOVE_CYCLE_MS                       0
-#define SKIP_ANGLE                       3
+#define ITEM_0_ANGLE_OFFSET      90
+#define MOVE_CYCLE_MS            0
+#define SKIP_ANGLE               3
+
+#define ANGLE_2_RADIAN(angle)    ((angle)*0.017453292519943f)
 
 static bool _radialMenuDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -49,7 +51,7 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
         return;
     }
 
-    LOG_DEBUG("[radialMenu] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[radialMenu] del,id:%d\n",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -83,7 +85,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
     }
     case BTN_RELEASE:
     {
-        if(menu->isMove==false)
+        if((menu->isMove==false)&&(menu->offsetAngle==0))//只允许静止状态下选择
         {
             x-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
             y-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
@@ -231,7 +233,6 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
             if((bIsNewFrame)&&(isTimeOut)&&(pWidget->offsetAngle!=0))
 #endif
             {
-                int16_t preAngle=360/pWidget->itemCount;
                 if(pWidget->offsetAngle>0)
                 {
 #if SKIP_ANGLE == 0
@@ -271,9 +272,8 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
                 //计算坐标
                 for(uint8_t i=0;i<pWidget->itemCount;i++)
                 {
-                    int16_t angle=preAngle*(i+1)-preAngle+pWidget->nowAngle+ITEM_0_ANGLE_OFFSET;
-                    pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32( angle * PI / 180) * pWidget->xAxis/2)-pWidget->pItemList[i].size.width/2;
-                    pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32( angle * PI / 180) * pWidget->yAxis/2)-pWidget->pItemList[i].size.height/2;
+                    pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle+pWidget->nowAngle)) * pWidget->xAxis/2)-pWidget->pItemList[i].size.width/2;
+                    pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle+pWidget->nowAngle)) * pWidget->yAxis/2)-pWidget->pItemList[i].size.height/2;
                 }
 
                 //计算排序
@@ -282,40 +282,16 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
                     pWidget->showList[i] = i;
                 }
                 _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
-            }
 
-//            //旋转结束
-//            if((pWidget->offsetAngle==0)&&(pWidget->selectItem!=pWidget->targetItem))
-//            {
-//                LOG_DEBUG("end\n");
-//                LOG_DEBUG("target Item x\n",pWidget->pItemList[pWidget->targetItem].pos.x);
-//                pWidget->selectItem=pWidget->targetItem;
-//                pWidget->nowAngle%=360;
-//            }
-
-            //强制结束
-            if(pWidget->offsetAngle>0)
-            {
-                if((pWidget->pItemList[pWidget->targetItem].pos.x+pWidget->pItemList[pWidget->targetItem].size.width/2)>=((ptResTile->tRegion.tSize.iWidth/2)))
+                //旋转结束
+                if((pWidget->offsetAngle==0)&&(pWidget->selectItem!=pWidget->targetItem))
                 {
-                    LOG_DEBUG("end left\n");
-                    LOG_DEBUG("target Item x=%d\n",pWidget->pItemList[pWidget->targetItem].pos.x);
-                    pWidget->offsetAngle=0;
                     pWidget->selectItem=pWidget->targetItem;
                     pWidget->nowAngle%=360;
                 }
             }
-            if(pWidget->offsetAngle<0)
-            {
-                if((pWidget->pItemList[pWidget->targetItem].pos.x+pWidget->pItemList[pWidget->targetItem].size.width/2)<=((ptResTile->tRegion.tSize.iWidth/2)))
-                {
-                    LOG_DEBUG("end right\n");
-                    LOG_DEBUG("target Item x=%d\n",pWidget->pItemList[pWidget->targetItem].pos.x);
-                    pWidget->offsetAngle=0;
-                    pWidget->selectItem=pWidget->targetItem;
-                    pWidget->nowAngle%=360;
-                }
-            }
+
+
 
             //刷新item
             for(uint8_t i=0;i<pWidget->itemCount;i++)
@@ -365,16 +341,18 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
 
         pWidget->itemCount++;
 
-        int16_t preAngle=360/pWidget->itemCount;
+        float preAngle=360/pWidget->itemCount;
+
+        for(uint8_t i=0;i<pWidget->itemCount;i++)
+        {
+            pWidget->pItemList[i].angle=preAngle*i+ITEM_0_ANGLE_OFFSET;
+        }
 
         //计算坐标
         for(uint8_t i=0;i<pWidget->itemCount;i++)
         {
-
-            int16_t angle=preAngle*(i+1)-preAngle+ITEM_0_ANGLE_OFFSET;
-
-            pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32( angle * PI / 180) * pWidget->xAxis/2)-pWidget->pItemList[i].size.width/2;
-            pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32( angle * PI / 180) * pWidget->yAxis/2)-pWidget->pItemList[i].size.height/2;
+            pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle)) * pWidget->xAxis/2)-pWidget->pItemList[i].size.width/2;
+            pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle)) * pWidget->yAxis/2)-pWidget->pItemList[i].size.height/2;
         }
         //计算排序
         for (int i = 0; i < pWidget->itemMax; i++)
@@ -397,52 +375,37 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
         return;
     }
 
-    LOG_DEBUG("select item:%d\n",num);
-    int8_t itemOffset=0;
-
     arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     pWidget->targetItem=num;
 
 
     ldRadialMenuItem_t* targetItem=&pWidget->pItemList[pWidget->targetItem];
-
     if((targetItem->pos.x+(targetItem->size.width/2))<(ptResTile->tRegion.tSize.iWidth/2))// left
     {
-        pWidget->offsetAngle=180;
+        if(pWidget->targetItem<pWidget->selectItem)
+        {
+            pWidget->offsetAngle=pWidget->pItemList[pWidget->selectItem].angle-pWidget->pItemList[pWidget->targetItem].angle;
+        }
+        else
+        {
+            pWidget->offsetAngle=360-pWidget->pItemList[pWidget->targetItem].angle+pWidget->pItemList[pWidget->selectItem].angle;
+        }
     }
     else// right
     {
-        pWidget->offsetAngle=-180;
+        if(pWidget->targetItem>pWidget->selectItem)
+        {
+            pWidget->offsetAngle=pWidget->pItemList[pWidget->targetItem].angle-pWidget->pItemList[pWidget->selectItem].angle;
+        }
+        else
+        {
+            pWidget->offsetAngle=360-pWidget->pItemList[pWidget->selectItem].angle+pWidget->pItemList[pWidget->targetItem].angle;
+        }
+        pWidget->offsetAngle=0-pWidget->offsetAngle;
     }
 
-//    if((targetItem->pos.x+(targetItem->size.width/2))<(ptResTile->tRegion.tSize.iWidth/2))// left
-//    {
-//        if(pWidget->targetItem<pWidget->selectItem)
-//        {
-//            itemOffset=pWidget->selectItem-pWidget->targetItem;
-//        }
-//        else
-//        {
-//            itemOffset=pWidget->itemCount-pWidget->targetItem+pWidget->selectItem;
-//        }
-//    }
-//    else// right
-//    {
-//        if(pWidget->targetItem>pWidget->selectItem)
-//        {
-//            itemOffset=pWidget->targetItem-pWidget->selectItem;
-//        }
-//        else
-//        {
-//            itemOffset=pWidget->itemCount-pWidget->selectItem+pWidget->targetItem;
-//        }
-//        itemOffset=0-itemOffset;
-//    }
-
-
-//    uint8_t preAngle=360/pWidget->itemCount;
-//    pWidget->offsetAngle=itemOffset*preAngle;
+    pWidget->offsetAngle=pWidget->offsetAngle%360;
 }
 
 #if defined(__clang__)
