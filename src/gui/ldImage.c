@@ -207,14 +207,11 @@ void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask)
     }
     pWidget->isTransparent=false;
     pWidget->isWithMask=isWithMask;
-    if(((arm_2d_tile_t*)(&pWidget->resource))->tInfo.bVirtualResource)
-    {
+#if USE_VIRTUAL_RESOURCE == 1
         ((arm_2d_vres_t*)(&pWidget->resource))->pTarget=imageAddr;
-    }
-    else
-    {
+#endif
         ((arm_2d_tile_t*)(&pWidget->resource))->pchBuffer = (uint8_t *)imageAddr;
-    }
+
 }
 
 // grayBit :1 2 4 8

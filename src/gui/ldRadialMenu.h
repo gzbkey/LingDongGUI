@@ -7,10 +7,17 @@ extern "C" {
 
 #include "ldCommon.h"
 
+#ifndef USE_RADIA_MENU_SCALE
+#define USE_RADIA_MENU_SCALE     1
+#endif
+
 typedef struct {
     uint32_t addr;
     bool isWithMask:1;
     uint8_t count;
+#if USE_RADIA_MENU_SCALE == 1
+    uint8_t scalePercent;
+#endif
     ldSize_t size;
     ldPoint_t pos;
     uint16_t angle;
@@ -19,6 +26,7 @@ typedef struct {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isMove:1;
+    bool isWaitInit:1;
     ldRadialMenuItem_t *pItemList;
     uint8_t itemCount;
     uint8_t itemMax;

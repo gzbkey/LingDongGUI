@@ -348,6 +348,70 @@ void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,bool isWithMask
     }
 }
 
+void ldBaseImageScale(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,bool isWithMask,float scale,bool bIsNewFrame)
+{
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t resource=*ptResource;
+#else
+    arm_2d_vres_t resource =*((arm_2d_vres_t*)ptResource);
+#endif
+    //root tile init
+    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iX=0;
+    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iY=0;
+    arm_2d_location_t tCentre = {
+                    .iX = (*(arm_2d_tile_t*)(&resource)).tRegion.tSize.iWidth >> 1,
+                    .iY = (*(arm_2d_tile_t*)(&resource)).tRegion.tSize.iHeight >> 1,
+                };
+
+    if (isWithMask)
+    {
+#if USE_VIRTUAL_RESOURCE == 0
+        arm_2d_tile_t maskTile = resource;
+#else
+        arm_2d_vres_t maskTile = *((arm_2d_vres_t*)&resource);
+#endif
+        (*(arm_2d_tile_t*)(&maskTile)).tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
+        (*(arm_2d_tile_t*)(&maskTile)).pchBuffer += (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iWidth * (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iHeight * 2;
+#if USE_VIRTUAL_RESOURCE == 1
+        maskTile.pTarget=(uintptr_t)maskTile.tTile.pchBuffer;
+#endif
+        arm_2d_op_trans_msk_opa_t tOP;
+        arm_2dp_tile_transform_with_src_mask_and_opacity(
+                    &tOP,         //!< control block
+                    (arm_2d_tile_t*)(&resource),        //!< source tile
+                    (arm_2d_tile_t *)&maskTile,          //!< source mask
+                    ptTile,             //!< target tile
+                    NULL,               //!< target region
+                    tCentre,            //!< pivot on source
+                    0,           //!< rotation angle
+                    scale,           //!< zoom scale
+                    255         //!< opacity
+                    );
+    }
+    else
+    {
+        switch ( (*(arm_2d_tile_t*)(&resource)).tInfo.tColourInfo.chScheme)
+        {
+        case ARM_2D_COLOUR_RGB565:
+        case ARM_2D_COLOUR_CCCA8888:
+        {
+            arm_2d_op_trans_t tOP;
+            arm_2dp_tile_transform_only(&tOP,
+                                        (arm_2d_tile_t*)(&resource),
+                                        ptTile,
+                                        NULL,
+                                        tCentre,
+                                        0,
+                                        scale);
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
+}
+
 void ldBaseMaskImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,ldColor textColor,uint8_t opacity)
 {
 #if USE_VIRTUAL_RESOURCE == 0
@@ -649,8 +713,6 @@ arm_2d_region_t ldBaseGetAlignRegion(arm_2d_tile_t *ptTile,arm_2d_size_t size,ui
                 break;
             }
         }
-//    retRegion.tLocation.iX+=ptTile->tRegion.tLocation.iX;
-//    retRegion.tLocation.iY+=ptTile->tRegion.tLocation.iY;
     return retRegion;
 }
 
@@ -711,8 +773,6 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
             lineWidth=0;
             sizeHeightMax+=ptTextInfo->ptFontDict->lineOffset;
         }
-
-
     }
 
     if(sizeWidthMax==0)//单行

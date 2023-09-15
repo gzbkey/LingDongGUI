@@ -36,6 +36,9 @@ extern const uint8_t icon8_jpeg[];
 extern const uint8_t icon9_jpeg[];
 #define ICON9_JPEG (uint32_t)&icon9_jpeg[0]
 
+extern const uint8_t icon9_png[];
+#define ICON9_PNG (uint32_t)&icon9_png[0]
+
 #define JETBRAINS_MONO_NL_REGULAR_9 (&dict_JetBrains_Mono_NL_Regular_9)
 extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;
 
@@ -67,6 +70,9 @@ extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;
 
 //icon9.jpeg w:100 h:100 < 565 >
 #define ICON9_JPEG 160000
+
+//icon9.png w:100 h:100 < 565+Mask >
+#define ICON9_PNG 180000
 
 #define JETBRAINS_MONO_NL_REGULAR_9 (&dict_JetBrains_Mono_NL_Regular_9)
 extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;

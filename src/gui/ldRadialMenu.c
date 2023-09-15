@@ -173,8 +173,8 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->pItemList=pNewItemList;
         pNewWidget->itemMax=itemMax;
 
-        pNewWidget->originPos.x=tResTile->tRegion.tSize.iWidth/2;
-        pNewWidget->originPos.y=tResTile->tRegion.tSize.iHeight/2;
+        pNewWidget->originPos.x=tResTile->tRegion.tSize.iWidth>>1;
+        pNewWidget->originPos.y=tResTile->tRegion.tSize.iHeight>>1;
         pNewWidget->xAxis=xAxis;
         pNewWidget->yAxis=yAxis;
         pNewWidget->timer=0;
@@ -183,6 +183,7 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->selectItem=0;
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
+        pNewWidget->isWaitInit=true;
 
         xConnect(nameId,BTN_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,BTN_RELEASE,nameId,slotMenuSelect);
@@ -200,6 +201,44 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
     }
 
     return pNewWidget;
+}
+
+static void _autoScalePercent(ldRadialMenu_t *pWidget)
+{
+#if USE_RADIA_MENU_SCALE == 1
+    for(uint8_t i=0;i<pWidget->itemCount;i++)
+    {
+        if((pWidget->pItemList[i].scalePercent%10)>=5)
+        {
+            pWidget->pItemList[i].scalePercent=(pWidget->pItemList[i].scalePercent/10+1)*10;
+        }
+        else
+        {
+            pWidget->pItemList[i].scalePercent=(pWidget->pItemList[i].scalePercent/10)*10;
+        }
+    }
+#endif
+}
+
+static void _autoSort(ldRadialMenu_t *pWidget)
+{
+    //计算坐标
+    for(uint8_t i=0;i<pWidget->itemCount;i++)
+    {
+        pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle+pWidget->nowAngle)) * (pWidget->xAxis>>1))-(pWidget->pItemList[i].size.width>>1);
+        pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle+pWidget->nowAngle)) * (pWidget->yAxis>>1))-(pWidget->pItemList[i].size.height>>1);
+#if USE_RADIA_MENU_SCALE == 1
+        //计算缩放比例
+        pWidget->pItemList[i].scalePercent=(pWidget->pItemList[pWidget->showList[i]].pos.y)*50/pWidget->yAxis+50;
+#endif
+    }
+
+    //计算排序
+    for (int i = 0; i < pWidget->itemMax; i++)
+    {
+        pWidget->showList[i] = i;
+    }
+    _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
 }
 
 void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
@@ -223,7 +262,7 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
         if(pWidget->itemCount)
         {
 #if MOVE_CYCLE_MS == 0
-            if((bIsNewFrame)&&(pWidget->offsetAngle!=0))
+            if((bIsNewFrame)&&((pWidget->offsetAngle!=0)||(pWidget->isWaitInit)))
 #else
             bool isTimeOut=false;
             if(ldTimeOut(MOVE_CYCLE_MS,&pWidget->timer,true))
@@ -269,29 +308,18 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
                     }
 #endif
                 }
-                //计算坐标
-                for(uint8_t i=0;i<pWidget->itemCount;i++)
-                {
-                    pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle+pWidget->nowAngle)) * pWidget->xAxis/2)-pWidget->pItemList[i].size.width/2;
-                    pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle+pWidget->nowAngle)) * pWidget->yAxis/2)-pWidget->pItemList[i].size.height/2;
-                }
 
-                //计算排序
-                for (int i = 0; i < pWidget->itemMax; i++)
-                {
-                    pWidget->showList[i] = i;
-                }
-                _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
+                _autoSort(pWidget);
 
                 //旋转结束
-                if((pWidget->offsetAngle==0)&&(pWidget->selectItem!=pWidget->targetItem))
+                if((pWidget->offsetAngle==0)&&((pWidget->selectItem!=pWidget->targetItem)||(pWidget->isWaitInit)))
                 {
                     pWidget->selectItem=pWidget->targetItem;
                     pWidget->nowAngle%=360;
+
+                    _autoScalePercent(pWidget);
                 }
             }
-
-
 
             //刷新item
             for(uint8_t i=0;i<pWidget->itemCount;i++)
@@ -306,12 +334,15 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
 
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=pWidget->pItemList[pWidget->showList[i]].size.width;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pItemList[pWidget->showList[i]].size.height;
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=pWidget->pItemList[pWidget->showList[i]].addr;//PRESS_BMP;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=pWidget->pItemList[pWidget->showList[i]].addr;
 #if USE_VIRTUAL_RESOURCE == 1
-
+                    tempRes.pTarget=pWidget->pItemList[pWidget->showList[i]].addr;
 #endif
+#if USE_RADIA_MENU_SCALE == 1
+                    ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,bIsNewFrame);
+#else
                     ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,255);
-
+#endif
                     arm_2d_op_wait_async(NULL);
                 } while (0);
             }
@@ -347,19 +378,6 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
         {
             pWidget->pItemList[i].angle=preAngle*i+ITEM_0_ANGLE_OFFSET;
         }
-
-        //计算坐标
-        for(uint8_t i=0;i<pWidget->itemCount;i++)
-        {
-            pWidget->pItemList[i].pos.x  = pWidget->originPos.x - (arm_cos_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle)) * pWidget->xAxis/2)-pWidget->pItemList[i].size.width/2;
-            pWidget->pItemList[i].pos.y  = pWidget->originPos.y + (arm_sin_f32(ANGLE_2_RADIAN(pWidget->pItemList[i].angle)) * pWidget->yAxis/2)-pWidget->pItemList[i].size.height/2;
-        }
-        //计算排序
-        for (int i = 0; i < pWidget->itemMax; i++)
-        {
-            pWidget->showList[i] = i;
-        }
-        _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
     }
 }
 
@@ -381,7 +399,7 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
 
 
     ldRadialMenuItem_t* targetItem=&pWidget->pItemList[pWidget->targetItem];
-    if((targetItem->pos.x+(targetItem->size.width/2))<(ptResTile->tRegion.tSize.iWidth/2))// left
+    if((targetItem->pos.x+(targetItem->size.width>>1))<(ptResTile->tRegion.tSize.iWidth>>1))// left
     {
         if(pWidget->targetItem<pWidget->selectItem)
         {

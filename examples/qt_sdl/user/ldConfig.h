@@ -17,6 +17,8 @@ extern "C" {
 #define USE_OPACITY                               1
 #define USE_TLSF                                  1
 
+#define USE_RADIA_MENU_SCALE                      1
+
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 
 

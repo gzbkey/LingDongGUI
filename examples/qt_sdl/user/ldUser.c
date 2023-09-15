@@ -91,7 +91,7 @@ void userInit(void)
     ldRadialMenuAddItem(menu,ICON6_JPEG,100,100,1,false);
     ldRadialMenuAddItem(menu,ICON7_JPEG,100,100,1,false);
     ldRadialMenuAddItem(menu,ICON8_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON9_JPEG,100,100,1,false);
+    ldRadialMenuAddItem(menu,ICON9_PNG,100,100,1,true);
 }
 
 
