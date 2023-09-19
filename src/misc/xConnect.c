@@ -17,12 +17,13 @@ bool xEmitInit(void)
     return false;
 }
 
-bool xEmit(uint16_t senderId,uint8_t signal)
+bool xEmit(uint16_t senderId,uint8_t signal,size_t value)
 {
     emitInfo_t emitInfo;
     
     emitInfo.senderId=senderId;
     emitInfo.signalType=signal;
+    emitInfo.value=value;
     return xQueueEnqueue(emitQueue,&emitInfo,sizeof (emitInfo_t));
 }
 
@@ -148,6 +149,7 @@ void xConnectProcess(void)
                         connectInfo.senderId=pRelationInfo->senderId;
                         connectInfo.signalType=pRelationInfo->signalType;
                         connectInfo.receiverId=pRelationInfo->receiverId;
+                        connectInfo.value=emitInfo.value;
                         ignoreSignal=pRelationInfo->receiverFunc(connectInfo);
 
                         if(ignoreSignal==true)

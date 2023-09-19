@@ -271,18 +271,16 @@ void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
 static bool slotTextVerticalScroll(xConnectInfo_t info)
 {
     ldText_t *txt;
-    int16_t x;int16_t y;
-    int16_t offset;
 
     txt=ldGetWidgetById(info.receiverId);
 
-    ldCfgTouchGetPoint(&x,&y);
 
-    switch (info.signalType) {
-    case BTN_PRESS:
+
+    switch (info.signalType)
+    {
+    case SIGNAL_PRESS:
     {
         txt->isRelease=false;
-        _pressY=y;
         _scrollOffset=txt->scrollOffset;
         _isTopScroll=false;
         _isBottomScroll=false;
@@ -290,11 +288,10 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        offset=y-_pressY;
-        txt->scrollOffset=_scrollOffset+offset;
+        txt->scrollOffset=_scrollOffset+(int16_t)(info.value&0xFFFF);
         break;
     }
-    case BTN_RELEASE:
+    case SIGNAL_RELEASE:
     {
         txt->isRelease=true;
 
@@ -347,15 +344,15 @@ void ldTextSetScroll(ldText_t *pWidget,bool isEnable)
         pWidget->isScroll=isEnable;
         if(isEnable)
         {
-            xConnect(pWidget->nameId,BTN_PRESS,pWidget->nameId,slotTextVerticalScroll);
+            xConnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
             xConnect(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pWidget->nameId,slotTextVerticalScroll);
-            xConnect(pWidget->nameId,BTN_RELEASE,pWidget->nameId,slotTextVerticalScroll);
+            xConnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
         }
         else
         {
-            xDisconnect(pWidget->nameId,BTN_PRESS,pWidget->nameId,slotTextVerticalScroll);
+            xDisconnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
             xDisconnect(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pWidget->nameId,slotTextVerticalScroll);
-            xDisconnect(pWidget->nameId,BTN_RELEASE,pWidget->nameId,slotTextVerticalScroll);
+            xDisconnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
         }
     }
 }

@@ -81,7 +81,7 @@ void userInit(void)
 //    ldProgressBarSetPercent(bar3,50);
 
     //radial menu
-    menu=ldRadialMenuInit(9,0,10,10,400,200,300,100,9);
+    menu=ldRadialMenuInit(9,0,0,10,480,200,300,100,9);
 
 //    ldRadialMenuAddItem(menu,ICON1_JPEG,100,100,1,false);
     ldRadialMenuAddItem(menu,ICON2_JPEG,100,100,1,false);

@@ -1,4 +1,5 @@
 #include "ldProgressBar.h"
+#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push

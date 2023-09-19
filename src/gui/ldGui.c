@@ -14,7 +14,8 @@ int64_t sysTimer=0;
 #define TOUCH_NO_CLICK           0
 #define TOUCH_CLICK              1
 
-
+static volatile ldPoint_t pressPoint;
+static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
@@ -28,11 +29,11 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 
     switch(touchSignal)
     {
-    case BTN_NO_OPERATION:
+    case SIGNAL_NO_OPERATION:
     {
         break;
     }
-    case BTN_PRESS:
+    case SIGNAL_PRESS:
     {
         pWidget=NULL;
 //        if(temporaryTopWidget!=NULL)
@@ -60,33 +61,44 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         prevX=x;
         prevY=y;
         prevWidget=pWidget;//准备数据,释放时候使用
+        pressPoint.x=x;
+        pressPoint.y=y;
+        deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
 
         if(pWidget!=NULL)
         {
-            xEmit(pWidget->nameId,touchSignal);
+            xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
         }
         break;
     }
-    case BTN_HOLD_DOWN:
+    case SIGNAL_HOLD_DOWN:
     {
         if((prevX!=x)||(prevY!=y))
         {
             pWidget=prevWidget;//不可以把static变量作为函数变量调用
             if(pWidget!=NULL)
             {
-                xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE);
+                xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,(((x-pressPoint.x)<<16)&0xFFFF0000)|((y-pressPoint.y)&0xFFFF));
             }
             prevX=x;
             prevY=y;
         }
         break;
     }
-    case BTN_RELEASE:
+    case SIGNAL_RELEASE:
     {
         pWidget=prevWidget;
         if(pWidget!=NULL)
         {
-            xEmit(pWidget->nameId,touchSignal);
+            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
+
+            //计算速度
+            deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
+            pressPoint.x=(prevX-pressPoint.x);
+            pressPoint.y=(prevY-pressPoint.y);
+            pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
+            pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
+            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));
         }
         break;
     }
@@ -101,7 +113,7 @@ void ldGuiTouchProcess(void)
     int16_t y;
     bool nowState;
     static bool prevState=TOUCH_NO_CLICK;
-    uint8_t touchSignal=BTN_NO_OPERATION;
+    uint8_t touchSignal=SIGNAL_NO_OPERATION;
 
     nowState = ldCfgTouchGetPoint(&x,&y);
 
@@ -109,22 +121,22 @@ void ldGuiTouchProcess(void)
     {
         if(prevState==TOUCH_NO_CLICK)//按下,                下降沿触发
         {
-            touchSignal=BTN_PRESS;
+            touchSignal=SIGNAL_PRESS;
         }
         else// prevState==TOUCH_CLICK 按住                低电平
         {
-            touchSignal=BTN_HOLD_DOWN;
+            touchSignal=SIGNAL_HOLD_DOWN;
         }
     }
     else// nowState==TOUCH_NO_CLICK 无按下
     {
         if(prevState==TOUCH_NO_CLICK)//无按下                高电平
         {
-            touchSignal=BTN_NO_OPERATION;
+            touchSignal=SIGNAL_NO_OPERATION;
         }
         else// prevState==TOUCH_CLICK 按下,上升沿触发       上降沿触发
         {
-            touchSignal=BTN_RELEASE;
+            touchSignal=SIGNAL_RELEASE;
         }
     }
     prevState=nowState;

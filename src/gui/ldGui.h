@@ -10,12 +10,14 @@ extern "C" {
 
 
 //btn占用0-9
+#define SIGNAL_NO_OPERATION         BTN_NO_OPERATION
+#define SIGNAL_PRESS                BTN_PRESS           // value = x (2Byte) + y (2Byte)
+#define SIGNAL_HOLD_DOWN            BTN_HOLD_DOWN
+#define SIGNAL_RELEASE              BTN_RELEASE         // value = x (2Byte) + y (2Byte)
 
-#define SIGNAL_TOUCH_HOLD_MOVE      10 // press and move
+#define SIGNAL_TOUCH_HOLD_MOVE      10 // value = x offset(2Byte) + y offset(2Byte)
+#define SIGNAL_MOVE_SPEED           11 // value = x speed(2Byte) + y speed(2Byte)
 
-//#define SIGNAL_TOUCH_CHECK_PRESSED      4 // 单状态按下
-//#define SIGNAL_TOUCH_CHECK_RELEASED      5 // 单状态释放
-//
 //#define SIGNAL_VALUE_CHANGED           7 //数据变化
 //#define SIGNAL_WIDGET_ACTIVE           8 //激活控件
 //#define SIGNAL_EIDTING_FINISHED           9 //编辑结束

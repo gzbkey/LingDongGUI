@@ -20,7 +20,7 @@
 
 #define ITEM_0_ANGLE_OFFSET      90
 #define MOVE_CYCLE_MS            0
-#define SKIP_ANGLE               3
+#define SKIP_ANGLE               5
 
 #define ANGLE_2_RADIAN(angle)    ((angle)*0.017453292519943f)
 
@@ -68,30 +68,40 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
 static bool slotMenuSelect(xConnectInfo_t info)
 {
     ldRadialMenu_t *menu;
-    static int16_t x, y;
+    size_t value;
+    static int16_t pressX,pressY,nowX,nowY;
 
+    value=info.value;
     menu=ldGetWidgetById(info.receiverId);
 
     switch (info.signalType)
     {
-    case BTN_PRESS:
+    case SIGNAL_PRESS:
     {
-        ldCfgTouchGetPoint(&x,&y);
+        pressX=(value>>16)&0xFFFF;
+        pressY=value&0xFFFF;
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
         break;
     }
-    case BTN_RELEASE:
+    case SIGNAL_RELEASE:
     {
         if((menu->isMove==false)&&(menu->offsetAngle==0))//只允许静止状态下选择
         {
-            x-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
-            y-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
+            nowX=(value>>16)&0xFFFF;
+            nowY=value&0xFFFF;
+
+            nowX-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
+            nowY-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
+            pressX-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
+            pressY-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
+
             for(int8_t i=menu->itemCount-1;i>=0;i--)
             {
-                if((x>=menu->pItemList[menu->showList[i]].pos.x)&&(x<=(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(y>=menu->pItemList[menu->showList[i]].pos.y)&&(y<=(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1)))
+                if(((pressX>=menu->pItemList[menu->showList[i]].pos.x)&&(pressX<=(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(pressY>=menu->pItemList[menu->showList[i]].pos.y)&&(pressY<=(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1)))&&
+                    ((nowX>=menu->pItemList[menu->showList[i]].pos.x)&&(nowX<=(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(nowY>=menu->pItemList[menu->showList[i]].pos.y)&&(nowY<=(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1))))
                 {
                     ldRadialMenuSelectItem(menu,menu->showList[i]);
                     break;
@@ -100,27 +110,59 @@ static bool slotMenuSelect(xConnectInfo_t info)
         }
         break;
     }
+    case SIGNAL_MOVE_SPEED:
+    {
+        //将移动速度强制转换成item数量，并且限制360度内
+        int16_t preAngle;
+        int8_t offsetItem;
+        nowX=(value>>16)&0xFFFF;
+        preAngle=360/menu->itemCount;
+
+        if((nowX>=preAngle)||(nowX<=(-preAngle)))
+        {
+            if(nowX>=360)
+            {
+                nowX=359;
+            }
+            else
+            {
+                if(nowX<=-360)
+                {
+                    nowX=-359;
+                }
+            }
+            offsetItem=nowX/preAngle;
+            menu->offsetAngle=offsetItem*preAngle;
+            if(offsetItem>0)
+            {
+                if((menu->selectItem-offsetItem)>=0)
+                {
+                    menu->targetItem=menu->selectItem-offsetItem;
+                }
+                else
+                {
+                    menu->targetItem=menu->itemCount+(menu->selectItem-offsetItem);
+                }
+            }
+            else
+            {
+                if((menu->selectItem-offsetItem)<menu->itemCount)
+                {
+                    menu->targetItem=menu->selectItem-offsetItem;
+                }
+                else
+                {
+                    menu->targetItem=-offsetItem-(menu->itemCount-menu->selectItem);
+                }
+            }
+        }
+
+        break;
+    }
     default:break;
     }
 
     return false;
-}
-
-static void _sortByYAxis(ldRadialMenuItem_t* arr, uint8_t* indexArr, int size)
-{
-    int i, j;
-    for (i = 0; i < size - 1; i++)
-    {
-        for (j = 0; j < size - 1 - i; j++)
-        {
-            if(arr[indexArr[j]].pos.y>arr[indexArr[j+1]].pos.y)
-            {
-                int temp = indexArr[j];
-                indexArr[j] = indexArr[j + 1];
-                indexArr[j + 1] = temp;
-            }
-        }
-    }
 }
 
 ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax)
@@ -185,9 +227,10 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
 
-        xConnect(nameId,BTN_PRESS,nameId,slotMenuSelect);
-        xConnect(nameId,BTN_RELEASE,nameId,slotMenuSelect);
+        xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
+        xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_TOUCH_HOLD_MOVE,nameId,slotMenuSelect);
+        xConnect(nameId,SIGNAL_MOVE_SPEED,nameId,slotMenuSelect);
 
         LOG_INFO("[radialMenu] init,id:%d\n",nameId);
     }
@@ -208,6 +251,9 @@ static void _autoScalePercent(ldRadialMenu_t *pWidget)
 #if USE_RADIA_MENU_SCALE == 1
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
+        //计算缩放比例
+        pWidget->pItemList[i].scalePercent=(pWidget->pItemList[pWidget->showList[i]].pos.y)*50/pWidget->yAxis+50;
+
         if((pWidget->pItemList[i].scalePercent%10)>=5)
         {
             pWidget->pItemList[i].scalePercent=(pWidget->pItemList[i].scalePercent/10+1)*10;
@@ -218,6 +264,23 @@ static void _autoScalePercent(ldRadialMenu_t *pWidget)
         }
     }
 #endif
+}
+
+static void _sortByYAxis(ldRadialMenuItem_t* arr, uint8_t* indexArr, int size)
+{
+    int i, j;
+    for (i = 0; i < size - 1; i++)
+    {
+        for (j = 0; j < size - 1 - i; j++)
+        {
+            if(arr[indexArr[j]].pos.y>arr[indexArr[j+1]].pos.y)
+            {
+                int temp = indexArr[j];
+                indexArr[j] = indexArr[j + 1];
+                indexArr[j + 1] = temp;
+            }
+        }
+    }
 }
 
 static void _autoSort(ldRadialMenu_t *pWidget)
@@ -316,8 +379,9 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
                 {
                     pWidget->selectItem=pWidget->targetItem;
                     pWidget->nowAngle%=360;
-
+                    pWidget->isWaitInit=false;
                     _autoScalePercent(pWidget);
+                    LOG_DEBUG("select item num:%d\n",pWidget->selectItem);
                 }
             }
 

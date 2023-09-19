@@ -1,4 +1,5 @@
 #include "ldButton.h"
+#include "ldGui.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -65,11 +66,11 @@ static bool slotButtonToggle(xConnectInfo_t info)
 
     btn=ldGetWidgetById(info.receiverId);
 
-    if(info.signalType==BTN_PRESS)
+    if(info.signalType==SIGNAL_PRESS)
     {
         btn->isPressed=true;
     }
-    if(info.signalType==BTN_RELEASE)
+    if(info.signalType==SIGNAL_RELEASE)
     {
         btn->isPressed=false;
     }
@@ -135,8 +136,8 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
         //动作
-        xConnect(nameId,BTN_PRESS,nameId,slotButtonToggle);
-        xConnect(nameId,BTN_RELEASE,nameId,slotButtonToggle);
+        xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
+        xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
 
         LOG_INFO("[button] init,id:%d\n",nameId);
     }
