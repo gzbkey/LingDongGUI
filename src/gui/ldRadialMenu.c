@@ -92,7 +92,6 @@ static bool slotMenuSelect(xConnectInfo_t info)
         {
             nowX=(value>>16)&0xFFFF;
             nowY=value&0xFFFF;
-
             nowX-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
             nowY-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
             pressX-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
@@ -100,8 +99,8 @@ static bool slotMenuSelect(xConnectInfo_t info)
 
             for(int8_t i=menu->itemCount-1;i>=0;i--)
             {
-                if(((pressX>=menu->pItemList[menu->showList[i]].pos.x)&&(pressX<=(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(pressY>=menu->pItemList[menu->showList[i]].pos.y)&&(pressY<=(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1)))&&
-                    ((nowX>=menu->pItemList[menu->showList[i]].pos.x)&&(nowX<=(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(nowY>=menu->pItemList[menu->showList[i]].pos.y)&&(nowY<=(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1))))
+                if(((pressX>menu->pItemList[menu->showList[i]].pos.x)&&(pressX<(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(pressY>menu->pItemList[menu->showList[i]].pos.y)&&(pressY<(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1)))&&
+                        ((nowX>menu->pItemList[menu->showList[i]].pos.x)&&(nowX<(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(nowY>menu->pItemList[menu->showList[i]].pos.y)&&(nowY<(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1))))
                 {
                     ldRadialMenuSelectItem(menu,menu->showList[i]);
                     break;
@@ -113,50 +112,51 @@ static bool slotMenuSelect(xConnectInfo_t info)
     case SIGNAL_MOVE_SPEED:
     {
         //将移动速度强制转换成item数量，并且限制360度内
-        int16_t preAngle;
-        int8_t offsetItem;
-        nowX=(value>>16)&0xFFFF;
-        preAngle=360/menu->itemCount;
+        do{
+            float preAngle;
+            int8_t offsetItem;
+            nowX=(value>>16)&0xFFFF;
+            preAngle=360.0/menu->itemCount;
 
-        if((nowX>=preAngle)||(nowX<=(-preAngle)))
-        {
-            if(nowX>=360)
+            if((nowX>=preAngle)||(nowX<=(-preAngle)))
             {
-                nowX=359;
-            }
-            else
-            {
-                if(nowX<=-360)
+                if(nowX>=360)
                 {
-                    nowX=-359;
-                }
-            }
-            offsetItem=nowX/preAngle;
-            menu->offsetAngle=offsetItem*preAngle;
-            if(offsetItem>0)
-            {
-                if((menu->selectItem-offsetItem)>=0)
-                {
-                    menu->targetItem=menu->selectItem-offsetItem;
+                    nowX=359;
                 }
                 else
                 {
-                    menu->targetItem=menu->itemCount+(menu->selectItem-offsetItem);
+                    if(nowX<=-360)
+                    {
+                        nowX=-359;
+                    }
                 }
-            }
-            else
-            {
-                if((menu->selectItem-offsetItem)<menu->itemCount)
+                offsetItem=nowX/preAngle;
+                menu->offsetAngle=offsetItem*preAngle;
+                if(offsetItem>0)
                 {
-                    menu->targetItem=menu->selectItem-offsetItem;
+                    if((menu->selectItem-offsetItem)>=0)
+                    {
+                        menu->targetItem=menu->selectItem-offsetItem;
+                    }
+                    else
+                    {
+                        menu->targetItem=menu->itemCount+(menu->selectItem-offsetItem);
+                    }
                 }
                 else
                 {
-                    menu->targetItem=-offsetItem-(menu->itemCount-menu->selectItem);
+                    if((menu->selectItem-offsetItem)<menu->itemCount)
+                    {
+                        menu->targetItem=menu->selectItem-offsetItem;
+                    }
+                    else
+                    {
+                        menu->targetItem=-offsetItem-(menu->itemCount-menu->selectItem);
+                    }
                 }
             }
-        }
-
+        }while(0);
         break;
     }
     default:break;
@@ -343,7 +343,7 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
 #else
                     if(pWidget->offsetAngle<SKIP_ANGLE)
                     {
-                        pWidget->nowAngle+=pWidget->offsetAngle;
+                        pWidget->nowAngle=ITEM_0_ANGLE_OFFSET-pWidget->pItemList[pWidget->targetItem].angle;
                         pWidget->offsetAngle=0;
                     }
                     else
@@ -361,8 +361,8 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
 #else
                     if(pWidget->offsetAngle>(-SKIP_ANGLE))
                     {
-                        pWidget->nowAngle-=pWidget->offsetAngle;
-                        pWidget->offsetAngle=0;
+                        pWidget->nowAngle=ITEM_0_ANGLE_OFFSET-pWidget->pItemList[pWidget->targetItem].angle+360;
+                        pWidget->offsetAngle++;
                     }
                     else
                     {
@@ -381,7 +381,6 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
                     pWidget->nowAngle%=360;
                     pWidget->isWaitInit=false;
                     _autoScalePercent(pWidget);
-                    LOG_DEBUG("select item num:%d\n",pWidget->selectItem);
                 }
             }
 
@@ -436,7 +435,7 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
 
         pWidget->itemCount++;
 
-        float preAngle=360/pWidget->itemCount;
+        float preAngle=360.0/pWidget->itemCount;
 
         for(uint8_t i=0;i<pWidget->itemCount;i++)
         {
