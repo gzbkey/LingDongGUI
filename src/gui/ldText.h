@@ -21,17 +21,17 @@ typedef struct {
 }ldText_t;
 
 ldText_t* ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
-void ldTextLoop(ldText_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
-void ldTextDel(ldText_t *widget);
+void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldTextDel(ldText_t *pWidget);
 
-void ldTextSetHidden(ldText_t *widget,bool isHidden);
-void ldTextSetText(ldText_t* widget,uint8_t *pStr);
-void ldTextSetTextColor(ldText_t* widget,ldColor charColor);
-void ldTextSetAlign(ldText_t *widget,uint8_t align);
-void ldTextSetTransparent(ldText_t* widget,bool isTransparent);
-void ldTextScrollSeek(ldText_t *widget,int16_t offset);
-void ldTextScrollMove(ldText_t *widget, int8_t moveValue);
-void ldTextSetScroll(ldText_t *widget,bool isEnable);
+void ldTextSetHidden(ldText_t *pWidget,bool isHidden);
+void ldTextSetText(ldText_t* pWidget,uint8_t *pStr);
+void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor);
+void ldTextSetAlign(ldText_t *pWidget,uint8_t align);
+void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent);
+void ldTextScrollSeek(ldText_t *pWidget,int16_t offset);
+void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue);
+void ldTextSetScroll(ldText_t *pWidget,bool isEnable);
 #ifdef __cplusplus
 }
 #endif

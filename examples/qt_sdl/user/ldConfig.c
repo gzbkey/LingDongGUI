@@ -23,10 +23,27 @@ bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
     
     //添加触摸函数
     touchState=vtMouseGetPoint(&rx,&ry);
-    *x=rx;
-    *y=ry;
+
     if((touchState!=0)&&(((rx!=-1)&&(ry!=-1))||((rx!=0)&&(ry!=0))))
     {
+        if(rx<0)
+        {
+            rx=0;
+        }
+        if(ry<0)
+        {
+            ry=0;
+        }
+        if(rx>LD_CFG_SCEEN_WIDTH)
+        {
+            rx=LD_CFG_SCEEN_WIDTH;
+        }
+        if(ry>LD_CFG_SCEEN_HEIGHT)
+        {
+            ry=LD_CFG_SCEEN_HEIGHT;
+        }
+        *x=rx;
+        *y=ry;
         touchState=true;
     }
     else

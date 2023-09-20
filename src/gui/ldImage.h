@@ -20,14 +20,14 @@ typedef struct {
 }ldImage_t;
 
 ldImage_t* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imageAddr,bool isWithMask);
-void ldImageLoop(ldImage_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
-void ldImageDel(ldImage_t *widget);
+void ldImageLoop(ldImage_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldImageDel(ldImage_t *pWidget);
 
-void ldImageSetBgColor(ldImage_t *widget,ldColor bgColor);
-void ldImageSetHidden(ldImage_t *widget,bool isHidden);
-void ldImageSetOpacity(ldImage_t *widget, uint8_t opacity);
-void ldImageSetImage(ldImage_t *widget, uint32_t imageAddr, bool isWithMask);
-void ldImageSetGrayscale(ldImage_t *widget, uint8_t grayBit, ldColor writeColor);
+void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor);
+void ldImageSetHidden(ldImage_t *pWidget,bool isHidden);
+void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity);
+void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask);
+void ldImageSetGrayscale(ldImage_t *pWidget, uint8_t grayBit, ldColor writeColor);
 
 
 

@@ -13,9 +13,9 @@ extern "C" {
 
 
 ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
-void ldWindowDel(ldWindow_t *widget);
+void ldWindowDel(ldWindow_t *pWidget);
 
-void ldWindowSetTransparent(ldWindow_t *widget,bool isTransparent);
+void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent);
 
 #define ldWindowSetHidden        ldImageSetHidden
 #define ldWindowSetBgColor       ldImageSetBgColor

@@ -5,7 +5,7 @@
 #include "ldText.h"
 #include "ldWindow.h"
 #include "ldProgressBar.h"
-
+#include "ldRadialMenu.h"
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
 
@@ -14,13 +14,14 @@ int64_t sysTimer=0;
 #define TOUCH_NO_CLICK           0
 #define TOUCH_CLICK              1
 
-
+static volatile ldPoint_t pressPoint;
+static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
-    ldCommon_t *widget;
+    ldCommon_t *pWidget;
 //    ldPoint_t globalPos;
 //    ldPoint_t pos;
 //    ldGeometry tempGeometry;
@@ -28,13 +29,13 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 
     switch(touchSignal)
     {
-    case BTN_NO_OPERATION:
+    case SIGNAL_NO_OPERATION:
     {
         break;
     }
-    case BTN_PRESS:
+    case SIGNAL_PRESS:
     {
-        widget=NULL;
+        pWidget=NULL;
 //        if(temporaryTopWidget!=NULL)
 //        {
 //            pos.x=x;
@@ -48,45 +49,56 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 //                widget=temporaryTopWidget;
 //            }
 //        }
-        if(widget==NULL)
+        if(pWidget==NULL)
         {
             pNode=ldGetWidgetInfoByPos(x,y);
             if(pNode!=NULL)
             {
-                widget=pNode->info;
-                LOG_DEBUG("click widget id:%d\n",widget->nameId);
+                pWidget=pNode->info;
+                LOG_DEBUG("click widget id:%d\n",pWidget->nameId);
             }
         }
         prevX=x;
         prevY=y;
-        prevWidget=widget;//准备数据,释放时候使用
+        prevWidget=pWidget;//准备数据,释放时候使用
+        pressPoint.x=x;
+        pressPoint.y=y;
+        deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
 
-        if(widget!=NULL)
+        if(pWidget!=NULL)
         {
-            xEmit(widget->nameId,touchSignal);
+            xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
         }
         break;
     }
-    case BTN_HOLD_DOWN:
+    case SIGNAL_HOLD_DOWN:
     {
         if((prevX!=x)||(prevY!=y))
         {
-            widget=prevWidget;//不可以把static变量作为函数变量调用
-            if(widget!=NULL)
+            pWidget=prevWidget;//不可以把static变量作为函数变量调用
+            if(pWidget!=NULL)
             {
-                xEmit(widget->nameId,SIGNAL_TOUCH_HOLD_MOVE);
+                xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,(((x-pressPoint.x)<<16)&0xFFFF0000)|((y-pressPoint.y)&0xFFFF));
             }
             prevX=x;
             prevY=y;
         }
         break;
     }
-    case BTN_RELEASE:
+    case SIGNAL_RELEASE:
     {
-        widget=prevWidget;
-        if(widget!=NULL)
+        pWidget=prevWidget;
+        if(pWidget!=NULL)
         {
-            xEmit(widget->nameId,touchSignal);
+            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
+
+            //计算速度
+            deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
+            pressPoint.x=(prevX-pressPoint.x);
+            pressPoint.y=(prevY-pressPoint.y);
+            pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
+            pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
+            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));
         }
         break;
     }
@@ -101,7 +113,7 @@ void ldGuiTouchProcess(void)
     int16_t y;
     bool nowState;
     static bool prevState=TOUCH_NO_CLICK;
-    uint8_t touchSignal=BTN_NO_OPERATION;
+    uint8_t touchSignal=SIGNAL_NO_OPERATION;
 
     nowState = ldCfgTouchGetPoint(&x,&y);
 
@@ -109,22 +121,22 @@ void ldGuiTouchProcess(void)
     {
         if(prevState==TOUCH_NO_CLICK)//按下,                下降沿触发
         {
-            touchSignal=BTN_PRESS;
+            touchSignal=SIGNAL_PRESS;
         }
         else// prevState==TOUCH_CLICK 按住                低电平
         {
-            touchSignal=BTN_HOLD_DOWN;
+            touchSignal=SIGNAL_HOLD_DOWN;
         }
     }
     else// nowState==TOUCH_NO_CLICK 无按下
     {
         if(prevState==TOUCH_NO_CLICK)//无按下                高电平
         {
-            touchSignal=BTN_NO_OPERATION;
+            touchSignal=SIGNAL_NO_OPERATION;
         }
         else// prevState==TOUCH_CLICK 按下,上升沿触发       上降沿触发
         {
-            touchSignal=BTN_RELEASE;
+            touchSignal=SIGNAL_RELEASE;
         }
     }
     prevState=nowState;
@@ -132,33 +144,38 @@ void ldGuiTouchProcess(void)
 }
 
 
-void ldGuiDelWidget(ldCommon_t *widget)
+void ldGuiDelWidget(ldCommon_t *pWidget)
 {
-    switch(widget->widgetType)
+    switch(pWidget->widgetType)
     {
     case widgetTypeWindow:
     {
-        ldWindowDel((ldWindow_t*)widget);
+        ldWindowDel((ldWindow_t*)pWidget);
         break;
     }
     case widgetTypeImage:
     {
-        ldImageDel((ldImage_t*)widget);
+        ldImageDel((ldImage_t*)pWidget);
         break;
     }
     case widgetTypeButton:
     {
-        ldButtonDel((ldButton_t*)widget);
+        ldButtonDel((ldButton_t*)pWidget);
         break;
     }
     case widgetTypeText:
     {
-        ldTextDel((ldText_t*)widget);
+        ldTextDel((ldText_t*)pWidget);
         break;
     }
     case widgetTypeProgressBar:
     {
-        ldProgressBarDel((ldProgressBar_t*)widget);
+        ldProgressBarDel((ldProgressBar_t*)pWidget);
+        break;
+    }
+    case widgetTypeRadialMenu:
+    {
+        ldRadialMenuDel((ldRadialMenu_t*)pWidget);
         break;
     }
     default:
@@ -166,29 +183,34 @@ void ldGuiDelWidget(ldCommon_t *widget)
     }
 }
 
-static void _widgetLoop(ldCommon_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    switch(widget->widgetType)
+    switch(pWidget->widgetType)
     {
     case widgetTypeWindow:
     case widgetTypeImage:
     {
-        ldImageLoop((ldImage_t*)widget,ptParent,bIsNewFrame);
+        ldImageLoop((ldImage_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeButton:
     {
-        ldButtonLoop((ldButton_t*)widget,ptParent,bIsNewFrame);
+        ldButtonLoop((ldButton_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeText:
     {
-        ldTextLoop((ldText_t*)widget,ptParent,bIsNewFrame);
+        ldTextLoop((ldText_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     case widgetTypeProgressBar:
     {
-        ldProgressBarLoop((ldProgressBar_t*)widget,ptParent,bIsNewFrame);
+        ldProgressBarLoop((ldProgressBar_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeRadialMenu:
+    {
+        ldRadialMenuLoop((ldRadialMenu_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     default:

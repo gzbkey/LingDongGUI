@@ -29,29 +29,31 @@ static bool _templateDel(xListNode *pEachInfo, void *pTarget)
     return false;
 }
 
-void ldTemplateDel(ldTemplate_t *widget)
+void ldTemplateDel(ldTemplate_t *pWidget)
 {
     xListNode *listInfo;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if(widget->widgetType!=widgetTypeTemplate)
+    if(pWidget->widgetType!=widgetTypeTemplate)
     {
         return;
     }
 
-    LOG_DEBUG("[template] del,id:%d\n",widget->nameId);
+    LOG_INFO("[template] del,id:%d\n",pWidget->nameId);
+
+    xDeleteConnect(pWidget->nameId);
 
     // 查找父链表
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)widget->parentWidget)->nameId);
+    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
     {
-        xListInfoPrevTraverse(listInfo, widget, _templateDel);
+        xListInfoPrevTraverse(listInfo, pWidget, _templateDel);
     }
 }
 
@@ -111,16 +113,16 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldTemplateLoop(ldTemplate_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&widget->resource;
+    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
 
-    if (widget == NULL)
+    if (pWidget == NULL)
     {
         return;
     }
 
-    if((widget->isParentHidden)||(widget->isHidden))
+    if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
         return;
     }
@@ -133,9 +135,9 @@ void ldTemplateLoop(ldTemplate_t *widget,const arm_2d_tile_t *ptParent,bool bIsN
     }
 }
 
-void ldTemplateSetHidden(ldTemplate_t *widget,bool isHidden)
+void ldTemplateSetHidden(ldTemplate_t *pWidget,bool isHidden)
 {
-    ldBaseSetHidden((ldCommon_t*) widget,isHidden);
+    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 #if defined(__clang__)

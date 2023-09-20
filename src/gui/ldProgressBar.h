@@ -28,15 +28,15 @@ typedef struct {
 }ldProgressBar_t;
 
 ldProgressBar_t* ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
-void ldProgressBarLoop(ldProgressBar_t *widget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
-void ldProgressBarDel(ldProgressBar_t *widget);
+void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldProgressBarDel(ldProgressBar_t *pWidget);
 
-void ldProgressBarSetPercent(ldProgressBar_t *widget,float percent);
-void ldProgressBarSetBgImage(ldProgressBar_t *widget,uint32_t bgAddr,uint16_t bgWidth,bool isMove);
-void ldProgressBarSetFgImage(ldProgressBar_t *widget,uint32_t fgAddr,uint16_t fgWidth,bool isMove);
-void ldProgressBarSetFrameImage(ldProgressBar_t *widget,uint32_t frameAddr);
+void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent);
+void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove);
+void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove);
+void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr);
 
-void ldProgressBarSetColor(ldProgressBar_t *widget,ldColor bgColor,ldColor fgColor,ldColor frameColor);
+void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor);
 
 #ifdef __cplusplus
 }
