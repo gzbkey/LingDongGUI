@@ -44,7 +44,6 @@ void ldImageDel(ldImage_t *pWidget)
 
     LOG_INFO("[image] del,id:%d\n",pWidget->nameId);
 
-    // 查找父链表
     if ((ldCommon_t *)pWidget->parentType == widgetTypeNone)
     {
         listInfo = &ldWidgetLink;

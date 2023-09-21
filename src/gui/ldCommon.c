@@ -517,6 +517,7 @@ ldChar_t * ldBaseCheckText(ldChar_t **charInfo)
             return NULL;
         }
         (*charInfo)->pStr=NULL;
+        (*charInfo)->align=LD_ALIGN_CENTER;
         (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).tInfo.bIsRoot=true;
         (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).tInfo.bHasEnforcedColour=true;
         (*(arm_2d_tile_t*)(&(*charInfo)->tFontTile)).tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;

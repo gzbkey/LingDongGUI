@@ -9,73 +9,43 @@ extern "C" {
 
 #if USE_VIRTUAL_RESOURCE == 0
 
-extern const uint8_t icon1_jpeg[];
-#define ICON1_JPEG (uint32_t)&icon1_jpeg[0]
+extern const uint8_t barFrame_png[];
+#define BARFRAME_PNG (uint32_t)barFrame_png
 
-extern const uint8_t icon2_jpeg[];
-#define ICON2_JPEG (uint32_t)&icon2_jpeg[0]
+extern const uint8_t frame_png[];
+#define FRAME_PNG (uint32_t)frame_png
 
-extern const uint8_t icon3_jpeg[];
-#define ICON3_JPEG (uint32_t)&icon3_jpeg[0]
+extern const uint8_t press_bmp[];
+#define PRESS_BMP (uint32_t)&press_bmp[0]
 
-extern const uint8_t icon4_jpeg[];
-#define ICON4_JPEG (uint32_t)&icon4_jpeg[0]
+extern const uint8_t release_bmp[];
+#define RELEASE_BMP (uint32_t)release_bmp
 
-extern const uint8_t icon5_jpeg[];
-#define ICON5_JPEG (uint32_t)&icon5_jpeg[0]
+extern const uint8_t release_png[];
+#define RELEASE_PNG (uint32_t)release_png
 
-extern const uint8_t icon6_jpeg[];
-#define ICON6_JPEG (uint32_t)&icon6_jpeg[0]
-
-extern const uint8_t icon7_jpeg[];
-#define ICON7_JPEG (uint32_t)&icon7_jpeg[0]
-
-extern const uint8_t icon8_jpeg[];
-#define ICON8_JPEG (uint32_t)&icon8_jpeg[0]
-
-extern const uint8_t icon9_jpeg[];
-#define ICON9_JPEG (uint32_t)&icon9_jpeg[0]
-
-extern const uint8_t icon9_png[];
-#define ICON9_PNG (uint32_t)&icon9_png[0]
-
-#define JETBRAINS_MONO_NL_REGULAR_9 (&dict_JetBrains_Mono_NL_Regular_9)
-extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;
+#define MICROSOFT_YAHEI_REGULAR_20 (&dict_Microsoft_YaHei_Regular_20)
+extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
 
 #else
 
-//icon1.jpeg w:100 h:100 < 565 >
-#define ICON1_JPEG 0
+//barFrame.png w:100 h:18 < 565+Mask >
+#define BARFRAME_PNG 0
 
-//icon2.jpeg w:100 h:100 < 565 >
-#define ICON2_JPEG 20000
+//frame.png w:72 h:72 < A8 >
+#define FRAME_PNG 5400
 
-//icon3.jpeg w:100 h:100 < 565 >
-#define ICON3_JPEG 40000
+//press.bmp w:72 h:72 < 565 >
+#define PRESS_BMP 10584
 
-//icon4.jpeg w:100 h:100 < 565 >
-#define ICON4_JPEG 60000
+//release.bmp w:72 h:72 < 565 >
+#define RELEASE_BMP 20952
 
-//icon5.jpeg w:100 h:100 < 565 >
-#define ICON5_JPEG 80000
+//release.png w:72 h:72 < 565+Mask >
+#define RELEASE_PNG 31320
 
-//icon6.jpeg w:100 h:100 < 565 >
-#define ICON6_JPEG 100000
-
-//icon7.jpeg w:100 h:100 < 565 >
-#define ICON7_JPEG 120000
-
-//icon8.jpeg w:100 h:100 < 565 >
-#define ICON8_JPEG 140000
-
-//icon9.jpeg w:100 h:100 < 565 >
-#define ICON9_JPEG 160000
-
-//icon9.png w:100 h:100 < 565+Mask >
-#define ICON9_PNG 180000
-
-#define JETBRAINS_MONO_NL_REGULAR_9 (&dict_JetBrains_Mono_NL_Regular_9)
-extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;
+#define MICROSOFT_YAHEI_REGULAR_20 (&dict_Microsoft_YaHei_Regular_20)
+extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
 
 #endif
 

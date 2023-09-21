@@ -55,7 +55,6 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 

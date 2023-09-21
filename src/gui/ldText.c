@@ -52,7 +52,6 @@ void ldTextDel(ldText_t *pWidget)
 
     LOG_INFO("[text] del,id:%d\n",pWidget->nameId);
 
-    // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
@@ -142,7 +141,8 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
         int32_t iResult;
         bool isPiEnd;
 
-        isPiEnd=arm_2d_helper_pi_slider(&pWidget->tPISlider, _scrollOffset*100, &iResult);
+        isPiEnd=arm_2d_helper_pi_slider(&pWidget->tPISlider, _scrollOffset, &iResult);
+
         if(_isTopScroll)
         {
             if(isPiEnd)
@@ -152,7 +152,7 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
             }
             else
             {
-                pWidget->scrollOffset=_scrollOffset-iResult/100;
+                pWidget->scrollOffset=_scrollOffset-iResult;
             }
         }
         if(_isBottomScroll)
@@ -164,7 +164,7 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
             }
             else
             {
-                pWidget->scrollOffset=(ptResTile->tRegion.tSize.iHeight-pWidget->strHeight)-(_scrollOffset-iResult/100);
+                pWidget->scrollOffset=(ptResTile->tRegion.tSize.iHeight-pWidget->strHeight)-(_scrollOffset-iResult);
             }
         }
     }
@@ -319,7 +319,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
         do {
             static const arm_2d_helper_pi_slider_cfg_t tCFG = {
                 .fProportion = 0.2f,
-                .fIntegration = 0.05f,
+                .fIntegration = 0.1f,
                 .nInterval = 10,
             };
             arm_2d_helper_pi_slider_init(&txt->tPISlider, (arm_2d_helper_pi_slider_cfg_t *)&tCFG, 0);

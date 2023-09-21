@@ -8,6 +8,7 @@
 #include "ldText.h"
 #include "ldProgressBar.h"
 #include "ldRadialMenu.h"
+#include "ldCheckBox.h"
 
 ldImage_t *img0;
 ldWindow_t *win0;
@@ -21,6 +22,8 @@ ldProgressBar_t *bar,*bar1,*bar2,*bar3;
 
 ldRadialMenu_t* menu;
 
+ldCheckBox_t *cBox;
+
 
 #define ID_BTN0      2
 #define ID_BTN1      3
@@ -29,8 +32,8 @@ void userInit(void)
     win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(win0,__RGB(220,220,220));
 
-//    img0=ldImageInit(1, 0, 20,20,72,72,RELEASE_PNG,true);
-//    ldImageSetOpacity(img0,128);
+    img0=ldImageInit(1, 0, 20,20,72,72,RELEASE_PNG,true);
+    ldImageSetOpacity(img0,128);
 
 
 //    btn0=ldButtonInit(ID_BTN0, 0, 20,100,72,72);
@@ -81,17 +84,26 @@ void userInit(void)
 //    ldProgressBarSetPercent(bar3,50);
 
     //radial menu
-    menu=ldRadialMenuInit(9,0,0,10,480,200,300,100,9);
+//    menu=ldRadialMenuInit(9,0,0,10,480,200,300,100,9);
 
-//    ldRadialMenuAddItem(menu,ICON1_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON2_JPEG,100,100,1,false);
-//    ldRadialMenuAddItem(menu,ICON3_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON4_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON5_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON6_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON7_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON8_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,ICON9_PNG,100,100,1,true);
+////    ldRadialMenuAddItem(menu,ICON1_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON2_JPEG,100,100,1,false);
+////    ldRadialMenuAddItem(menu,ICON3_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON4_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON5_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON6_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON7_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON8_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON9_PNG,100,100,1,true);
+
+
+
+    cBox=ldCheckBoxInit(10,0,100,20,144,72);
+
+    ldCheckBoxSetFont(cBox,MICROSOFT_YAHEI_REGULAR_20);
+    ldCheckBoxSetText(cBox,"栟𨭉");
+//    ldCheckBoxSetColor(cBox,GLCD_COLOR_BLUE,GLCD_COLOR_WHITE);
+    ldCheckBoxSetImage(cBox,72,PRESS_BMP,false,RELEASE_PNG,true);
 }
 
 
