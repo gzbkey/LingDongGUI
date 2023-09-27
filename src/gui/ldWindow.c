@@ -33,7 +33,7 @@ void ldWindowDel(ldWindow_t *pWidget)
         return;
     }
 
-    if(pWidget->widgetType!=widgetTypeWindow)
+    if((pWidget->widgetType!=widgetTypeWindow)&&(pWidget->widgetType!=widgetTypeBackground))
     {
         return;
     }
@@ -58,9 +58,19 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     {
         if(xListMallocNode(&pNewWidget->childList)!=NULL)
         {
-            pNewWidget->isTransparent=true;
-            pNewWidget->widgetType=widgetTypeWindow;
+            if(pNewWidget->parentWidget==NULL)
+            {
+                pNewWidget->isTransparent=false;
+                pNewWidget->widgetType=widgetTypeBackground;
+            }
+            else
+            {
+                pNewWidget->isTransparent=true;
+                pNewWidget->widgetType=widgetTypeWindow;
+            }
+
             LOG_INFO("[window] init,id:%d\n",nameId);
+
         }
         else
         {

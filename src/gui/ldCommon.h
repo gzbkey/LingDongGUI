@@ -78,6 +78,7 @@ extern "C" {
 
 typedef enum{
     widgetTypeNone,
+    widgetTypeBackground,
     widgetTypeWindow,
     widgetTypeButton,
     widgetTypeImage,
@@ -105,7 +106,6 @@ typedef enum{
 #if USE_VIRTUAL_RESOURCE == 0
 #define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
                               ldWidgetType widgetType; \
-                              ldWidgetType parentType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
@@ -132,8 +132,8 @@ typedef struct{
 }ldFontDict_t;
 
 typedef struct{
-    arm_2d_tile_t tFontTile;//字库
-    ldFontDict_t* ptFontDict;//字典(目录)
+    arm_2d_tile_t fontTile;//字库
+    ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
@@ -142,7 +142,6 @@ typedef struct{
 #else
 #define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
                               ldWidgetType widgetType; \
-                              ldWidgetType parentType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
@@ -169,8 +168,8 @@ typedef struct{
 }ldFontDict_t;
 
 typedef struct{
-    arm_2d_vres_t tFontTile;//字库
-    ldFontDict_t* ptFontDict;//字典(目录)
+    arm_2d_vres_t fontTile;//字库
+    ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
     uint8_t* pStr;
@@ -200,33 +199,37 @@ void ldFree(void *p);
 void *ldRealloc(void *ptr,uint32_t newSize);
 
 
-bool ldTimeOut(uint16_t ms, int64_t *plTimer,bool isReset);
+bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 void* ldGetWidgetById(uint16_t nameId);
-ldPoint_t ldGetGlobalPos(ldCommon_t *widget);
+ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget);
 xListNode* ldGetWidgetInfoById(uint16_t nameId);
 xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
 
 
 
-void ldBaseColor(arm_2d_tile_t* ptTile,ldColor color,uint8_t opacity);
-void ldBaseImage(arm_2d_tile_t* ptTile,arm_2d_tile_t *ptResource,bool isWithMask,uint8_t opacity);
-void ldBaseMaskImage(arm_2d_tile_t* ptTile, arm_2d_tile_t *ptResource, ldColor textColor, uint8_t opacity);
-void ldBaseImageScale(arm_2d_tile_t* ptTile,arm_2d_tile_t* ptResource,bool isWithMask,float scale,bool bIsNewFrame);
+void ldBaseColor(arm_2d_tile_t* pTile,ldColor color,uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t *pResTile,bool isWithMask,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
+void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,bool bIsNewFrame);
 
-void ldBaseSetTextInfo(arm_2d_tile_t* ptTile,ldChar_t *ptCharInfo,uint8_t opacity);
-void ldBaseSetFont(ldChar_t **pptCharInfo, ldFontDict_t *fontDictAddr);
+void ldBaseSetFont(ldChar_t **ppCharInfo, ldFontDict_t *pFontDictAddr);
 
-void ldBaseTextDel(ldChar_t *charInfo);
-ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
+void ldBaseTextDel(ldChar_t *pCharInfo);
+ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo);
 
-uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
-void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffset);
+uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *pCharUtf8,int16_t *pAdvWidth,int16_t *pOffsetX,int16_t *pOffsetY,int16_t *pWidth,int16_t *pHeight,uint32_t *pImgAddr);
+void ldBaseShowText(arm_2d_tile_t target, arm_2d_region_t region, ldChar_t *pTextInfo, int16_t scrollOffset);
 
-void ldBaseSetHidden(ldCommon_t* widget,bool isHidden);
-void ldBaseSetText(ldChar_t **pptTextInfo, uint8_t *pStr);
-void ldBaseSetTextColor(ldChar_t **pptTextInfo, ldColor charColor);
-void ldBaseSetAlign(ldChar_t **pptTextInfo, uint8_t align);
-arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint16_t frameWidth);
+
+void ldBaseSetText(ldChar_t **ppTextInfo, uint8_t *pStr);
+void ldBaseSetTextColor(ldChar_t **ppTextInfo, ldColor charColor);
+void ldBaseSetAlign(ldChar_t **ppTextInfo, uint8_t align);
+arm_2d_size_t ldBaseGetStringSize(ldChar_t *pTextInfo,int16_t *pBmpAscender,uint16_t frameWidth);
+
+arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *pTargetRegion);
+
+void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y);
+void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden);
 
 #ifdef __cplusplus
 }

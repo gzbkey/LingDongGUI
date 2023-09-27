@@ -22,9 +22,9 @@ static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldButton_t*)pTarget)->ptTextInfo!=NULL)
+        if(((ldButton_t*)pTarget)->pTextInfo!=NULL)
         {
-            ldBaseTextDel(((ldButton_t*)pTarget)->ptTextInfo);
+            ldBaseTextDel(((ldButton_t*)pTarget)->pTextInfo);
         }
         ldFree(((ldButton_t*)pTarget));
         xListInfoDel(pEachInfo);
@@ -50,7 +50,6 @@ void ldButtonDel(ldButton_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
@@ -101,7 +100,6 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeButton;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isCheckable=false;
         pNewWidget->isChecked=false;
@@ -118,7 +116,7 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->isPressMask = false;
         pNewWidget->isTransparent=false;
         pNewWidget->isHidden = false;
-        pNewWidget->ptTextInfo = NULL;
+        pNewWidget->pTextInfo = NULL;
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -135,7 +133,7 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        //动作
+
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
 
@@ -156,7 +154,7 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
     {
         return;
     }
-    ldBaseSetText(&pWidget->ptTextInfo,pStr);
+    ldBaseSetText(&pWidget->pTextInfo,pStr);
 }
 
 void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
@@ -195,7 +193,7 @@ void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
     {
         return;
     }
-    ldBaseSetTextColor(&pWidget->ptTextInfo,charColor);
+    ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
 }
 
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
@@ -205,11 +203,6 @@ void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
         return;
     }
     pWidget->isTransparent=isTransparent;
-}
-
-void ldButtonSetHidden(ldButton_t* pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
@@ -230,10 +223,10 @@ void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
     pWidget->isSelected=isSelected;
 }
 
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     uint32_t btnColor;
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t tempRes;
@@ -250,11 +243,11 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
     {
         return;
     }
-    
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
+
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+
+    arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
-        
         if(!pWidget->isTransparent)
         {
             if ((pWidget->releaseImgAddr==LD_ADDR_NONE)&&(pWidget->pressImgAddr==LD_ADDR_NONE))//color
@@ -271,7 +264,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
                 {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = tTarget.tRegion.tSize;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = pResTile->tRegion.tSize;//tTarget.tRegion.tSize;
                     draw_round_corner_box(&tTarget,
                                                 &((arm_2d_tile_t*)&tempRes)->tRegion,
                                                 btnColor,
@@ -287,32 +280,32 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
             {
                 if(pWidget->isPressed)
                 {
-                    ptResTile->pchBuffer = (uint8_t *)pWidget->pressImgAddr;
+                    pResTile->pchBuffer = (uint8_t *)pWidget->pressImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)ptResTile)->pTarget=pWidget->pressImgAddr;
+                    ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->pressImgAddr;
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,ptResTile,pWidget->isPressMask,255);
+                        ldBaseImage(&tTarget,pResTile,pWidget->isPressMask,255);
                     }
                 }
                 else
                 {
-                    ptResTile->pchBuffer = (uint8_t *)pWidget->releaseImgAddr;
+                    pResTile->pchBuffer = (uint8_t *)pWidget->releaseImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)ptResTile)->pTarget=pWidget->releaseImgAddr;
+                    ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->releaseImgAddr;
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,ptResTile,pWidget->isReleaseMask,255);
+                        ldBaseImage(&tTarget,pResTile,pWidget->isReleaseMask,255);
                     }
                 }
                 if(pWidget->isCorner)
                 {
 #if USE_VIRTUAL_RESOURCE == 0
-                    tempRes=*ptResTile;
+                    tempRes=*pResTile;
 #else
-                    tempRes=*((arm_2d_vres_t*)ptResTile);
+                    tempRes=*((arm_2d_vres_t*)pResTile);
 #endif
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
@@ -324,9 +317,9 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
             }
             arm_2d_op_wait_async(NULL);
 
-            if(pWidget->ptTextInfo!=NULL)
+            if(pWidget->pTextInfo!=NULL)
             {
-                ldBaseShowText(tTarget,pWidget->ptTextInfo,0);
+                ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0);
                 arm_2d_op_wait_async(NULL);
             }
 
@@ -336,7 +329,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
                 {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = tTarget.tRegion.tSize;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = pResTile->tRegion.tSize;//tTarget.tRegion.tSize;
 
                     if(pWidget->isCorner)
                     {
@@ -353,11 +346,11 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
                 else
                 {
 #if USE_VIRTUAL_RESOURCE == 0
-                    tempRes=*ptResTile;
+                    tempRes=*pResTile;
                     tempRes.tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
                     tempRes.pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
 #else
-                    tempRes=*((arm_2d_vres_t*)ptResTile);
+                    tempRes=*((arm_2d_vres_t*)pResTile);
                     ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
                     ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
                     tempRes.pTarget=pWidget->selectMaskAddr;
@@ -379,7 +372,7 @@ void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
     {
         return;
     }
-    ldBaseSetAlign(&pWidget->ptTextInfo,align);
+    ldBaseSetAlign(&pWidget->pTextInfo,align);
 }
 
 void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
@@ -388,7 +381,7 @@ void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
     {
         return;
     }
-    ldBaseSetFont(&pWidget->ptTextInfo,pFontDict);
+    ldBaseSetFont(&pWidget->pTextInfo,pFontDict);
 }
 
 #if defined(__clang__)

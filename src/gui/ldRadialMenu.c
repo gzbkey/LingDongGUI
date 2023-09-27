@@ -55,7 +55,6 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
@@ -191,7 +190,6 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeRadialMenu;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
 
@@ -304,9 +302,9 @@ static void _autoSort(ldRadialMenu_t *pWidget)
     _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
 }
 
-void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -318,10 +316,10 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
         return;
     }
 
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
-    {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
+    arm_2d_container(pParentTile,tTarget , &newRegion)
+    {
         if(pWidget->itemCount)
         {
 #if MOVE_CYCLE_MS == 0
@@ -389,9 +387,9 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
             {
                 do {
 #if USE_VIRTUAL_RESOURCE == 0
-                    arm_2d_tile_t tempRes = *ptResTile;
+                    arm_2d_tile_t tempRes = *pResTile;
 #else
-                    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)ptResTile);
+                    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
 #endif
                     arm_2d_tile_t tempTile = impl_child_tile(tTarget,pWidget->pItemList[pWidget->showList[i]].pos.x,pWidget->pItemList[pWidget->showList[i]].pos.y,pWidget->pItemList[pWidget->showList[i]].size.width,pWidget->pItemList[pWidget->showList[i]].size.height);
 
@@ -411,11 +409,6 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
             }
         }
     }
-}
-
-void ldRadialMenuSetHidden(ldRadialMenu_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask)
@@ -456,13 +449,13 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
         return;
     }
 
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     pWidget->targetItem=num;
 
 
     ldRadialMenuItem_t* targetItem=&pWidget->pItemList[pWidget->targetItem];
-    if((targetItem->pos.x+(targetItem->size.width>>1))<(ptResTile->tRegion.tSize.iWidth>>1))// left
+    if((targetItem->pos.x+(targetItem->size.width>>1))<(pResTile->tRegion.tSize.iWidth>>1))// left
     {
         if(pWidget->targetItem<pWidget->selectItem)
         {

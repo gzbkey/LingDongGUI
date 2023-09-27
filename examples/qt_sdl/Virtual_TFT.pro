@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
     ../../src/gui/ldButton.c \
+    ../../src/gui/ldCheckBox.c \
     ../../src/gui/ldCommon.c \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldImage.c \
@@ -99,6 +100,7 @@ SOURCES += \
 
 HEADERS += \
     ../../src/gui/ldButton.h \
+    ../../src/gui/ldCheckBox.h \
     ../../src/gui/ldCommon.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldImage.h \

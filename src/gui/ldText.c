@@ -25,9 +25,9 @@ static bool _textDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldText_t*)pTarget)->ptTextInfo!=NULL)
+        if(((ldText_t*)pTarget)->pTextInfo!=NULL)
         {
-            ldBaseTextDel(((ldText_t*)pTarget)->ptTextInfo);
+            ldBaseTextDel(((ldText_t*)pTarget)->pTextInfo);
         }
         ldTextSetScroll((ldText_t*)pTarget,false);
         ldFree(((ldText_t *)pTarget));
@@ -52,7 +52,6 @@ void ldTextDel(ldText_t *pWidget)
 
     LOG_INFO("[text] del,id:%d\n",pWidget->nameId);
 
-    // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
@@ -84,7 +83,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeText;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
         pNewWidget->bgImgAddr=LD_ADDR_NONE;
@@ -107,7 +105,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
 
         pNewWidget->isTransparent=false;
         pNewWidget->bgColor=__RGB(255,255,255);
-        ldBaseSetFont(&pNewWidget->ptTextInfo,pFontDict);
+        ldBaseSetFont(&pNewWidget->pTextInfo,pFontDict);
         pNewWidget->scrollOffset=0;
         pNewWidget->isRelease=false;
 
@@ -123,9 +121,9 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     return pNewWidget;
 }
 
-void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -142,7 +140,8 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
         int32_t iResult;
         bool isPiEnd;
 
-        isPiEnd=arm_2d_helper_pi_slider(&pWidget->tPISlider, _scrollOffset*100, &iResult);
+        isPiEnd=arm_2d_helper_pi_slider(&pWidget->tPISlider, _scrollOffset, &iResult);
+
         if(_isTopScroll)
         {
             if(isPiEnd)
@@ -152,7 +151,7 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
             }
             else
             {
-                pWidget->scrollOffset=_scrollOffset-iResult/100;
+                pWidget->scrollOffset=_scrollOffset-iResult;
             }
         }
         if(_isBottomScroll)
@@ -160,19 +159,19 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
             if(isPiEnd)
             {
                 pWidget->isRelease=false;
-                pWidget->scrollOffset=ptResTile->tRegion.tSize.iHeight-pWidget->strHeight;
+                pWidget->scrollOffset=pResTile->tRegion.tSize.iHeight-pWidget->strHeight;
             }
             else
             {
-                pWidget->scrollOffset=(ptResTile->tRegion.tSize.iHeight-pWidget->strHeight)-(_scrollOffset-iResult/100);
+                pWidget->scrollOffset=(pResTile->tRegion.tSize.iHeight-pWidget->strHeight)-(_scrollOffset-iResult);
             }
         }
     }
 
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
-    {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
+    arm_2d_container(pParentTile,tTarget , &newRegion)
+    {
         if(!pWidget->isTransparent)
         {
             if (pWidget->bgImgAddr==LD_ADDR_NONE)//color
@@ -181,17 +180,17 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
             }
             else
             {
-                ptResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
+                pResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)ptResTile)->pTarget=pWidget->bgImgAddr;
+                ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
 #endif
-                ldBaseImage(&tTarget,ptResTile,false,255);
+                ldBaseImage(&tTarget,pResTile,false,255);
             }
             arm_2d_op_wait_async(NULL);
         }
-        if(pWidget->ptTextInfo!=NULL)
+        if(pWidget->pTextInfo!=NULL)
         {
-            ldBaseShowText(tTarget,pWidget->ptTextInfo,pWidget->scrollOffset);
+            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,pWidget->scrollOffset);
             arm_2d_op_wait_async(NULL);
         }
     }
@@ -206,11 +205,6 @@ void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
-void ldTextSetHidden(ldText_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
-}
-
 void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
 {
     int16_t bmpH1Max;
@@ -219,8 +213,8 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
     {
         return;
     }
-    ldBaseSetText(&pWidget->ptTextInfo,pStr);
-    textSize= ldBaseGetStringSize(pWidget->ptTextInfo,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
+    ldBaseSetText(&pWidget->pTextInfo,pStr);
+    textSize= ldBaseGetStringSize(pWidget->pTextInfo,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
     pWidget->strHeight=textSize.iHeight;
 }
 
@@ -230,7 +224,7 @@ void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
     {
         return;
     }
-    ldBaseSetTextColor(&pWidget->ptTextInfo,charColor);
+    ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
 }
 
 void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
@@ -239,7 +233,7 @@ void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
     {
         return;
     }
-    ldBaseSetAlign(&pWidget->ptTextInfo,align);
+    ldBaseSetAlign(&pWidget->pTextInfo,align);
 }
 
 void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
@@ -319,7 +313,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
         do {
             static const arm_2d_helper_pi_slider_cfg_t tCFG = {
                 .fProportion = 0.2f,
-                .fIntegration = 0.05f,
+                .fIntegration = 0.1f,
                 .nInterval = 10,
             };
             arm_2d_helper_pi_slider_init(&txt->tPISlider, (arm_2d_helper_pi_slider_cfg_t *)&tCFG, 0);

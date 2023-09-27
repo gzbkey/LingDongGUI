@@ -37,15 +37,14 @@ void ldImageDel(ldImage_t *pWidget)
         return;
     }
 
-    if((pWidget->widgetType!=widgetTypeImage)&&(pWidget->widgetType!=widgetTypeWindow))
+    if((pWidget->widgetType!=widgetTypeImage)&&(pWidget->widgetType!=widgetTypeWindow)&&(pWidget->widgetType!=widgetTypeBackground))
     {
         return;
     }
 
     LOG_INFO("[image] del,id:%d\n",pWidget->nameId);
 
-    // 查找父链表
-    if ((ldCommon_t *)pWidget->parentType == widgetTypeNone)
+    if (pWidget->parentWidget == NULL)
     {
         listInfo = &ldWidgetLink;
     }
@@ -73,7 +72,6 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         if (parentInfo)
         {
             parent_link = ((ldCommon_t *)parentInfo->info)->childList;
@@ -93,11 +91,9 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         if (parent_link == &ldWidgetLink) // 自身为bg
         {
             pNewWidget->parentWidget = NULL;
-            pNewWidget->parentType = widgetTypeNone;
         }
         else
         {
-            pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
             pNewWidget->parentWidget = parentInfo->info;
         }
         pNewWidget->bgColor = 0;
@@ -148,12 +144,7 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
     pWidget->bgColor=bgColor;
 }
 
-void ldImageSetHidden(ldImage_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
-}
-
-void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewFrame)
+void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)
 {
 #if USE_OPACITY == 1
 #define IMG_OPACITY        pWidget->opacity
@@ -161,7 +152,7 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewF
 #define IMG_OPACITY        255
 #endif
 
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -172,18 +163,18 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewF
     {
         return;
     }
-    
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
-    {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+
+    arm_2d_container(pParentTile,tTarget , &newRegion)
+    {
         if (pWidget->isColor)
         {
             ldBaseColor(&tTarget,pWidget->bgColor,IMG_OPACITY);
         }
         else
         {
-            ldBaseImage(&tTarget,ptResTile,pWidget->isWithMask,IMG_OPACITY);
+            ldBaseImage(&tTarget,pResTile,pWidget->isWithMask,IMG_OPACITY);
         }
     }
     arm_2d_op_wait_async(NULL);

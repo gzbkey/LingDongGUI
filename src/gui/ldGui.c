@@ -6,6 +6,8 @@
 #include "ldWindow.h"
 #include "ldProgressBar.h"
 #include "ldRadialMenu.h"
+#include "ldCheckBox.h"
+
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
 
@@ -22,9 +24,6 @@ static void *prevWidget;
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *pWidget;
-//    ldPoint_t globalPos;
-//    ldPoint_t pos;
-//    ldGeometry tempGeometry;
     xListNode *pNode;
 
     switch(touchSignal)
@@ -36,19 +35,6 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
     case SIGNAL_PRESS:
     {
         pWidget=NULL;
-//        if(temporaryTopWidget!=NULL)
-//        {
-//            pos.x=x;
-//            pos.y=y;
-//            globalPos=llListGetGlobalPos(((llGeneral*)temporaryTopWidget)->parentWidget);
-//            tempGeometry=((llGeneral*)temporaryTopWidget)->geometry;
-//            tempGeometry.x+=globalPos.x;
-//            tempGeometry.y+=globalPos.y;
-//            if(llPointInRect(pos,tempGeometry))
-//            {
-//                widget=temporaryTopWidget;
-//            }
-//        }
         if(pWidget==NULL)
         {
             pNode=ldGetWidgetInfoByPos(x,y);
@@ -148,6 +134,7 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
 {
     switch(pWidget->widgetType)
     {
+    case widgetTypeBackground:
     case widgetTypeWindow:
     {
         ldWindowDel((ldWindow_t*)pWidget);
@@ -178,6 +165,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldRadialMenuDel((ldRadialMenu_t*)pWidget);
         break;
     }
+    case widgetTypeCheckBox:
+    {
+        ldCheckBoxDel((ldCheckBox_t*)pWidget);
+        break;
+    }
     default:
         break;
     }
@@ -187,6 +179,7 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
 {
     switch(pWidget->widgetType)
     {
+    case widgetTypeBackground:
     case widgetTypeWindow:
     case widgetTypeImage:
     {
@@ -211,6 +204,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeRadialMenu:
     {
         ldRadialMenuLoop((ldRadialMenu_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeCheckBox:
+    {
+        ldCheckBoxLoop((ldCheckBox_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     default:
