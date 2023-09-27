@@ -107,9 +107,9 @@ static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldCheckBox_t*)pTarget)->ptTextInfo!=NULL)
+        if(((ldCheckBox_t*)pTarget)->pTextInfo!=NULL)
         {
-            ldBaseTextDel(((ldCheckBox_t*)pTarget)->ptTextInfo);
+            ldBaseTextDel(((ldCheckBox_t*)pTarget)->pTextInfo);
         }
         ldFree(((ldCheckBox_t *)pTarget));
         xListInfoDel(pEachInfo);
@@ -203,7 +203,7 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->textColor=__RGB(0,0,0);
         pNewWidget->checkedImgAddr=LD_ADDR_NONE;
         pNewWidget->uncheckedImgAddr=LD_ADDR_NONE;
-        pNewWidget->ptTextInfo = NULL;
+        pNewWidget->pTextInfo = NULL;
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
@@ -220,9 +220,9 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -234,19 +234,17 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *ptParent,bool bIs
         return;
     }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
-    arm_2d_container(ptParent,tTarget , &newRegion)
+    arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
-
         if ((pWidget->checkedImgAddr==LD_ADDR_NONE)&&(pWidget->uncheckedImgAddr==LD_ADDR_NONE))//color
         {
             do{
                 arm_2d_region_t tBoxRegion = {
                     .tLocation = {
                         .iX = 0,
-                        .iY = (ptResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2,
+                        .iY = (pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2,
                     },
                     .tSize = {
                         .iWidth=pWidget->boxWidth,
@@ -310,7 +308,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *ptParent,bool bIs
 
                 //借用srcTile生成新tile
                 ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iX=0;
-                ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iY=(ptResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
+                ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
                 arm_2d_tile_t tChildTile;
                 arm_2d_tile_generate_child(&tTarget, &((arm_2d_tile_t*)&srcTile)->tRegion, &tChildTile, false);
 
@@ -334,13 +332,13 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *ptParent,bool bIs
         }
         arm_2d_op_wait_async(NULL);
 
-        if(pWidget->ptTextInfo!=NULL)
+        if(pWidget->pTextInfo!=NULL)
         {
             //最后使用，不再生产中间变量，直接修改tTarget
             tTarget.tRegion.tLocation.iX+=pWidget->boxWidth+2;
             tTarget.tRegion.tSize.iWidth-=pWidget->boxWidth+2;
 
-            ldBaseShowText(tTarget,ptResTile->tRegion,pWidget->ptTextInfo,0);
+            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0);
             arm_2d_op_wait_async(NULL);
         }
     }
@@ -374,8 +372,8 @@ void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict)
     {
         return;
     }
-    ldBaseSetFont(&pWidget->ptTextInfo,pFontDict);
-    pWidget->ptTextInfo->align=LD_ALIGN_LEFT;
+    ldBaseSetFont(&pWidget->pTextInfo,pFontDict);
+    pWidget->pTextInfo->align=LD_ALIGN_LEFT;
 }
 
 void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
@@ -384,7 +382,7 @@ void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
     {
         return;
     }
-    ldBaseSetText(&pWidget->ptTextInfo,pStr);
+    ldBaseSetText(&pWidget->pTextInfo,pStr);
 }
 
 #if defined(__clang__)

@@ -274,9 +274,9 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
     }
 }
 
-void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -288,12 +288,10 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *ptParent,bo
         return;
     }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
-    arm_2d_container(ptParent,tTarget , &newRegion)
+    arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
-
         if(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE)//color
         {
             _progressBarColorShow(pWidget,&tTarget);

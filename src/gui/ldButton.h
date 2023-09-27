@@ -23,14 +23,14 @@ typedef struct {
     uint32_t pressImgAddr;
     uint32_t selectMaskAddr;
     uint32_t keyValue;
-    ldChar_t *ptTextInfo;
+    ldChar_t *pTextInfo;
     ldColor releaseColor;
     ldColor pressColor;
     ldColor selectColor;
 }ldButton_t;
 
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldButtonDel(ldButton_t *pWidget);
 
 void ldButtonSetColor(ldButton_t* pWidget, ldColor releaseColor, ldColor pressColor);

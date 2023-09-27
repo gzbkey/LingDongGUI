@@ -302,9 +302,9 @@ static void _autoSort(ldRadialMenu_t *pWidget)
     _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
 }
 
-void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -316,12 +316,10 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
         return;
     }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
-    arm_2d_container(ptParent,tTarget , &newRegion)
+    arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
-
         if(pWidget->itemCount)
         {
 #if MOVE_CYCLE_MS == 0
@@ -389,9 +387,9 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
             {
                 do {
 #if USE_VIRTUAL_RESOURCE == 0
-                    arm_2d_tile_t tempRes = *ptResTile;
+                    arm_2d_tile_t tempRes = *pResTile;
 #else
-                    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)ptResTile);
+                    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
 #endif
                     arm_2d_tile_t tempTile = impl_child_tile(tTarget,pWidget->pItemList[pWidget->showList[i]].pos.x,pWidget->pItemList[pWidget->showList[i]].pos.y,pWidget->pItemList[pWidget->showList[i]].size.width,pWidget->pItemList[pWidget->showList[i]].size.height);
 
@@ -451,13 +449,13 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
         return;
     }
 
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     pWidget->targetItem=num;
 
 
     ldRadialMenuItem_t* targetItem=&pWidget->pItemList[pWidget->targetItem];
-    if((targetItem->pos.x+(targetItem->size.width>>1))<(ptResTile->tRegion.tSize.iWidth>>1))// left
+    if((targetItem->pos.x+(targetItem->size.width>>1))<(pResTile->tRegion.tSize.iWidth>>1))// left
     {
         if(pWidget->targetItem<pWidget->selectItem)
         {

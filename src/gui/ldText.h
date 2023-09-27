@@ -14,14 +14,14 @@ typedef struct {
     bool isRelease:1;
     arm_2d_helper_pi_slider_t tPISlider;
     uint32_t bgImgAddr;
-    ldChar_t *ptTextInfo;
+    ldChar_t *pTextInfo;
     ldColor bgColor;
     int16_t scrollOffset;
     int16_t strHeight;
 }ldText_t;
 
 ldText_t* ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
-void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldTextDel(ldText_t *pWidget);
 
 void ldTextSetText(ldText_t* pWidget,uint8_t *pStr);

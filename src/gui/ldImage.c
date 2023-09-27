@@ -144,7 +144,7 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
     pWidget->bgColor=bgColor;
 }
 
-void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewFrame)
+void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)
 {
 #if USE_OPACITY == 1
 #define IMG_OPACITY        pWidget->opacity
@@ -152,7 +152,7 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewF
 #define IMG_OPACITY        255
 #endif
 
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -164,9 +164,9 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewF
         return;
     }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
-    arm_2d_container(ptParent,tTarget , &newRegion)
+    arm_2d_container(pParentTile,tTarget , &newRegion)
     {
         if (pWidget->isColor)
         {
@@ -174,7 +174,7 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewF
         }
         else
         {
-            ldBaseImage(&tTarget,ptResTile,pWidget->isWithMask,IMG_OPACITY);
+            ldBaseImage(&tTarget,pResTile,pWidget->isWithMask,IMG_OPACITY);
         }
     }
     arm_2d_op_wait_async(NULL);

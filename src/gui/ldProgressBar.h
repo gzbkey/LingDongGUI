@@ -31,7 +31,7 @@ typedef struct {
 }ldProgressBar_t;
 
 ldProgressBar_t* ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
-void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldProgressBarDel(ldProgressBar_t *pWidget);
 
 void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent);
