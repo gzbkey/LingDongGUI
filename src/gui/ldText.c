@@ -83,7 +83,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeText;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
         pNewWidget->bgImgAddr=LD_ADDR_NONE;
@@ -169,9 +168,11 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
         }
     }
 
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+
+    arm_2d_container(ptParent,tTarget , &newRegion)
     {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
+//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
         if(!pWidget->isTransparent)
         {
@@ -191,7 +192,7 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame
         }
         if(pWidget->ptTextInfo!=NULL)
         {
-            ldBaseShowText(tTarget,pWidget->ptTextInfo,pWidget->scrollOffset);
+            ldBaseShowText(tTarget,ptResTile->tRegion,pWidget->ptTextInfo,pWidget->scrollOffset);
             arm_2d_op_wait_async(NULL);
         }
     }
@@ -204,11 +205,6 @@ void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
         return;
     }
     pWidget->isTransparent=isTransparent;
-}
-
-void ldTextSetHidden(ldText_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)

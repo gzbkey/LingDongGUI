@@ -177,7 +177,6 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeCheckBox;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
 
@@ -235,9 +234,11 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *ptParent,bool bIs
         return;
     }
 
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+
+    arm_2d_container(ptParent,tTarget , &newRegion)
     {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
+//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
         if ((pWidget->checkedImgAddr==LD_ADDR_NONE)&&(pWidget->uncheckedImgAddr==LD_ADDR_NONE))//color
         {
@@ -339,15 +340,10 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *ptParent,bool bIs
             tTarget.tRegion.tLocation.iX+=pWidget->boxWidth+2;
             tTarget.tRegion.tSize.iWidth-=pWidget->boxWidth+2;
 
-            ldBaseShowText(tTarget,pWidget->ptTextInfo,0);
+            ldBaseShowText(tTarget,ptResTile->tRegion,pWidget->ptTextInfo,0);
             arm_2d_op_wait_async(NULL);
         }
     }
-}
-
-void ldCheckBoxSetHidden(ldCheckBox_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor)

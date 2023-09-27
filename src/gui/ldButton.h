@@ -38,7 +38,6 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
 void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor selectColor);
 
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent);
-void ldButtonSetHidden(ldButton_t* pWidget,bool isHidden);
 void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner);
 void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected);
 
@@ -46,6 +45,10 @@ void ldButtonSetFont(ldButton_t *pWidget, ldFontDict_t *pFontDict);
 void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr);
 void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor);
 void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align);
+
+#define ldButtonSetHidden          ldBaseSetHidden
+#define ldButtonMove               ldBaseMove
+
 #ifdef __cplusplus
 }
 #endif

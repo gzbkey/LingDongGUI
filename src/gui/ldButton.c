@@ -100,7 +100,6 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeButton;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isCheckable=false;
         pNewWidget->isChecked=false;
@@ -206,11 +205,6 @@ void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
-void ldButtonSetHidden(ldButton_t* pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
-}
-
 void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
 {
     if(pWidget==NULL)
@@ -249,10 +243,12 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
     {
         return;
     }
-    
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
+
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+
+    arm_2d_container(ptParent,tTarget , &newRegion)
     {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
+//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
         
         if(!pWidget->isTransparent)
         {
@@ -270,7 +266,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
                 {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = tTarget.tRegion.tSize;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = ptResTile->tRegion.tSize;//tTarget.tRegion.tSize;
                     draw_round_corner_box(&tTarget,
                                                 &((arm_2d_tile_t*)&tempRes)->tRegion,
                                                 btnColor,
@@ -325,7 +321,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
 
             if(pWidget->ptTextInfo!=NULL)
             {
-                ldBaseShowText(tTarget,pWidget->ptTextInfo,0);
+                ldBaseShowText(tTarget,ptResTile->tRegion,pWidget->ptTextInfo,0);
                 arm_2d_op_wait_async(NULL);
             }
 
@@ -335,7 +331,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewF
                 {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = tTarget.tRegion.tSize;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = ptResTile->tRegion.tSize;//tTarget.tRegion.tSize;
 
                     if(pWidget->isCorner)
                     {

@@ -24,12 +24,12 @@ void ldImageLoop(ldImage_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFra
 void ldImageDel(ldImage_t *pWidget);
 
 void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor);
-void ldImageSetHidden(ldImage_t *pWidget,bool isHidden);
 void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity);
 void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask);
 void ldImageSetGrayscale(ldImage_t *pWidget, uint8_t grayBit, ldColor writeColor);
 
-
+#define ldImageSetHidden          ldBaseSetHidden
+#define ldImageMove               ldBaseMove
 
 #ifdef __cplusplus
 }

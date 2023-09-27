@@ -134,6 +134,7 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
 {
     switch(pWidget->widgetType)
     {
+    case widgetTypeBackground:
     case widgetTypeWindow:
     {
         ldWindowDel((ldWindow_t*)pWidget);
@@ -178,6 +179,7 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
 {
     switch(pWidget->widgetType)
     {
+    case widgetTypeBackground:
     case widgetTypeWindow:
     case widgetTypeImage:
     {

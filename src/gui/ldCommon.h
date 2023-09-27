@@ -78,6 +78,7 @@ extern "C" {
 
 typedef enum{
     widgetTypeNone,
+    widgetTypeBackground,
     widgetTypeWindow,
     widgetTypeButton,
     widgetTypeImage,
@@ -105,7 +106,6 @@ typedef enum{
 #if USE_VIRTUAL_RESOURCE == 0
 #define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
                               ldWidgetType widgetType; \
-                              ldWidgetType parentType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
@@ -142,7 +142,6 @@ typedef struct{
 #else
 #define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
                               ldWidgetType widgetType; \
-                              ldWidgetType parentType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
@@ -220,13 +219,18 @@ void ldBaseTextDel(ldChar_t *charInfo);
 ldChar_t * ldBaseCheckText(ldChar_t **charInfo);
 
 uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *charUtf8,int16_t *advWidth,int16_t *offsetX,int16_t *offsetY,int16_t *width,int16_t *height,uint32_t *imgAddr);
-void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffset);
+void ldBaseShowText(arm_2d_tile_t tTarget, arm_2d_region_t tRegion, ldChar_t *ptTextInfo, int16_t scrollOffset);
 
-void ldBaseSetHidden(ldCommon_t* widget,bool isHidden);
+
 void ldBaseSetText(ldChar_t **pptTextInfo, uint8_t *pStr);
 void ldBaseSetTextColor(ldChar_t **pptTextInfo, ldColor charColor);
 void ldBaseSetAlign(ldChar_t **pptTextInfo, uint8_t align);
 arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint16_t frameWidth);
+
+arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *ptTargetRegion);
+
+void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y);
+void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden);
 
 #ifdef __cplusplus
 }

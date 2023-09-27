@@ -30,8 +30,8 @@ void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheck
 void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict);
 void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr);
 
-
-
+#define ldCheckBoxSetHidden        ldBaseSetHidden
+#define ldCheckBoxMove             ldBaseMove
 
 
 

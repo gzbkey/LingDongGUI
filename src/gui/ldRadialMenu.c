@@ -190,7 +190,6 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeRadialMenu;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
 
@@ -317,9 +316,11 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
         return;
     }
 
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+
+    arm_2d_container(ptParent,tTarget , &newRegion)
     {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
+//        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
         if(pWidget->itemCount)
         {
@@ -410,11 +411,6 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *ptParent,bool
             }
         }
     }
-}
-
-void ldRadialMenuSetHidden(ldRadialMenu_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask)

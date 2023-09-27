@@ -49,6 +49,9 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget);
 void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask);
 void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num);
 
+#define ldRadialMenuSetHidden        ldBaseSetHidden
+#define ldRadialMenuMove             ldBaseMove
+
 #ifdef __cplusplus
 }
 #endif

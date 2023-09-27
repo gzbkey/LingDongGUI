@@ -217,7 +217,7 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
 //获取全局坐标
 ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
 {
-    ldPoint_t pos={0,0},posParent;
+    ldPoint_t pos={0,0},posParent={0,0};
 
     if(pWidget==NULL)
     {
@@ -227,22 +227,19 @@ ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
     pos.x=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iX;
     pos.y=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iY;
 
-    posParent.x=0;
-    posParent.y=0;
-
-    if(pWidget->parentType!=widgetTypeNone)
+    if(pWidget->parentWidget!=NULL)
     {
-        if(pWidget->parentType!=widgetTypeWindow)
+        if(((ldCommon_t*)pWidget->parentWidget)->widgetType!=widgetTypeBackground)
         {
-        posParent=ldGetGlobalPos(pWidget->parentWidget);
+            posParent=ldGetGlobalPos(pWidget->parentWidget);
+        }
+        else
+        {
+            posParent.x=(*(arm_2d_tile_t*)&(((ldCommon_t*)pWidget->parentWidget)->resource)).tRegion.tLocation.iX;
+            posParent.y=(*(arm_2d_tile_t*)&(((ldCommon_t*)pWidget->parentWidget)->resource)).tRegion.tLocation.iY;
+        }
     }
-    else
-    {
-        posParent.x=(*(arm_2d_tile_t*)&(((ldCommon_t*)pWidget->parentWidget)->resource)).tRegion.tLocation.iX;
-        posParent.y=(*(arm_2d_tile_t*)&(((ldCommon_t*)pWidget->parentWidget)->resource)).tRegion.tLocation.iY;
-    }
-	}
-        
+
     pos.x+=posParent.x;
     pos.y+=posParent.y;
 
@@ -796,7 +793,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *ptTextInfo,int16_t *bmpAscender,uint
 
 
 
-void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffset)
+void ldBaseShowText(arm_2d_tile_t tTarget,arm_2d_region_t tRegion,ldChar_t *ptTextInfo,int16_t scrollOffset)
 {
     int16_t advWidth;
     int16_t width;
@@ -809,14 +806,16 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffse
     int16_t bmpH1Max;
 
     arm_2d_size_t textSize;
+    arm_2d_tile_t fullTile=tTarget;
+    fullTile.tRegion=tRegion;
 
-    textSize= ldBaseGetStringSize(ptTextInfo,&bmpH1Max,tTile.tRegion.tSize.iWidth);
+    textSize= ldBaseGetStringSize(ptTextInfo,&bmpH1Max,tRegion.tSize.iWidth);
 
-    arm_2d_region_t alignSize= ldBaseGetAlignRegion(&tTile,textSize,ptTextInfo->align);
+    arm_2d_region_t alignSize= ldBaseGetAlignRegion(&fullTile,textSize,ptTextInfo->align);
 
     if(ptTextInfo->align==(LD_ALIGN_TOP|LD_ALIGN_LEFT))
     {
-        alignSize.tSize.iHeight=tTile.tRegion.tSize.iHeight;
+        alignSize.tSize.iHeight=tTarget.tRegion.tSize.iHeight;
     }
 
 #if USE_VIRTUAL_RESOURCE == 0
@@ -825,7 +824,7 @@ void ldBaseShowText(arm_2d_tile_t tTile,ldChar_t *ptTextInfo,int16_t scrollOffse
     arm_2d_vres_t fontTile;
 #endif
 
-    arm_2d_container(&tTile,showTile,&alignSize)
+    arm_2d_container(&tTarget,showTile,&alignSize)
     {
         for(int i=0;i<ptTextInfo->strLen;)
         {
@@ -944,6 +943,38 @@ void ldBaseSetAlign(ldChar_t **pptTextInfo,uint8_t align)
         (*pptTextInfo)->align=align;
     }
 }
+
+arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *ptTargetRegion)
+{
+    arm_2d_region_t parentRegion={{0,0},{0,0}},outRegion;
+
+    if(pWidget->parentWidget==NULL)
+    {
+        parentRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH;
+        parentRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT;
+    }
+    else
+    {
+        parentRegion.tSize.iWidth=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iWidth;
+        parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
+    }
+    arm_2d_region_intersect(&parentRegion,ptTargetRegion,&outRegion);
+    ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
+    outRegion.tLocation.iX=outRegion.tLocation.iX+globalPos.x;
+    outRegion.tLocation.iY=outRegion.tLocation.iY+globalPos.y;
+    return outRegion;
+}
+
+void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX=x;
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY=y;
+}
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

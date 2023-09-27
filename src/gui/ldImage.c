@@ -37,14 +37,14 @@ void ldImageDel(ldImage_t *pWidget)
         return;
     }
 
-    if((pWidget->widgetType!=widgetTypeImage)&&(pWidget->widgetType!=widgetTypeWindow))
+    if((pWidget->widgetType!=widgetTypeImage)&&(pWidget->widgetType!=widgetTypeWindow)&&(pWidget->widgetType!=widgetTypeBackground))
     {
         return;
     }
 
     LOG_INFO("[image] del,id:%d\n",pWidget->nameId);
 
-    if ((ldCommon_t *)pWidget->parentType == widgetTypeNone)
+    if (pWidget->parentWidget == NULL)
     {
         listInfo = &ldWidgetLink;
     }
@@ -72,7 +72,6 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         if (parentInfo)
         {
             parent_link = ((ldCommon_t *)parentInfo->info)->childList;
@@ -92,11 +91,9 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         if (parent_link == &ldWidgetLink) // 自身为bg
         {
             pNewWidget->parentWidget = NULL;
-            pNewWidget->parentType = widgetTypeNone;
         }
         else
         {
-            pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
             pNewWidget->parentWidget = parentInfo->info;
         }
         pNewWidget->bgColor = 0;
@@ -147,11 +144,6 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
     pWidget->bgColor=bgColor;
 }
 
-void ldImageSetHidden(ldImage_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
-}
-
 void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewFrame)
 {
 #if USE_OPACITY == 1
@@ -171,11 +163,11 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *ptParent, bool bIsNewF
     {
         return;
     }
-    
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
-    {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
 
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&ptResTile->tRegion);
+
+    arm_2d_container(ptParent,tTarget , &newRegion)
+    {
         if (pWidget->isColor)
         {
             ldBaseColor(&tTarget,pWidget->bgColor,IMG_OPACITY);
