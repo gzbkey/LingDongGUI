@@ -86,11 +86,11 @@ SOURCES += \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.c \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.c \
     ../common/virtual_flash/virtualNor.c \
-    math/arm_common_tables.c \
-    math/arm_cos_f32.c \
-    math/arm_cos_q31.c \
-    math/arm_sin_f32.c \
-    math/arm_sin_q31.c \
+    ../common/math/arm_common_tables.c \
+    ../common/math/arm_cos_f32.c \
+    ../common/math/arm_cos_q31.c \
+    ../common/math/arm_sin_f32.c \
+    ../common/math/arm_sin_q31.c \
     user/image.c \
     user/ldConfig.c \
     user/ldUser.c \
@@ -202,7 +202,7 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/Library/Include
 INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 
 INCLUDEPATH += $$PWD/user
-INCLUDEPATH += $$PWD/math
+INCLUDEPATH += $$PWD/../common/math
 INCLUDEPATH += $$PWD/../common/virtual_flash
 
 INCLUDEPATH += $$PWD/../../src/gui
