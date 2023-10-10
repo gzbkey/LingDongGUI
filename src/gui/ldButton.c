@@ -319,7 +319,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 
             if(pWidget->pTextInfo!=NULL)
             {
-                ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0);
+                ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
                 arm_2d_op_wait_async(NULL);
             }
 

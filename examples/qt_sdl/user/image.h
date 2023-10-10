@@ -27,6 +27,9 @@ extern const uint8_t release_png[];
 #define MICROSOFT_YAHEI_REGULAR_20 (&dict_Microsoft_YaHei_Regular_20)
 extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
 
+#define SIMSUN_REGULAR_12 (&dict_SimSun_Regular_12)
+extern ldFontDict_t dict_SimSun_Regular_12;
+
 #else
 
 //barFrame.png w:100 h:18 < 565+Mask >

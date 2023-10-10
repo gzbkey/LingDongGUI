@@ -9,6 +9,8 @@
 #include "ldProgressBar.h"
 #include "ldRadialMenu.h"
 #include "ldCheckBox.h"
+#include "ldLabel.h"
+#include "ldScrollSelecter.h"
 
 ldImage_t *img0;
 ldWindow_t *win0;
@@ -111,6 +113,16 @@ void userInit(void)
     ldCheckBoxSetText(cBox,"栟𨭉");
 //    ldCheckBoxSetColor(cBox,GLCD_COLOR_BLUE,GLCD_COLOR_WHITE);
     ldCheckBoxSetImage(cBox,72,PRESS_BMP,false,RELEASE_PNG,true);
+
+    ldLabelInit(12,1,200,120,72,50,MICROSOFT_YAHEI_REGULAR_20);
+    ldLabelSetText(ldGetWidgetById(12),"栟𨭉栟");
+    ldLabelSetAlign(ldGetWidgetById(12),LD_ALIGN_LEFT);
+//    ldLabelSetBgColor(ldGetWidgetById(12),__RGB(128,128,0));
+    ldLabelSetBgImage(ldGetWidgetById(12),PRESS_BMP);
+
+    ldScrollSelecterInit(13,1,0,0,60,40,SIMSUN_REGULAR_12,8);
+    ldScrollSelecterAddItem(ldGetWidgetById(13),"0123");
+//    ldScrollSelecterAddItem(ldGetWidgetById(13),"02");
 }
 
 

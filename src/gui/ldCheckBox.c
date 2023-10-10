@@ -338,7 +338,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             tTarget.tRegion.tLocation.iX+=pWidget->boxWidth+2;
             tTarget.tRegion.tSize.iWidth-=pWidget->boxWidth+2;
 
-            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0);
+            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
             arm_2d_op_wait_async(NULL);
         }
     }

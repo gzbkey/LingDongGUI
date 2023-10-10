@@ -14,7 +14,7 @@ extern "C" {
 #define LD_CFG_SCEEN_HEIGHT                       272
 #define LD_CFG_COLOR_DEPTH                        16
 
-#define USE_OPACITY                               1
+#define USE_OPACITY                               0
 #define USE_TLSF                                  1
 
 #define USE_RADIA_MENU_SCALE                      1

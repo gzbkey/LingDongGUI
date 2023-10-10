@@ -1,4 +1,18 @@
+# 简介
+
+* 灵动GUI是基于ARM-2D进行开发的GUI，极大降低ARM-2D的使用难度
+
+* 使用类似Qt的信号槽模式
+
+* 界面代码和逻辑代码分离
+
+主仓库: https://gitee.com/gzbkey/LingDongGUI
+
+镜像仓库: https://github.com/gzbkey/LingDongGUI
+
+
 # 控件列表
+
 | 状态 | 名称 | 说明 |
 | :----:| ---- | ---- |
 | ✅ | window | 窗体，多用于分层 |
@@ -8,7 +22,7 @@
 | ✅ | progress bar | 进度条，支持图片移动形成动画效果 |
 | ✅ | check box | 复选框，支持自定义图片和文字显示 |
 | ✅ | radia menu | 旋转菜单 |
-| 🔲 | number | 数字显示 |
+| ✅ | label | 简单文本显示 |
 | 🔲 | radio button | 单选按键 |
 | 🔲 | gauge | 仪表盘 |
 | 🔲 | list | 列表 |
@@ -20,12 +34,21 @@
 | 🔲 | icon slider | 滑动图标 |
 | 🔲 | number keyboard | 数字键盘 |
 | 🔲 | qwerty keyboard | 英文键盘 |
+| 🔲 | scroll selecter | 滚动选择器 |
 
 # 如何测试
+
+## Qt
 
 使用qt进行电脑模拟测试，路径为examples\qt_sdl
 
 [详细使用说明](./examples/qt_sdl/README.md)
+
+## VSCode
+
+使用vscode进行电脑模拟测试，路径为examples\vscode_sdl
+
+[详细使用说明](./examples/vscode_sdl/README.md)
 
 # 如何生产图片字模数据
 

@@ -7,6 +7,8 @@
 #include "ldProgressBar.h"
 #include "ldRadialMenu.h"
 #include "ldCheckBox.h"
+#include "ldLabel.h"
+#include "ldScrollSelecter.h"
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
@@ -170,6 +172,16 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldCheckBoxDel((ldCheckBox_t*)pWidget);
         break;
     }
+    case widgetTypeLabel:
+    {
+        ldLabelDel((ldLabel_t*)pWidget);
+        break;
+    }
+    case widgetTypeScrollSelecter:
+    {
+        ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
+        break;
+    }
     default:
         break;
     }
@@ -209,6 +221,16 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeCheckBox:
     {
         ldCheckBoxLoop((ldCheckBox_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeLabel:
+    {
+        ldLabelLoop((ldLabel_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeScrollSelecter:
+    {
+        ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
     default:

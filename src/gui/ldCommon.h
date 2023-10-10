@@ -100,6 +100,8 @@ typedef enum{
     widgetTypeStartupImage,
     widgetTypeArc,
     widgetTypeRadialMenu,
+    widgetTypeScrollSelecter,
+    widgetTypeLabel,
 }ldWidgetType;
     
 
@@ -132,7 +134,7 @@ typedef struct{
 }ldFontDict_t;
 
 typedef struct{
-    arm_2d_tile_t fontTile;//字库
+    arm_2d_tile_t fontTile;
     ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
@@ -168,7 +170,7 @@ typedef struct{
 }ldFontDict_t;
 
 typedef struct{
-    arm_2d_vres_t fontTile;//字库
+    arm_2d_vres_t fontTile;
     ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
@@ -196,7 +198,7 @@ extern xListNode ldWidgetLink;
 
 void *ldMalloc(uint32_t size);
 void ldFree(void *p);
-void *ldRealloc(void *ptr,uint32_t newSize);
+//void *ldRealloc(void *ptr,uint32_t newSize);
 
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
@@ -218,7 +220,7 @@ void ldBaseTextDel(ldChar_t *pCharInfo);
 ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo);
 
 uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *pCharUtf8,int16_t *pAdvWidth,int16_t *pOffsetX,int16_t *pOffsetY,int16_t *pWidth,int16_t *pHeight,uint32_t *pImgAddr);
-void ldBaseShowText(arm_2d_tile_t target, arm_2d_region_t region, ldChar_t *pTextInfo, int16_t scrollOffset);
+void ldBaseShowText(arm_2d_tile_t target, arm_2d_region_t region, ldChar_t *pTextInfo, int16_t scrollOffset, uint8_t opacity);
 
 
 void ldBaseSetText(ldChar_t **ppTextInfo, uint8_t *pStr);

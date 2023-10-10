@@ -75,14 +75,14 @@ __WEAK void ldFree(void *p)
 #endif
 }
 
-__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
-{
-#if USE_TLSF == 1
-    return tlsf_realloc(pTlsfMem, ptr, newSize);
-#else
-    return realloc(ptr,newSize);
-#endif
-}
+//__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
+//{
+//#if USE_TLSF == 1
+//    return tlsf_realloc(pTlsfMem, ptr, newSize);
+//#else
+//    return realloc(ptr,newSize);
+//#endif
+//}
 
 static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
@@ -790,10 +790,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *pTextInfo, int16_t *pBmpAscender, ui
     return retSize;
 }
 
-
-
-
-void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextInfo,int16_t scrollOffset)
+void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextInfo,int16_t scrollOffset,uint8_t opacity)
 {
     int16_t advWidth;
     int16_t width;
@@ -881,7 +878,7 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
 
             arm_2d_tile_t charTile=impl_child_tile(showTile,textOffsetX+offsetX,tempHeight,width,height);
 
-            ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,pTextInfo->charColor,255);
+            ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,pTextInfo->charColor,opacity);
             arm_2d_op_wait_async(NULL);
 
             textOffsetX+=advWidth;
@@ -903,7 +900,7 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
 void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
 {
     uint8_t newStrlen;
-    newStrlen=strlen((char*)pStr);
+    newStrlen=strlen((char*)pStr)+1;
 
     if(ldBaseCheckText(ppTextInfo))
     {
@@ -923,7 +920,7 @@ void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
             }
             (*ppTextInfo)-> strLen=newStrlen;
         }
-
+        memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
         strcpy((char*)(*ppTextInfo)->pStr,(char*)pStr);
     }
 }
