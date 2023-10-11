@@ -63,13 +63,15 @@ tools文件夹中有工具生成数据
 
 2、添加刚才新建的文件到项目中
 
-3、修改ldCommon.h中的控件类型,ldWidgetType
+自动处理：
 
-4、ldGui.c中添加新控件的头文件
+修改ldCommon.h中的控件类型,ldWidgetType
 
-5、修改ldGui.c中的函数，ldGuiDelWidget，_widgetLoop
+ldGui.c中添加新控件的头文件
 
-6、修改新控件的.c .h文件
+修改ldGui.c中的函数，ldGuiDelWidget，_widgetLoop
+
+3、修改新控件的.c .h文件
 
 # 技术交流
 
