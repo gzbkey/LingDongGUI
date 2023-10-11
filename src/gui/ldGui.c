@@ -9,6 +9,7 @@
 #include "ldCheckBox.h"
 #include "ldLabel.h"
 #include "ldScrollSelecter.h"
+/*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
@@ -182,6 +183,7 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
         break;
     }
+/*============================ auto add del ==================================*/
     default:
         break;
     }
@@ -233,6 +235,7 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
         ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
+/*============================ auto add loop =================================*/
     default:
         break;
     }

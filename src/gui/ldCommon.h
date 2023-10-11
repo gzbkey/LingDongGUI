@@ -84,7 +84,6 @@ typedef enum{
     widgetTypeImage,
     widgetTypeText,
     widgetTypeLineEdit,
-    widgetTypeDashboardSimple,
     widgetTypeGraph,
     widgetTypeCheckBox,
     widgetTypeSlider,
@@ -94,16 +93,12 @@ typedef enum{
     widgetTypeDateTime,
     widgetTypeIconSlider,
     widgetTypeComboBox,
-    widgetTypeIconRotateAround,
     widgetTypeNumber,
-    widgetTypeStaticText,
-    widgetTypeStartupImage,
     widgetTypeArc,
     widgetTypeRadialMenu,
     widgetTypeScrollSelecter,
     widgetTypeLabel,
 }ldWidgetType;
-    
 
 #if USE_VIRTUAL_RESOURCE == 0
 #define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
