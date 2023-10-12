@@ -528,44 +528,43 @@ ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo)
     return *ppCharInfo;
 }
 
+uint8_t ldBaseGetChScheme(uint8_t maskType)
+{
+    switch (maskType)
+    {
+    case 1:
+    {
+        return ARM_2D_COLOUR_1BIT;
+    }
+    case 2:
+    {
+        return ARM_2D_COLOUR_MASK_A2;
+    }
+    case 4:
+    {
+        return ARM_2D_COLOUR_MASK_A4;
+    }
+    case 8:
+    {
+        return ARM_2D_COLOUR_MASK_A8;
+    }
+    default:
+    {
+        return ARM_2D_COLOUR_1BIT;
+    }
+    }
+}
+
 void ldBaseSetFont(ldChar_t **ppCharInfo, ldFontDict_t* pFontDictAddr)
 {
     if(ldBaseCheckText(ppCharInfo))
     {
-
-    (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).pchBuffer=(uint8_t *)pFontDictAddr->pFontSrc;
+        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).pchBuffer=(uint8_t *)pFontDictAddr->pFontSrc;
 #if USE_VIRTUAL_RESOURCE == 1
-    (*ppCharInfo)->fontTile.pTarget=pFontDict->pFontSrc;
+        (*ppCharInfo)->fontTile.pTarget=pFontDict->pFontSrc;
 #endif
-    (*ppCharInfo)->pFontDict=pFontDictAddr;
-
-    switch (pFontDictAddr->maskType)
-    {
-    case 1:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
-        break;
-    }
-    case 2:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A2;
-        break;
-    }
-    case 4:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A4;
-        break;
-    }
-    case 8:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
-        break;
-    }
-    default:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
-    }
-    }
+        (*ppCharInfo)->pFontDict=pFontDictAddr;
+        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ldBaseGetChScheme(pFontDictAddr->maskType);
     }
 }
 

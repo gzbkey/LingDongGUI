@@ -20,10 +20,9 @@
 | ✅ | button | 按键 |
 | ✅ | text | 文本 |
 | ✅ | progress bar | 进度条，支持图片移动形成动画效果 |
-| ✅ | check box | 复选框，支持自定义图片和文字显示 |
+| ✅ | check box & radio button| 复选框 + 单选功能，支持自定义图片和文字显示 |
 | ✅ | radia menu | 旋转菜单 |
 | ✅ | label | 简单文本显示 |
-| 🔲 | radio button | 单选按键 |
 | 🔲 | gauge | 仪表盘 |
 | 🔲 | list | 列表 |
 | 🔲 | graph | 波形图 |

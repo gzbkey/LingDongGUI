@@ -13,12 +13,14 @@ typedef struct {
     bool isCorner:1;
     bool isUncheckedMask:1;
     bool isCheckedMask:1;
+    bool isRadioButton:1;
     ldColor bgColor;
     ldColor fgColor;
     ldColor textColor;
     uint32_t uncheckedImgAddr;
     uint32_t checkedImgAddr;
     uint16_t boxWidth;
+    uint8_t radioButtonGroup;
     ldChar_t *pTextInfo;
 }ldCheckBox_t;
 
@@ -29,6 +31,8 @@ void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor);
 void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheckedImgAddr,bool isUncheckedMask,uint32_t checkedImgAddr,bool isCheckedMask);
 void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict);
 void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr);
+void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num);
+void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner);
 
 #define ldCheckBoxSetHidden        ldBaseSetHidden
 #define ldCheckBoxMove             ldBaseMove

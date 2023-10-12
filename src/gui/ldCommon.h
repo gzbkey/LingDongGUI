@@ -227,7 +227,7 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *pTarg
 
 void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden);
-
+uint8_t ldBaseGetChScheme(uint8_t maskType);
 #ifdef __cplusplus
 }
 #endif

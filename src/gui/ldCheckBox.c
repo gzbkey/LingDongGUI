@@ -103,6 +103,11 @@ const arm_2d_tile_t checkBoxCheckedMask = {
     .pchBuffer = (uint8_t *)checked_png,
 };
 
+struct {
+    uint16_t nameId;
+    uint8_t group;
+}radioButtonValue;
+
 static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -150,7 +155,19 @@ static bool slotCheckBoxToggle(xConnectInfo_t info)
     cb=ldGetWidgetById(info.receiverId);
     if(info.signalType==SIGNAL_PRESS)
     {
-        cb->isChecked=!cb->isChecked;
+        if(!cb->isRadioButton)
+        {
+            cb->isChecked=!cb->isChecked;
+        }
+        else
+        {
+            if(cb->isChecked==false)
+            {
+                cb->isChecked=true;
+                radioButtonValue.group=cb->radioButtonGroup;
+                radioButtonValue.nameId=cb->nameId;
+            }
+        }
     }
     return false;
 }
@@ -205,6 +222,8 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->uncheckedImgAddr=LD_ADDR_NONE;
         pNewWidget->pTextInfo = NULL;
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
+        pNewWidget->isRadioButton=false;
+        pNewWidget->radioButtonGroup=0;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 
@@ -234,6 +253,15 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
+    //自动清除radioButton选中状态
+    if(pWidget->isChecked)
+    {
+        if((pWidget->radioButtonGroup==radioButtonValue.group)&&(pWidget->nameId!=radioButtonValue.nameId))
+        {
+            pWidget->isChecked=false;
+        }
+    }
+
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -254,7 +282,8 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
                 arm_2d_tile_t tChildTile;
                 arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
-                if(pWidget->isCorner)
+
+                if((pWidget->isCorner)&&(!pWidget->isRadioButton))
                 {
                     draw_round_corner_box(&tTarget,
                                           &tChildTile.tRegion,
@@ -289,9 +318,18 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     tChildTile.tRegion.tSize.iWidth-=4;
                     tChildTile.tRegion.tSize.iHeight-=4;
                 }
+
                 if(pWidget->isChecked)
                 {
-                    ldBaseMaskImage(&tChildTile,&checkBoxCheckedMask,pWidget->fgColor,255);
+                    if(pWidget->isRadioButton)
+                    {
+                        arm_2d_draw_box(&tTarget,&tChildTile.tRegion,5,pWidget->fgColor,255);
+                    }
+                    else
+                    {
+                        ldBaseMaskImage(&tChildTile,&checkBoxCheckedMask,pWidget->fgColor,255);
+                    }
+
                 }
             }while(0);
         }
@@ -383,6 +421,25 @@ void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
         return;
     }
     ldBaseSetText(&pWidget->pTextInfo,pStr);
+}
+
+void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->isRadioButton=true;
+    pWidget->radioButtonGroup=num;
+}
+
+void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->isCorner=isCorner;
 }
 
 #if defined(__clang__)
