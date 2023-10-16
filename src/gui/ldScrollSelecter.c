@@ -21,11 +21,10 @@ static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldScrollSelecter_t*)pTarget)->pTextInfo!=NULL)
+        for(uint8_t i=0;i<((ldScrollSelecter_t *)pTarget)->itemCount;i++)
         {
-            ldBaseTextDel(((ldScrollSelecter_t*)pTarget)->pTextInfo);
+            ldFree(((ldScrollSelecter_t *)pTarget)->ppItemStrGroup[i]);
         }
-
         ldFree(((ldScrollSelecter_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -95,10 +94,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
-        tResTile->pchBuffer = 0;
+        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
         tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget=0;
+        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
@@ -115,10 +114,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->opacity=255;
 #endif
         pNewWidget->charColor=__RGB(0,255,0);
-        pNewWidget->scrollOffset=-5;
-
-        ldBaseSetFont(&pNewWidget->pTextInfo,pFontDict);
-
+        pNewWidget->scrollOffset=-25;
+        pNewWidget->pFontDict=pFontDict;
+        pNewWidget->isTransparent=true;
+        pNewWidget->bgColor=0;
 
         LOG_INFO("[scrollSelecter] init,id:%d\n",nameId);
     }
@@ -135,12 +134,6 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
 
 void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes;
-#else
-    arm_2d_vres_t tempRes;
-#endif
-
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
@@ -157,115 +150,41 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        newRegion.tLocation.iX=0;
-        newRegion.tLocation.iY=0;
+        if(!pWidget->isTransparent)
+        {
+            if(pResTile->pchBuffer==LD_ADDR_NONE)
+            {
 
-        arm_2d_draw_box(&tTarget,&newRegion,1,0,255);
+#if USE_OPACITY == 1
+            ldBaseColor(&tTarget,pWidget->bgColor,pWidget->opacity);
+#else
+            ldBaseColor(&tTarget,pWidget->bgColor,255);
+#endif
+            }
+            else
+            {
+                pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+#if USE_OPACITY == 1
+            ldBaseImage(&tTarget,pResTile,false,pWidget->opacity);
+#else
+            ldBaseImage(&tTarget,pResTile,false,255);
+#endif
+            }
+            arm_2d_op_wait_async(NULL);
+        }
 
-//        for(int i=0;i<pTextInfo->strLen;)
-//        {
-//            len=ldBaseGetCharInfo(pTextInfo->pFontDict,&pTextInfo->pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
-//            if(width==0)
-//            {
-//                switch(pTextInfo->pStr[i])
-//                {
-//                case '\r':
-//                {
-//                    textOffsetX=0;
-//                    break;
-//                }
-//                case '\n':
-//                {
-//                    textOffsetX=0;
-//                    textOffsetY+=pTextInfo->pFontDict->lineOffset;
-//                    break;
-//                }
-//                default:
-//                    break;
-//                }
-//                i+=len;
-//                continue;
-//            }
-
-//#if USE_VIRTUAL_RESOURCE == 0
-//            fontTile = pTextInfo->fontTile;
-//            fontTile.tRegion.tSize.iWidth=width;
-//            fontTile.tRegion.tSize.iHeight=height;
-//            fontTile.pchBuffer+=imgAddr;
-//#else
-//            fontTile = *((arm_2d_vres_t*)&pTextInfo->fontTile);
-//            fontTile.tTile.tRegion.tSize.iWidth=width;
-//            fontTile.tTile.tRegion.tSize.iHeight=height;
-//            fontTile.tTile.pchBuffer=imgAddr;
-//            fontTile.pTarget=imgAddr;
-//#endif
-//            int16_t tempHeight;
-//            //偏移坐标
-//            if(textSize.iHeight>pTextInfo->pFontDict->lineOffset)//多行
-//            {
-//                if((textOffsetX+advWidth)>textSize.iWidth)//自动换行
-//                {
-//                    textOffsetX=0;
-//                    textOffsetY+=pTextInfo->pFontDict->lineOffset;
-//                }
-//                tempHeight=textOffsetY-(height+offsetY);
-//            }
-//            else
-//            {
-//                tempHeight=bmpH1Max-(height+offsetY);
-//            }
-
-//            arm_2d_tile_t charTile=impl_child_tile(showTile,textOffsetX+offsetX,tempHeight,width,height);
-
-//            ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,pTextInfo->charColor,opacity);
-//            arm_2d_op_wait_async(NULL);
-
-//            textOffsetX+=advWidth;
-
-//            i+=len;
-//        }
-
-////        void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t *pResTile,ldColor textColor,uint8_t opacity)
-//#if USE_VIRTUAL_RESOURCE == 0
-//                    tempRes=*pResTile;
-//                    tempRes.pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
-//#else
-//                    tempRes=*((arm_2d_vres_t*)pResTile);
-//                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
-//                    tempRes.pTarget=pWidget->selectMaskAddr;
-//                    tempRes.Load = &__disp_adapter0_vres_asset_loader;
-//                    tempRes.Depose = &__disp_adapter0_vres_buffer_deposer;
-//#endif
-
-//#if USE_OPACITY == 1
-//             ldBaseMaskImage(&tTarget,&tempRes,pWidget->charColor,pWidget.opacity);
-//#else
-//                    ldBaseMaskImage(&tTarget,&tempRes,pWidget->charColor,255);
-//#endif
-
-
-//        int16_t posY=tTarget.tRegion.tLocation.iY;
-//        for(uint8_t i=0;i<pWidget->itemCount;i++)
-//        {
-//            newRegion.tLocation.iX=0;
-//            newRegion.tLocation.iY=0;
-
-////        tTarget.tRegion.tLocation.iY=posY+(pResTile->tRegion.tSize.iHeight*i);
-
-////        LOG_DEBUG("ScrollSelecter\n");
-//        ldBaseSetText(&pWidget->pTextInfo,pWidget->ppItemStrGroup[i]);
-
-////        pWidget->pTextInfo->fontTile.tRegion.tLocation.iY=pWidget->scrollOffset+(pWidget->pTextInfo->fontTile.tRegion.tSize.iHeight*i);
-////        LOG_DEBUG("====%d %s %ld \n",textInfo.strLen,textInfo.pStr,textInfo.pFontDict);
-////        LOG_REGION("9999",tTarget.tRegion);
-//        arm_2d_draw_box(&tTarget,&newRegion,1,0,255);
-//#if USE_OPACITY == 1
-//            ldBaseShowText(tTarget,newRegion,pWidget->pTextInfo,0,pWidget->opacity);
-//#else
-//            ldBaseShowText(tTarget,newRegion,pWidget->pTextInfo,pWidget->scrollOffset,255);
-//#endif
-//            arm_2d_op_wait_async(NULL);
-//        }
+        pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        for(uint8_t strGroupCount=0;strGroupCount<pWidget->itemCount;strGroupCount++)
+        {
+            uint8_t *pStrGroup=pWidget->ppItemStrGroup[strGroupCount];
+            int16_t offset=(strGroupCount*pWidget->resource.tRegion.tSize.iHeight)+pWidget->scrollOffset;
+#if USE_OPACITY == 1
+            ldBaseLineText(&tTarget,&pWidget->resource,pStrGroup,pWidget->pFontDict,pWidget->align,pWidget->charColor,offset,pWidget->opacity);
+#else
+            ldBaseLineText(&tTarget,&pWidget->resource,pStrGroup,pWidget->pFontDict,pWidget->align,pWidget->charColor,offset,255);
+#endif
+        }
+        arm_2d_op_wait_async(NULL);
     }
 }
 
@@ -283,8 +202,6 @@ void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
         {
             pWidget->ppItemStrGroup[pWidget->itemCount]=LD_MALLOC_STRING(pStr);
             strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],pStr);
-//            LOG_DEBUG("===%s\n",pWidget->ppItemStrGroup[pWidget->itemCount]);
-//            LOG_DEBUG("===%s\n",pStr);
             pWidget->itemCount++;
         }
     }
@@ -296,17 +213,55 @@ void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor)
     {
         return;
     }
-    ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
+    pWidget->charColor=charColor;
 }
 
-//void ldScrollSelecterSetText(ldScrollSelecter_t* pWidget,uint8_t *pStr)
-//{
-//    if(pWidget==NULL)
-//    {
-//        return;
-//    }
-//    ldBaseSetText(&pWidget->pTextInfo,pStr);
-//}
+void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->bgColor=bgColor;
+    ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)LD_ADDR_NONE;
+#if USE_VIRTUAL_RESOURCE == 1
+    ((arm_2d_vres_t*)&pWidget->resource)->pTarget = LD_ADDR_NONE;
+#endif
+    pWidget->isTransparent=false;
+}
+
+void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)imgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+    ((arm_2d_vres_t*)&pWidget->resource)->pTarget = imgAddr;
+#endif
+    pWidget->isTransparent=false;
+}
+
+void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->isTransparent=isTransparent;
+}
+
+void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+#if USE_OPACITY == 1
+    pWidget->opacity=opacity;
+#endif
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

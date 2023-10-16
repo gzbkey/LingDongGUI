@@ -228,6 +228,10 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *pTarg
 void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden);
 uint8_t ldBaseGetChScheme(uint8_t maskType);
+
+void ldBaseCharacter(arm_2d_tile_t* pParentTile, arm_2d_region_t *pShowRegion, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
+void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity);
+
 #ifdef __cplusplus
 }
 #endif

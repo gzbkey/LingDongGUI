@@ -9,12 +9,15 @@ extern "C" {
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;
+    bool isTransparent:1;
+    uint8_t align:4;
     uint8_t itemMax;
     uint8_t itemCount;
     void **ppItemStrGroup;
-    ldChar_t *pTextInfo;
-    ldColor charColor;
+    ldFontDict_t* pFontDict;//字典(目录)
     int16_t scrollOffset;
+    ldColor charColor;
+    ldColor bgColor;
 #if USE_OPACITY == 1
     uint8_t opacity;
 #endif
@@ -26,6 +29,10 @@ void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
 //void ldScrollSelecterSetText(ldScrollSelecter_t* pWidget,uint8_t *pStr);
 void ldScrollSelecterSetFont(ldScrollSelecter_t *pWidget,ldFontDict_t *pFontDict);
 void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr);
+void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
+void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr);
+void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
+void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity);
 
 #define ldScrollSelecterSetHidden          ldBaseSetHidden
 #define ldScrollSelecterMove               ldBaseMove
