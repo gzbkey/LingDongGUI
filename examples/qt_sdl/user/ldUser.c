@@ -62,7 +62,7 @@ void userInit(void)
 
     txt0=ldTextInit(5, 1, 310, 10, 55, 120,MICROSOFT_YAHEI_REGULAR_20);
 //    ldTextSetTransparent(txt0,true);
-    ldTextSetText(ldGetWidgetById(5),"栟𨭉栟𨭉栟𨭉栟𨭉");
+    ldTextSetText(ldGetWidgetById(5),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
     ldTextSetAlign(ldGetWidgetById(5),LD_ALIGN_TOP|LD_ALIGN_LEFT);
     ldTextSetScroll(txt0,true);
 

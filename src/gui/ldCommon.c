@@ -633,178 +633,83 @@ arm_2d_region_t ldBaseAutoAlign(arm_2d_region_t *pRegion,arm_2d_size_t *pShowSiz
     {
     case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
+        arm_2d_align_top_left(*pRegion,*pShowSize)
+        {
+            retRegion=__top_left_region;
+        }
         break;
     }
     case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iX+= (pShowSize->iWidth - (pShowSize->iWidth)) >> 1;
+        arm_2d_align_top_centre(*pRegion,*pShowSize)
+        {
+            retRegion=__top_centre_region;
+        }
         break;
     }
     case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iX+= (pShowSize->iWidth - pShowSize->iWidth);
+        arm_2d_align_top_right(*pRegion,*pShowSize)
+        {
+            retRegion=__top_right_region;
+        }
         break;
     }
     case LD_ALIGN_LEFT:
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iY+= (pRegion->tSize.iHeight - pShowSize->iHeight) >> 1;
+        arm_2d_align_left(*pRegion,*pShowSize)
+        {
+            retRegion=__left_region;
+        }
         break;
     }
     case LD_ALIGN_CENTER:
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iX
-            += (pRegion->tSize.iWidth - pShowSize->iWidth)  >> 1;
-        retRegion.tLocation.iY
-            += (pRegion->tSize.iHeight - pShowSize->iHeight)>> 1;
+        arm_2d_align_centre(*pRegion,*pShowSize)
+        {
+            retRegion=__centre_region;
+        }
         break;
     }
     case LD_ALIGN_RIGHT:
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iX
-            += (pRegion->tSize.iWidth - pShowSize->iWidth);
-        retRegion.tLocation.iY
-            += (pRegion->tSize.iHeight - pShowSize->iHeight) >> 1;
+        arm_2d_align_right(*pRegion,*pShowSize)
+        {
+            retRegion=__right_region;
+        }
         break;
     }
     case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iY
-            += (pRegion->tSize.iHeight - pShowSize->iHeight);
+        arm_2d_align_bottom_left(*pRegion,*pShowSize)
+        {
+            retRegion=__bottom_left_region;
+        }
         break;
     }
     case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iX
-            += (pRegion->tSize.iWidth - pShowSize->iWidth)  >> 1;
-        retRegion.tLocation.iY
-            += (pRegion->tSize.iHeight - pShowSize->iHeight);
+        arm_2d_align_bottom_centre(*pRegion,*pShowSize)
+        {
+            retRegion=__bottom_centre_region;
+        }
         break;
     }
     case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
     {
-        retRegion.tSize.iWidth = pShowSize->iWidth;
-        retRegion.tSize.iHeight = pShowSize->iHeight;
-        retRegion.tLocation = pRegion->tLocation;
-        retRegion.tLocation.iX
-            += (pRegion->tSize.iWidth - pShowSize->iWidth);
-        retRegion.tLocation.iY
-            += (pRegion->tSize.iHeight - pShowSize->iHeight);
+        arm_2d_align_bottom_right(*pRegion,*pShowSize)
+        {
+            retRegion=__bottom_right_region;
+        }
         break;
     }
     default:
         break;
     }
-    return retRegion;
-}
 
-arm_2d_region_t ldBaseGetAlignRegion(arm_2d_tile_t *pTile,arm_2d_size_t size,uint8_t align)
-{
-    arm_2d_region_t retRegion;
+    retRegion.tLocation.iX-=pRegion->tLocation.iX;
+    retRegion.tLocation.iY-=pRegion->tLocation.iY;
 
-    arm_2d_canvas(pTile,newCavas)
-        {
-            switch (align)
-            {
-            case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
-            {
-                arm_2d_align_top_left(newCavas,size)
-                {
-                    retRegion=__top_left_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
-            {
-                arm_2d_align_top_centre(newCavas,size)
-                {
-                    retRegion=__top_centre_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
-            {
-                arm_2d_align_top_right(newCavas,size)
-                {
-                    retRegion=__top_right_region;
-                }
-                break;
-            }
-            case LD_ALIGN_LEFT:
-            {
-                arm_2d_align_left(newCavas,size)
-                {
-                    retRegion=__left_region;
-                }
-                break;
-            }
-            case LD_ALIGN_CENTER:
-            {
-                arm_2d_align_centre(newCavas,size)
-                {
-                    retRegion=__centre_region;
-                }
-                break;
-            }
-            case LD_ALIGN_RIGHT:
-            {
-                arm_2d_align_right(newCavas,size)
-                {
-                    retRegion=__right_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
-            {
-                arm_2d_align_bottom_left(newCavas,size)
-                {
-                    retRegion=__bottom_left_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
-            {
-                arm_2d_align_bottom_centre(newCavas,size)
-                {
-                    retRegion=__bottom_centre_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
-            {
-                arm_2d_align_bottom_right(newCavas,size)
-                {
-                    retRegion=__bottom_right_region;
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
     return retRegion;
 }
 
@@ -942,7 +847,7 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
 
     textSize= ldBaseGetStringSize(pTextInfo,&bmpH1Max,region.tSize.iWidth);
 
-    arm_2d_region_t alignSize= ldBaseGetAlignRegion(&fullTile,textSize,pTextInfo->align);
+    arm_2d_region_t alignSize= ldBaseAutoAlign(&target.tRegion,&textSize,pTextInfo->align);
 
     if(pTextInfo->align==(LD_ALIGN_TOP|LD_ALIGN_LEFT))
     {
@@ -1120,9 +1025,6 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
     textSize= ldBaseGetLineStrSize(pStr,pFontDict,&bmpH1Max);
 
     arm_2d_region_t alignSize= ldBaseAutoAlign(&pResTileTemplate->tRegion,&textSize,align);
-
-    alignSize.tLocation.iX-=pResTileTemplate->tRegion.tLocation.iX;
-    alignSize.tLocation.iY-=pResTileTemplate->tRegion.tLocation.iY;
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resTile = *pResTileTemplate;
