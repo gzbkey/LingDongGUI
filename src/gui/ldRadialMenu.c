@@ -395,12 +395,19 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
 
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=pWidget->pItemList[pWidget->showList[i]].size.width;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pItemList[pWidget->showList[i]].size.height;
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=pWidget->pItemList[pWidget->showList[i]].addr;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)pWidget->pItemList[pWidget->showList[i]].addr;
 #if USE_VIRTUAL_RESOURCE == 1
                     tempRes.pTarget=pWidget->pItemList[pWidget->showList[i]].addr;
 #endif
 #if USE_RADIA_MENU_SCALE == 1
-                    ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,&pWidget->pItemList->op,bIsNewFrame);
+                    if(pWidget->pItemList[i].scalePercent>=100)
+                    {
+                        ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,255);
+                    }
+                    else
+                    {
+                        ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,&pWidget->pItemList[i].op,bIsNewFrame);
+                    }
 #else
                     ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,255);
 #endif

@@ -407,7 +407,7 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
     }
 }
 
-void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t *pResTile,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textColor,uint8_t opacity)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*pResTile;
@@ -594,7 +594,7 @@ uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict, uint8_t *pCharUtf8, int16_t *
     uint8_t retBytes=0;
     ldFontInfo_t *pInfoList;
     dictCount=pFontDict->count;
-    pInfoList=pFontDict->pInfoList;
+    pInfoList=(ldFontInfo_t*)pFontDict->pInfoList;
 
     retBytes=_getUtf8Len(pCharUtf8[0]);
 
@@ -726,7 +726,7 @@ arm_2d_size_t ldBaseGetLineStrSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t
     int16_t h2_min=0;
     int16_t lineWidth=0;
 
-    uint8_t strLen=strlen(pStr);
+    uint8_t strLen=strlen((char*)pStr);
 
     for(int i=0;i<strLen;)
     {
@@ -1045,7 +1045,7 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
 
         resTile.tRegion.tSize.iWidth=width;
         resTile.tRegion.tSize.iHeight=height;
-        resTile.pchBuffer=pFontDict->pFontSrc+imgAddr;
+        resTile.pchBuffer=(uint8_t*)(pFontDict->pFontSrc+imgAddr);
 #else
         fontTile = *((arm_2d_vres_t*)&pTextInfo->fontTile);
         fontTile.tTile.tRegion.tSize.iWidth=width;

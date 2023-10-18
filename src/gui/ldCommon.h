@@ -205,8 +205,8 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
 
 
 void ldBaseColor(arm_2d_tile_t* pTile,ldColor color,uint8_t opacity);
-void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t *pResTile,bool isWithMask,uint8_t opacity);
-void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t* pResTile, ldColor textColor, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,arm_2d_op_trans_msk_opa_t *pOP,bool bIsNewFrame);
 
 void ldBaseSetFont(ldChar_t **ppCharInfo, ldFontDict_t *pFontDictAddr);

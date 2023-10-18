@@ -327,7 +327,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }
                     else
                     {
-                        ldBaseMaskImage(&tChildTile,&checkBoxCheckedMask,pWidget->fgColor,255);
+                        ldBaseMaskImage(&tChildTile,(arm_2d_tile_t*)&checkBoxCheckedMask,pWidget->fgColor,255);
                     }
 
                 }

@@ -247,7 +247,7 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     {
         if(!pWidget->isTransparent)
         {
-            if(pResTile->pchBuffer==LD_ADDR_NONE)
+            if(pResTile->pchBuffer==(uint8_t*)LD_ADDR_NONE)
             {
 
 #if USE_OPACITY == 1
@@ -296,7 +296,7 @@ void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
         if(pWidget->ppItemStrGroup[pWidget->itemCount]==NULL)
         {
             pWidget->ppItemStrGroup[pWidget->itemCount]=LD_MALLOC_STRING(pStr);
-            strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],pStr);
+            strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],(char*)pStr);
             pWidget->itemCount++;
         }
     }
