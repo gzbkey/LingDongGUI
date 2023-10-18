@@ -400,7 +400,7 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
                     tempRes.pTarget=pWidget->pItemList[pWidget->showList[i]].addr;
 #endif
 #if USE_RADIA_MENU_SCALE == 1
-                    ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,bIsNewFrame);
+                    ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,&pWidget->pItemList->op,bIsNewFrame);
 #else
                     ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,255);
 #endif

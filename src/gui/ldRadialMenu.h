@@ -21,6 +21,7 @@ typedef struct {
     ldSize_t size;
     ldPoint_t pos;
     uint16_t angle;
+    arm_2d_op_trans_msk_opa_t op;
 }ldRadialMenuItem_t;
 
 typedef struct {

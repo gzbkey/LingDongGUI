@@ -345,7 +345,7 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,ui
     }
 }
 
-void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,bool bIsNewFrame)
+void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,arm_2d_op_trans_msk_opa_t *pOP,bool bIsNewFrame)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*pResTile;
@@ -372,9 +372,8 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
 #if USE_VIRTUAL_RESOURCE == 1
         maskTile.pTarget=(uintptr_t)maskTile.tTile.pchBuffer;
 #endif
-        arm_2d_op_trans_msk_opa_t tOP;
         arm_2dp_tile_transform_with_src_mask_and_opacity(
-                    &tOP,         //!< control block
+                    pOP,         //!< control block
                     (arm_2d_tile_t*)(&resource),        //!< source tile
                     (arm_2d_tile_t *)&maskTile,          //!< source mask
                     pTile,             //!< target tile
@@ -392,8 +391,7 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
         case ARM_2D_COLOUR_RGB565:
         case ARM_2D_COLOUR_CCCA8888:
         {
-            arm_2d_op_trans_t tOP;
-            arm_2dp_tile_transform_only(&tOP,
+            arm_2dp_tile_transform_only((arm_2d_op_trans_t*)pOP,
                                         (arm_2d_tile_t*)(&resource),
                                         pTile,
                                         NULL,

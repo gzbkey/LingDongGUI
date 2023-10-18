@@ -88,12 +88,12 @@ void userInit(void)
 //    ldProgressBarSetPercent(bar3,50);
 
     //radial menu
-//    menu=ldRadialMenuInit(10,0,0,10,480,200,300,100,9);
+    menu=ldRadialMenuInit(10,1,0,10,480,200,300,100,9);
 
-////    ldRadialMenuAddItem(menu,ICON1_JPEG,100,100,1,false);
-//    ldRadialMenuAddItem(menu,ICON2_JPEG,100,100,1,false);
-////    ldRadialMenuAddItem(menu,ICON3_JPEG,100,100,1,false);
-//    ldRadialMenuAddItem(menu,ICON4_JPEG,100,100,1,false);
+//    ldRadialMenuAddItem(menu,ICON1_JPEG,100,100,1,false);
+    ldRadialMenuAddItem(menu,PRESS_BMP,72,72,1,false);
+//    ldRadialMenuAddItem(menu,ICON3_JPEG,100,100,1,false);
+    ldRadialMenuAddItem(menu,RELEASE_BMP,72,72,1,false);
 //    ldRadialMenuAddItem(menu,ICON5_JPEG,100,100,1,false);
 //    ldRadialMenuAddItem(menu,ICON6_JPEG,100,100,1,false);
 //    ldRadialMenuAddItem(menu,ICON7_JPEG,100,100,1,false);
