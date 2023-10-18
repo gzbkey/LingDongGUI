@@ -1,4 +1,5 @@
 #include "ldScrollSelecter.h"
+#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -58,6 +59,67 @@ void ldScrollSelecterDel(ldScrollSelecter_t *pWidget)
     }
 }
 
+static uint8_t _ldScrollSelecterAutoItem(ldScrollSelecter_t *pWidget,int16_t offset)
+{
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+
+    if(offset>=0)
+    {
+        return 0;
+    }
+
+    offset=-offset;
+    int16_t temp1,temp2;
+
+    temp1=offset%pResTile->tRegion.tSize.iHeight;
+    temp2=offset/pResTile->tRegion.tSize.iHeight;
+    if(temp1>=(pResTile->tRegion.tSize.iHeight/2))
+    {
+        temp2++;
+    }
+
+    if(temp2>=pWidget->itemCount)
+    {
+        temp2=pWidget->itemCount-1;
+    }
+
+    return temp2;
+}
+
+static int16_t _scrollOffset;
+
+static bool slotScrollSelecterScroll(xConnectInfo_t info)
+{
+    ldScrollSelecter_t *selecter;
+
+    selecter=ldGetWidgetById(info.receiverId);
+
+    switch (info.signalType)
+    {
+    case SIGNAL_PRESS:
+    {
+        selecter->isRelease=false;
+        _scrollOffset=selecter->scrollOffset;
+        break;
+    }
+    case SIGNAL_TOUCH_HOLD_MOVE:
+    {
+        selecter->scrollOffset=_scrollOffset+(int16_t)(info.value&0xFFFF);
+        break;
+    }
+    case SIGNAL_RELEASE:
+    {
+        selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,selecter->scrollOffset);
+        selecter->isRelease=true;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return false;
+}
+
 ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
 {
     ldScrollSelecter_t *pNewWidget = NULL;
@@ -113,11 +175,15 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
-        pNewWidget->charColor=__RGB(0,255,0);
-        pNewWidget->scrollOffset=-25;
+        pNewWidget->charColor=0;
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->isTransparent=true;
         pNewWidget->bgColor=0;
+        pNewWidget->moveOffset=1;
+
+        xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
+        xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);
+        xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotScrollSelecterScroll);
 
         LOG_INFO("[scrollSelecter] init,id:%d\n",nameId);
     }
@@ -144,6 +210,35 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
         return;
+    }
+
+    if((pWidget->isRelease)&&(bIsNewFrame))
+    {
+        int16_t targetOffset=-(pWidget->itemSelect*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight);
+
+        if(pWidget->scrollOffset==targetOffset)
+        {
+            pWidget->isRelease=false;
+        }
+        else
+        {
+            if(pWidget->scrollOffset>targetOffset)
+            {
+                pWidget->scrollOffset-=pWidget->moveOffset;
+                if(pWidget->scrollOffset<targetOffset)
+                {
+                    pWidget->scrollOffset=targetOffset;
+                }
+            }
+            else
+            {
+                pWidget->scrollOffset+=pWidget->moveOffset;
+                if(pWidget->scrollOffset>targetOffset)
+                {
+                    pWidget->scrollOffset=targetOffset;
+                }
+            }
+        }
     }
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
@@ -261,6 +356,23 @@ void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
 #if USE_OPACITY == 1
     pWidget->opacity=opacity;
 #endif
+}
+
+void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+    if(speed<1)
+    {
+        speed=1;
+    }
+    if(speed>((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
+    {
+        speed=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
+    }
+    pWidget->moveOffset=speed;
 }
 
 #if defined(__clang__)

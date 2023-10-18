@@ -303,9 +303,10 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     {
         txt->isRelease=true;
 
+        _scrollOffset=txt->scrollOffset;
+
         if(txt->scrollOffset>0)
         {
-            _scrollOffset=txt->scrollOffset;
             _isTopScroll=true;
             _isBottomScroll=false;
         }
@@ -319,7 +320,6 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
 
         if(txt->strHeight<=((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight)
         {
-            _scrollOffset=txt->scrollOffset;
             _isTopScroll=true;
             _isBottomScroll=false;
         }

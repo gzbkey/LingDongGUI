@@ -1,3 +1,10 @@
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">灵动GUI</h1>
+<h4 align="center">一个基于ARM-2D的轻巧GUI</h4>
+<p align="center">
+	<a href="https://gitee.com/gzbkey/LingDongGUI/stargazers"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/star.svg"></a>
+	<a href="https://gitee.com/gzbkey/LingDongGUI/members"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/fork.svg"></a>
+</p>
+
 # 简介
 
 * 灵动GUI是基于ARM-2D进行开发的GUI，极大降低ARM-2D的使用难度
@@ -6,9 +13,9 @@
 
 * 界面代码和逻辑代码分离
 
-主仓库: https://gitee.com/gzbkey/LingDongGUI
+🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
 
-镜像仓库: https://github.com/gzbkey/LingDongGUI
+🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
 
 
 # 控件列表
@@ -39,29 +46,32 @@
 
 ## Qt
 
-使用qt进行电脑模拟测试，路径为examples\qt_sdl
+使用qt进行电脑模拟测试，路径为[examples/qt_sdl](./examples/qt_sdl)
 
-[详细使用说明](./examples/qt_sdl/README.md)
+📖 [使用说明](./examples/qt_sdl/README.md)
 
 ## VSCode
 
-使用vscode进行电脑模拟测试，路径为examples\vscode_sdl
+使用vscode进行电脑模拟测试，路径为[examples/vscode_sdl](./examples/vscode_sdl)
 
-[详细使用说明](./examples/vscode_sdl/README.md)
+📖 [使用说明](./examples/vscode_sdl/README.md)
 
 # 如何生产图片字模数据
 
 tools文件夹中有工具生成数据
 
-[详细使用说明](./tools/README.md)
+📖 [使用说明](./tools/README.md)
 
 
 # 如何添加自定义控件
 
-1、运行python脚本，src/gui/createWidget.py，自动创控件文件
+1、运行python脚本，[src/gui/createWidget.py](./src/gui/createWidget.py)，输入控件名称后，自动创控件名称文件和自动修改代码
 
-2、添加刚才新建的文件到项目中
+2、添加刚才新建的文件到项目中(新文件在./src/gui中)
 
+3、修改新控件的.c .h文件
+
+---
 自动处理：
 
 修改ldCommon.h中的控件类型,ldWidgetType
@@ -70,11 +80,11 @@ ldGui.c中添加新控件的头文件
 
 修改ldGui.c中的函数，ldGuiDelWidget，_widgetLoop
 
-3、修改新控件的.c .h文件
+---
 
 # 技术交流
 
-QQ群：187033407
+🐧 QQ群：187033407
 
 
 

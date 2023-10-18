@@ -721,92 +721,92 @@ arm_2d_region_t ldBaseAutoAlign(arm_2d_region_t *pRegion,arm_2d_size_t *pShowSiz
     return retRegion;
 }
 
-//arm_2d_region_t ldBaseGetAlignRegion(arm_2d_tile_t *pTile,arm_2d_size_t size,uint8_t align)
-//{
-//    arm_2d_region_t retRegion;
+arm_2d_region_t ldBaseGetAlignRegion(arm_2d_tile_t *pTile,arm_2d_size_t size,uint8_t align)
+{
+    arm_2d_region_t retRegion;
 
-//    arm_2d_canvas(pTile,newCavas)
-//        {
-//            switch (align)
-//            {
-//            case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
-//            {
-//                arm_2d_align_top_left(newCavas,size)
-//                {
-//                    retRegion=__top_left_region;
-//                }
-//                break;
-//            }
-//            case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
-//            {
-//                arm_2d_align_top_centre(newCavas,size)
-//                {
-//                    retRegion=__top_centre_region;
-//                }
-//                break;
-//            }
-//            case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
-//            {
-//                arm_2d_align_top_right(newCavas,size)
-//                {
-//                    retRegion=__top_right_region;
-//                }
-//                break;
-//            }
-//            case LD_ALIGN_LEFT:
-//            {
-//                arm_2d_align_left(newCavas,size)
-//                {
-//                    retRegion=__left_region;
-//                }
-//                break;
-//            }
-//            case LD_ALIGN_CENTER:
-//            {
-//                arm_2d_align_centre(newCavas,size)
-//                {
-//                    retRegion=__centre_region;
-//                }
-//                break;
-//            }
-//            case LD_ALIGN_RIGHT:
-//            {
-//                arm_2d_align_right(newCavas,size)
-//                {
-//                    retRegion=__right_region;
-//                }
-//                break;
-//            }
-//            case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
-//            {
-//                arm_2d_align_bottom_left(newCavas,size)
-//                {
-//                    retRegion=__bottom_left_region;
-//                }
-//                break;
-//            }
-//            case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
-//            {
-//                arm_2d_align_bottom_centre(newCavas,size)
-//                {
-//                    retRegion=__bottom_centre_region;
-//                }
-//                break;
-//            }
-//            case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
-//            {
-//                arm_2d_align_bottom_right(newCavas,size)
-//                {
-//                    retRegion=__bottom_right_region;
-//                }
-//                break;
-//            }
-//            default:
-//                break;
-//            }
-//        }
-//    return retRegion;
-//}
+    arm_2d_canvas(pTile,newCavas)
+        {
+            switch (align)
+            {
+            case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
+            {
+                arm_2d_align_top_left(newCavas,size)
+                {
+                    retRegion=__top_left_region;
+                }
+                break;
+            }
+            case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
+            {
+                arm_2d_align_top_centre(newCavas,size)
+                {
+                    retRegion=__top_centre_region;
+                }
+                break;
+            }
+            case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
+            {
+                arm_2d_align_top_right(newCavas,size)
+                {
+                    retRegion=__top_right_region;
+                }
+                break;
+            }
+            case LD_ALIGN_LEFT:
+            {
+                arm_2d_align_left(newCavas,size)
+                {
+                    retRegion=__left_region;
+                }
+                break;
+            }
+            case LD_ALIGN_CENTER:
+            {
+                arm_2d_align_centre(newCavas,size)
+                {
+                    retRegion=__centre_region;
+                }
+                break;
+            }
+            case LD_ALIGN_RIGHT:
+            {
+                arm_2d_align_right(newCavas,size)
+                {
+                    retRegion=__right_region;
+                }
+                break;
+            }
+            case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
+            {
+                arm_2d_align_bottom_left(newCavas,size)
+                {
+                    retRegion=__bottom_left_region;
+                }
+                break;
+            }
+            case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
+            {
+                arm_2d_align_bottom_centre(newCavas,size)
+                {
+                    retRegion=__bottom_centre_region;
+                }
+                break;
+            }
+            case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
+            {
+                arm_2d_align_bottom_right(newCavas,size)
+                {
+                    retRegion=__bottom_right_region;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+    return retRegion;
+}
 
 //待优化融合
 arm_2d_size_t ldBaseGetLineStrSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t *pRetBmpAscender)
@@ -937,10 +937,12 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
     int16_t bmpH1Max;
 
     arm_2d_size_t textSize;
+    arm_2d_tile_t fullTile=target;
+    fullTile.tRegion=region;
 
     textSize= ldBaseGetStringSize(pTextInfo,&bmpH1Max,region.tSize.iWidth);
 
-    arm_2d_region_t alignSize= ldBaseAutoAlign(&region,&textSize,pTextInfo->align);
+    arm_2d_region_t alignSize= ldBaseGetAlignRegion(&fullTile,textSize,pTextInfo->align);
 
     if(pTextInfo->align==(LD_ALIGN_TOP|LD_ALIGN_LEFT))
     {
@@ -1203,7 +1205,7 @@ void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
             {
                 return;
             }
-            (*ppTextInfo)-> strLen=newStrlen;
+            (*ppTextInfo)-> strLen=newStrlen-1;
         }
         memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
         strcpy((char*)(*ppTextInfo)->pStr,(char*)pStr);

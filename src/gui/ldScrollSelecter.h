@@ -10,14 +10,17 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isTransparent:1;
+    bool isRelease:1;
     uint8_t align:4;
     uint8_t itemMax;
     uint8_t itemCount;
+    ldFontDict_t* pFontDict;
     void **ppItemStrGroup;
-    ldFontDict_t* pFontDict;//字典(目录)
     int16_t scrollOffset;
     ldColor charColor;
     ldColor bgColor;
+    uint8_t itemSelect;
+    uint8_t moveOffset;
 #if USE_OPACITY == 1
     uint8_t opacity;
 #endif
@@ -33,6 +36,7 @@ void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
 void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr);
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
 void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity);
+void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
 
 #define ldScrollSelecterSetHidden          ldBaseSetHidden
 #define ldScrollSelecterMove               ldBaseMove
