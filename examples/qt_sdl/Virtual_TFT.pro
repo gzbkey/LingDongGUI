@@ -9,9 +9,11 @@ SOURCES += \
     ../../src/gui/ldCommon.c \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldImage.c \
+    ../../src/gui/ldLabel.c \
     ../../src/gui/ldRadialMenu.c \
     ../../src/gui/ldProgressBar.c \
     ../../src/gui/ldScene0.c \
+    ../../src/gui/ldScrollSelecter.c \
     ../../src/gui/ldText.c \
     ../../src/gui/ldWindow.c \
     ../../src/misc/freeRtosHeap4.c \
@@ -86,11 +88,11 @@ SOURCES += \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.c \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.c \
     ../common/virtual_flash/virtualNor.c \
-    math/arm_common_tables.c \
-    math/arm_cos_f32.c \
-    math/arm_cos_q31.c \
-    math/arm_sin_f32.c \
-    math/arm_sin_q31.c \
+    ../common/math/arm_common_tables.c \
+    ../common/math/arm_cos_f32.c \
+    ../common/math/arm_cos_q31.c \
+    ../common/math/arm_sin_f32.c \
+    ../common/math/arm_sin_q31.c \
     user/image.c \
     user/ldConfig.c \
     user/ldUser.c \
@@ -104,9 +106,11 @@ HEADERS += \
     ../../src/gui/ldCommon.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldImage.h \
+    ../../src/gui/ldLabel.h \
     ../../src/gui/ldRadialMenu.h \
     ../../src/gui/ldProgressBar.h \
     ../../src/gui/ldScene0.h \
+    ../../src/gui/ldScrollSelecter.h \
     ../../src/gui/ldText.h \
     ../../src/gui/ldWindow.h \
     ../../src/misc/freeRtosHeap4.h \
@@ -202,7 +206,7 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/Library/Include
 INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 
 INCLUDEPATH += $$PWD/user
-INCLUDEPATH += $$PWD/math
+INCLUDEPATH += $$PWD/../common/math
 INCLUDEPATH += $$PWD/../common/virtual_flash
 
 INCLUDEPATH += $$PWD/../../src/gui

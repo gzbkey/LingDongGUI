@@ -7,6 +7,9 @@
 #include "ldProgressBar.h"
 #include "ldRadialMenu.h"
 #include "ldCheckBox.h"
+#include "ldLabel.h"
+#include "ldScrollSelecter.h"
+/*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
@@ -76,15 +79,14 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         pWidget=prevWidget;
         if(pWidget!=NULL)
         {
-            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
-
-            //计算速度
+            //cal speed
             deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
             pressPoint.x=(prevX-pressPoint.x);
             pressPoint.y=(prevY-pressPoint.y);
             pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
             pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
-            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));
+            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));//x speed | y speed
+            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
         }
         break;
     }
@@ -170,6 +172,17 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldCheckBoxDel((ldCheckBox_t*)pWidget);
         break;
     }
+    case widgetTypeLabel:
+    {
+        ldLabelDel((ldLabel_t*)pWidget);
+        break;
+    }
+    case widgetTypeScrollSelecter:
+    {
+        ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
+        break;
+    }
+/*============================ auto add del ==================================*/
     default:
         break;
     }
@@ -211,6 +224,17 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
         ldCheckBoxLoop((ldCheckBox_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
+    case widgetTypeLabel:
+    {
+        ldLabelLoop((ldLabel_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeScrollSelecter:
+    {
+        ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+/*============================ auto add loop =================================*/
     default:
         break;
     }

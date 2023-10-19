@@ -201,10 +201,10 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = 0;
+        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
         tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget=0;
+        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
@@ -395,12 +395,19 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
 
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=pWidget->pItemList[pWidget->showList[i]].size.width;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pItemList[pWidget->showList[i]].size.height;
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=pWidget->pItemList[pWidget->showList[i]].addr;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)pWidget->pItemList[pWidget->showList[i]].addr;
 #if USE_VIRTUAL_RESOURCE == 1
                     tempRes.pTarget=pWidget->pItemList[pWidget->showList[i]].addr;
 #endif
 #if USE_RADIA_MENU_SCALE == 1
-                    ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,bIsNewFrame);
+                    if(pWidget->pItemList[i].scalePercent>=100)
+                    {
+                        ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,255);
+                    }
+                    else
+                    {
+                        ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,pWidget->pItemList[i].scalePercent/100.0,&pWidget->pItemList[i].op,bIsNewFrame);
+                    }
 #else
                     ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,pWidget->pItemList[pWidget->showList[i]].isWithMask,255);
 #endif

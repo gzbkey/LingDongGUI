@@ -27,7 +27,7 @@ typedef struct {
     uint16_t frameWidth;
     uint8_t bgOffset;
     uint8_t fgOffset;
-    uint64_t timer;
+    int64_t timer;
 }ldProgressBar_t;
 
 ldProgressBar_t* ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);

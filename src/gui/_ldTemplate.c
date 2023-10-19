@@ -47,7 +47,6 @@ void ldTemplateDel(ldTemplate_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    // 查找父链表
     listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
@@ -79,7 +78,6 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->childList = NULL;
         pNewWidget->widgetType = widgetTypeTemplate;
         xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentType = ((ldCommon_t *)(parentInfo->info))->widgetType;
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
 
@@ -91,10 +89,10 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = 0;
+        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
         tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget=0;
+        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
@@ -113,9 +111,9 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
-    arm_2d_tile_t *ptResTile=(arm_2d_tile_t*)&pWidget->resource;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
     {
@@ -127,17 +125,13 @@ void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *ptParent,bool bIs
         return;
     }
 
-    arm_2d_container(ptParent,tTarget , &ptResTile->tRegion)
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+
+    arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        tTarget.tRegion.tLocation = ptResTile->tRegion.tLocation;
-
         // add user code
+        arm_2d_op_wait_async(NULL);
     }
-}
-
-void ldTemplateSetHidden(ldTemplate_t *pWidget,bool isHidden)
-{
-    ldBaseSetHidden((ldCommon_t*) pWidget,isHidden);
 }
 
 #if defined(__clang__)

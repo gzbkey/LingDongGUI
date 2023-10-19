@@ -95,10 +95,10 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = 0;
+        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
         tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget=0;
+        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
@@ -108,7 +108,9 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         ldBaseSetFont(&pNewWidget->pTextInfo,pFontDict);
         pNewWidget->scrollOffset=0;
         pNewWidget->isRelease=false;
-
+#if USE_OPACITY == 1
+        pNewWidget->opacity=255;
+#endif
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
     else
@@ -176,7 +178,11 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
         {
             if (pWidget->bgImgAddr==LD_ADDR_NONE)//color
             {
+#if USE_OPACITY == 1
+                ldBaseColor(&tTarget,pWidget->bgColor,pWidget->opacity);
+#else
                 ldBaseColor(&tTarget,pWidget->bgColor,255);
+#endif
             }
             else
             {
@@ -184,13 +190,21 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
 #if USE_VIRTUAL_RESOURCE == 1
                 ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
 #endif
+#if USE_OPACITY == 1
+                ldBaseImage(&tTarget,pResTile,false,pWidget->opacity);
+#else
                 ldBaseImage(&tTarget,pResTile,false,255);
+#endif
             }
             arm_2d_op_wait_async(NULL);
         }
         if(pWidget->pTextInfo!=NULL)
         {
-            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,pWidget->scrollOffset);
+#if USE_OPACITY == 1
+            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,pWidget->scrollOffset,pWidget->opacity);
+#else
+            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,pWidget->scrollOffset,255);
+#endif
             arm_2d_op_wait_async(NULL);
         }
     }
@@ -289,9 +303,10 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     {
         txt->isRelease=true;
 
+        _scrollOffset=txt->scrollOffset;
+
         if(txt->scrollOffset>0)
         {
-            _scrollOffset=txt->scrollOffset;
             _isTopScroll=true;
             _isBottomScroll=false;
         }
@@ -305,7 +320,6 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
 
         if(txt->strHeight<=((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight)
         {
-            _scrollOffset=txt->scrollOffset;
             _isTopScroll=true;
             _isBottomScroll=false;
         }
@@ -370,6 +384,17 @@ void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor)
     pWidget->bgColor=bgColor;
     pWidget->isTransparent=false;
     pWidget->bgImgAddr=LD_ADDR_NONE;
+}
+
+void ldTextSetOpacity(ldText_t *pWidget, uint8_t opacity)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+#if USE_OPACITY == 1
+    pWidget->opacity=opacity;
+#endif
 }
 
 #if defined(__clang__)

@@ -1,3 +1,9 @@
+# 软件准备
+
+安装vscode
+
+安装插件c/c++、Code Runner
+
 # 下载子模块
 
 git submodule init

@@ -22,6 +22,7 @@
 /*============================ INCLUDES ======================================*/
 
 //#include "RTE_Components.h"
+#include "ldConfig.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -96,7 +97,7 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your LCD
 // <i> Default: 16
-#   define __GLCD_CFG_COLOUR_DEPTH__                                    16
+#   define __GLCD_CFG_COLOUR_DEPTH__                                    LD_CFG_COLOR_DEPTH
 #endif
 
 // <o>Width of the screen <8-32767>

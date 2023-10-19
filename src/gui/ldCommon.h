@@ -84,7 +84,6 @@ typedef enum{
     widgetTypeImage,
     widgetTypeText,
     widgetTypeLineEdit,
-    widgetTypeDashboardSimple,
     widgetTypeGraph,
     widgetTypeCheckBox,
     widgetTypeSlider,
@@ -94,14 +93,12 @@ typedef enum{
     widgetTypeDateTime,
     widgetTypeIconSlider,
     widgetTypeComboBox,
-    widgetTypeIconRotateAround,
     widgetTypeNumber,
-    widgetTypeStaticText,
-    widgetTypeStartupImage,
     widgetTypeArc,
     widgetTypeRadialMenu,
+    widgetTypeScrollSelecter,
+    widgetTypeLabel,
 }ldWidgetType;
-    
 
 #if USE_VIRTUAL_RESOURCE == 0
 #define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
@@ -132,7 +129,7 @@ typedef struct{
 }ldFontDict_t;
 
 typedef struct{
-    arm_2d_tile_t fontTile;//字库
+    arm_2d_tile_t fontTile;
     ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
@@ -168,7 +165,7 @@ typedef struct{
 }ldFontDict_t;
 
 typedef struct{
-    arm_2d_vres_t fontTile;//字库
+    arm_2d_vres_t fontTile;
     ldFontDict_t* pFontDict;//字典(目录)
     uint16_t strLen;
     ldColor charColor;
@@ -196,7 +193,7 @@ extern xListNode ldWidgetLink;
 
 void *ldMalloc(uint32_t size);
 void ldFree(void *p);
-void *ldRealloc(void *ptr,uint32_t newSize);
+//void *ldRealloc(void *ptr,uint32_t newSize);
 
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
@@ -208,9 +205,9 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
 
 
 void ldBaseColor(arm_2d_tile_t* pTile,ldColor color,uint8_t opacity);
-void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t *pResTile,bool isWithMask,uint8_t opacity);
-void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
-void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,bool bIsNewFrame);
+void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t* pResTile, ldColor textColor, uint8_t opacity);
+void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,arm_2d_op_trans_msk_opa_t *pOP,bool bIsNewFrame);
 
 void ldBaseSetFont(ldChar_t **ppCharInfo, ldFontDict_t *pFontDictAddr);
 
@@ -218,7 +215,7 @@ void ldBaseTextDel(ldChar_t *pCharInfo);
 ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo);
 
 uint8_t ldBaseGetCharInfo(ldFontDict_t *ptFontDict,uint8_t *pCharUtf8,int16_t *pAdvWidth,int16_t *pOffsetX,int16_t *pOffsetY,int16_t *pWidth,int16_t *pHeight,uint32_t *pImgAddr);
-void ldBaseShowText(arm_2d_tile_t target, arm_2d_region_t region, ldChar_t *pTextInfo, int16_t scrollOffset);
+void ldBaseShowText(arm_2d_tile_t target, arm_2d_region_t region, ldChar_t *pTextInfo, int16_t scrollOffset, uint8_t opacity);
 
 
 void ldBaseSetText(ldChar_t **ppTextInfo, uint8_t *pStr);
@@ -230,6 +227,10 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *pTarg
 
 void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden);
+uint8_t ldBaseGetChScheme(uint8_t maskType);
+
+void ldBaseCharacter(arm_2d_tile_t* pParentTile, arm_2d_region_t *pShowRegion, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
+void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity);
 
 #ifdef __cplusplus
 }

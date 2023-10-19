@@ -75,14 +75,14 @@ __WEAK void ldFree(void *p)
 #endif
 }
 
-__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
-{
-#if USE_TLSF == 1
-    return tlsf_realloc(pTlsfMem, ptr, newSize);
-#else
-    return realloc(ptr,newSize);
-#endif
-}
+//__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
+//{
+//#if USE_TLSF == 1
+//    return tlsf_realloc(pTlsfMem, ptr, newSize);
+//#else
+//    return realloc(ptr,newSize);
+//#endif
+//}
 
 static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
@@ -345,7 +345,7 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,ui
     }
 }
 
-void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,bool bIsNewFrame)
+void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,arm_2d_op_trans_msk_opa_t *pOP,bool bIsNewFrame)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*pResTile;
@@ -372,9 +372,8 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
 #if USE_VIRTUAL_RESOURCE == 1
         maskTile.pTarget=(uintptr_t)maskTile.tTile.pchBuffer;
 #endif
-        arm_2d_op_trans_msk_opa_t tOP;
         arm_2dp_tile_transform_with_src_mask_and_opacity(
-                    &tOP,         //!< control block
+                    pOP,         //!< control block
                     (arm_2d_tile_t*)(&resource),        //!< source tile
                     (arm_2d_tile_t *)&maskTile,          //!< source mask
                     pTile,             //!< target tile
@@ -392,8 +391,7 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
         case ARM_2D_COLOUR_RGB565:
         case ARM_2D_COLOUR_CCCA8888:
         {
-            arm_2d_op_trans_t tOP;
-            arm_2dp_tile_transform_only(&tOP,
+            arm_2dp_tile_transform_only((arm_2d_op_trans_t*)pOP,
                                         (arm_2d_tile_t*)(&resource),
                                         pTile,
                                         NULL,
@@ -409,7 +407,7 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
     }
 }
 
-void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t *pResTile,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textColor,uint8_t opacity)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*pResTile;
@@ -528,44 +526,43 @@ ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo)
     return *ppCharInfo;
 }
 
+uint8_t ldBaseGetChScheme(uint8_t maskType)
+{
+    switch (maskType)
+    {
+    case 1:
+    {
+        return ARM_2D_COLOUR_1BIT;
+    }
+    case 2:
+    {
+        return ARM_2D_COLOUR_MASK_A2;
+    }
+    case 4:
+    {
+        return ARM_2D_COLOUR_MASK_A4;
+    }
+    case 8:
+    {
+        return ARM_2D_COLOUR_MASK_A8;
+    }
+    default:
+    {
+        return ARM_2D_COLOUR_1BIT;
+    }
+    }
+}
+
 void ldBaseSetFont(ldChar_t **ppCharInfo, ldFontDict_t* pFontDictAddr)
 {
     if(ldBaseCheckText(ppCharInfo))
     {
-
-    (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).pchBuffer=(uint8_t *)pFontDictAddr->pFontSrc;
+        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).pchBuffer=(uint8_t *)pFontDictAddr->pFontSrc;
 #if USE_VIRTUAL_RESOURCE == 1
-    (*ppCharInfo)->fontTile.pTarget=pFontDict->pFontSrc;
+        (*ppCharInfo)->fontTile.pTarget=pFontDict->pFontSrc;
 #endif
-    (*ppCharInfo)->pFontDict=pFontDictAddr;
-
-    switch (pFontDictAddr->maskType)
-    {
-    case 1:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
-        break;
-    }
-    case 2:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A2;
-        break;
-    }
-    case 4:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A4;
-        break;
-    }
-    case 8:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
-        break;
-    }
-    default:
-    {
-        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ARM_2D_COLOUR_1BIT;
-    }
-    }
+        (*ppCharInfo)->pFontDict=pFontDictAddr;
+        (*(arm_2d_tile_t*)(&(*ppCharInfo)->fontTile)).tColourInfo.chScheme=ldBaseGetChScheme(pFontDictAddr->maskType);
     }
 }
 
@@ -597,7 +594,7 @@ uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict, uint8_t *pCharUtf8, int16_t *
     uint8_t retBytes=0;
     ldFontInfo_t *pInfoList;
     dictCount=pFontDict->count;
-    pInfoList=pFontDict->pInfoList;
+    pInfoList=(ldFontInfo_t*)pFontDict->pInfoList;
 
     retBytes=_getUtf8Len(pCharUtf8[0]);
 
@@ -627,91 +624,131 @@ uint8_t ldBaseGetCharInfo(ldFontDict_t *pFontDict, uint8_t *pCharUtf8, int16_t *
     return retBytes;
 }
 
-arm_2d_region_t ldBaseGetAlignRegion(arm_2d_tile_t *pTile,arm_2d_size_t size,uint8_t align)
+arm_2d_region_t ldBaseAutoAlign(arm_2d_region_t *pRegion,arm_2d_size_t *pShowSize,uint8_t align)
 {
     arm_2d_region_t retRegion;
-
-    arm_2d_canvas(pTile,newCavas)
+    switch (align)
+    {
+    case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
+    {
+        arm_2d_align_top_left(*pRegion,*pShowSize)
         {
-            switch (align)
-            {
-            case (LD_ALIGN_TOP|LD_ALIGN_LEFT):
-            {
-                arm_2d_align_top_left(newCavas,size)
-                {
-                    retRegion=__top_left_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
-            {
-                arm_2d_align_top_centre(newCavas,size)
-                {
-                    retRegion=__top_centre_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
-            {
-                arm_2d_align_top_right(newCavas,size)
-                {
-                    retRegion=__top_right_region;
-                }
-                break;
-            }
-            case LD_ALIGN_LEFT:
-            {
-                arm_2d_align_left(newCavas,size)
-                {
-                    retRegion=__left_region;
-                }
-                break;
-            }
-            case LD_ALIGN_CENTER:
-            {
-                arm_2d_align_centre(newCavas,size)
-                {
-                    retRegion=__centre_region;
-                }
-                break;
-            }
-            case LD_ALIGN_RIGHT:
-            {
-                arm_2d_align_right(newCavas,size)
-                {
-                    retRegion=__right_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
-            {
-                arm_2d_align_bottom_left(newCavas,size)
-                {
-                    retRegion=__bottom_left_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
-            {
-                arm_2d_align_bottom_centre(newCavas,size)
-                {
-                    retRegion=__bottom_centre_region;
-                }
-                break;
-            }
-            case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
-            {
-                arm_2d_align_bottom_right(newCavas,size)
-                {
-                    retRegion=__bottom_right_region;
-                }
-                break;
-            }
-            default:
-                break;
-            }
+            retRegion=__top_left_region;
         }
+        break;
+    }
+    case (LD_ALIGN_TOP|LD_ALIGN_CENTER):
+    {
+        arm_2d_align_top_centre(*pRegion,*pShowSize)
+        {
+            retRegion=__top_centre_region;
+        }
+        break;
+    }
+    case (LD_ALIGN_TOP|LD_ALIGN_RIGHT):
+    {
+        arm_2d_align_top_right(*pRegion,*pShowSize)
+        {
+            retRegion=__top_right_region;
+        }
+        break;
+    }
+    case LD_ALIGN_LEFT:
+    {
+        arm_2d_align_left(*pRegion,*pShowSize)
+        {
+            retRegion=__left_region;
+        }
+        break;
+    }
+    case LD_ALIGN_CENTER:
+    {
+        arm_2d_align_centre(*pRegion,*pShowSize)
+        {
+            retRegion=__centre_region;
+        }
+        break;
+    }
+    case LD_ALIGN_RIGHT:
+    {
+        arm_2d_align_right(*pRegion,*pShowSize)
+        {
+            retRegion=__right_region;
+        }
+        break;
+    }
+    case (LD_ALIGN_BOTTOM|LD_ALIGN_LEFT):
+    {
+        arm_2d_align_bottom_left(*pRegion,*pShowSize)
+        {
+            retRegion=__bottom_left_region;
+        }
+        break;
+    }
+    case (LD_ALIGN_BOTTOM|LD_ALIGN_CENTER):
+    {
+        arm_2d_align_bottom_centre(*pRegion,*pShowSize)
+        {
+            retRegion=__bottom_centre_region;
+        }
+        break;
+    }
+    case (LD_ALIGN_BOTTOM|LD_ALIGN_RIGHT):
+    {
+        arm_2d_align_bottom_right(*pRegion,*pShowSize)
+        {
+            retRegion=__bottom_right_region;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    retRegion.tLocation.iX-=pRegion->tLocation.iX;
+    retRegion.tLocation.iY-=pRegion->tLocation.iY;
+
     return retRegion;
+}
+
+//待优化融合
+arm_2d_size_t ldBaseGetLineStrSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t *pRetBmpAscender)
+{
+    arm_2d_size_t retSize;
+    int16_t advWidth;
+    int16_t offsetX;
+    int16_t offsetY;
+    int16_t width;
+    int16_t height;
+    uint32_t imgAddr;
+    uint16_t len;
+    int16_t h1_max=0;
+    int16_t h2_min=0;
+    int16_t lineWidth=0;
+
+    uint8_t strLen=strlen((char*)pStr);
+
+    for(int i=0;i<strLen;)
+    {
+        len=ldBaseGetCharInfo(pFontDict,&pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
+        if(width==0)
+        {
+            break;
+        }
+
+        i+=len;
+
+        lineWidth+=advWidth;
+        h1_max=MAX(h1_max,height+offsetY);
+        h2_min=MIN(h2_min,offsetY);
+    }
+
+    retSize.iWidth=lineWidth;
+    retSize.iHeight=h1_max-h2_min;
+
+    *pRetBmpAscender=h1_max;
+
+    return retSize;
 }
 
 arm_2d_size_t ldBaseGetStringSize(ldChar_t *pTextInfo, int16_t *pBmpAscender, uint16_t frameWidth)
@@ -790,10 +827,7 @@ arm_2d_size_t ldBaseGetStringSize(ldChar_t *pTextInfo, int16_t *pBmpAscender, ui
     return retSize;
 }
 
-
-
-
-void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextInfo,int16_t scrollOffset)
+void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextInfo,int16_t scrollOffset,uint8_t opacity)
 {
     int16_t advWidth;
     int16_t width;
@@ -811,7 +845,7 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
 
     textSize= ldBaseGetStringSize(pTextInfo,&bmpH1Max,region.tSize.iWidth);
 
-    arm_2d_region_t alignSize= ldBaseGetAlignRegion(&fullTile,textSize,pTextInfo->align);
+    arm_2d_region_t alignSize= ldBaseAutoAlign(&target.tRegion,&textSize,pTextInfo->align);
 
     if(pTextInfo->align==(LD_ALIGN_TOP|LD_ALIGN_LEFT))
     {
@@ -881,13 +915,163 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
 
             arm_2d_tile_t charTile=impl_child_tile(showTile,textOffsetX+offsetX,tempHeight,width,height);
 
-            ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,pTextInfo->charColor,255);
+            ldBaseMaskImage(&charTile,(arm_2d_tile_t*)&fontTile,pTextInfo->charColor,opacity);
             arm_2d_op_wait_async(NULL);
 
             textOffsetX+=advWidth;
 
             i+=len;
         }
+    }
+}
+
+void ldBaseCharacter(arm_2d_tile_t* pParentTile,arm_2d_region_t* pShowRegion,arm_2d_tile_t *pResTile,ldColor textColor,uint8_t opacity)
+{
+#if USE_OPACITY == 0
+    ARM_2D_UNUSED(opacity);
+#endif
+    switch (pResTile->tInfo.tColourInfo.chScheme)
+    {
+    case ARM_2D_COLOUR_1BIT:
+    {
+#if USE_OPACITY == 1
+        arm_2d_draw_pattern(pResTile,
+                            pParentTile,
+                            pShowRegion,
+                            ARM_2D_DRW_PATN_MODE_COPY,
+                            textColor,
+                            GLCD_COLOR_BLACK);
+#else
+        arm_2d_draw_pattern(pResTile,
+                            pParentTile,
+                            pShowRegion,
+                            ARM_2D_DRW_PATN_MODE_COPY,
+                            textColor,
+                            GLCD_COLOR_BLACK);
+#endif
+
+        break;
+    }
+    case ARM_2D_COLOUR_MASK_A2:
+    {
+#if USE_OPACITY == 1
+        arm_2d_fill_colour_with_a2_mask_and_opacity(pParentTile,
+                                                    pShowRegion,
+                                                    pResTile,
+                                                    (__arm_2d_color_t){textColor},
+                                                    opacity);
+#else
+        arm_2d_fill_colour_with_a2_mask(pParentTile,
+                                        pShowRegion,
+                                        pResTile,
+                                        (__arm_2d_color_t){textColor});
+#endif
+        break;
+    }
+    case ARM_2D_COLOUR_MASK_A4:
+    {
+#if USE_OPACITY == 1
+        arm_2d_fill_colour_with_a4_mask_and_opacity(pParentTile,
+                                                    pShowRegion,
+                                                    pResTile,
+                                                    (__arm_2d_color_t){textColor},
+                                                    opacity);
+#else
+        arm_2d_fill_colour_with_a4_mask(pParentTile,
+                                        pShowRegion,
+                                        pResTile,
+                                        (__arm_2d_color_t){textColor});
+#endif
+        break;
+    }
+    case ARM_2D_COLOUR_MASK_A8:
+    {
+#if USE_OPACITY == 1
+        arm_2d_fill_colour_with_mask_and_opacity(pParentTile,
+                                                 pShowRegion,
+                                                 pResTile,
+                                                 (__arm_2d_color_t){textColor},
+                                                 opacity);
+#else
+        arm_2d_fill_colour_with_mask(pParentTile,
+                                     pShowRegion,
+                                     pResTile,
+                                     (__arm_2d_color_t){textColor});
+#endif
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity)
+{
+    int16_t advWidth;
+    int16_t width;
+    int16_t height;
+    uint32_t imgAddr;
+    uint8_t len;
+    int16_t offsetX=0,offsetY=0;
+    int16_t textOffsetX=0;
+    int16_t bmpH1Max;
+
+    uint8_t strLen=strlen((char*)pStr);
+
+    arm_2d_size_t textSize;
+
+    textSize= ldBaseGetLineStrSize(pStr,pFontDict,&bmpH1Max);
+
+    arm_2d_region_t alignSize= ldBaseAutoAlign(&pResTileTemplate->tRegion,&textSize,align);
+
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t resTile = *pResTileTemplate;
+#else
+    arm_2d_vres_t resTile = *((arm_2d_vres_t*)pResTileTemplate);
+#endif
+
+    textOffsetX=0;
+
+    for(int i=0;i<strLen;)
+    {
+        len=ldBaseGetCharInfo(pFontDict,&pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
+
+        if(width==0)
+        {
+            break;
+        }
+
+#if USE_VIRTUAL_RESOURCE == 0
+
+        resTile.tRegion.tSize.iWidth=width;
+        resTile.tRegion.tSize.iHeight=height;
+        resTile.pchBuffer=(uint8_t*)(pFontDict->pFontSrc+imgAddr);
+#else
+        fontTile = *((arm_2d_vres_t*)&pTextInfo->fontTile);
+        fontTile.tTile.tRegion.tSize.iWidth=width;
+        fontTile.tTile.tRegion.tSize.iHeight=height;
+        fontTile.tTile.pchBuffer=imgAddr;
+        fontTile.pTarget=imgAddr;
+#endif
+        int16_t tempHeight;
+
+
+        tempHeight=bmpH1Max-(height+offsetY);
+        resTile.tRegion.tLocation.iX=0;
+        resTile.tRegion.tLocation.iY=0;
+
+        arm_2d_region_t showRegion;
+        showRegion.tLocation.iX=alignSize.tLocation.iX+textOffsetX;
+        showRegion.tLocation.iY=alignSize.tLocation.iY+tempHeight+scrollOffset;
+        showRegion.tSize=resTile.tRegion.tSize;
+
+        ldBaseCharacter(pTile,&showRegion,&resTile,textColor,opacity);
+
+        arm_2d_op_wait_async(NULL);
+
+        textOffsetX+=advWidth;
+
+        i+=len;
     }
 }
 
@@ -903,7 +1087,7 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
 void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
 {
     uint8_t newStrlen;
-    newStrlen=strlen((char*)pStr);
+    newStrlen=strlen((char*)pStr)+1;
 
     if(ldBaseCheckText(ppTextInfo))
     {
@@ -921,9 +1105,9 @@ void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
             {
                 return;
             }
-            (*ppTextInfo)-> strLen=newStrlen;
+            (*ppTextInfo)-> strLen=newStrlen-1;
         }
-
+        memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
         strcpy((char*)(*ppTextInfo)->pStr,(char*)pStr);
     }
 }
