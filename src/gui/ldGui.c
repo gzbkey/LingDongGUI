@@ -79,15 +79,14 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         pWidget=prevWidget;
         if(pWidget!=NULL)
         {
-            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
-
-            //计算速度
+            //cal speed
             deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
             pressPoint.x=(prevX-pressPoint.x);
             pressPoint.y=(prevY-pressPoint.y);
             pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
             pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
-            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));
+            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));//x speed | y speed
+            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
         }
         break;
     }

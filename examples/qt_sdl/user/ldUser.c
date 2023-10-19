@@ -25,14 +25,14 @@ ldProgressBar_t *bar,*bar1,*bar2,*bar3;
 ldRadialMenu_t* menu;
 
 ldCheckBox_t *cBox,*cBox1;
-
+ldScrollSelecter_t *scroll;
 
 void userInit(void)
 {
     win0=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(win0,__RGB(220,220,220));
 
-    win1=ldWindowInit(1, 0, 0,0,400,200);
+    win1=ldWindowInit(1, 0, 20,30,400,200);
     ldWindowSetBgColor(win1,__RGB(180,180,180));
 
 //    img0=ldImageInit(2, 1, 10,40,72,72,RELEASE_PNG,true);
@@ -60,11 +60,11 @@ void userInit(void)
 
 //    ldButtonSetSelect(btn1,true);
 
-    txt0=ldTextInit(5, 1, 310, 10, 55, 120,MICROSOFT_YAHEI_REGULAR_20);
-//    ldTextSetTransparent(txt0,true);
-    ldTextSetText(ldGetWidgetById(5),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
-    ldTextSetAlign(ldGetWidgetById(5),LD_ALIGN_TOP|LD_ALIGN_LEFT);
-    ldTextSetScroll(txt0,true);
+//    txt0=ldTextInit(5, 1, 310, 10, 55, 120,MICROSOFT_YAHEI_REGULAR_20);
+////    ldTextSetTransparent(txt0,true);
+//    ldTextSetText(ldGetWidgetById(5),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
+//    ldTextSetAlign(ldGetWidgetById(5),LD_ALIGN_TOP|LD_ALIGN_LEFT);
+//    ldTextSetScroll(txt0,true);
 
 //    bar=ldProgressBarInit(6,1,200,15,100,18);
 //    ldProgressBarSetPercent(bar,50);
@@ -88,12 +88,12 @@ void userInit(void)
 //    ldProgressBarSetPercent(bar3,50);
 
     //radial menu
-    menu=ldRadialMenuInit(10,1,0,10,480,200,300,100,9);
+//    menu=ldRadialMenuInit(10,1,0,10,480,200,300,100,9);
 
 //    ldRadialMenuAddItem(menu,ICON1_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,PRESS_BMP,72,72,1,false);
+//    ldRadialMenuAddItem(menu,PRESS_BMP,72,72,1,false);
 //    ldRadialMenuAddItem(menu,ICON3_JPEG,100,100,1,false);
-    ldRadialMenuAddItem(menu,RELEASE_BMP,72,72,1,false);
+//    ldRadialMenuAddItem(menu,RELEASE_BMP,72,72,1,false);
 //    ldRadialMenuAddItem(menu,ICON5_JPEG,100,100,1,false);
 //    ldRadialMenuAddItem(menu,ICON6_JPEG,100,100,1,false);
 //    ldRadialMenuAddItem(menu,ICON7_JPEG,100,100,1,false);
@@ -107,19 +107,19 @@ void userInit(void)
 //        ldRadialMenuAddItem(menu,RELEASE_BMP,72,72,1,false);
 //        ldRadialMenuAddItem(menu,RELEASE_BMP,72,72,1,false);
 
-    cBox=ldCheckBoxInit(11,1,10,120,144,72);
+//    cBox=ldCheckBoxInit(11,1,10,120,144,72);
 
-    ldCheckBoxSetFont(cBox,MICROSOFT_YAHEI_REGULAR_20);
-    ldCheckBoxSetText(cBox,"栟𨭉");
-//    ldCheckBoxSetColor(cBox,GLCD_COLOR_BLUE,GLCD_COLOR_WHITE);
-//    ldCheckBoxSetImage(cBox,72,PRESS_BMP,false,RELEASE_PNG,true);
-    ldCheckBoxSetCorner(cBox,1);
-ldCheckBoxSetRadioButtonGroup(cBox,0);
+//    ldCheckBoxSetFont(cBox,MICROSOFT_YAHEI_REGULAR_20);
+//    ldCheckBoxSetText(cBox,"栟𨭉");
+////    ldCheckBoxSetColor(cBox,GLCD_COLOR_BLUE,GLCD_COLOR_WHITE);
+////    ldCheckBoxSetImage(cBox,72,PRESS_BMP,false,RELEASE_PNG,true);
+//    ldCheckBoxSetCorner(cBox,1);
+//ldCheckBoxSetRadioButtonGroup(cBox,0);
 
-    cBox1=ldCheckBoxInit(14,1,10,80,144,72);
-    ldCheckBoxSetFont(cBox1,MICROSOFT_YAHEI_REGULAR_20);
-    ldCheckBoxSetText(cBox1,"栟𨭉");
-ldCheckBoxSetRadioButtonGroup(cBox1,1);
+//    cBox1=ldCheckBoxInit(14,1,10,80,144,72);
+//    ldCheckBoxSetFont(cBox1,MICROSOFT_YAHEI_REGULAR_20);
+//    ldCheckBoxSetText(cBox1,"栟𨭉");
+//ldCheckBoxSetRadioButtonGroup(cBox1,1);
 //    ldLabelInit(12,1,200,120,72,50,MICROSOFT_YAHEI_REGULAR_20);
 //    ldLabelSetText(ldGetWidgetById(12),"栟𨭉栟");
 //    ldLabelSetAlign(ldGetWidgetById(12),LD_ALIGN_LEFT);
@@ -130,7 +130,7 @@ ldCheckBoxSetRadioButtonGroup(cBox1,1);
 //    ldScrollSelecterAddItem(ldGetWidgetById(13),"0123");
 //    ldScrollSelecterAddItem(ldGetWidgetById(13),"02");
 
-ldScrollSelecter_t *scroll=ldScrollSelecterInit(2,1,100,30,72,72,SIMSUN_REGULAR_12,10);
+    scroll=ldScrollSelecterInit(2,1,100,30,72,72,SIMSUN_REGULAR_12,10);
     ldScrollSelecterAddItem(scroll,"0");
     ldScrollSelecterAddItem(scroll,"1");
     ldScrollSelecterAddItem(scroll,"2");
@@ -144,7 +144,7 @@ ldScrollSelecter_t *scroll=ldScrollSelecterInit(2,1,100,30,72,72,SIMSUN_REGULAR_
 
 //ldScrollSelecterSetBgColor(scroll,__RGB(180,0,0));
     ldScrollSelecterSetBgImage(scroll,PRESS_BMP);
-ldScrollSelecterSetSpeed(scroll,3);
+ldScrollSelecterSetSpeed(scroll,5);
 }
 
 
@@ -154,12 +154,23 @@ void userInit1(void)
 //    img1=ldImageInit(1, 0, 100,120,163,65,(uint32_t)&press_bmp[0],false);
 }
 
+bool isTop=false;
 void userLoop(void)
 {
-    if( ldTimeOut(200, &timer,true))
+    if( ldTimeOut(3000, &timer,true))
     {
 //        btn0->isPressed=!btn0->isPressed;
 //        ldGuiJumpPage(1);
+
+        if(isTop)
+        {
+            ldScrollSelecterSetItem(scroll,0);
+        }
+        else
+        {
+            ldScrollSelecterSetItem(scroll,9);
+        }
+isTop=!isTop;
     }
 
 //    if(xBtnGetState(KEY_NUM_LEFT,BTN_PRESS))

@@ -18,6 +18,9 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+#define MOVE_SPEED_THRESHOLD_VALUE     (20)          //触摸移动速度超过此值，则产生惯性滑动效果
+#define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
+
 static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -98,7 +101,8 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     {
     case SIGNAL_PRESS:
     {
-        selecter->isRelease=false;
+        selecter->isWaitMove=false;
+        selecter->isAutoMove=false;
         _scrollOffset=selecter->scrollOffset;
         break;
     }
@@ -109,8 +113,30 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     }
     case SIGNAL_RELEASE:
     {
-        selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,selecter->scrollOffset);
-        selecter->isRelease=true;
+        if(!selecter->isAutoMove)
+        {
+            selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,selecter->scrollOffset);
+        }
+        selecter->isWaitMove=true;
+        break;
+    }
+    case SIGNAL_MOVE_SPEED:
+    {
+        int16_t ySpeed=(int16_t)(info.value&0xFFFF);
+
+        if(ySpeed>MOVE_SPEED_THRESHOLD_VALUE)
+        {
+            selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
+            selecter->isAutoMove=true;
+        }
+        else
+        {
+            if(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE)
+            {
+                selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
+                selecter->isAutoMove=true;
+            }
+        }
         break;
     }
     default:
@@ -180,10 +206,13 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->isTransparent=true;
         pNewWidget->bgColor=0;
         pNewWidget->moveOffset=1;
+        pNewWidget->isAutoMove=false;
+        pNewWidget->isWaitMove=false;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotScrollSelecterScroll);
+        xConnect(pNewWidget->nameId,SIGNAL_MOVE_SPEED,pNewWidget->nameId,slotScrollSelecterScroll);
 
         LOG_INFO("[scrollSelecter] init,id:%d\n",nameId);
     }
@@ -212,13 +241,13 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
         return;
     }
 
-    if((pWidget->isRelease)&&(bIsNewFrame))
+    if((pWidget->isWaitMove)&&(bIsNewFrame))
     {
         int16_t targetOffset=-(pWidget->itemSelect*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight);
 
         if(pWidget->scrollOffset==targetOffset)
         {
-            pWidget->isRelease=false;
+            pWidget->isWaitMove=false;
         }
         else
         {
@@ -358,6 +387,9 @@ void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
 #endif
 }
 
+//selecter的滑动速度
+//最小值:1
+//最大值:控件高度
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
 {
     if (pWidget == NULL)
@@ -373,6 +405,20 @@ void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
         speed=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
     }
     pWidget->moveOffset=speed;
+}
+
+void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+    if(itemNum>=pWidget->itemCount)
+    {
+        itemNum=pWidget->itemCount-1;
+    }
+    pWidget->itemSelect=itemNum;
+    pWidget->isWaitMove=true;
 }
 
 #if defined(__clang__)

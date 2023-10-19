@@ -1,5 +1,5 @@
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">灵动GUI</h1>
-<h4 align="center">一个基于ARM-2D的轻巧GUI</h4>
+<h4 align="center">一个基于ARM-2D的GUI</h4>
 <p align="center">
 	<a href="https://gitee.com/gzbkey/LingDongGUI/stargazers"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/star.svg"></a>
 	<a href="https://gitee.com/gzbkey/LingDongGUI/members"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/fork.svg"></a>
@@ -8,6 +8,8 @@
 # 简介
 
 * 灵动GUI是基于ARM-2D进行开发的GUI，极大降低ARM-2D的使用难度
+
+* 支持ARM单片机、RISCV单片机
 
 * 使用类似Qt的信号槽模式
 
