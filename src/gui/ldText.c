@@ -228,7 +228,7 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
         return;
     }
     ldBaseSetText(&pWidget->pTextInfo,pStr);
-    textSize= ldBaseGetStringSize(pWidget->pTextInfo,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
+    textSize= ldBaseGetStringSize(pWidget->pTextInfo->pStr,pWidget->pTextInfo->pFontDict,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
     pWidget->strHeight=textSize.iHeight;
 }
 

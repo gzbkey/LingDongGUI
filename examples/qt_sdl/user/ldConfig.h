@@ -21,6 +21,7 @@ extern "C" {
 
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 
+#define LD_DEBUG                                  0
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

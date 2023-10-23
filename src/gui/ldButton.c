@@ -22,10 +22,7 @@ static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldButton_t*)pTarget)->pTextInfo!=NULL)
-        {
-            ldBaseTextDel(((ldButton_t*)pTarget)->pTextInfo);
-        }
+        ldFree(((ldButton_t*)pTarget)->pStr);
         ldFree(((ldButton_t*)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -116,7 +113,9 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->isPressMask = false;
         pNewWidget->isTransparent=false;
         pNewWidget->isHidden = false;
-        pNewWidget->pTextInfo = NULL;
+        pNewWidget->pStr = NULL;
+        pNewWidget->pFontDict = NULL;
+        pNewWidget->align = 0;
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -154,7 +153,9 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
     {
         return;
     }
-    ldBaseSetText(&pWidget->pTextInfo,pStr);
+    ldFree(pWidget->pStr);
+    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
 void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
@@ -193,7 +194,7 @@ void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
     {
         return;
     }
-    ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
+    pWidget->charColor=charColor;
 }
 
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
@@ -317,9 +318,9 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
             }
             arm_2d_op_wait_async(NULL);
 
-            if(pWidget->pTextInfo!=NULL)
+            if(pWidget->pStr!=NULL)
             {
-                ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
+                ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
                 arm_2d_op_wait_async(NULL);
             }
 
@@ -340,18 +341,17 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                     else
                     {
                         arm_2d_draw_box(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,3,pWidget->selectColor,SELECT_COLOR_OPACITY);
-
                     }
                 }
                 else
                 {
 #if USE_VIRTUAL_RESOURCE == 0
                     tempRes=*pResTile;
-                    tempRes.tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                    tempRes.tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
                     tempRes.pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
 #else
                     tempRes=*((arm_2d_vres_t*)pResTile);
-                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
                     ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
                     tempRes.pTarget=pWidget->selectMaskAddr;
                     tempRes.Load = &__disp_adapter0_vres_asset_loader;
@@ -372,7 +372,7 @@ void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
     {
         return;
     }
-    ldBaseSetAlign(&pWidget->pTextInfo,align);
+    pWidget->align=align;
 }
 
 void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
@@ -381,7 +381,7 @@ void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
     {
         return;
     }
-    ldBaseSetFont(&pWidget->pTextInfo,pFontDict);
+    pWidget->pFontDict=pFontDict;
 }
 
 #if defined(__clang__)

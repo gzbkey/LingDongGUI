@@ -23,7 +23,10 @@ typedef struct {
     uint32_t pressImgAddr;
     uint32_t selectMaskAddr;
     uint32_t keyValue;
-    ldChar_t *pTextInfo;
+    ldFontDict_t* pFontDict;
+    uint8_t* pStr;
+    uint8_t align:4;
+    ldColor charColor;
     ldColor releaseColor;
     ldColor pressColor;
     ldColor selectColor;

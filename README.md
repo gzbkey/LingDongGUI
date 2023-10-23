@@ -5,7 +5,7 @@
 	<a href="https://gitee.com/gzbkey/LingDongGUI/members"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/fork.svg"></a>
 </p>
 
-# 简介
+## 简介
 
 * 灵动GUI是基于ARM-2D进行开发的GUI，极大降低ARM-2D的使用难度
 
@@ -20,7 +20,7 @@
 🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
 
 
-# 控件列表
+## 控件列表
 
 | 状态 | 名称 | 说明 |
 | :----:| ---- | ---- |
@@ -44,28 +44,28 @@
 | 🔲 | number keyboard | 数字键盘 |
 | 🔲 | qwerty keyboard | 英文键盘 |
 
-# 如何测试
+## 如何测试
 
-## Qt
+### Qt
 
 使用qt进行电脑模拟测试，路径为[examples/qt_sdl](./examples/qt_sdl)
 
 📖 [使用说明](./examples/qt_sdl/README.md)
 
-## VSCode
+### VSCode
 
 使用vscode进行电脑模拟测试，路径为[examples/vscode_sdl](./examples/vscode_sdl)
 
 📖 [使用说明](./examples/vscode_sdl/README.md)
 
-# 如何生产图片字模数据
+## 如何生产图片字模数据
 
 tools文件夹中有工具生成数据
 
 📖 [使用说明](./tools/README.md)
 
 
-# 如何添加自定义控件
+## 如何添加自定义控件
 
 1、运行python脚本，[src/gui/createWidget.py](./src/gui/createWidget.py)，输入控件名称后，自动创控件名称文件和自动修改代码
 
@@ -84,7 +84,7 @@ ldGui.c中添加新控件的头文件
 
 ---
 
-# 技术交流
+## 技术交流
 
 🐧 QQ群：187033407
 

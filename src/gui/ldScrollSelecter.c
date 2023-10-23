@@ -181,7 +181,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         tResTile->tRegion.tSize.iHeight=height;
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        tResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pFontDict->maskType);
         tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
         tResTile->tInfo.bVirtualResource = true;
@@ -297,11 +297,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
             arm_2d_op_wait_async(NULL);
         }
 
-        pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        pResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
         for(uint8_t strGroupCount=0;strGroupCount<pWidget->itemCount;strGroupCount++)
         {
             uint8_t *pStrGroup=pWidget->ppItemStrGroup[strGroupCount];
-            int16_t offset=(strGroupCount*pWidget->resource.tRegion.tSize.iHeight)+pWidget->scrollOffset;
+            int16_t offset=(strGroupCount*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)+pWidget->scrollOffset;
 #if USE_OPACITY == 1
             ldBaseLineText(&tTarget,&pWidget->resource,pStrGroup,pWidget->pFontDict,pWidget->align,pWidget->charColor,offset,pWidget->opacity);
 #else

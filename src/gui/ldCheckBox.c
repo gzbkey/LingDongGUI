@@ -112,10 +112,7 @@ static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldCheckBox_t*)pTarget)->pTextInfo!=NULL)
-        {
-            ldBaseTextDel(((ldCheckBox_t*)pTarget)->pTextInfo);
-        }
+        ldFree(((ldCheckBox_t*)pTarget)->pStr);
         ldFree(((ldCheckBox_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -217,10 +214,12 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->isChecked=false;
         pNewWidget->bgColor=__RGB(255,255,255);
         pNewWidget->fgColor=__RGB(0,0,0);
-        pNewWidget->textColor=__RGB(0,0,0);
+        pNewWidget->charColor=__RGB(0,0,0);
         pNewWidget->checkedImgAddr=LD_ADDR_NONE;
         pNewWidget->uncheckedImgAddr=LD_ADDR_NONE;
-        pNewWidget->pTextInfo = NULL;
+        pNewWidget->pStr = NULL;
+        pNewWidget->pFontDict = NULL;
+        pNewWidget->align = 0;
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
         pNewWidget->isRadioButton=false;
         pNewWidget->radioButtonGroup=0;
@@ -370,13 +369,12 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
         arm_2d_op_wait_async(NULL);
 
-        if(pWidget->pTextInfo!=NULL)
+        if(pWidget->pStr!=NULL)
         {
             //最后使用，不再生产中间变量，直接修改tTarget
             tTarget.tRegion.tLocation.iX+=pWidget->boxWidth+2;
             tTarget.tRegion.tSize.iWidth-=pWidget->boxWidth+2;
-
-            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
+            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
             arm_2d_op_wait_async(NULL);
         }
     }
@@ -410,8 +408,8 @@ void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict)
     {
         return;
     }
-    ldBaseSetFont(&pWidget->pTextInfo,pFontDict);
-    pWidget->pTextInfo->align=LD_ALIGN_LEFT;
+    pWidget->pFontDict=pFontDict;
+    pWidget->align=LD_ALIGN_LEFT;
 }
 
 void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
@@ -420,7 +418,9 @@ void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
     {
         return;
     }
-    ldBaseSetText(&pWidget->pTextInfo,pStr);
+    ldFree(pWidget->pStr);
+    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num)

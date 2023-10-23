@@ -60,11 +60,11 @@ void userInit(void)
 
 //    ldButtonSetSelect(btn1,true);
 
-//    txt0=ldTextInit(5, 1, 310, 10, 55, 120,MICROSOFT_YAHEI_REGULAR_20);
-////    ldTextSetTransparent(txt0,true);
-//    ldTextSetText(ldGetWidgetById(5),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
-//    ldTextSetAlign(ldGetWidgetById(5),LD_ALIGN_TOP|LD_ALIGN_LEFT);
-//    ldTextSetScroll(txt0,true);
+    txt0=ldTextInit(5, 1, 310, 10, 55, 120,MICROSOFT_YAHEI_REGULAR_20);
+//    ldTextSetTransparent(txt0,true);
+    ldTextSetText(ldGetWidgetById(5),"栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟𨭉栟栟");
+    ldTextSetAlign(ldGetWidgetById(5),LD_ALIGN_TOP|LD_ALIGN_LEFT);
+    ldTextSetScroll(txt0,true);
 
 //    bar=ldProgressBarInit(6,1,200,15,100,18);
 //    ldProgressBarSetPercent(bar,50);
@@ -120,27 +120,27 @@ void userInit(void)
 //    ldCheckBoxSetFont(cBox1,MICROSOFT_YAHEI_REGULAR_20);
 //    ldCheckBoxSetText(cBox1,"栟𨭉");
 //ldCheckBoxSetRadioButtonGroup(cBox1,1);
-//    ldLabelInit(12,1,200,120,72,50,MICROSOFT_YAHEI_REGULAR_20);
-//    ldLabelSetText(ldGetWidgetById(12),"栟𨭉栟");
-//    ldLabelSetAlign(ldGetWidgetById(12),LD_ALIGN_LEFT);
-////    ldLabelSetBgColor(ldGetWidgetById(12),__RGB(128,128,0));
-//    ldLabelSetBgImage(ldGetWidgetById(12),PRESS_BMP);
+    ldLabelInit(12,1,200,120,72,50,MICROSOFT_YAHEI_REGULAR_20);
+    ldLabelSetText(ldGetWidgetById(12),"栟𨭉");
+    ldLabelSetAlign(ldGetWidgetById(12),LD_ALIGN_LEFT);
+//    ldLabelSetBgColor(ldGetWidgetById(12),__RGB(128,128,0));
+    ldLabelSetBgImage(ldGetWidgetById(12),PRESS_BMP);
 
 //    ldScrollSelecterInit(13,1,0,0,60,40,SIMSUN_REGULAR_12,8);
 //    ldScrollSelecterAddItem(ldGetWidgetById(13),"0123");
 //    ldScrollSelecterAddItem(ldGetWidgetById(13),"02");
 
-    scroll=ldScrollSelecterInit(2,1,100,30,72,72,SIMSUN_REGULAR_12,10);
-    ldScrollSelecterAddItem(scroll,"0");
-    ldScrollSelecterAddItem(scroll,"1");
-    ldScrollSelecterAddItem(scroll,"2");
-    ldScrollSelecterAddItem(scroll,"3");
-    ldScrollSelecterAddItem(scroll,"10");
-    ldScrollSelecterAddItem(scroll,"11");
-    ldScrollSelecterAddItem(scroll,"12");
-    ldScrollSelecterAddItem(scroll,"13");
-    ldScrollSelecterAddItem(scroll,"20");
-    ldScrollSelecterAddItem(scroll,"21");
+    scroll=ldScrollSelecterInit(2,1,100,30,72,72,MICROSOFT_YAHEI_REGULAR_20,10);
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"栟");
+    ldScrollSelecterAddItem(scroll,"𨭉");
+    ldScrollSelecterAddItem(scroll,"𨭉");
+    ldScrollSelecterAddItem(scroll,"𨭉");
 
 //ldScrollSelecterSetBgColor(scroll,__RGB(180,0,0));
     ldScrollSelecterSetBgImage(scroll,PRESS_BMP);

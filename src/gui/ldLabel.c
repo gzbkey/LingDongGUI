@@ -21,10 +21,7 @@ static bool _labelDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldLabel_t*)pTarget)->pTextInfo!=NULL)
-        {
-            ldBaseTextDel(((ldLabel_t*)pTarget)->pTextInfo);
-        }
+        ldFree(((ldLabel_t*)pTarget)->pStr);
         ldFree(((ldLabel_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -100,7 +97,11 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 #endif
 
         pNewWidget->isTransparent=true;
-        ldBaseSetFont(&pNewWidget->pTextInfo,pFontDict);
+        pNewWidget->pStr = NULL;
+        pNewWidget->pFontDict = NULL;
+        pNewWidget->align = 0;
+        pNewWidget->charColor = 0;
+        pNewWidget->pFontDict = pFontDict;
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
@@ -147,6 +148,7 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             }
             else
             {
+                pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
                 pResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
                 ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
@@ -161,12 +163,13 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             arm_2d_op_wait_async(NULL);
         }
 
-        if(pWidget->pTextInfo!=NULL)
+        if(pWidget->pStr!=NULL)
         {
+            pResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
 #if USE_OPACITY == 1
-            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,pWidget->opacity);
+            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,pWidget->opacity);
 #else
-            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
+            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,0,pWidget->charColor,0,255);
 #endif
             arm_2d_op_wait_async(NULL);
         }
@@ -188,7 +191,9 @@ void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr)
     {
         return;
     }
-    ldBaseSetText(&pWidget->pTextInfo,pStr);
+    ldFree(pWidget->pStr);
+    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
 void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor)
@@ -197,7 +202,7 @@ void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor)
     {
         return;
     }
-    ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
+    pWidget->charColor=charColor;
 }
 
 void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align)
@@ -206,7 +211,7 @@ void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align)
     {
         return;
     }
-    ldBaseSetAlign(&pWidget->pTextInfo,align);
+    pWidget->align=align;
 }
 
 void ldLabelSetBgImage(ldLabel_t *pWidget, uint32_t imageAddr)

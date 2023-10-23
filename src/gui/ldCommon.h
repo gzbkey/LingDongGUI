@@ -221,7 +221,7 @@ void ldBaseShowText(arm_2d_tile_t target, arm_2d_region_t region, ldChar_t *pTex
 void ldBaseSetText(ldChar_t **ppTextInfo, uint8_t *pStr);
 void ldBaseSetTextColor(ldChar_t **ppTextInfo, ldColor charColor);
 void ldBaseSetAlign(ldChar_t **ppTextInfo, uint8_t align);
-arm_2d_size_t ldBaseGetStringSize(ldChar_t *pTextInfo,int16_t *pBmpAscender,uint16_t frameWidth);
+arm_2d_size_t ldBaseGetStringSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t *pRetBmpAscender, uint16_t frameWidth);
 
 arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget,arm_2d_region_t *pTargetRegion);
 
