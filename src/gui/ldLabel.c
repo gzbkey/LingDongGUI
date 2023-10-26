@@ -169,7 +169,7 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #if USE_OPACITY == 1
             ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,pWidget->opacity);
 #else
-            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,0,pWidget->charColor,0,255);
+            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
 #endif
             arm_2d_op_wait_async(NULL);
         }

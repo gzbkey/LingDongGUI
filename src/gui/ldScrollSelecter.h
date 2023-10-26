@@ -39,6 +39,7 @@ void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTranspare
 void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity);
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
 void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum);
+void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align);
 
 #define ldScrollSelecterSetHidden          ldBaseSetHidden
 #define ldScrollSelecterMove               ldBaseMove

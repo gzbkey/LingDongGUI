@@ -3,6 +3,7 @@
 <p align="center">
 	<a href="https://gitee.com/gzbkey/LingDongGUI/stargazers"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/star.svg"></a>
 	<a href="https://gitee.com/gzbkey/LingDongGUI/members"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/fork.svg"></a>
+	<a><img src="https://img.shields.io/github/license/gzbkey/LingDongGUI"></a>
 </p>
 
 ## 简介

@@ -719,8 +719,6 @@ arm_2d_size_t ldBaseGetStringSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t 
     int16_t height;
     uint32_t imgAddr;
     uint16_t len;
-    int16_t h1_max=0;
-    int16_t h2_min=0;
     int16_t lineWidth=0;
     int16_t sizeWidthMax=0;
     int16_t sizeHeightMax=pFontDict->lineOffset;
@@ -758,8 +756,6 @@ arm_2d_size_t ldBaseGetStringSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t 
         i+=len;
 
         lineWidth+=advWidth;
-        h1_max=MAX(h1_max,height+offsetY);
-        h2_min=MIN(h2_min,offsetY);
         if(((lineWidth+advWidth)>frameWidth)&&(i<strLen))//自动换行
         {
             sizeWidthMax=MAX(sizeWidthMax,lineWidth);
@@ -771,9 +767,9 @@ arm_2d_size_t ldBaseGetStringSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t 
     if(sizeWidthMax==0)//单行
     {
         retSize.iWidth=lineWidth;
-        retSize.iHeight=h1_max-h2_min;
+        retSize.iHeight=pFontDict->lineStrHeight;//h1_max-h2_min;
 
-        *pRetBmpAscender=h1_max;
+        *pRetBmpAscender=pFontDict->lineStrAscender;//h1_max;
     }
     else
     {
@@ -979,7 +975,7 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
 
     arm_2d_size_t textSize;
 
-    textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,pResTileTemplate->tRegion.tSize.iWidth);
+    textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
 
     arm_2d_region_t alignSize= ldBaseAutoAlign(&pResTileTemplate->tRegion,&textSize,align);
 

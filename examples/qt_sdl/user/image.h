@@ -30,6 +30,11 @@ extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
 #define SIMSUN_REGULAR_12 (&dict_SimSun_Regular_12)
 extern ldFontDict_t dict_SimSun_Regular_12;
 
+#define WENQUANYI_ZEN_HEI_REGULAR_36 (&dict_WenQuanYi_Zen_Hei_Regular_36)
+extern ldFontDict_t dict_WenQuanYi_Zen_Hei_Regular_36;
+
+
+
 #else
 
 //barFrame.png w:100 h:18 < 565+Mask >

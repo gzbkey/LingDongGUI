@@ -121,9 +121,11 @@ typedef struct{
 
 typedef struct{
     uint8_t maskType;
-    uint32_t count;
+    uint16_t count;
     uint16_t lineOffset;
     int16_t descender;
+    uint16_t lineStrHeight;
+    int16_t lineStrAscender;
     const ldFontInfo_t *pInfoList;
     const uint8_t *pFontSrc;
 }ldFontDict_t;

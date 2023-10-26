@@ -421,6 +421,15 @@ void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum)
     pWidget->isWaitMove=true;
 }
 
+void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->align=align;
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
