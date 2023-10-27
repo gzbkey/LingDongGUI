@@ -162,6 +162,8 @@ typedef struct{
     uint32_t count;
     uint16_t lineOffset;
     int16_t descender;
+    uint16_t lineStrHeight;
+    int16_t lineStrAscender;
     const ldFontInfo_t *pInfoList;
     uint32_t pFontSrc;
 }ldFontDict_t;
