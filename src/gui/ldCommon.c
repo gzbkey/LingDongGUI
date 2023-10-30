@@ -727,7 +727,7 @@ arm_2d_size_t ldBaseGetStringSize(uint8_t* pStr,ldFontDict_t *pFontDict,int16_t 
     for(int i=0;i<strLen;)
     {
         len=ldBaseGetCharInfo(pFontDict,&pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
-        if(width==0)
+        if((width==0)&&(pStr[i]!=' '))
         {
             switch(pStr[i])
             {
@@ -815,7 +815,7 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
         for(int i=0;i<pTextInfo->strLen;)
         {
             len=ldBaseGetCharInfo(pTextInfo->pFontDict,&pTextInfo->pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
-            if(width==0)
+            if((width==0)&&(pTextInfo->pStr[i]!=' '))
             {
                 switch(pTextInfo->pStr[i])
                 {
@@ -991,7 +991,7 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
     {
         len=ldBaseGetCharInfo(pFontDict,&pStr[i],&advWidth,&offsetX,&offsetY,&width,&height,&imgAddr);
 
-        if(width==0)
+        if((width==0)&&(pStr[i]!=' '))
         {
             break;
         }

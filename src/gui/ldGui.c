@@ -9,6 +9,7 @@
 #include "ldCheckBox.h"
 #include "ldLabel.h"
 #include "ldScrollSelecter.h"
+#include "ldDateTime.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -182,6 +183,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
         break;
     }
+    case widgetTypeDateTime:
+    {
+        ldDateTimeDel((ldDateTime_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -232,6 +238,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeScrollSelecter:
     {
         ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeDateTime:
+    {
+        ldDateTimeLoop((ldDateTime_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
 /*============================ auto add loop =================================*/

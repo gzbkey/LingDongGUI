@@ -11,6 +11,7 @@
 #include "ldCheckBox.h"
 #include "ldLabel.h"
 #include "ldScrollSelecter.h"
+#include "ldDateTime.h"
 
 void* obj;
 
@@ -57,6 +58,10 @@ void userInit(void)
     ldScrollSelecterAddItem(obj,(uint8_t*)"10");
 
 //    ldScrollSelecterSetItem(obj,7);
+
+    obj=ldDateTimeInit(6,BG_WIN,0,10,240, 40,WENQUANYI_ZEN_HEI_REGULAR_36);
+
+    ldDateTimeSetFormat(obj,"yyyy-mm-dd hh:nn:ss");
 }
 
 

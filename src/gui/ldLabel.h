@@ -10,12 +10,12 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isTransparent:1;
+    uint8_t align:4;
     uint32_t bgImgAddr;
     ldColor bgColor;
     ldColor charColor;
     ldFontDict_t* pFontDict;
     uint8_t* pStr;
-    uint8_t align:4;
 #if USE_OPACITY == 1
     uint8_t opacity;
 #endif
