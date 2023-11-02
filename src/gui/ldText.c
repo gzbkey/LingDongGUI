@@ -296,7 +296,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        txt->scrollOffset=_scrollOffset+(int16_t)(info.value&0xFFFF);
+        txt->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:

@@ -144,9 +144,6 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
         strcpy((char *)pWidget->formatStrTemp,(char *)pWidget->formatStr);
 
-        LOG_DEBUG("%s========\n",pWidget->formatStr);
-        LOG_DEBUG("%s========\n",pWidget->formatStrTemp);
-
         addr=strstr((char *)pWidget->formatStrTemp,"yyyy");
         if(addr)
         {
@@ -201,8 +198,6 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 memcpy(addr,strTemp,2);
             }
         }
-
-        LOG_DEBUG("%s\n",pWidget->formatStrTemp);
     }
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);

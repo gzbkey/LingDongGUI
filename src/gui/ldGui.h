@@ -24,6 +24,8 @@ extern "C" {
 //#define SIGNAL_SYS_TIME_OUT             10//gui软件定时器
 
 
+#define GET_SIGNAL_VALUE_X(dat)     ((dat>>16)&0xFFFF)
+#define GET_SIGNAL_VALUE_Y(dat)     (dat&0xFFFF)
 
 
 

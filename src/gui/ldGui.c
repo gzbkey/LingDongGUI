@@ -10,6 +10,7 @@
 #include "ldLabel.h"
 #include "ldScrollSelecter.h"
 #include "ldDateTime.h"
+#include "ldIconSlider.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -188,6 +189,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldDateTimeDel((ldDateTime_t*)pWidget);
         break;
     }
+    case widgetTypeIconSlider:
+    {
+        ldIconSliderDel((ldIconSlider_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -243,6 +249,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeDateTime:
     {
         ldDateTimeLoop((ldDateTime_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeIconSlider:
+    {
+        ldIconSliderLoop((ldIconSlider_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
 /*============================ auto add loop =================================*/

@@ -108,7 +108,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        selecter->scrollOffset=_scrollOffset+(int16_t)(info.value&0xFFFF);
+        selecter->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
@@ -122,20 +122,12 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     }
     case SIGNAL_MOVE_SPEED:
     {
-        int16_t ySpeed=(int16_t)(info.value&0xFFFF);
+        int16_t ySpeed=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
-        if(ySpeed>MOVE_SPEED_THRESHOLD_VALUE)
+        if((ySpeed>MOVE_SPEED_THRESHOLD_VALUE)||(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
             selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
             selecter->isAutoMove=true;
-        }
-        else
-        {
-            if(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE)
-            {
-                selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
-                selecter->isAutoMove=true;
-            }
         }
         break;
     }
@@ -387,9 +379,6 @@ void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
 #endif
 }
 
-//selecter的滑动速度
-//最小值:1
-//最大值:控件高度
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
 {
     if (pWidget == NULL)

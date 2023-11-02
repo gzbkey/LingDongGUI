@@ -12,6 +12,7 @@
 #include "ldLabel.h"
 #include "ldScrollSelecter.h"
 #include "ldDateTime.h"
+#include "ldIconSlider.h"
 
 void* obj;
 
@@ -62,6 +63,17 @@ void userInit(void)
     obj=ldDateTimeInit(6,BG_WIN,0,10,240, 40,WENQUANYI_ZEN_HEI_REGULAR_36);
 
     ldDateTimeSetFormat(obj,"yyyy-mm-dd hh:nn:ss");
+
+    obj=ldIconSliderInit(7,BG_WIN,0,60,200,140,52,10,5,1,1,WENQUANYI_ZEN_HEI_REGULAR_36);
+
+    ldIconSliderAddIcon(obj,ICON_BMP,"12");
+    ldIconSliderAddIcon(obj,ICON_BMP,"34");
+    ldIconSliderAddIcon(obj,ICON_BMP,"56");
+    ldIconSliderAddIcon(obj,ICON_BMP,"78");
+    ldIconSliderAddIcon(obj,ICON_BMP,"90");
+
+//    ldIconSliderSetHorizontalScroll(obj,false);
+    ldIconSliderSetSpeed(obj,3);
 }
 
 
