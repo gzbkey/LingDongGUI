@@ -1,3 +1,26 @@
+/*
+ * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file    ldIconSlider.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   icon slider widget
+ * @version 0.1
+ * @date    2023-11-03
+ */
 #include "ldIconSlider.h"
 #include "ldGui.h"
 
@@ -20,6 +43,7 @@
 
 #define MOVE_SPEED_THRESHOLD_VALUE     (20)          //触摸移动速度超过此值，则产生惯性滑动效果
 #define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
+#define IMG_FONT_SPACE                 (1)           //图片和文字的间隔
 
 static bool _iconSliderDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -136,7 +160,7 @@ static uint8_t _ldIconSliderAutoFirstItem(ldIconSlider_t *pWidget,int16_t offset
     }
     else
     {
-        d=pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict);
+        d=pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict)+IMG_FONT_SPACE;
         iconFirstMax=pWidget->iconCount-(pResTile->tRegion.tSize.iHeight/d);
     }
 
@@ -230,7 +254,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
 
                 ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)slider);
                 itemOffsetWidth=slider->iconSpace+slider->iconWidth;
-                itemOffsetHeight=slider->iconSpace+slider->iconWidth+_getStrHeight(slider->pFontDict);
+                itemOffsetHeight=slider->iconSpace+slider->iconWidth+_getStrHeight(slider->pFontDict)+IMG_FONT_SPACE;
 
 
                 itemX=((x-globalPos.x))/itemOffsetWidth;
@@ -245,11 +269,11 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
 
                     if(slider->isHorizontalScroll)
                     {
-                        selectItem=itemX+itemOffsetX;
+                        (itemY==0)?(selectItem=itemX+itemOffsetX):(selectItem=(-1));
                     }
                     else
                     {
-                        selectItem=itemY+itemOffsetY;
+                        (itemX==0)?(selectItem=itemY+itemOffsetY):(selectItem=(-1));
                     }
                 }
                 else
@@ -411,7 +435,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
             {
                 pNewWidget->isHorizontalScroll=false;
 
-                if(height>=pNewWidget->iconMax*(pNewWidget->iconWidth+pNewWidget->iconSpace+_getStrHeight(pFontDict)))
+                if(height>=pNewWidget->iconMax*(pNewWidget->iconWidth+pNewWidget->iconSpace+_getStrHeight(pFontDict)+IMG_FONT_SPACE))
                 {
                     isScrollEn=false;
                 }
@@ -472,7 +496,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
             }
             else
             {
-                targetOffset=-(pWidget->selectIconOrPage*(pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict)));
+                targetOffset=-(pWidget->selectIconOrPage*(pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict)+IMG_FONT_SPACE));
             }
         }
         else
@@ -568,7 +592,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
 
                     if((pWidget->pFontDict!=NULL)&&(pWidget->pIconInfoList[showCount].pName!=NULL))
                     {
-                        arm_2d_tile_t fontPosTile = impl_child_tile(tTarget,x+offsetX,y+offsetY+pWidget->iconWidth,pWidget->iconWidth,pWidget->pFontDict->lineStrHeight);
+                        arm_2d_tile_t fontPosTile = impl_child_tile(tTarget,x+offsetX,y+offsetY+pWidget->iconWidth+IMG_FONT_SPACE,pWidget->iconWidth,pWidget->pFontDict->lineStrHeight);
                         ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
                         ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=fontPosTile.tRegion.tSize.iWidth;
                         ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pFontDict->lineStrHeight;
@@ -579,7 +603,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
                     showCount++;
                     x+=pWidget->iconWidth+pWidget->iconSpace;
                 }
-                y+=pWidget->iconWidth+pWidget->iconSpace+_getStrHeight(pWidget->pFontDict);
+                y+=pWidget->iconWidth+pWidget->iconSpace+_getStrHeight(pWidget->pFontDict)+IMG_FONT_SPACE;
             }
         }
     }

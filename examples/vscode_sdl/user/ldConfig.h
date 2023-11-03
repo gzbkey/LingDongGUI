@@ -8,19 +8,20 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 
-#define USE_VIRTUAL_RESOURCE                      0
+#define USE_VIRTUAL_RESOURCE                      1
 
-#define LD_CFG_SCEEN_WIDTH                        480
-#define LD_CFG_SCEEN_HEIGHT                       272
+#define LD_CFG_SCEEN_WIDTH                        240
+#define LD_CFG_SCEEN_HEIGHT                       320
 #define LD_CFG_COLOR_DEPTH                        16
 
-#define USE_OPACITY                               1
+#define USE_OPACITY                               0
 #define USE_TLSF                                  1
 
 #define USE_RADIA_MENU_SCALE                      1
 
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 
+#define LD_DEBUG                                  1
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 
