@@ -171,8 +171,12 @@ static int16_t _scrollOffset;
 static bool slotIconSliderScroll(xConnectInfo_t info)
 {
     ldIconSlider_t *slider;
+    int16_t x,y;
+    arm_2d_tile_t *pResTile;
 
     slider=ldGetWidgetById(info.receiverId);
+
+    pResTile=(arm_2d_tile_t*)&slider->resource;
 
     switch (info.signalType)
     {
@@ -180,6 +184,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     {
         slider->isWaitMove=false;
         slider->isAutoMove=false;
+        slider->isHoldMove=false;
         _scrollOffset=slider->scrollOffset;
         break;
     }
@@ -193,22 +198,75 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         {
             slider->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         }
-
+        slider->isHoldMove=true;
         break;
     }
     case SIGNAL_RELEASE:
     {
         if(!slider->isAutoMove)
         {
-            if(isLineScroll(slider))
+            if(slider->isHoldMove)
             {
-                slider->selectIconOrPage=_ldIconSliderAutoFirstItem(slider,slider->scrollOffset);
+                if(isLineScroll(slider))
+                {
+                    slider->selectIconOrPage=_ldIconSliderAutoFirstItem(slider,slider->scrollOffset);
+                }
+                else
+                {
+                    slider->selectIconOrPage=_ldIconSliderAutoSelectPage(slider,slider->scrollOffset);
+                }
             }
             else
             {
-                slider->selectIconOrPage=_ldIconSliderAutoSelectPage(slider,slider->scrollOffset);
-            }
+                x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
+                y=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
+                uint16_t itemOffsetWidth,itemOffsetHeight;
+                int32_t selectItem=0;
+
+                uint8_t itemX=0;
+                uint8_t itemY=0;
+
+
+                ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)slider);
+                itemOffsetWidth=slider->iconSpace+slider->iconWidth;
+                itemOffsetHeight=slider->iconSpace+slider->iconWidth+_getStrHeight(slider->pFontDict);
+
+
+                itemX=((x-globalPos.x))/itemOffsetWidth;
+                itemY=((y-globalPos.y))/itemOffsetHeight;
+
+                if(isLineScroll(slider))
+                {
+                    uint8_t itemOffsetX=0;
+                    uint8_t itemOffsetY=0;
+                    itemOffsetX=(-slider->scrollOffset)/itemOffsetWidth;
+                    itemOffsetY=(-slider->scrollOffset)/itemOffsetHeight;
+
+                    if(slider->isHorizontalScroll)
+                    {
+                        selectItem=itemX+itemOffsetX;
+                    }
+                    else
+                    {
+                        selectItem=itemY+itemOffsetY;
+                    }
+                }
+                else
+                {
+                    uint8_t pageCount = _ldIconSliderAutoSelectPage(slider,slider->scrollOffset);
+
+                    selectItem=pageCount*slider->rowCount*slider->columnCount;
+                    selectItem+=itemY*slider->columnCount+itemX;
+                }
+
+                if(selectItem>=slider->iconCount)
+                {
+                    selectItem=(-1);
+                }
+                LOG_DEBUG("clicked item:%d\n",selectItem);
+                xEmit(slider->nameId,SIGNAL_CLICKED_ITEM,selectItem);
+            }
         }
         slider->isWaitMove=true;
         break;
@@ -247,7 +305,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     return false;
 }
 
-ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t rowCount,uint8_t columnCount,uint8_t pageMax,ldFontDict_t* pFontDict)
+ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict)
 {
     ldIconSlider_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -293,7 +351,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
 
-        pNewWidget->iconMax=rowCount*columnCount;
+        pNewWidget->iconMax=rowCount*columnCount*pageMax;
         pNewWidget->rowCount=rowCount;
         pNewWidget->columnCount=columnCount;
         pNewWidget->pageMax=pageMax;
@@ -360,11 +418,11 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
             }
         }
 
+        xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
+        xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
         if(isScrollEn)
         {
-            xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
             xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotIconSliderScroll);
-            xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
             xConnect(pNewWidget->nameId,SIGNAL_MOVE_SPEED,pNewWidget->nameId,slotIconSliderScroll);
         }
 
@@ -384,7 +442,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-    int16_t x=0,y=0,offsetX=0,offsetY=0;
+    int16_t x,y,offsetX,offsetY;
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t tempRes = *pResTile;
@@ -465,6 +523,8 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         uint8_t showCount=0;
         for(uint8_t pageCount=0;pageCount<pWidget->pageMax;pageCount++)
         {
+            offsetX=0;
+            offsetY=0;
             if(pWidget->hasVerticalBorder)
             {
                 offsetX=pWidget->iconSpace;
@@ -473,7 +533,6 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
             {
                 offsetY=pWidget->iconSpace;
             }
-
             if(pWidget->isHorizontalScroll)
             {
                 offsetX+=pageCount*pResTile->tRegion.tSize.iWidth;
@@ -491,8 +550,12 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
                 x=0;
                 for(uint8_t columnCount=0;columnCount<pWidget->columnCount;columnCount++)
                 {
-                    arm_2d_tile_t tempTile = impl_child_tile(tTarget,x+offsetX,y+offsetY,pWidget->iconWidth,pWidget->iconWidth);
+                    if((showCount+1)>pWidget->iconCount)
+                    {
+                        continue;
+                    }
 
+                    arm_2d_tile_t imgPosTile = impl_child_tile(tTarget,x+offsetX,y+offsetY,pWidget->iconWidth,pWidget->iconWidth);
                     ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=pWidget->iconWidth;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->iconWidth;
@@ -500,28 +563,20 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #if USE_VIRTUAL_RESOURCE == 1
                     tempRes.pTarget=pWidget->pIconInfoList[showCount].imgAddr;
 #endif
-                    ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,false,255);
+                    ldBaseImage(&imgPosTile,(arm_2d_tile_t*)&tempRes,false,255);
                     arm_2d_op_wait_async(NULL);
 
                     if((pWidget->pFontDict!=NULL)&&(pWidget->pIconInfoList[showCount].pName!=NULL))
                     {
-                    arm_2d_tile_t fontPosTile = impl_child_tile(tTarget,x+offsetX,y+offsetY+pWidget->iconWidth,pWidget->iconWidth,pWidget->pFontDict->lineStrHeight);
-
-                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=fontPosTile.tRegion.tSize.iWidth;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pFontDict->lineStrHeight;
-
-                    ldBaseLineText(&fontPosTile,&tempRes,pWidget->pIconInfoList[showCount].pName,pWidget->pFontDict,LD_ALIGN_CENTER,pWidget->charColor,0,255);
-
-                    arm_2d_op_wait_async(NULL);
+                        arm_2d_tile_t fontPosTile = impl_child_tile(tTarget,x+offsetX,y+offsetY+pWidget->iconWidth,pWidget->iconWidth,pWidget->pFontDict->lineStrHeight);
+                        ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
+                        ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=fontPosTile.tRegion.tSize.iWidth;
+                        ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pFontDict->lineStrHeight;
+                        ldBaseLineText(&fontPosTile,&tempRes,pWidget->pIconInfoList[showCount].pName,pWidget->pFontDict,LD_ALIGN_CENTER,pWidget->charColor,0,255);
+                        arm_2d_op_wait_async(NULL);
                     }
 
                     showCount++;
-                    if(showCount>pWidget->iconCount)
-                    {
-                        rowCount=254;
-                        columnCount=254;
-                    }
                     x+=pWidget->iconWidth+pWidget->iconSpace;
                 }
                 y+=pWidget->iconWidth+pWidget->iconSpace+_getStrHeight(pWidget->pFontDict);

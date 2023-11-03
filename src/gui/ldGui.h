@@ -15,8 +15,9 @@ extern "C" {
 #define SIGNAL_HOLD_DOWN            BTN_HOLD_DOWN
 #define SIGNAL_RELEASE              BTN_RELEASE         // value = x (2Byte) + y (2Byte)
 
-#define SIGNAL_TOUCH_HOLD_MOVE      10 // value = x offset(2Byte) + y offset(2Byte)
-#define SIGNAL_MOVE_SPEED           11 // value = x speed(2Byte) + y speed(2Byte)
+#define SIGNAL_TOUCH_HOLD_MOVE      10                  // value = x offset(2Byte) + y offset(2Byte)
+#define SIGNAL_MOVE_SPEED           11                  // value = x speed(2Byte) + y speed(2Byte)
+#define SIGNAL_CLICKED_ITEM         12                  // value = item num
 
 //#define SIGNAL_VALUE_CHANGED           7 //数据变化
 //#define SIGNAL_WIDGET_ACTIVE           8 //激活控件
