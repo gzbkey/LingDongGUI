@@ -19,7 +19,7 @@ void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent);
 
 #define ldWindowSetHidden        ldBaseSetHidden
 #define ldWindowSetBgColor       ldImageSetBgColor
-#define ldWindowSetImage         ldImageSetAddr
+#define ldWindowSetImage         ldImageSetImage
 #define ldWindowMove             ldBaseMove
 
 

@@ -18,6 +18,7 @@
  * @file    ldWindow.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   window widget
+ *          窗体控件可包含其他的控件，实现复合型控件或者控件组合模块
  * @version 0.1
  * @date    2023-11-03
  */
@@ -73,6 +74,19 @@ void ldWindowDel(ldWindow_t *pWidget)
     }
 }
 
+/**
+ * @brief   window初始化函数
+ * 
+ * @param   nameId          控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @return  ldWindow_t*     新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldWindow_t * pNewWidget = NULL;
@@ -105,6 +119,14 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
+/**
+ * @brief   window控件设置透明
+ * 
+ * @param   pWidget         window控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent)
 {
     if (pWidget == NULL)

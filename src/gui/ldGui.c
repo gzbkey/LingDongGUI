@@ -303,6 +303,12 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
     }
 }
 
+/**
+ * @brief   ldgui的初始化函数
+ * 
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiInit(void)
 {
     xEmitInit();
@@ -310,11 +316,25 @@ void ldGuiInit(void)
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 }
 
+/**
+ * @brief   ldgui的逻辑处理函数
+ * 
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiLogicLoop(void)
 {
     ldUserPageLoopFunc[pageNumNow]();
 }
 
+/**
+ * @brief   ldgui的界面处理函数
+ * 
+ * @param   ptParent        arm2d的tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     //遍历控件
@@ -332,12 +352,25 @@ void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
     xConnectProcess();
 }
 
+/**
+ * @brief   ldgui的页面退出函数
+ * 
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiQuit(void)
 {
     ldUserPageQuitFunc[pageNumNow]();
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 
+/**
+ * @brief   ldgui页面跳转函数
+ * 
+ * @param   pageNum         目标页面序号
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiJumpPage(uint8_t pageNum)
 {
     pageTarget=pageNum;
