@@ -45,45 +45,9 @@
 | 🔲 | number keyboard | 数字键盘 |
 | 🔲 | qwerty keyboard | 英文键盘 |
 
-## 如何测试
+## 教程
 
-### Qt
-
-使用qt进行电脑模拟测试，路径为[examples/qt_sdl](./examples/qt_sdl)
-
-📖 [使用说明](./examples/qt_sdl/README.md)
-
-### VSCode
-
-使用vscode进行电脑模拟测试，路径为[examples/vscode_sdl](./examples/vscode_sdl)
-
-📖 [使用说明](./examples/vscode_sdl/README.md)
-
-## 如何生产图片字模数据
-
-tools文件夹中有工具生成数据
-
-📖 [使用说明](./tools/README.md)
-
-
-## 如何添加自定义控件
-
-1、运行python脚本，[src/gui/createWidget.py](./src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h
-
-2、添加刚才新建的.c .h文件到项目中(新文件在./src/gui中)
-
-3、修改新控件的.c .h文件
-
----
-自动处理：
-
-修改ldCommon.h中的控件类型,ldWidgetType
-
-ldGui.c中添加新控件的头文件
-
-修改ldGui.c中的函数，ldGuiDelWidget，_widgetLoop
-
----
+📖 [详细教程](./docs/tutorial)
 
 ## 技术交流
 
