@@ -20,6 +20,7 @@
  * @brief   icon slider widget
  * @version 0.1
  * @date    2023-11-03
+ * @signal  SIGNAL_CLICKED_ITEM
  */
 #include "ldIconSlider.h"
 #include "ldGui.h"

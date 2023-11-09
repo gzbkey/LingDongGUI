@@ -93,7 +93,11 @@ def getParam(comment,targetName):
                     while i < itemLenMax:
                         spaceStr+=' '
                         i += 1
-                    paramStr += '\n' + headSpace + spaceStr + list[1].strip()
+                    
+                    if '@brief' in targetName:
+                        paramStr += '\n' + headSpace + list[1].strip()
+                    else:
+                        paramStr += '\n' + headSpace + spaceStr + list[1].strip()
             else:
                 if len(paramStr) != 0:
                     paramStrList.append(paramStr)
@@ -117,29 +121,28 @@ def getFunctionDescriptionStr(funcNames,comments):
     index = 0
     outStr = ''
     while index<objLen:
-        outStr+='##### '
-        outStr+=getFunctionTinyName(funcNames[index])+'\n'
+        outStr+='#### '+getFunctionTinyName(funcNames[index])+'\n'
+
+        outStr+='##### 原型\n'
         outStr+='```c\n'
-        outStr+='原型\n'
-        outStr+='    '+funcNames[index].replace('\n','')+';\n'
+        outStr+=funcNames[index].replace('\n','')+';\n'
+        outStr+='```\n'
         list = getParam(comments[index],'@brief')
         if len(list) > 0:
-            outStr+='说明\n'
+            outStr+='##### 说明\n'
             outStr+=list[0]+'\n'
         outStr+='\n'
         list = getParam(comments[index],'@param')
         if len(list) > 0:
-            outStr+='参数\n'
+            outStr+='##### 参数\n'
             for item in list:
                 outStr+=item+'\n'
         outStr+='\n'
         list = getParam(comments[index],'@return')
         if len(list) > 0:
-            outStr+='返回\n'
+            outStr+='##### 返回\n'
             outStr+=list[0]+'\n'
-
-        # outStr+=comments[index]+'\n'
-        outStr+='```\n\n'
+        outStr+='<br>\n\n'
         index += 1
 
     return outStr
@@ -197,11 +200,10 @@ for filePath in fileList:
     fileComment = getFileComment(filePath)
     outList=getParam(fileComment[0],'@file')
     widgetName=outList[0].replace(" ", "").lstrip("ld").rstrip(".c")
-    
     if 'scene' in widgetName.lower() or 'gui' in widgetName.lower():
         continue
-    
-    outStr += '## '+widgetName+'\n'
+
+    outStr += '# '+widgetName+'\n'
 
     outStr += '### 简述\n'
     outList=getParam(fileComment[0],'@brief')
@@ -211,8 +213,12 @@ for filePath in fileList:
     outStr+= '### 函数列表\n'
     for name in names:
         outStr+='* '+name.replace('\n','')+';\n'
-        
+
     outStr+= '### 信号列表\n'
+    outList=getParam(fileComment[0],'@signal')
+
+    for signal in outList:
+        outStr+='* '+signal.strip()+'\n'
 
     outStr+= '### 函数说明\n'
     outStr+=getFunctionDescriptionStr(names,comments)

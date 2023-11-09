@@ -20,6 +20,8 @@
  * @brief   button widget
  * @version 0.1
  * @date    2023-11-03
+ * @signal  SIGNAL_PRESS
+ * @signal  SIGNAL_RELEASE
  */
 #include "ldButton.h"
 #include "ldGui.h"
@@ -97,7 +99,19 @@ static bool slotButtonToggle(xConnectInfo_t info)
     return false;
 }
 
-
+/**
+ * @brief   button初始化函数
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @return  ldButton_t*     新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldButton_t * pNewWidget = NULL;
@@ -170,6 +184,14 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
+/**
+ * @brief   设置按键显示文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            字符串指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)
@@ -181,6 +203,15 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
     strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
+/**
+ * @brief   设置按键颜色，设置该函数后，图片设置无效
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   releaseColor    松开显示的颜色
+ * @param   pressColor      按下显示的颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
 {
     pWidget->releaseColor=releaseColor;
@@ -189,6 +220,17 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
     pWidget->pressImgAddr=LD_ADDR_NONE;
 }
 
+/**
+ * @brief   设置按键图片，设置该函数后，颜色设置无效
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   releaseImgAddr  松开显示的图片
+ * @param   isReleaseMask   松开显示的图片是否带透明度(蒙版)
+ * @param   pressImgAddr    按下显示的图片
+ * @param   isPressMask     按下显示的图片是否带透明度(蒙版)
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask)
 {
     if(pWidget==NULL)
@@ -201,6 +243,15 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
     pWidget->isPressMask=isPressMask;
 }
 
+/**
+ * @brief   选中按键的选中框(图片)
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   selectMaskAddr  选择效果显示的图片(蒙版)
+ * @param   selectColor     显示的颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor selectColor)
 {
     if(pWidget==NULL)
@@ -211,6 +262,14 @@ void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor 
     pWidget->selectColor=selectColor;
 }
 
+/**
+ * @brief   设置文字颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文字颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
@@ -220,6 +279,16 @@ void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
     pWidget->charColor=charColor;
 }
 
+/**
+ * @brief   按键设置为透明，则不显示，但按下有按键效果
+ *          例如触摸某图片的左右两侧后，会切换图片，
+ *          则可以使用功能两个透明按键放置图片顶层的两侧，
+ *          即可实现该功能
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -229,6 +298,14 @@ void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   按键实现圆角显示效果
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isCorner        true=圆角 false=方角
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
 {
     if(pWidget==NULL)
@@ -238,6 +315,14 @@ void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
     pWidget->isCorner=isCorner;
 }
 
+/**
+ * @brief   选择按键，触发选中的显示效果
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isSelected      true=选中 false=不选中
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
 {
     if(pWidget==NULL)
@@ -247,6 +332,15 @@ void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
     pWidget->isSelected=isSelected;
 }
 
+/**
+ * @brief   按键循环处理函数
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     uint32_t btnColor;
@@ -388,7 +482,18 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
     }
 }
 
-
+/**
+ * @brief   文本的对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)
@@ -398,6 +503,14 @@ void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
     pWidget->align=align;
 }
 
+/**
+ * @brief   设置字体
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pFontDict       字体指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
 {
     if(pWidget==NULL)
