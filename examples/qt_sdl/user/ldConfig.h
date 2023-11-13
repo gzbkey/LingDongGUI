@@ -12,7 +12,7 @@ extern "C" {
 
 #define LD_CFG_SCEEN_WIDTH                        240
 #define LD_CFG_SCEEN_HEIGHT                       320
-#define LD_CFG_COLOR_DEPTH                        16
+#define LD_CFG_COLOR_DEPTH                        16   // 8 16 32
 
 #define USE_OPACITY                               0
 #define USE_TLSF                                  1

@@ -60,6 +60,8 @@ extern "C" {
 #define SWAP(x,y)                               ((x) = (x)+(y),(y)=(x)-(y),(x)=(x)-(y))
 #endif
 
+#define ANGLE_2_RADIAN(angle)    ((angle)*0.017453292519943f)
+
 #define ldColor                                 COLOUR_INT
 
 #define XMALLOC                                 ldMalloc

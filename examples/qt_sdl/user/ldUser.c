@@ -13,6 +13,7 @@
 #include "ldScrollSelecter.h"
 #include "ldDateTime.h"
 #include "ldIconSlider.h"
+#include "ldGauge.h"
 
 void* obj;
 
@@ -28,52 +29,15 @@ void userInit(void)
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-//    obj=ldLabelInit(VOL_LABEL_NAME,BG_WIN,20,200,80,40,WENQUANYI_ZEN_HEI_REGULAR_36);
-//    ldLabelSetText(obj,"电压:");
-//    ldLabelSetAlign(obj,LD_ALIGN_LEFT);
-//    ldLabelSetBgColor(obj,__RGB(128,128,128));
+    obj=ldGaugeInit(1,0, 10, 10, 100, 100,BBG_BMP,false);
 
-    obj=ldScrollSelecterInit(VOL_NUM_TEN,BG_WIN,105,200,22,40,WENQUANYI_ZEN_HEI_REGULAR_36,10);
-    ldScrollSelecterSetBgColor(obj,__RGB(255,255,255));
-//    ldScrollSelecterSetBgImage(scroll,PRESS_BMP);
-    ldScrollSelecterSetSpeed(obj,10);
-    ldScrollSelecterAddItem(obj,(uint8_t*)"2");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"1");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"0");
-    ldScrollSelecterSetItem(obj,0);
+    ldGaugeSetPointerImage(obj,POINTERMASK_PNG,9,55,5,45);
 
-    obj=ldScrollSelecterInit(VOL_NUM_IND,BG_WIN,127,200,22,40,WENQUANYI_ZEN_HEI_REGULAR_36,10);
-    ldScrollSelecterSetBgColor(obj,__RGB(255,255,255));
-//    ldScrollSelecterSetBgImage(scroll,PRESS_BMP);
-    ldScrollSelecterSetAlign(obj,LD_ALIGN_LEFT);
-    ldScrollSelecterSetSpeed(obj,10);
-    ldScrollSelecterAddItem(obj,(uint8_t*)"0123456789");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"8");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"7");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"6");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"5");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"4");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"3");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"2");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"1");
-    ldScrollSelecterAddItem(obj,(uint8_t*)"10");
+    ldGaugeSetPointerImageType(obj,onlyMask,__RGB(0,0,255));
 
-//    ldScrollSelecterSetItem(obj,7);
+//    ldGaugeSetCenterOffset(obj,0,30);
 
-    obj=ldDateTimeInit(6,BG_WIN,0,10,240, 40,WENQUANYI_ZEN_HEI_REGULAR_36);
-
-    ldDateTimeSetFormat(obj,"yyyy-mm-dd hh:nn:ss");
-
-    obj=ldIconSliderInit(7,BG_WIN,0,60,200,140,52,10,5,1,1,WENQUANYI_ZEN_HEI_REGULAR_36);
-
-    ldIconSliderAddIcon(obj,ICON_BMP,"12");
-    ldIconSliderAddIcon(obj,ICON_BMP,"34");
-    ldIconSliderAddIcon(obj,ICON_BMP,"56");
-    ldIconSliderAddIcon(obj,ICON_BMP,"78");
-    ldIconSliderAddIcon(obj,ICON_BMP,"90");
-
-//    ldIconSliderSetHorizontalScroll(obj,false);
-    ldIconSliderSetSpeed(obj,3);
+    ldGaugeSetAngle(obj,120);
 }
 
 

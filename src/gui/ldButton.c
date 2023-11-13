@@ -146,8 +146,8 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->releaseImgAddr=LD_ADDR_NONE;
         pNewWidget->pressImgAddr=LD_ADDR_NONE;
         pNewWidget->selectMaskAddr=LD_ADDR_NONE;
-        pNewWidget->isReleaseMask = false;
-        pNewWidget->isPressMask = false;
+        pNewWidget->isWithReleaseMask = false;
+        pNewWidget->isWithPressMask = false;
         pNewWidget->isTransparent=false;
         pNewWidget->isHidden = false;
         pNewWidget->pStr = NULL;
@@ -239,8 +239,8 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
     }
     pWidget->releaseImgAddr=releaseImgAddr;
     pWidget->pressImgAddr=pressImgAddr;
-    pWidget->isReleaseMask=isReleaseMask;
-    pWidget->isPressMask=isPressMask;
+    pWidget->isWithReleaseMask=isReleaseMask;
+    pWidget->isWithPressMask=isPressMask;
 }
 
 /**
@@ -404,7 +404,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,pResTile,pWidget->isPressMask,255);
+                        ldBaseImage(&tTarget,pResTile,pWidget->isWithPressMask,255);
                     }
                 }
                 else
@@ -415,7 +415,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,pResTile,pWidget->isReleaseMask,255);
+                        ldBaseImage(&tTarget,pResTile,pWidget->isWithReleaseMask,255);
                     }
                 }
                 if(pWidget->isCorner)

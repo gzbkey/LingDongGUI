@@ -332,7 +332,16 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,ui
         arm_2d_vres_t maskTile = *((arm_2d_vres_t*)&resource);
 #endif
         (*(arm_2d_tile_t*)(&maskTile)).tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
+#if LD_CFG_COLOR_DEPTH == 8
+        (*(arm_2d_tile_t*)(&maskTile)).pchBuffer += (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iWidth * (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iHeight;
+#endif
+#if LD_CFG_COLOR_DEPTH == 16
         (*(arm_2d_tile_t*)(&maskTile)).pchBuffer += (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iWidth * (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iHeight * 2;
+#endif
+#if LD_CFG_COLOR_DEPTH == 32
+        (*(arm_2d_tile_t*)(&maskTile)).pchBuffer += (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iWidth * (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iHeight * 4;
+#endif
+
 #if USE_VIRTUAL_RESOURCE == 1
         maskTile.pTarget=(uintptr_t)maskTile.tTile.pchBuffer;
 #endif

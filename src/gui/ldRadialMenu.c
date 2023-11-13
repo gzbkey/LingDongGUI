@@ -45,8 +45,6 @@
 #define MOVE_CYCLE_MS            0
 #define SKIP_ANGLE               5
 
-#define ANGLE_2_RADIAN(angle)    ((angle)*0.017453292519943f)
-
 static bool _radialMenuDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)

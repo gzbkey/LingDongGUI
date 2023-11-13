@@ -11,8 +11,8 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isChecked:1;
     bool isCorner:1;
-    bool isUncheckedMask:1;
-    bool isCheckedMask:1;
+    bool isWithUncheckedMask:1;
+    bool isWithCheckedMask:1;
     bool isRadioButton:1;
     ldColor bgColor;
     ldColor fgColor;

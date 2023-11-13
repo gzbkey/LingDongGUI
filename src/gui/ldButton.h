@@ -16,8 +16,8 @@ typedef struct {
     bool isChecked:1;
     bool isPressed:1;
     bool isSelected:1;
-    bool isReleaseMask:1;
-    bool isPressMask:1;
+    bool isWithReleaseMask:1;
+    bool isWithPressMask:1;
     bool isCorner:1;
     uint32_t releaseImgAddr;
     uint32_t pressImgAddr;

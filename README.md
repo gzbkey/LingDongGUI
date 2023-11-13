@@ -4,17 +4,32 @@
 	<a href="https://gitee.com/gzbkey/LingDongGUI/stargazers"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/star.svg"></a>
 	<a href="https://gitee.com/gzbkey/LingDongGUI/members"><img src="https://gitee.com/gzbkey/LingDongGUI/badge/fork.svg"></a>
 	<a><img src="https://img.shields.io/github/license/gzbkey/LingDongGUI"></a>
+	<a><img src="https://img.shields.io/badge/architecture-ARM%20|%20RISC%20V-blue"></a>	
 </p>
 
-## 简介
+## 扩展性
 
-* 灵动GUI是基于ARM-2D进行开发的GUI，极大降低ARM-2D的使用难度
+灵动GUI是基于ARM-2D进行开发的GUI
 
-* 支持ARM单片机、RISCV单片机
+* 极大降低ARM-2D的使用难度
+
+* 使用ARM-2D API自由组合控件
+
+## 通用性
+
+可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制
+
+* 支持ARM单片机、RISC-V单片机
+
+* 需要支持GNU 99以上编译器
+
+## 易用性
 
 * 使用类似Qt的信号槽模式
 
 * 界面代码和逻辑代码分离
+
+## 源码
 
 🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
 
@@ -36,7 +51,7 @@
 | ✅ | scroll selecter | 滚动选择器 |
 | ✅ | date time | 日期和时间 |
 | ✅ | icon slider | 滑动图标 |
-| 🔲 | gauge | 仪表盘 |
+| ✅ | gauge | 仪表盘 |
 | 🔲 | list | 列表 |
 | 🔲 | graph | 波形图 |
 | 🔲 | line edit | 编辑框 |
