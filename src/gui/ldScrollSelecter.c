@@ -1,3 +1,26 @@
+/*
+ * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file    ldScrollSelecter.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   scroll selecter widget
+ * @version 0.1
+ * @date    2023-11-03
+ */
 #include "ldScrollSelecter.h"
 #include "ldGui.h"
 
@@ -108,7 +131,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        selecter->scrollOffset=_scrollOffset+(int16_t)(info.value&0xFFFF);
+        selecter->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
@@ -122,20 +145,12 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     }
     case SIGNAL_MOVE_SPEED:
     {
-        int16_t ySpeed=(int16_t)(info.value&0xFFFF);
+        int16_t ySpeed=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
-        if(ySpeed>MOVE_SPEED_THRESHOLD_VALUE)
+        if((ySpeed>MOVE_SPEED_THRESHOLD_VALUE)||(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
             selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
             selecter->isAutoMove=true;
-        }
-        else
-        {
-            if(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE)
-            {
-                selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
-                selecter->isAutoMove=true;
-            }
         }
         break;
     }
@@ -181,7 +196,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         tResTile->tRegion.tSize.iHeight=height;
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        tResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pFontDict->maskType);
         tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
         tResTile->tInfo.bVirtualResource = true;
@@ -297,11 +312,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
             arm_2d_op_wait_async(NULL);
         }
 
-        pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        pResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
         for(uint8_t strGroupCount=0;strGroupCount<pWidget->itemCount;strGroupCount++)
         {
             uint8_t *pStrGroup=pWidget->ppItemStrGroup[strGroupCount];
-            int16_t offset=(strGroupCount*pWidget->resource.tRegion.tSize.iHeight)+pWidget->scrollOffset;
+            int16_t offset=(strGroupCount*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)+pWidget->scrollOffset;
 #if USE_OPACITY == 1
             ldBaseLineText(&tTarget,&pWidget->resource,pStrGroup,pWidget->pFontDict,pWidget->align,pWidget->charColor,offset,pWidget->opacity);
 #else
@@ -387,9 +402,6 @@ void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
 #endif
 }
 
-//selecter的滑动速度
-//最小值:1
-//最大值:控件高度
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
 {
     if (pWidget == NULL)
@@ -419,6 +431,15 @@ void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum)
     }
     pWidget->itemSelect=itemNum;
     pWidget->isWaitMove=true;
+}
+
+void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->align=align;
 }
 
 #if defined(__clang__)

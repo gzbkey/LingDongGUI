@@ -1,3 +1,26 @@
+/*
+ * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file    ldCheckBox.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   复选框 + 单选功能，支持自定义图片和文字显示
+ * @version 0.1
+ * @date    2023-11-03
+ */
 #include "ldCheckBox.h"
 #include "ldGui.h"
 
@@ -112,10 +135,7 @@ static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldCheckBox_t*)pTarget)->pTextInfo!=NULL)
-        {
-            ldBaseTextDel(((ldCheckBox_t*)pTarget)->pTextInfo);
-        }
+        ldFree(((ldCheckBox_t*)pTarget)->pStr);
         ldFree(((ldCheckBox_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -172,6 +192,19 @@ static bool slotCheckBoxToggle(xConnectInfo_t info)
     return false;
 }
 
+/**
+ * @brief   check box初始化函数
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @return  ldCheckBox_t*   新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldCheckBox_t *pNewWidget = NULL;
@@ -217,10 +250,12 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->isChecked=false;
         pNewWidget->bgColor=__RGB(255,255,255);
         pNewWidget->fgColor=__RGB(0,0,0);
-        pNewWidget->textColor=__RGB(0,0,0);
+        pNewWidget->charColor=__RGB(0,0,0);
         pNewWidget->checkedImgAddr=LD_ADDR_NONE;
         pNewWidget->uncheckedImgAddr=LD_ADDR_NONE;
-        pNewWidget->pTextInfo = NULL;
+        pNewWidget->pStr = NULL;
+        pNewWidget->pFontDict = NULL;
+        pNewWidget->align = 0;
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
         pNewWidget->isRadioButton=false;
         pNewWidget->radioButtonGroup=0;
@@ -239,6 +274,15 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
+/**
+ * @brief   check box循环处理函数
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -356,7 +400,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 #if USE_VIRTUAL_RESOURCE == 1
                     ((arm_2d_vres_t*)&srcTile)->pTarget=pWidget->checkedImgAddr;
 #endif
-                    ldBaseImage(&tChildTile,&srcTile,pWidget->isCheckedMask,255);
+                    ldBaseImage(&tChildTile,&srcTile,pWidget->isWithCheckedMask,255);
                 }
                 else
                 {
@@ -364,24 +408,32 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 #if USE_VIRTUAL_RESOURCE == 1
                     ((arm_2d_vres_t*)&srcTile)->pTarget=pWidget->uncheckedImgAddr;
 #endif
-                    ldBaseImage(&tChildTile,&srcTile,pWidget->isUncheckedMask,255);
+                    ldBaseImage(&tChildTile,&srcTile,pWidget->isWithUncheckedMask,255);
                 }
             }while(0);
         }
         arm_2d_op_wait_async(NULL);
 
-        if(pWidget->pTextInfo!=NULL)
+        if(pWidget->pStr!=NULL)
         {
             //最后使用，不再生产中间变量，直接修改tTarget
             tTarget.tRegion.tLocation.iX+=pWidget->boxWidth+2;
             tTarget.tRegion.tSize.iWidth-=pWidget->boxWidth+2;
-
-            ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
+            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
             arm_2d_op_wait_async(NULL);
         }
     }
 }
 
+/**
+ * @brief   设定颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         背景颜色
+ * @param   fgColor         前景颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor)
 {
     pWidget->bgColor=bgColor;
@@ -391,6 +443,18 @@ void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor)
     pWidget->boxWidth=CHECK_BOX_SIZE;
 }
 
+/**
+ * @brief   设定图片，只能设定方型图片
+ * 
+ * @param   pWidget          目标控件指针
+ * @param   boxWidth         图片宽度
+ * @param   uncheckedImgAddr 未选中的显示图片
+ * @param   isUncheckedMask  未选中图片是否带透明度
+ * @param   checkedImgAddr   选中的显示图片
+ * @param   isCheckedMask    选中图片是否带透明度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheckedImgAddr,bool isUncheckedMask,uint32_t checkedImgAddr,bool isCheckedMask)
 {
     if(pWidget==NULL)
@@ -399,30 +463,56 @@ void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheck
     }
     pWidget->uncheckedImgAddr=uncheckedImgAddr;
     pWidget->checkedImgAddr=checkedImgAddr;
-    pWidget->isUncheckedMask=isUncheckedMask;
-    pWidget->isCheckedMask=isCheckedMask;
+    pWidget->isWithUncheckedMask=isUncheckedMask;
+    pWidget->isWithCheckedMask=isCheckedMask;
     pWidget->boxWidth=boxWidth;
 }
 
+/**
+ * @brief   设置字体
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pFontDict       字体
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict)
 {
     if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetFont(&pWidget->pTextInfo,pFontDict);
-    pWidget->pTextInfo->align=LD_ALIGN_LEFT;
+    pWidget->pFontDict=pFontDict;
+    pWidget->align=LD_ALIGN_LEFT;
 }
 
+/**
+ * @brief   设置显示文字
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            需要显示的字符串
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetText(&pWidget->pTextInfo,pStr);
+    ldFree(pWidget->pStr);
+    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
+/**
+ * @brief   单选功能设定为同一组
+ *          实现同一组的radio button自动单选
+ * @param   pWidget         目标控件指针
+ * @param   num             组号 0-255
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num)
 {
     if(pWidget==NULL)
@@ -433,6 +523,14 @@ void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num)
     pWidget->radioButtonGroup=num;
 }
 
+/**
+ * @brief   实现圆角显示效果
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isCorner        true=圆角 false=方角
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-10
+ */
 void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
 {
     if(pWidget==NULL)

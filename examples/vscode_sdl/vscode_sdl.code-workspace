@@ -5,7 +5,15 @@
 		},
 		{
 			"path": "../common"
+		},
+		{
+			"path": "../../src"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"ldcheckbox.h": "c",
+			"ldgui.h": "c"
+		}
+	}
 }

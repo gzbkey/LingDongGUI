@@ -7,7 +7,10 @@ SOURCES += \
     ../../src/gui/ldButton.c \
     ../../src/gui/ldCheckBox.c \
     ../../src/gui/ldCommon.c \
+    ../../src/gui/ldDateTime.c \
+    ../../src/gui/ldGauge.c \
     ../../src/gui/ldGui.c \
+    ../../src/gui/ldIconSlider.c \
     ../../src/gui/ldImage.c \
     ../../src/gui/ldLabel.c \
     ../../src/gui/ldRadialMenu.c \
@@ -104,7 +107,10 @@ HEADERS += \
     ../../src/gui/ldButton.h \
     ../../src/gui/ldCheckBox.h \
     ../../src/gui/ldCommon.h \
+    ../../src/gui/ldDateTime.h \
+    ../../src/gui/ldGauge.h \
     ../../src/gui/ldGui.h \
+    ../../src/gui/ldIconSlider.h \
     ../../src/gui/ldImage.h \
     ../../src/gui/ldLabel.h \
     ../../src/gui/ldRadialMenu.h \

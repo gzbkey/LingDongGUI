@@ -7,50 +7,48 @@ extern "C" {
 #include "stdint.h"
 #include "ldCommon.h"
 
+//bbg.bmp w:100 h:100 < 565 >
 #if USE_VIRTUAL_RESOURCE == 0
-
-extern const uint8_t barFrame_png[];
-#define BARFRAME_PNG (uint32_t)barFrame_png
-
-extern const uint8_t frame_png[];
-#define FRAME_PNG (uint32_t)frame_png
-
-extern const uint8_t press_bmp[];
-#define PRESS_BMP (uint32_t)&press_bmp[0]
-
-extern const uint8_t release_bmp[];
-#define RELEASE_BMP (uint32_t)release_bmp
-
-extern const uint8_t release_png[];
-#define RELEASE_PNG (uint32_t)release_png
-
-#define MICROSOFT_YAHEI_REGULAR_20 (&dict_Microsoft_YaHei_Regular_20)
-extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
-
-#define SIMSUN_REGULAR_12 (&dict_SimSun_Regular_12)
-extern ldFontDict_t dict_SimSun_Regular_12;
-
+extern const uint8_t bbg_bmp[];
+#define BBG_BMP (uint32_t)&bbg_bmp[0]
 #else
-
-//barFrame.png w:100 h:18 < 565+Mask >
-#define BARFRAME_PNG 0
-
-//frame.png w:72 h:72 < A8 >
-#define FRAME_PNG 5400
-
-//press.bmp w:72 h:72 < 565 >
-#define PRESS_BMP 10584
-
-//release.bmp w:72 h:72 < 565 >
-#define RELEASE_BMP 20952
-
-//release.png w:72 h:72 < 565+Mask >
-#define RELEASE_PNG 31320
-
-#define MICROSOFT_YAHEI_REGULAR_20 (&dict_Microsoft_YaHei_Regular_20)
-extern ldFontDict_t dict_Microsoft_YaHei_Regular_20;
-
+#define BBG_BMP 0
 #endif
+
+//icon.bmp w:52 h:52 < 565 >
+#if USE_VIRTUAL_RESOURCE == 0
+extern const uint8_t icon_bmp[];
+#define ICON_BMP (uint32_t)&icon_bmp[0]
+#else
+#define ICON_BMP 20000
+#endif
+
+//pointer.bmp w:9 h:55 < 565 >
+#if USE_VIRTUAL_RESOURCE == 0
+extern const uint8_t pointer_bmp[];
+#define POINTER_BMP (uint32_t)&pointer_bmp[0]
+#else
+#define POINTER_BMP 25408
+#endif
+
+//pointer.png w:9 h:55 < 565+Mask >
+#if USE_VIRTUAL_RESOURCE == 0
+extern const uint8_t pointer_png[];
+#define POINTER_PNG (uint32_t)&pointer_png[0]
+#else
+#define POINTER_PNG 26398
+#endif
+
+//pointerMask.png w:9 h:55 < A8 >
+#if USE_VIRTUAL_RESOURCE == 0
+extern const uint8_t pointerMask_png[];
+#define POINTERMASK_PNG (uint32_t)&pointerMask_png[0]
+#else
+#define POINTERMASK_PNG 27883
+#endif
+
+#define JETBRAINS_MONO_NL_REGULAR_9 (&dict_JetBrains_Mono_NL_Regular_9)
+extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;
 
 #ifdef __cplusplus
 }

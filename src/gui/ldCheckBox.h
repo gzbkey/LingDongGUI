@@ -11,17 +11,19 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isChecked:1;
     bool isCorner:1;
-    bool isUncheckedMask:1;
-    bool isCheckedMask:1;
+    bool isWithUncheckedMask:1;
+    bool isWithCheckedMask:1;
     bool isRadioButton:1;
     ldColor bgColor;
     ldColor fgColor;
-    ldColor textColor;
+    ldColor charColor;
     uint32_t uncheckedImgAddr;
     uint32_t checkedImgAddr;
     uint16_t boxWidth;
     uint8_t radioButtonGroup;
-    ldChar_t *pTextInfo;
+    ldFontDict_t* pFontDict;
+    uint8_t* pStr;
+    uint8_t align:4;
 }ldCheckBox_t;
 
 ldCheckBox_t* ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);

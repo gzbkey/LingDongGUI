@@ -1,3 +1,28 @@
+/*
+ * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file    ldButton.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   button widget
+ * @version 0.1
+ * @date    2023-11-03
+ * @signal  SIGNAL_PRESS
+ * @signal  SIGNAL_RELEASE
+ */
 #include "ldButton.h"
 #include "ldGui.h"
 
@@ -22,10 +47,7 @@ static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        if(((ldButton_t*)pTarget)->pTextInfo!=NULL)
-        {
-            ldBaseTextDel(((ldButton_t*)pTarget)->pTextInfo);
-        }
+        ldFree(((ldButton_t*)pTarget)->pStr);
         ldFree(((ldButton_t*)pTarget));
         xListInfoDel(pEachInfo);
     }
@@ -77,7 +99,19 @@ static bool slotButtonToggle(xConnectInfo_t info)
     return false;
 }
 
-
+/**
+ * @brief   button初始化函数
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @return  ldButton_t*     新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldButton_t * pNewWidget = NULL;
@@ -112,11 +146,13 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->releaseImgAddr=LD_ADDR_NONE;
         pNewWidget->pressImgAddr=LD_ADDR_NONE;
         pNewWidget->selectMaskAddr=LD_ADDR_NONE;
-        pNewWidget->isReleaseMask = false;
-        pNewWidget->isPressMask = false;
+        pNewWidget->isWithReleaseMask = false;
+        pNewWidget->isWithPressMask = false;
         pNewWidget->isTransparent=false;
         pNewWidget->isHidden = false;
-        pNewWidget->pTextInfo = NULL;
+        pNewWidget->pStr = NULL;
+        pNewWidget->pFontDict = NULL;
+        pNewWidget->align = 0;
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -148,15 +184,34 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
+/**
+ * @brief   设置按键显示文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            字符串指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetText(&pWidget->pTextInfo,pStr);
+    ldFree(pWidget->pStr);
+    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
+/**
+ * @brief   设置按键颜色，设置该函数后，图片设置无效
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   releaseColor    松开显示的颜色
+ * @param   pressColor      按下显示的颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
 {
     pWidget->releaseColor=releaseColor;
@@ -165,6 +220,17 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
     pWidget->pressImgAddr=LD_ADDR_NONE;
 }
 
+/**
+ * @brief   设置按键图片，设置该函数后，颜色设置无效
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   releaseImgAddr  松开显示的图片
+ * @param   isReleaseMask   松开显示的图片是否带透明度(蒙版)
+ * @param   pressImgAddr    按下显示的图片
+ * @param   isPressMask     按下显示的图片是否带透明度(蒙版)
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask)
 {
     if(pWidget==NULL)
@@ -173,10 +239,19 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
     }
     pWidget->releaseImgAddr=releaseImgAddr;
     pWidget->pressImgAddr=pressImgAddr;
-    pWidget->isReleaseMask=isReleaseMask;
-    pWidget->isPressMask=isPressMask;
+    pWidget->isWithReleaseMask=isReleaseMask;
+    pWidget->isWithPressMask=isPressMask;
 }
 
+/**
+ * @brief   选中按键的选中框(图片)
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   selectMaskAddr  选择效果显示的图片(蒙版)
+ * @param   selectColor     显示的颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor selectColor)
 {
     if(pWidget==NULL)
@@ -187,15 +262,33 @@ void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor 
     pWidget->selectColor=selectColor;
 }
 
+/**
+ * @brief   设置文字颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文字颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
+    pWidget->charColor=charColor;
 }
 
+/**
+ * @brief   按键设置为透明，则不显示，但按下有按键效果
+ *          例如触摸某图片的左右两侧后，会切换图片，
+ *          则可以使用功能两个透明按键放置图片顶层的两侧，
+ *          即可实现该功能
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -205,6 +298,14 @@ void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   按键实现圆角显示效果
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isCorner        true=圆角 false=方角
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
 {
     if(pWidget==NULL)
@@ -214,6 +315,14 @@ void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
     pWidget->isCorner=isCorner;
 }
 
+/**
+ * @brief   选择按键，触发选中的显示效果
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isSelected      true=选中 false=不选中
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
 {
     if(pWidget==NULL)
@@ -223,6 +332,15 @@ void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
     pWidget->isSelected=isSelected;
 }
 
+/**
+ * @brief   按键循环处理函数
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     uint32_t btnColor;
@@ -286,7 +404,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,pResTile,pWidget->isPressMask,255);
+                        ldBaseImage(&tTarget,pResTile,pWidget->isWithPressMask,255);
                     }
                 }
                 else
@@ -297,7 +415,7 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,pResTile,pWidget->isReleaseMask,255);
+                        ldBaseImage(&tTarget,pResTile,pWidget->isWithReleaseMask,255);
                     }
                 }
                 if(pWidget->isCorner)
@@ -317,9 +435,9 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
             }
             arm_2d_op_wait_async(NULL);
 
-            if(pWidget->pTextInfo!=NULL)
+            if(pWidget->pStr!=NULL)
             {
-                ldBaseShowText(tTarget,pResTile->tRegion,pWidget->pTextInfo,0,255);
+                ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
                 arm_2d_op_wait_async(NULL);
             }
 
@@ -340,18 +458,17 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                     else
                     {
                         arm_2d_draw_box(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,3,pWidget->selectColor,SELECT_COLOR_OPACITY);
-
                     }
                 }
                 else
                 {
 #if USE_VIRTUAL_RESOURCE == 0
                     tempRes=*pResTile;
-                    tempRes.tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                    tempRes.tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
                     tempRes.pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
 #else
                     tempRes=*((arm_2d_vres_t*)pResTile);
-                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
                     ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
                     tempRes.pTarget=pWidget->selectMaskAddr;
                     tempRes.Load = &__disp_adapter0_vres_asset_loader;
@@ -365,23 +482,42 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
     }
 }
 
-
+/**
+ * @brief   文本的对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetAlign(&pWidget->pTextInfo,align);
+    pWidget->align=align;
 }
 
+/**
+ * @brief   设置字体
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pFontDict       字体指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
 void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
 {
     if(pWidget==NULL)
     {
         return;
     }
-    ldBaseSetFont(&pWidget->pTextInfo,pFontDict);
+    pWidget->pFontDict=pFontDict;
 }
 
 #if defined(__clang__)

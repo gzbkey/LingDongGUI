@@ -48,7 +48,7 @@ extern "C" {
 // <i> Note that enabling this feature suffers a non-negligible performance drop.
 // <i> This feature is disabled by default.
 #ifndef __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__
-#   define __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__                      0
+#   define __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__                      1
 #endif
 
 // <q>Enable support for accessing individual colour channels
@@ -84,6 +84,14 @@ extern "C" {
 #ifndef __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__
 #   define __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__     0
 #endif
+
+// <q> Optimize the scaler version of transform operations for hollow out masks
+// <i> This feature is disabled by default. There is no guarantee that the performance will increase or decrease. It is all depends your applications. If your application uses a lot of hollow out masks, it might help.
+// <i> This feature has no meaning when the anti-alias transform is disabled or the helium acceleration is available.
+#ifndef __ARM_2D_CFG_OPTIMIZE_FOR_HOLLOW_OUT_MASK_IN_TRANSFORM__
+#   define __ARM_2D_CFG_OPTIMIZE_FOR_HOLLOW_OUT_MASK_IN_TRANSFORM__         0
+#endif
+
 // </h>
 
 
@@ -100,20 +108,6 @@ extern "C" {
 #   define __GLCD_CFG_COLOUR_DEPTH__                                    LD_CFG_COLOR_DEPTH
 #endif
 
-// <o>Width of the screen <8-32767>
-// <i> The width of your screen
-// <i> Default: 320
-#ifndef __GLCD_CFG_SCEEN_WIDTH__
-#   define __GLCD_CFG_SCEEN_WIDTH__                                     480
-#endif
-
-// <o>Height of the screen <8-32767>
-// <i> The height of your screen
-// <i> Default: 240
-#ifndef __GLCD_CFG_SCEEN_HEIGHT__
-#   define __GLCD_CFG_SCEEN_HEIGHT__                                     272
-#endif
-
 // <o> The size of the LCD printf text buffer <16-65535>
 // <i> The text buffer size for the lcd printf service. It determins how many character you can use in one printf string.
 #ifndef __LCD_PRINTF_CFG_TEXT_BUFFER_SIZE__
@@ -121,6 +115,20 @@ extern "C" {
 #endif
 
 // <h>Benchmark
+
+// <o>Width of the screen <8-32767>
+// <i> The width of your screen for running benchmark
+// <i> Default: 320
+#ifndef __GLCD_CFG_SCEEN_WIDTH__
+#   define __GLCD_CFG_SCEEN_WIDTH__                                     320
+#endif
+
+// <o>Height of the screen <8-32767>
+// <i> The height of your screen for running benchmark
+// <i> Default: 240
+#ifndef __GLCD_CFG_SCEEN_HEIGHT__
+#   define __GLCD_CFG_SCEEN_HEIGHT__                                    240
+#endif
 
 // <o>Number of iterations <1-2000>
 // <i> run number of iterations in arm-2d benchmark before calculating the result.
@@ -142,6 +150,11 @@ extern "C" {
 #   define __ARM_2D_CFG_WATCH_PANEL_STOPWATCH_MODE__                    0
 #endif
 
+// <q> Enable the nebula effect mode in the Benchmark:Watch-panel
+// <i> This feature is disabled by default and it is only available in the Tiny mode.
+#ifndef __ARM_2D_CFG_BENCHMARK_WATCH_PANEL_USE_NEBULA__
+#   define __ARM_2D_CFG_BENCHMARK_WATCH_PANEL_USE_NEBULA__              0
+#endif
 
 // <q> Exit benchmark when finished
 // <i> Exit the arm_2d_run_benchmark() after running specified iterations

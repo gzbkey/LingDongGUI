@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Ou Jianbo 59935554@qq.com
+ * Copyright 2021-2024 Ou Jianbo 59935554@qq.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
 */
 
+/**
+ * @file    xString.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   字符串处理
+ * @version 0.1
+ * @date    2023-11-03
+ */
 #include "xString.h"
 
 //反转字符串

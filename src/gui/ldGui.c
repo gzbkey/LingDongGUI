@@ -1,3 +1,26 @@
+/*
+ * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file    ldGui.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   ldgui的主文件
+ * @version 0.1
+ * @date    2023-11-03
+ */
 #include "ldGui.h"
 #include "ldUser.h"
 #include "ldImage.h"
@@ -9,6 +32,9 @@
 #include "ldCheckBox.h"
 #include "ldLabel.h"
 #include "ldScrollSelecter.h"
+#include "ldDateTime.h"
+#include "ldIconSlider.h"
+#include "ldGauge.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -182,6 +208,21 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
         break;
     }
+    case widgetTypeDateTime:
+    {
+        ldDateTimeDel((ldDateTime_t*)pWidget);
+        break;
+    }
+    case widgetTypeIconSlider:
+    {
+        ldIconSliderDel((ldIconSlider_t*)pWidget);
+        break;
+    }
+    case widgetTypeGauge:
+    {
+        ldGaugeDel((ldGauge_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -234,6 +275,21 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
         ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
+    case widgetTypeDateTime:
+    {
+        ldDateTimeLoop((ldDateTime_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeIconSlider:
+    {
+        ldIconSliderLoop((ldIconSlider_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeGauge:
+    {
+        ldGaugeLoop((ldGauge_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
 /*============================ auto add loop =================================*/
     default:
         break;
@@ -258,6 +314,12 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
     }
 }
 
+/**
+ * @brief   ldgui的初始化函数
+ * 
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiInit(void)
 {
     xEmitInit();
@@ -265,11 +327,25 @@ void ldGuiInit(void)
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 }
 
+/**
+ * @brief   ldgui的逻辑处理函数
+ * 
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiLogicLoop(void)
 {
     ldUserPageLoopFunc[pageNumNow]();
 }
 
+/**
+ * @brief   ldgui的界面处理函数
+ * 
+ * @param   ptParent        arm2d的tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     //遍历控件
@@ -287,12 +363,25 @@ void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
     xConnectProcess();
 }
 
+/**
+ * @brief   ldgui的页面退出函数
+ * 
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiQuit(void)
 {
     ldUserPageQuitFunc[pageNumNow]();
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 
+/**
+ * @brief   ldgui页面跳转函数
+ * 
+ * @param   pageNum         目标页面序号
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-07
+ */
 void ldGuiJumpPage(uint8_t pageNum)
 {
     pageTarget=pageNum;

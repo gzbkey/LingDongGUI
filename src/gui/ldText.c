@@ -1,3 +1,26 @@
+/*
+ * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file    ldText.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   text widget
+ * @version 0.1
+ * @date    2023-11-03
+ */
 #include "ldText.h"
 #include "ldGui.h"
 
@@ -228,7 +251,7 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
         return;
     }
     ldBaseSetText(&pWidget->pTextInfo,pStr);
-    textSize= ldBaseGetStringSize(pWidget->pTextInfo,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
+    textSize= ldBaseGetStringSize(pWidget->pTextInfo->pStr,pWidget->pTextInfo->pFontDict,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
     pWidget->strHeight=textSize.iHeight;
 }
 
@@ -296,7 +319,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        txt->scrollOffset=_scrollOffset+(int16_t)(info.value&0xFFFF);
+        txt->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:

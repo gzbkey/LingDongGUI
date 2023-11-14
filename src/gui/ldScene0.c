@@ -16,6 +16,13 @@
  * limitations under the License.
  */
 
+/**
+ * @file    ldScene0.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   arm2d的场景文件，是arm2d的关键用户文件
+ * @version 0.1
+ * @date    2023-11-03
+ */
 /*============================ INCLUDES ======================================*/
 
 #include "arm_2d.h"

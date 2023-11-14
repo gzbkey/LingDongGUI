@@ -1,16 +1,37 @@
-# 软件准备
+## 软件准备
 
-安装vscode
+### VSCode
+
+https://code.visualstudio.com/Download
 
 安装插件c/c++、Code Runner
 
-# 下载子模块
+### git
+
+安装git，用于下载源码。(也可以手动下载源码，但不推荐)
+
+https://git-scm.com/download/win
+
+## 下载源码
+
+### 方法1
+
+##### 步骤1
+//gitee
+
+git clone https://gitee.com/gzbkey/LingDongGUI.git
+
+//github 
+
+git clone https://github.com/gzbkey/LingDongGUI.git
+
+##### 步骤2
 
 git submodule init
 
 git submodule update
 
-或者
+### 方法2
 
 //gitee
 
@@ -20,9 +41,9 @@ git clone --recursive https://gitee.com/gzbkey/LingDongGUI.git
 
 git clone --recursive https://github.com/gzbkey/LingDongGUI.git
 
-# VSCode SDL Demo 的使用
+## VSCode SDL Demo 的使用
 
-#### 安装 gcc
+### 安装 gcc
 
 我使用的是MinGW-w64
 
@@ -50,7 +71,7 @@ D:\mingw64
 
 根据自己需求选择即可
 
-#### 修改配置
+### 修改配置
 
 通过vscode打开项目文件夹
 
@@ -66,7 +87,7 @@ D:\mingw64
 
 修改对应版本的command
 
-#### 编译
+### 编译
 
 点击左侧按键"运行和调试"，选择对应版本编译即可
 
