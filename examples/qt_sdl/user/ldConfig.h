@@ -8,7 +8,7 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 
-#define USE_VIRTUAL_RESOURCE                      1
+#define USE_VIRTUAL_RESOURCE                      0
 
 #define LD_CFG_SCEEN_WIDTH                        240
 #define LD_CFG_SCEEN_HEIGHT                       320

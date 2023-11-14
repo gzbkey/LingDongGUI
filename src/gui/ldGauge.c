@@ -203,7 +203,6 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         ldBaseImage(&tTarget,pResTile,pWidget->isWithBgMask,255);
         arm_2d_op_wait_async(NULL);
 
-        /* draw pointer sec */
         do {
 
 
@@ -224,6 +223,12 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             pTempRes->tInfo.bIsRoot=true;
             pTempRes->bHasEnforcedColour=true;
 
+            pTempRes->pchBuffer = (uint8_t *)pWidget->pointerImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+            ((arm_2d_vres_t*)pTempRes)->pTarget=pWidget->pointerImgAddr;
+#endif
+            pTempRes->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+
             arm_2d_location_t targetCentre =
             {
                 .iX = pWidget->pointerOriginOffsetX,
@@ -241,14 +246,7 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #else
             arm_2d_vres_t maskTile;
 #endif
-                pTempRes->pchBuffer = (uint8_t *)pWidget->pointerImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)pTempRes)->pTarget=pWidget->pointerImgAddr;
-#endif
-                pTempRes->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-
                 maskTile=tempRes;
-
                 (*(arm_2d_tile_t*)(&maskTile)).tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_8BIT;
 #if LD_CFG_COLOR_DEPTH == 8
                 (*(arm_2d_tile_t*)(&maskTile)).pchBuffer += (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iWidth * (*(arm_2d_tile_t*)(&maskTile)).tRegion.tSize.iHeight;

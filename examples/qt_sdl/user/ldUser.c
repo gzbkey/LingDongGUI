@@ -31,9 +31,9 @@ void userInit(void)
 
     obj=ldGaugeInit(1,0, 10, 10, 100, 100,BBG_BMP,false);
 
-    ldGaugeSetPointerImage(obj,POINTERMASK_PNG,9,55,5,45);
+    ldGaugeSetPointerImage(obj,POINTER_BMP,9,55,5,45);
 
-    ldGaugeSetPointerImageType(obj,onlyMask,__RGB(0,0,255));
+    ldGaugeSetPointerImageType(obj,keying,__RGB(255,255,255));
 
 //    ldGaugeSetCenterOffset(obj,0,30);
 
