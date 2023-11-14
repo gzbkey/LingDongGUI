@@ -14,30 +14,20 @@
 #include "ldDateTime.h"
 #include "ldIconSlider.h"
 #include "ldGauge.h"
+#include "ldQRCode.h"
 
 void* obj;
 
 #define BG_WIN   0
-#define VOL_LABEL_NAME 1
-#define VOL_NUM_TEN  2
-#define VOL_NUM_IND  3
-#define VOL_LABEL_POINT 4
-#define VOL_NUM_POINT1  5
+
 
 void userInit(void)
 {
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-    obj=ldGaugeInit(1,0, 10, 10, 100, 100,BBG_BMP,false);
+    obj=ldQRCodeInit(2,BG_WIN,10, 100, 50, 50, "ldgui",0,__RGB(255,255,255), qrcodegen_Ecc_LOW, qrcodegen_Mask_0, 2, 2);
 
-    ldGaugeSetPointerImage(obj,POINTER_BMP,9,55,5,45);
-
-    ldGaugeSetPointerImageType(obj,keying,__RGB(255,255,255));
-
-//    ldGaugeSetCenterOffset(obj,0,30);
-
-    ldGaugeSetAngle(obj,120);
 }
 
 

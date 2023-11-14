@@ -13,6 +13,7 @@ SOURCES += \
     ../../src/gui/ldIconSlider.c \
     ../../src/gui/ldImage.c \
     ../../src/gui/ldLabel.c \
+    ../../src/gui/ldQRCode.c \
     ../../src/gui/ldRadialMenu.c \
     ../../src/gui/ldProgressBar.c \
     ../../src/gui/ldScene0.c \
@@ -20,6 +21,7 @@ SOURCES += \
     ../../src/gui/ldText.c \
     ../../src/gui/ldWindow.c \
     ../../src/misc/freeRtosHeap4.c \
+    ../../src/misc/qrcodegen.c \
     ../../src/misc/tlsf.c \
     ../../src/misc/xBtnAction.c \
     ../../src/misc/xConnect.c \
@@ -113,6 +115,7 @@ HEADERS += \
     ../../src/gui/ldIconSlider.h \
     ../../src/gui/ldImage.h \
     ../../src/gui/ldLabel.h \
+    ../../src/gui/ldQRCode.h \
     ../../src/gui/ldRadialMenu.h \
     ../../src/gui/ldProgressBar.h \
     ../../src/gui/ldScene0.h \
@@ -120,6 +123,7 @@ HEADERS += \
     ../../src/gui/ldText.h \
     ../../src/gui/ldWindow.h \
     ../../src/misc/freeRtosHeap4.h \
+    ../../src/misc/qrcodegen.h \
     ../../src/misc/tlsf.h \
     ../../src/misc/xBtnAction.h \
     ../../src/misc/xConnect.h \

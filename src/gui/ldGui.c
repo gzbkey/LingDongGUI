@@ -35,6 +35,7 @@
 #include "ldDateTime.h"
 #include "ldIconSlider.h"
 #include "ldGauge.h"
+#include "ldQRCode.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -223,6 +224,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldGaugeDel((ldGauge_t*)pWidget);
         break;
     }
+    case widgetTypeQRCode:
+    {
+        ldQRCodeDel((ldQRCode_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -288,6 +294,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeGauge:
     {
         ldGaugeLoop((ldGauge_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeQRCode:
+    {
+        ldQRCodeLoop((ldQRCode_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
 /*============================ auto add loop =================================*/
