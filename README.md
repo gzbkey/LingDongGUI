@@ -29,13 +29,9 @@
     * 队列
     * 彩色log打印
 
-<div style="background-color: #f8f8f8; border: 1px solid #ddd; border-left: 4px solid #17a2b8; padding: 10px; margin-bottom: 10px;border-radius: 4px;">
-    <p style="color: #17a2b8;">
-        <i class="fa fa-info-circle"></i>
-        Note
-    </p>
-    <p>可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制，理论上可以在任意支持C语言的平台运行。</p>
-</div>
+|ℹ️ Note|
+|:----|
+|可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制，理论上可以在任意支持C语言的平台运行。|
 
 ## 源码
 
@@ -61,7 +57,7 @@
 | ✅ | icon slider | 滑动图标 |
 | ✅ | gauge | 仪表盘 |
 | ✅ | qr code | 二维码 |
-| 🔲 | list | 列表 |
+| ✅ | table | 表格 |
 | 🔲 | graph | 波形图 |
 | 🔲 | line edit | 编辑框 |
 | 🔲 | arc bar | 圆环进度条 |
