@@ -18,6 +18,7 @@ SOURCES += \
     ../../src/gui/ldProgressBar.c \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldScrollSelecter.c \
+    ../../src/gui/ldTable.c \
     ../../src/gui/ldText.c \
     ../../src/gui/ldWindow.c \
     ../../src/misc/freeRtosHeap4.c \
@@ -120,6 +121,7 @@ HEADERS += \
     ../../src/gui/ldProgressBar.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldScrollSelecter.h \
+    ../../src/gui/ldTable.h \
     ../../src/gui/ldText.h \
     ../../src/gui/ldWindow.h \
     ../../src/misc/freeRtosHeap4.h \

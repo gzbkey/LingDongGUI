@@ -15,12 +15,13 @@
 #include "ldIconSlider.h"
 #include "ldGauge.h"
 #include "ldQRCode.h"
+#include "ldTable.h"
 
 void* obj;
 
 #define BG_WIN   0
 
-
+uint8_t strTest[]="5693";
 void userInit(void)
 {
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
@@ -28,6 +29,22 @@ void userInit(void)
 
     obj=ldQRCodeInit(2,BG_WIN,10, 100, 50, 50, "ldgui",0,__RGB(255,255,255), qrcodegen_Ecc_LOW, qrcodegen_Mask_0, 2, 2);
 
+    obj=ldTableInit(3,BG_WIN,10,10, 200, 80, 3, 3, 2);
+
+    ldTableSetItemWidth(obj,3,12);
+
+    ldTableSetItemText(obj,0,0,"1",WENQUANYI_ZEN_HEI_REGULAR_9);
+    ldTableSetItemText(obj,0,1,"2",WENQUANYI_ZEN_HEI_REGULAR_9);
+    ldTableSetItemText(obj,0,2,"3",WENQUANYI_ZEN_HEI_REGULAR_9);
+    ldTableSetItemText(obj,1,2,"4",WENQUANYI_ZEN_HEI_REGULAR_9);
+    ldTableSetItemStaticText(obj,2,2,strTest,WENQUANYI_ZEN_HEI_REGULAR_9);
+
+
+    obj=ldCheckBoxInit(4,BG_WIN,10,200,80,50);
+    ldCheckBoxSetText(obj,"123");
+    ldCheckBoxSetFont(obj,WENQUANYI_ZEN_HEI_REGULAR_9);
+//    ldCheckBoxSetColor(obj,0xFF,0xFF00);
+//    ldCheckBoxSetCharColor(obj,0xFF);
 }
 
 

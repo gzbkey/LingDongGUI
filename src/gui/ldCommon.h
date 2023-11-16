@@ -100,6 +100,7 @@ typedef enum{
     widgetTypeRadialMenu,
     widgetTypeScrollSelecter,
     widgetTypeLabel,
+    widgetTypeTable,
 }ldWidgetType;
 
 #if USE_VIRTUAL_RESOURCE == 0

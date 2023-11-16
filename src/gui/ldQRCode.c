@@ -16,12 +16,11 @@
 
 /**
  * @file    QRCode.c
- * @author  
- * @brief   
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   qr code widget
  * @version 0.1
- * @date    
+ * @date    2023-11-14
  */
-
 #include "ldQRCode.h"
 #include "ldGui.h"
 
@@ -194,6 +193,7 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                         {
                             tempColor=pWidget->bgColor;
                         }
+
                         arm_2d_region_t tBoxRegion = {
                             .tLocation = {
                                 .iX = x*pWidget->qrZoom,
@@ -204,17 +204,10 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                                 .iHeight=pWidget->qrZoom,
                             }
                         };
-
                         arm_2d_tile_t tChildTile;
                         arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
-                        ldBaseColor(&tChildTile,tempColor,255);
 
-//                        for (int i=0; i<pWidget->qrZoom; i++)
-//                        {
-//                            llFillSingleColor(globalPos.x+widget->geometry.x+x*widget->qrZoom,      globalPos.y+widget->geometry.y+y*widget->qrZoom+i,
-//                                              globalPos.x+widget->geometry.x+(x+1)*widget->qrZoom-1,globalPos.y+widget->geometry.y+y*widget->qrZoom+i,
-//                                              tempColor);
-//                        }
+                        ldBaseColor(&tChildTile,tempColor,255);
                     }
                 }
             }

@@ -47,8 +47,8 @@ extern const uint8_t pointerMask_png[];
 #define POINTERMASK_PNG 27883
 #endif
 
-#define JETBRAINS_MONO_NL_REGULAR_9 (&dict_JetBrains_Mono_NL_Regular_9)
-extern ldFontDict_t dict_JetBrains_Mono_NL_Regular_9;
+#define WENQUANYI_ZEN_HEI_REGULAR_9 (&dict_WenQuanYi_Zen_Hei_Regular_9)
+extern ldFontDict_t dict_WenQuanYi_Zen_Hei_Regular_9;
 
 #ifdef __cplusplus
 }

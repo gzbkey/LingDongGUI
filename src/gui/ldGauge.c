@@ -21,7 +21,6 @@
  * @version 0.1
  * @date    2023-11-09
  */
-
 #include "ldGauge.h"
 #include "ldGui.h"
 

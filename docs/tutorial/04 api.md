@@ -499,6 +499,13 @@ progress bar widget
 ### 信号列表
 ### 函数说明
 ---
+# QRCode
+### 简述
+qr code widget
+### 函数列表
+### 信号列表
+### 函数说明
+---
 # RadialMenu
 ### 简述
 radial menu widget
@@ -512,6 +519,154 @@ scroll selecter widget
 ### 函数列表
 ### 信号列表
 ### 函数说明
+---
+# Table
+### 简述
+table widget
+### 函数列表
+* ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
+* void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+* void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
+* void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height);
+* void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
+* void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
+* void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
+* void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
+### 信号列表
+### 函数说明
+#### ldTableInit
+##### 原型
+```c
+ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
+```
+##### 说明
+    表格初始化
+
+##### 参数
+    nameId              新控件id
+    parentNameId        父控件id
+    x                   相对坐标x轴
+    y                   相对坐标y轴
+    width               控件宽度
+    height              控件高度
+    rowCount            行数
+    columnCount         列数
+    itemSpace           间隔
+
+##### 返回
+    ldTable_t*          新控件指针
+<br>
+
+#### ldTableLoop
+##### 原型
+```c
+void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+```
+##### 说明
+    表格显示处理
+
+##### 参数
+    pWidget             目标控件指针
+    pParentTile         父控件tile对象
+    bIsNewFrame         新的一帧开始标志
+
+<br>
+
+#### ldTableSetItemWidth
+##### 原型
+```c
+void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
+```
+##### 说明
+    设置指定列的宽度
+
+##### 参数
+    pWidget             目标控件指针
+    column              列
+    width               宽度
+
+<br>
+
+#### ldTableSetItemHeight
+##### 原型
+```c
+void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height);
+```
+##### 说明
+    设置指定行的高度
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行
+    height              高度
+
+<br>
+
+#### ldTableSetItemText
+##### 原型
+```c
+void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
+```
+##### 说明
+    设置项目的文本
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行
+    column              列
+    pText               文本内容
+    pFontDict           字体
+
+<br>
+
+#### ldTableSetItemStaticText
+##### 原型
+```c
+void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
+```
+##### 说明
+    设置项目的静态文本，不可变更的文本内容，不消耗内存
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行
+    column              列
+    pText               文本内容
+    pFontDict           字体
+
+<br>
+
+#### ldTableSetItemColor
+##### 原型
+```c
+void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
+```
+##### 说明
+    设置项目颜色
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行
+    column              列
+    textColor           文字颜色
+    bgColor             文字背景颜色
+
+<br>
+
+#### ldTableSetBgColor
+##### 原型
+```c
+void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
+```
+##### 说明
+    设置表格底色
+
+##### 参数
+    pWidget             目标控件指针
+    bgColor             底色
+
+<br>
+
 ---
 # Text
 ### 简述

@@ -1009,7 +1009,7 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
 
     textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
 
-    arm_2d_region_t alignSize= ldBaseAutoAlign(&pResTileTemplate->tRegion,&textSize,align);
+    arm_2d_region_t alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resTile = *pResTileTemplate;
@@ -1038,6 +1038,7 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
         ((arm_2d_tile_t*)&resTile)->tRegion.tSize.iWidth=width;
         ((arm_2d_tile_t*)&resTile)->tRegion.tSize.iHeight=height;
         ((arm_2d_tile_t*)&resTile)->pchBuffer=imgAddr;
+        ((arm_2d_tile_t*)&resTile)->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pFontDict->maskType);
         resTile.pTarget=imgAddr;
 #endif
         int16_t tempHeight;

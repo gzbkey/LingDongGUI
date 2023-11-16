@@ -13,8 +13,6 @@
     * 支持ARM单片机、RISC-V单片机
     * 编译器需要支持GNU C99以上标准
 
-    📝*可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制，理论上可以在任意支持C语言的平台运行*
-
 2. **简单易用**
     * 对ARM-2D进行二次封装，极大降低ARM-2D的使用难度
     * 使用类似Qt的信号槽模式
@@ -24,6 +22,20 @@
     * 使用脚本自动生成新控件框架
     * 使用ARM-2D原生API自由组合控件
     * 使用ldgui通用基础API自由组合控件
+
+4. **内置便捷功能**
+    * 软件定时器
+    * 多功能按键，支持实体按键和触摸按键
+    * 队列
+    * 彩色log打印
+
+<div style="background-color: #f8f8f8; border: 1px solid #ddd; border-left: 4px solid #17a2b8; padding: 10px; margin-bottom: 10px;border-radius: 4px;">
+    <p style="color: #17a2b8;">
+        <i class="fa fa-info-circle"></i>
+        Note
+    </p>
+    <p>可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制，理论上可以在任意支持C语言的平台运行。</p>
+</div>
 
 ## 源码
 

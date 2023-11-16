@@ -540,6 +540,15 @@ void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
     pWidget->isCorner=isCorner;
 }
 
+void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->charColor=charColor;
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
