@@ -38,6 +38,12 @@ void userInit(void)
     ldTableSetItemText(obj,0,2,"3",WENQUANYI_ZEN_HEI_REGULAR_9);
     ldTableSetItemText(obj,1,2,"4",WENQUANYI_ZEN_HEI_REGULAR_9);
     ldTableSetItemStaticText(obj,2,2,strTest,WENQUANYI_ZEN_HEI_REGULAR_9);
+    ldTableSetItemColor(obj,2,2,GLCD_COLOR_WHITE,GLCD_COLOR_YELLOW);
+
+    ldTableSetItemWidth(obj,0,100);
+//    ldTableSetItemHeight(obj,0,100);
+
+    ldTableSetItemButton(obj,2,2, 10,5, 52, 52, ICON_BMP, BBG_BMP, true);
 
 
     obj=ldCheckBoxInit(4,BG_WIN,10,200,80,50);
@@ -45,6 +51,7 @@ void userInit(void)
     ldCheckBoxSetFont(obj,WENQUANYI_ZEN_HEI_REGULAR_9);
 //    ldCheckBoxSetColor(obj,0xFF,0xFF00);
 //    ldCheckBoxSetCharColor(obj,0xFF);
+
 }
 
 

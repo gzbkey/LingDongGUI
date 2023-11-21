@@ -17,7 +17,7 @@
 /**
  * @file    ldTable.c
  * @author  Ou Jianbo(59935554@qq.com)
- * @brief   table widget
+ * @brief   表格控件
  * @version 0.1
  * @date    2023-11-14
  */
@@ -91,6 +91,331 @@ void ldTableDel(ldTable_t *pWidget)
     }
 }
 
+void _ldTableSelectItem(ldTable_t *pWidget,ldTableItem_t *item)
+{
+    for(uint8_t y=0;y<pWidget->rowCount;y++)
+    {
+        for(uint8_t x=0;x<pWidget->columnCount;x++)
+        {
+            if(&pWidget->pItemInfo[y*pWidget->columnCount+x]==item)
+            {
+                item->isSelect=true;
+                pWidget->currentRow=y;
+                pWidget->currentColumn=x;
+            }
+            else
+            {
+                pWidget->pItemInfo[y*pWidget->columnCount+x].isSelect=false;
+            }
+        }
+    }
+}
+
+/**
+ * @brief   获取选中列的编号
+ * 
+ * @param   pWidget         目标控件指针
+ * @return  uint8_t         列号
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+uint8_t ldTableCurrentColumn(ldTable_t *pWidget)
+{
+    return pWidget->currentColumn;
+}
+
+/**
+ * @brief   获取选中行的编号
+ * 
+ * @param   pWidget         目标控件指针
+ * @return  uint8_t         行号
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+uint8_t ldTableCurrentRow(ldTable_t *pWidget)
+{
+    return pWidget->currentRow;
+}
+
+/**
+ * @brief   获取选中行的项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @return  ldTableItem_t*  返回目标item指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget)
+{
+    return ldTableItem(pWidget,pWidget->currentRow,pWidget->currentColumn);
+}
+
+
+ldPoint_t _ldTableGetItemPos(ldTable_t *pWidget,uint8_t row, uint8_t column)
+{
+    ldPoint_t offset={0,0};
+
+    for(uint8_t x=0;x<pWidget->columnCount;x++)
+    {
+        if(x<column)
+        {
+        offset.x+=pWidget->itemSpace;
+        offset.x+=pWidget->pColumnWidth[x];
+        }
+    }
+    offset.x+=pWidget->itemSpace+pWidget->scrollOffsetX;
+
+    for(uint8_t y=0;y<pWidget->rowCount;y++)
+    {
+        if(y<row)
+        {
+        offset.y+=pWidget->itemSpace;
+        offset.y+=pWidget->pRowHeight[y];
+        }
+    }
+    offset.y+=pWidget->itemSpace+pWidget->scrollOffsetY;
+
+    return offset;
+}
+
+arm_2d_region_t _ldTableGetItemCellGlobalRegion(ldTable_t *pWidget,uint8_t row, uint8_t column)
+{
+    ldTableItem_t *targetItem=ldTableItem(pWidget,row,column);
+
+    ldPoint_t targetItemPos=_ldTableGetItemPos(pWidget,row,column);
+
+    int16_t targetItemWidth=pWidget->pColumnWidth[column];
+
+    int16_t targetItemHeight=pWidget->pRowHeight[row];
+
+    arm_2d_region_t itemRegion={
+        .tLocation={
+            .iX=0,
+            .iY=0,
+        },
+        .tSize={
+            .iWidth=targetItemWidth,
+            .iHeight=targetItemHeight,
+        },
+    };
+
+    arm_2d_region_t outRegion;
+
+    arm_2d_region_intersect(&itemRegion,&targetItem->imgRegion,&outRegion);
+
+    outRegion.tLocation.iX=targetItem->imgRegion.tLocation.iX+targetItemPos.x+((arm_2d_tile_t *)(arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+    outRegion.tLocation.iY=targetItem->imgRegion.tLocation.iY+targetItemPos.y+((arm_2d_tile_t *)(arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+
+    return outRegion;
+}
+
+/**
+ * @brief   获取指定的项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   row             行号
+ * @param   column          列号
+ * @return  ldTableItem_t*  返回目标item指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column)
+{
+    return &pWidget->pItemInfo[row*pWidget->columnCount+column];
+}
+
+/**
+ * @brief   获取指定坐标的项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   x               全局坐标x轴
+ * @param   y               全局坐标y轴
+ * @return  ldTableItem_t*  返回目标item指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y)
+{
+    uint8_t itemX,itemY;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+    x-=pResTile->tRegion.tLocation.iX;
+    y-=pResTile->tRegion.tLocation.iY;
+
+    itemX=0;
+    itemY=0;
+    int16_t tempOffset=pWidget->scrollOffsetX-x;
+    for(uint8_t i=0;i<pWidget->columnCount;i++)
+    {
+        if(tempOffset<-pWidget->pColumnWidth[i])
+        {
+            tempOffset+=pWidget->pColumnWidth[i];
+            tempOffset+=pWidget->itemSpace;
+            itemX++;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    tempOffset=pWidget->scrollOffsetY-y;
+    for(uint8_t i=0;i<pWidget->rowCount;i++)
+    {
+        if(tempOffset<-pWidget->pRowHeight[i])
+        {
+            tempOffset+=pWidget->pRowHeight[i];
+            tempOffset+=pWidget->itemSpace;
+            itemY++;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if(itemX>=pWidget->columnCount)
+    {
+        itemX=pWidget->columnCount-1;
+    }
+    if(itemY>=pWidget->rowCount)
+    {
+        itemY=pWidget->rowCount-1;
+    }
+
+    return &pWidget->pItemInfo[itemY*pWidget->columnCount+itemX];
+}
+
+static int16_t _scrollOffsetX,_scrollOffsetY;
+static int16_t _totalItemWidth,_totalItemHeight;
+static bool _isStopMove;
+static bool slotTableProcess(xConnectInfo_t info)
+{
+    ldTable_t *pWidget;
+    int16_t x,y;
+    int16_t offsetX,offsetY;
+    arm_2d_tile_t *pResTile;
+    ldTableItem_t *currentItem;
+
+    pWidget=ldGetWidgetById(info.receiverId);
+
+    pResTile=(arm_2d_tile_t*)&pWidget->resource;
+
+    switch (info.signalType)
+    {
+    case SIGNAL_PRESS:
+    {
+        currentItem=ldTableItemAt(pWidget,(int16_t)GET_SIGNAL_VALUE_X(info.value),(int16_t)GET_SIGNAL_VALUE_Y(info.value));
+
+        _ldTableSelectItem(pWidget,currentItem);
+
+        _scrollOffsetX=pWidget->scrollOffsetX;
+        _scrollOffsetY=pWidget->scrollOffsetY;
+
+        _totalItemWidth=0;
+        for(uint8_t i=0;i<pWidget->columnCount;i++)
+        {
+            _totalItemWidth+=pWidget->itemSpace;
+            _totalItemWidth+=pWidget->pColumnWidth[i];
+        }
+        _totalItemWidth+=pWidget->itemSpace;
+
+        _totalItemHeight=0;
+        for(uint8_t i=0;i<pWidget->rowCount;i++)
+        {
+            _totalItemHeight+=pWidget->itemSpace;
+            _totalItemHeight+=pWidget->pRowHeight[i];
+        }
+
+        if(currentItem->isButton)
+        {
+            arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(pWidget,pWidget->currentColumn,pWidget->currentRow);
+
+            x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            y=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+
+            if((x>=cellRegion.tLocation.iX)&&(y>=cellRegion.tLocation.iY)&&
+                    (x<(cellRegion.tLocation.iX+cellRegion.tSize.iWidth))&&
+                    (y<(cellRegion.tLocation.iY+cellRegion.tSize.iHeight)))
+            {
+                _isStopMove=true;
+                currentItem->isChecked=!currentItem->isChecked;
+            }
+        }
+        break;
+    }
+    case SIGNAL_TOUCH_HOLD_MOVE:
+    {
+        if(_isStopMove)
+        {
+            break;
+        }
+        offsetX=(int16_t)GET_SIGNAL_VALUE_X(info.value);
+        offsetY=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+
+
+        offsetX=abs(offsetX);
+        offsetY=abs(offsetY);
+
+        if(offsetX>=offsetY)
+        {
+            pWidget->scrollOffsetX=_scrollOffsetX+(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            if(pWidget->scrollOffsetX>0)
+            {
+                pWidget->scrollOffsetX=0;
+            }
+            else
+            {
+                if((_totalItemWidth+pWidget->scrollOffsetX)<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth)
+                {
+                    pWidget->scrollOffsetX=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth-_totalItemWidth;
+                }
+
+                if(_totalItemWidth<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth)
+                {
+                    pWidget->scrollOffsetX=0;
+                }
+            }
+        }
+        else
+        {
+            pWidget->scrollOffsetY=_scrollOffsetY+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+            if(pWidget->scrollOffsetY>0)
+            {
+                pWidget->scrollOffsetY=0;
+            }
+            else
+            {
+                if((_totalItemHeight+pWidget->scrollOffsetY)<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
+                {
+                    pWidget->scrollOffsetY=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight-_totalItemHeight;
+                }
+
+                if(_totalItemHeight<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
+                {
+                    pWidget->scrollOffsetY=0;
+                }
+            }
+        }
+
+        break;
+    }
+    case SIGNAL_RELEASE:
+    {
+        currentItem=ldTableCurrentItem(pWidget);
+        _isStopMove=false;
+        if(!currentItem->isCheckable)
+        {
+            currentItem->isChecked=!currentItem->isChecked;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return false;
+}
+
 /**
  * @brief   表格初始化
  * 
@@ -162,6 +487,9 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pRowHeight=heightBuf;
         pNewWidget->pItemInfo=pItemInfoBuf;
         memset(pItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
+        pNewWidget->isBgTransparent=false;
+        pNewWidget->bgColor=0;
+        pNewWidget->selectColor=GLCD_COLOR_DARK_GREEN;
 
         int16_t w=(width-itemSpace)/columnCount-itemSpace;
         for(uint8_t i=0;i<columnCount;i++)
@@ -181,12 +509,22 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].itemBgColor=__RGB( 255, 255, 255);
             pNewWidget->pItemInfo[i].isStaticText=false;
             pNewWidget->pItemInfo[i].pText=NULL;
+            pNewWidget->pItemInfo[i].align=LD_ALIGN_CENTER;
+            pNewWidget->pItemInfo[i].releaseImgAddr=LD_ADDR_NONE;
+            pNewWidget->pItemInfo[i].pressImgAddr=LD_ADDR_NONE;
+            pNewWidget->pItemInfo[i].isButton=false;
+            pNewWidget->pItemInfo[i].isCheckable=false;
+            pNewWidget->pItemInfo[i].isChecked=false;
+            pNewWidget->pItemInfo[i].isSelectShow=true;
+            pNewWidget->pItemInfo[i].isSelect=false;
         }
 
-        pNewWidget->isBgTransparent=false;
-        pNewWidget->bgColor=0;
+        xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
+        xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
+        xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotTableProcess);
 
         LOG_INFO("[table] init,id:%d\n",nameId);
+
     }
     else
     {
@@ -213,9 +551,15 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_region_t tBoxRegion;
-    arm_2d_tile_t tChildTile;
+    arm_2d_tile_t tItemTile,tImgTile;
 
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes = *pResTile;
+#else
+    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
+#endif
 
     if (pWidget == NULL)
     {
@@ -236,7 +580,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             ldBaseColor(&tTarget,pWidget->bgColor,255);
         }
 
-        tBoxRegion.tLocation.iY=0;
+        tBoxRegion.tLocation.iY=pWidget->scrollOffsetY;
         for(uint8_t y=0;y<pWidget->rowCount;y++)
         {
             if(y>0)
@@ -245,7 +589,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             }
             tBoxRegion.tLocation.iY+=pWidget->itemSpace;
 
-            tBoxRegion.tLocation.iX=0;
+            tBoxRegion.tLocation.iX=pWidget->scrollOffsetX;
             for(uint8_t x=0;x<pWidget->columnCount;x++)
             {
                 if(x>0)
@@ -256,18 +600,55 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
                 tBoxRegion.tSize.iWidth=pWidget->pColumnWidth[x];
                 tBoxRegion.tSize.iHeight=pWidget->pRowHeight[y];
-                arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+                arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tItemTile, false);
 
                 ldTableItem_t *item= &pWidget->pItemInfo[y*pWidget->columnCount+x];
-                ldBaseColor(&tChildTile,item->itemBgColor,255);
+                ldBaseColor(&tItemTile,item->itemBgColor,255);
                 if(item->pText!=NULL)
                 {
-                    LOG_DEBUG("%d,%d,%s\n",x,y,item->pText);
-                    ldBaseLineText(&tChildTile,pResTile,item->pText,item->pFontDict,0,item->textColor,0,255);
+                    ldBaseLineText(&tItemTile,pResTile,item->pText,item->pFontDict,item->align,item->textColor,0,255);
                 }
 
+                if((item->releaseImgAddr!=LD_ADDR_NONE)||(item->pressImgAddr!=LD_ADDR_NONE))
+                {
+                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion=item->imgRegion;
+
+                    arm_2d_tile_generate_child(&tItemTile, &item->imgRegion, &tImgTile, false);
+
+                    if(item->releaseImgAddr!=LD_ADDR_NONE)
+                    {
+                        if((!item->isButton)||((item->isButton)&&(item->isChecked==false)))
+                        {
+                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=item->releaseImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                            tempRes.pTarget=item->releaseImgAddr;
+#endif
+                            ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,false,255);
+                        }
+                    }
+
+                    if(item->pressImgAddr!=LD_ADDR_NONE)
+                    {
+                        if((item->isButton)&&(item->isChecked==true))
+                        {
+                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=item->pressImgAddr;
+    #if USE_VIRTUAL_RESOURCE == 1
+                            tempRes.pTarget=item->pressImgAddr;
+    #endif
+                            ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,false,255);
+                        }
+                    }
+                }
+
+                if((item->isSelect)&&(item->isSelectShow))
+                {
+                    arm_2d_draw_box(&tTarget,&tItemTile.tRegion,2,pWidget->selectColor,255);
+                }
+
+
 #if LD_DEBUG == 1
-                arm_2d_draw_box(&tTarget,&tChildTile.tRegion,1,0,255);
+                arm_2d_draw_box(&tTarget,&tItemTile.tRegion,1,0,255);
 #endif
             }
         }
@@ -316,7 +697,7 @@ void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height)
     }
     if(row<pWidget->rowCount)
     {
-        pWidget->pColumnWidth[row]=height;
+        pWidget->pRowHeight[row]=height;
     }
 }
 
@@ -421,6 +802,100 @@ void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor)
         return;
     }
     pWidget->bgColor=bgColor;
+}
+
+/**
+ * @brief   设置指定项目文本对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   row             行号
+ * @param   column          列号
+ * @param   align           对齐方式
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t align)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    {
+        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
+        item->align=align;
+    }
+}
+
+/**
+ * @brief   设置项目图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   row             行号
+ * @param   column          列号
+ * @param   x               图片在项目中的x轴坐标
+ * @param   y               图片在项目中的y轴坐标
+ * @param   width           图片宽度
+ * @param   height          图片高度
+ * @param   imgAddr         图片地址
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    {
+        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
+        item->imgRegion.tLocation.iX=x;
+        item->imgRegion.tLocation.iY=y;
+        item->imgRegion.tSize.iWidth=width;
+        item->imgRegion.tSize.iHeight=height;
+        item->releaseImgAddr=imgAddr;
+        item->pressImgAddr=LD_ADDR_NONE;
+        item->isButton=false;
+        item->isSelectShow=false;
+    }
+}
+
+/**
+ * @brief   设置项目按键图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   row             行号
+ * @param   column          列号
+ * @param   x               图片在项目中的x轴坐标
+ * @param   y               图片在项目中的y轴坐标
+ * @param   width           图片宽度
+ * @param   height          图片高度
+ * @param   releaseImgAddr  释放的图片地址
+ * @param   pressImgAddr    按下的图片地址
+ * @param   isCheckable     是否为开关型按键
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-21
+ */
+void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isCheckable)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    {
+        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
+        item->imgRegion.tLocation.iX=x;
+        item->imgRegion.tLocation.iY=y;
+        item->imgRegion.tSize.iWidth=width;
+        item->imgRegion.tSize.iHeight=height;
+        item->releaseImgAddr=releaseImgAddr;
+        item->pressImgAddr=pressImgAddr;
+        item->isButton=true;
+        item->isCheckable=isCheckable;
+        item->isSelectShow=false;
+    }
 }
 
 #if defined(__clang__)

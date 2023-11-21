@@ -522,8 +522,13 @@ scroll selecter widget
 ---
 # Table
 ### 简述
-table widget
+表格控件
 ### 函数列表
+* uint8_t ldTableCurrentColumn(ldTable_t *pWidget);
+* uint8_t ldTableCurrentRow(ldTable_t *pWidget);
+* ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget);
+* ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
+* ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
 * ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
 * void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
@@ -532,8 +537,90 @@ table widget
 * void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
 * void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
 * void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
+* void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t align);
+* void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr);
+* void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isCheckable);
 ### 信号列表
 ### 函数说明
+#### ldTableCurrentColumn
+##### 原型
+```c
+uint8_t ldTableCurrentColumn(ldTable_t *pWidget);
+```
+##### 说明
+    获取选中列的编号
+
+##### 参数
+    pWidget             目标控件指针
+
+##### 返回
+    uint8_t             列号
+<br>
+
+#### ldTableCurrentRow
+##### 原型
+```c
+uint8_t ldTableCurrentRow(ldTable_t *pWidget);
+```
+##### 说明
+    获取选中行的编号
+
+##### 参数
+    pWidget             目标控件指针
+
+##### 返回
+    uint8_t             行号
+<br>
+
+#### ldTableCurrentItem
+##### 原型
+```c
+ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget);
+```
+##### 说明
+    获取选中行的项目
+
+##### 参数
+    pWidget             目标控件指针
+
+##### 返回
+    ldTableItem_t*      返回目标item指针
+<br>
+
+#### ldTableItem
+##### 原型
+```c
+ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
+```
+##### 说明
+    获取指定的项目
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行号
+    column              列号
+
+##### 返回
+    ldTableItem_t*      返回目标item指针
+<br>
+
+#### ldTableItemAt
+##### 原型
+```c
+ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
+```
+##### 说明
+    获取指定坐标的项目
+
+##### 参数
+    pWidget             目标控件指针
+    x                   全局坐标x轴
+    y                   全局坐标y轴
+
+##### 返回
+    ldTableItem_t*      返回目标item指针
+<br>
+
 #### ldTableInit
 ##### 原型
 ```c
@@ -664,6 +751,64 @@ void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
 ##### 参数
     pWidget             目标控件指针
     bgColor             底色
+
+<br>
+
+#### ldTableSetItemAlign
+##### 原型
+```c
+void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t align);
+```
+##### 说明
+    设置指定项目文本对齐方式
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行号
+    column              列号
+    align               对齐方式
+
+<br>
+
+#### ldTableSetItemImage
+##### 原型
+```c
+void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr);
+```
+##### 说明
+    设置项目图片
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行号
+    column              列号
+    x                   图片在项目中的x轴坐标
+    y                   图片在项目中的y轴坐标
+    width               图片宽度
+    height              图片高度
+    imgAddr             图片地址
+
+<br>
+
+#### ldTableSetItemButton
+##### 原型
+```c
+void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isCheckable);
+```
+##### 说明
+    设置项目按键图片
+
+##### 参数
+    pWidget             目标控件指针
+    row                 行号
+    column              列号
+    x                   图片在项目中的x轴坐标
+    y                   图片在项目中的y轴坐标
+    width               图片宽度
+    height              图片高度
+    releaseImgAddr      释放的图片地址
+    pressImgAddr        按下的图片地址
+    isCheckable         是否为开关型按键
 
 <br>
 
