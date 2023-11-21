@@ -181,6 +181,7 @@ static bool slotCheckBoxToggle(xConnectInfo_t info)
         }
         else
         {
+
             if(cb->isChecked==false)
             {
                 cb->isChecked=true;
@@ -298,7 +299,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     }
 
     //自动清除radioButton选中状态
-    if(pWidget->isChecked)
+    if((pWidget->isChecked)&&(pWidget->isRadioButton))
     {
         if((pWidget->radioButtonGroup==radioButtonValue.group)&&(pWidget->nameId!=radioButtonValue.nameId))
         {
@@ -538,6 +539,15 @@ void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
         return;
     }
     pWidget->isCorner=isCorner;
+}
+
+void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->charColor=charColor;
 }
 
 #if defined(__clang__)

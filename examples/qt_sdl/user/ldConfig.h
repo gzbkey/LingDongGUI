@@ -19,9 +19,9 @@ extern "C" {
 
 #define USE_RADIA_MENU_SCALE                      1
 
-#define LD_MEM_SIZE                               (32*1024) //BYTE
+#define LD_MEM_SIZE                               (64*1024) //BYTE
 
-#define LD_DEBUG                                  1
+#define LD_DEBUG                                  0
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

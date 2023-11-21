@@ -7,27 +7,31 @@
 	<a><img src="https://img.shields.io/badge/architecture-ARM%20|%20RISC%20V-blue"></a>	
 </p>
 
-## 扩展性
+## 特性
 
-灵动GUI是基于ARM-2D进行开发的GUI
+1. **各种芯片通用**
+    * 支持ARM单片机、RISC-V单片机
+    * 编译器需要支持GNU C99以上标准
 
-* 极大降低ARM-2D的使用难度
+2. **简单易用**
+    * 对ARM-2D进行二次封装，极大降低ARM-2D的使用难度
+    * 使用类似Qt的信号槽模式
+    * 界面代码和逻辑代码分离
 
-* 使用ARM-2D API自由组合控件
+3. **自由扩展控件**
+    * 使用脚本自动生成新控件框架
+    * 使用ARM-2D原生API自由组合控件
+    * 使用ldgui通用基础API自由组合控件
 
-## 通用性
+4. **内置便捷功能**
+    * 软件定时器
+    * 多功能按键，支持实体按键和触摸按键
+    * 队列
+    * 彩色log打印
 
-可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制
-
-* 支持ARM单片机、RISC-V单片机
-
-* 需要支持GNU 99以上编译器
-
-## 易用性
-
-* 使用类似Qt的信号槽模式
-
-* 界面代码和逻辑代码分离
+|ℹ️ Note|
+|:----|
+|可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制，理论上可以在任意支持C语言的平台运行。|
 
 ## 源码
 
@@ -52,17 +56,23 @@
 | ✅ | date time | 日期和时间 |
 | ✅ | icon slider | 滑动图标 |
 | ✅ | gauge | 仪表盘 |
-| 🔲 | list | 列表 |
+| ✅ | qr code | 二维码 |
+| ✅ | table | 表格 |
 | 🔲 | graph | 波形图 |
 | 🔲 | line edit | 编辑框 |
 | 🔲 | arc bar | 圆环进度条 |
-| 🔲 | qr code | 二维码 |
 | 🔲 | number keyboard | 数字键盘 |
 | 🔲 | qwerty keyboard | 英文键盘 |
 
 ## 教程
 
-📖 [详细教程](./docs/tutorial)
+📖 [详细教程(目录)](./docs/tutorial)
+
+* 🏷️[介绍](./docs/tutorial/01%20introduction.md)
+* 🚀[开始使用](./docs/tutorial/02%20get%20started.md)
+* ⚙️[移植](./docs/tutorial/03%20porting.md)
+* 🔗[函数接口](./docs/tutorial/04%20api.md)
+* 🛠️[开发](./docs/tutorial/05%20development.md)
 
 ## 技术交流
 

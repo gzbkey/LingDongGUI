@@ -35,6 +35,7 @@ void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict);
 void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr);
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num);
 void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner);
+void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor);
 
 #define ldCheckBoxSetHidden        ldBaseSetHidden
 #define ldCheckBoxMove             ldBaseMove
