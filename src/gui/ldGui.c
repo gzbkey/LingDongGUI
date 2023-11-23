@@ -37,6 +37,7 @@
 #include "ldGauge.h"
 #include "ldQRCode.h"
 #include "ldTable.h"
+#include "ldKeyboard.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -235,6 +236,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldTableDel((ldTable_t*)pWidget);
         break;
     }
+    case widgetTypeKeyboard:
+    {
+        ldKeyboardDel((ldKeyboard_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -310,6 +316,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeTable:
     {
         ldTableLoop((ldTable_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeKeyboard:
+    {
+        ldKeyboardLoop((ldKeyboard_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
 /*============================ auto add loop =================================*/

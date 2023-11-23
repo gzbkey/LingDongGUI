@@ -485,6 +485,63 @@ image widget
 ### 信号列表
 ### 函数说明
 ---
+# keyboard
+### 简述
+键盘控件，可以切换数字键盘和字母键盘
+### 函数列表
+* ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t *pFontDict);
+* void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+* void ldKeyboardSetNumberOnly(ldKeyboard_t *pWidget,bool isOnlyNumber);
+### 信号列表
+* SIGNAL_INPUT_ASCII
+### 函数说明
+#### ldKeyboardInit
+##### 原型
+```c
+ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t *pFontDict);
+```
+##### 说明
+    键盘初始化
+
+##### 参数
+    nameId              目标控件指针
+    parentNameId        父控件id
+    pFontDict           字体指针
+
+##### 返回
+    ldKeyboard_t*       新控件指针
+<br>
+
+#### ldKeyboardLoop
+##### 原型
+```c
+void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+```
+##### 说明
+    键盘显示处理函数
+
+##### 参数
+    pWidget             目标控件指针
+    pParentTile         父控件tile对象
+    bIsNewFrame         新的一帧开始标志
+
+<br>
+
+#### ldKeyboardSetNumberOnly
+##### 原型
+```c
+void ldKeyboardSetNumberOnly(ldKeyboard_t *pWidget,bool isOnlyNumber);
+```
+##### 说明
+    设置为键盘模式
+
+##### 参数
+    pWidget             目标控件指针
+    isOnlyNumber        true:数字键盘 false:数字字母键盘可切换
+
+<br>
+
+---
 # Label
 ### 简述
 label widget

@@ -101,6 +101,7 @@ typedef enum{
     widgetTypeScrollSelecter,
     widgetTypeLabel,
     widgetTypeTable,
+    widgetTypeKeyboard,
 }ldWidgetType;
 
 #if USE_VIRTUAL_RESOURCE == 0
