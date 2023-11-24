@@ -38,6 +38,7 @@
 #include "ldQRCode.h"
 #include "ldTable.h"
 #include "ldKeyboard.h"
+#include "ldLineEdit.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -241,6 +242,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldKeyboardDel((ldKeyboard_t*)pWidget);
         break;
     }
+    case widgetTypeLineEdit:
+    {
+        ldLineEditDel((ldLineEdit_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -321,6 +327,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     case widgetTypeKeyboard:
     {
         ldKeyboardLoop((ldKeyboard_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeLineEdit:
+    {
+        ldLineEditLoop((ldLineEdit_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
 /*============================ auto add loop =================================*/

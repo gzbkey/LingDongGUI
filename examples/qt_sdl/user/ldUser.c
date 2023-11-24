@@ -17,8 +17,9 @@
 #include "ldQRCode.h"
 #include "ldTable.h"
 #include "ldKeyboard.h"
+#include "ldLineEdit.h"
 
-void* obj;
+ldCommon_t* obj,*kb;
 
 #define BG_WIN   0
 
@@ -27,9 +28,14 @@ void userInit(void)
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-    obj=ldKeyboardInit(1,BG_WIN,WENQUANYI_ZEN_HEI_REGULAR_16);
+    obj=ldLineEditInit(1,BG_WIN,10,10,100,40,WENQUANYI_ZEN_HEI_REGULAR_16,25);
 
-    ldKeyboardSetHidden(obj,false);
+    ldLineEditSetType(obj,typeString);
+
+    kb=ldKeyboardInit(2,BG_WIN,WENQUANYI_ZEN_HEI_REGULAR_16);
+
+    ldLineEditSetKeyboard(obj,kb->nameId);
+//    ldKeyboardSetHidden(obj,false);
 }
 
 

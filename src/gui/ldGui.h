@@ -20,6 +20,7 @@ extern "C" {
 #define SIGNAL_CLICKED_ITEM         12                  // value = item num
 
 #define SIGNAL_INPUT_ASCII          13
+#define SIGNAL_EDITING_FINISHED     14
 
 //#define SIGNAL_VALUE_CHANGED           7 //数据变化
 //#define SIGNAL_WIDGET_ACTIVE           8 //激活控件

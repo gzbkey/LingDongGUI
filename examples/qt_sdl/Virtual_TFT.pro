@@ -14,6 +14,7 @@ SOURCES += \
     ../../src/gui/ldImage.c \
     ../../src/gui/ldKeyboard.c \
     ../../src/gui/ldLabel.c \
+    ../../src/gui/ldLineEdit.c \
     ../../src/gui/ldQRCode.c \
     ../../src/gui/ldRadialMenu.c \
     ../../src/gui/ldProgressBar.c \
@@ -118,6 +119,7 @@ HEADERS += \
     ../../src/gui/ldImage.h \
     ../../src/gui/ldKeyboard.h \
     ../../src/gui/ldLabel.h \
+    ../../src/gui/ldLineEdit.h \
     ../../src/gui/ldQRCode.h \
     ../../src/gui/ldRadialMenu.h \
     ../../src/gui/ldProgressBar.h \

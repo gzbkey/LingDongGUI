@@ -122,11 +122,7 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iX=-1;
         pWidget->clickPoint.iY=-1;
         pWidget->isClick=true;
-
-        if((pWidget->kbValue<=0x20)&&(pWidget->kbValue<0x7F))
-        {
-            xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
-        }
+        xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
     }
     default:
         break;
@@ -185,12 +181,11 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
 
-        pNewWidget->isNumber=true;
+        pNewWidget->isNumber=false;
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->clickPoint.iX=-1;
         pNewWidget->clickPoint.iY=-1;
         pNewWidget->isClick=false;
-        pNewWidget->onlyNumber=false;
         pNewWidget->upperState=0;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
@@ -240,6 +235,11 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
         return;
+    }
+
+    if(((gActiveEditType==typeInt)||(gActiveEditType==typeFloat))&&(pWidget->isNumber==false))
+    {
+        pWidget->isNumber=true;
     }
 
     if(bIsNewFrame&&pWidget->isClick)
@@ -335,7 +335,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                         btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='6';
+                        pWidget->kbValue='5';
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
@@ -400,13 +400,16 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"0",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='.';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
+                    if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
+                    {
+                        if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                            btnColor=KB_ASCII_PRESS_COLOR;
+                            pWidget->kbValue='.';
+                        }else{
+                            btnColor=KB_ASCII_RELEASE_COLOR;
+                        }
                     _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)".",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    }
                 }
             }
 
@@ -419,13 +422,14 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
+                        pWidget->kbValue=0x08;
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
                     _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
-                    if(!pWidget->onlyNumber)
+                    if(gActiveEditType==typeString)
                     {
                         if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                             btnColor=KB_OTHER_PRESS_COLOR;
@@ -439,6 +443,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 __item_vertical(btnW,btnH*2+KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
+                        pWidget->kbValue=0x0d;
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
@@ -743,6 +748,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
+                        pWidget->kbValue=0x08;
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
@@ -800,6 +806,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 __item_horizontal(btnW+(btnW+KB_SPACE),btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
+                        pWidget->kbValue=0x0d;
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
@@ -810,23 +817,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
         arm_2d_op_wait_async(NULL);
     }
-}
-
-/**
- * @brief   设置为键盘模式
- * 
- * @param   pWidget         目标控件指针
- * @param   isOnlyNumber    true:数字键盘 false:数字字母键盘可切换
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-23
- */
-void ldKeyboardSetNumberOnly(ldKeyboard_t *pWidget,bool isOnlyNumber)
-{
-    if (pWidget == NULL)
-    {
-        return;
-    }
-    pWidget->onlyNumber=isOnlyNumber;
 }
 
 #if defined(__clang__)
