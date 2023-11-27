@@ -83,7 +83,7 @@ def getParam(comment,targetName):
                 while i < tempLen:
                     spaceStr+=' '
                     i += 1
-            paramStr += headSpace + itemName + spaceStr + itemStr
+            paramStr += headSpace + itemName + ' ' + spaceStr + itemStr
         else:
             if ' *  ' in line:
                 if len(paramStr) != 0:
@@ -97,7 +97,7 @@ def getParam(comment,targetName):
                     if '@brief' in targetName:
                         paramStr += '\n' + headSpace + list[1].strip()
                     else:
-                        paramStr += '\n' + headSpace + spaceStr + list[1].strip()
+                        paramStr += '\n' + headSpace + ' ' + spaceStr + list[1].strip()
             else:
                 if len(paramStr) != 0:
                     paramStrList.append(paramStr)
@@ -122,27 +122,55 @@ def getFunctionDescriptionStr(funcNames,comments):
     outStr = ''
     while index<objLen:
         outStr+='#### '+getFunctionTinyName(funcNames[index])+'\n'
-
-        outStr+='##### 原型\n'
-        outStr+='```c\n'
-        outStr+=funcNames[index].replace('\n','')+';\n'
-        outStr+='```\n'
+        
+        outStr+='<table>\n'
+        outStr+='    <tr>\n'
+        outStr+='        <td>函数</td>\n'
+        outStr+='        <td colspan="2">\n'
+        outStr+='            <pre><code class="language-c">'+funcNames[index].replace('\n','')+';</code></pre>\n'
+        outStr+='        </td>\n'
+        outStr+='    </tr>\n'
+        outStr+='    <tr>\n'
+        outStr+='        <td>说明</td>\n'
+        outStr+='        <td colspan="2">\n'
         list = getParam(comments[index],'@brief')
         if len(list) > 0:
-            outStr+='##### 说明\n'
-            outStr+=list[0]+'\n'
-        outStr+='\n'
+            for item in list:
+                item=item.strip()
+                item=item.replace('\n','<br>')
+                outStr+='    '+item
+        outStr+='        </td>\n'
+        outStr+='    </tr>\n'
         list = getParam(comments[index],'@param')
         if len(list) > 0:
-            outStr+='##### 参数\n'
+            onceFlag=1
             for item in list:
-                outStr+=item+'\n'
-        outStr+='\n'
+                item=item.strip()
+                item=item.replace('\n','<br>')
+                name=item.split(' ')
+                data=item.lstrip(name[0])
+                data=data.strip()
+                outStr+='    <tr>\n'
+                if onceFlag == 1:
+                    outStr+='        <td rowspan="'+str(len(list))+'">参数</td>\n'
+                    onceFlag=0
+                outStr+='        <td>'+name[0]+'</td>\n'
+                outStr+='        <td>'+data+'</td>\n'
+                outStr+='    </tr>\n'
         list = getParam(comments[index],'@return')
         if len(list) > 0:
-            outStr+='##### 返回\n'
-            outStr+=list[0]+'\n'
-        outStr+='<br>\n\n'
+            outStr+='    <tr>\n'
+            outStr+='        <td>返回</td>\n'
+            for item in list:
+                item=item.strip()
+                item=item.replace('\n','<br>')
+                name=item.split(' ')
+                data=item.lstrip(name[0])
+                data=data.strip()
+                outStr+='        <td>'+name[0]+'</td>\n'
+                outStr+='        <td>'+data+'</td>\n'
+            outStr+='    </tr>\n'
+        outStr+='</table>\n<br>\n\n'
         index += 1
 
     return outStr
@@ -216,9 +244,11 @@ for filePath in fileList:
 
     outStr+= '### 信号列表\n'
     outList=getParam(fileComment[0],'@signal')
-
-    for signal in outList:
-        outStr+='* '+signal.strip()+'\n'
+    if len(outList) > 0:
+        for item in outList:
+            item=item.replace(' ','')
+            item=item.replace('\n','\n* ')
+            outStr+='* '+item.strip()+'\n'
 
     outStr+= '### 函数说明\n'
     outStr+=getFunctionDescriptionStr(names,comments)
