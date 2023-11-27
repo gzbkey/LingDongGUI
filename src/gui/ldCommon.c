@@ -1063,7 +1063,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
         ((arm_2d_tile_t*)&resTile)->tRegion.tLocation.iY=0;
 
         arm_2d_region_t showRegion;
-        showRegion.tLocation.iX=alignSize.tLocation.iX+textOffsetX;
+        showRegion.tLocation.iX=alignSize.tLocation.iX+textOffsetX+offsetX;
         showRegion.tLocation.iY=alignSize.tLocation.iY+tempHeight+scrollOffset;
         showRegion.tSize=((arm_2d_tile_t*)&resTile)->tRegion.tSize;
 

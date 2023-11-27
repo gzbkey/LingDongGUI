@@ -393,7 +393,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
                         btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='2';
+                        pWidget->kbValue='0';
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
