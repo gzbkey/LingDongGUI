@@ -52,6 +52,8 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+ldEditType_t gActiveEditType;
+
 NEW_LIST(ldWidgetLink);
 
 #if USE_TLSF == 1
@@ -992,7 +994,7 @@ void ldBaseCharacter(arm_2d_tile_t* pParentTile,arm_2d_region_t* pShowRegion,arm
     }
 }
 
-void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity)
+arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity)
 {
     int16_t advWidth;
     int16_t width;
@@ -1008,6 +1010,18 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
     arm_2d_size_t textSize;
 
     textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
+
+    if(align==LD_ALIGN_LEFT_AUTO)
+    {
+        if(textSize.iWidth>pTile->tRegion.tSize.iWidth)
+        {
+            align=LD_ALIGN_RIGHT;
+        }
+        else
+        {
+            align=LD_ALIGN_LEFT;
+        }
+    }
 
     arm_2d_region_t alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
 
@@ -1049,7 +1063,7 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
         ((arm_2d_tile_t*)&resTile)->tRegion.tLocation.iY=0;
 
         arm_2d_region_t showRegion;
-        showRegion.tLocation.iX=alignSize.tLocation.iX+textOffsetX;
+        showRegion.tLocation.iX=alignSize.tLocation.iX+textOffsetX+offsetX;
         showRegion.tLocation.iY=alignSize.tLocation.iY+tempHeight+scrollOffset;
         showRegion.tSize=((arm_2d_tile_t*)&resTile)->tRegion.tSize;
 
@@ -1061,6 +1075,8 @@ void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t
 
         i+=len;
     }
+
+    return alignSize;
 }
 
 void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)

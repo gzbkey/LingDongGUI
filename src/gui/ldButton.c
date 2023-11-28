@@ -21,7 +21,7 @@
  * @version 0.1
  * @date    2023-11-03
  * @signal  SIGNAL_PRESS
- * @signal  SIGNAL_RELEASE
+ *          SIGNAL_RELEASE
  */
 #include "ldButton.h"
 #include "ldGui.h"

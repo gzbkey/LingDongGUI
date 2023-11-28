@@ -16,42 +16,26 @@
 #include "ldGauge.h"
 #include "ldQRCode.h"
 #include "ldTable.h"
+#include "ldKeyboard.h"
+#include "ldLineEdit.h"
 
-void* obj;
+ldCommon_t* obj,*kb;
 
 #define BG_WIN   0
 
-uint8_t strTest[]="5693";
 void userInit(void)
 {
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-    obj=ldQRCodeInit(2,BG_WIN,10, 100, 50, 50, "ldgui",0,__RGB(255,255,255), qrcodegen_Ecc_LOW, qrcodegen_Mask_0, 2, 2);
+    obj=ldLineEditInit(1,BG_WIN,10,10,100,40,WENQUANYI_ZEN_HEI_REGULAR_16,25);
 
-    obj=ldTableInit(3,BG_WIN,10,10, 200, 80, 3, 3, 2);
+    ldLineEditSetType(obj,typeString);
 
-    ldTableSetItemWidth(obj,3,12);
+    kb=ldKeyboardInit(2,BG_WIN,WENQUANYI_ZEN_HEI_REGULAR_16);
 
-    ldTableSetItemText(obj,0,0,"1",WENQUANYI_ZEN_HEI_REGULAR_9);
-    ldTableSetItemText(obj,0,1,"2",WENQUANYI_ZEN_HEI_REGULAR_9);
-    ldTableSetItemText(obj,0,2,"3",WENQUANYI_ZEN_HEI_REGULAR_9);
-    ldTableSetItemText(obj,1,2,"4",WENQUANYI_ZEN_HEI_REGULAR_9);
-    ldTableSetItemStaticText(obj,2,2,strTest,WENQUANYI_ZEN_HEI_REGULAR_9);
-    ldTableSetItemColor(obj,2,2,GLCD_COLOR_WHITE,GLCD_COLOR_YELLOW);
-
-    ldTableSetItemWidth(obj,0,100);
-//    ldTableSetItemHeight(obj,0,100);
-
-    ldTableSetItemButton(obj,2,2, 10,5, 52, 52, ICON_BMP, BBG_BMP, true);
-
-
-    obj=ldCheckBoxInit(4,BG_WIN,10,200,80,50);
-    ldCheckBoxSetText(obj,"123");
-    ldCheckBoxSetFont(obj,WENQUANYI_ZEN_HEI_REGULAR_9);
-//    ldCheckBoxSetColor(obj,0xFF,0xFF00);
-//    ldCheckBoxSetCharColor(obj,0xFF);
-
+    ldLineEditSetKeyboard(obj,kb->nameId);
+//    ldKeyboardSetHidden(obj,false);
 }
 
 

@@ -76,6 +76,8 @@ extern "C" {
 #define LD_ALIGN_LEFT            _BV(2)
 #define LD_ALIGN_RIGHT           _BV(3)
 
+#define LD_ALIGN_LEFT_AUTO       _BV(4) //GUI内部使用
+
 #define LD_ADDR_NONE             0xffffffffu
 
 typedef enum{
@@ -101,6 +103,7 @@ typedef enum{
     widgetTypeScrollSelecter,
     widgetTypeLabel,
     widgetTypeTable,
+    widgetTypeKeyboard,
 }ldWidgetType;
 
 #if USE_VIRTUAL_RESOURCE == 0
@@ -195,8 +198,15 @@ typedef struct{
     int16_t height;
 }ldSize_t;
 
+typedef enum{
+    typeString,
+    typeInt,
+    typeFloat
+}ldEditType_t;
+
 extern xListNode ldWidgetLink;
 
+extern ldEditType_t gActiveEditType;
 
 void *ldMalloc(uint32_t size);
 void ldFree(void *p);
@@ -237,7 +247,7 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden);
 uint8_t ldBaseGetChScheme(uint8_t maskType);
 
 void ldBaseCharacter(arm_2d_tile_t* pParentTile, arm_2d_region_t *pShowRegion, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
-void ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity);
+arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity);
 
 #ifdef __cplusplus
 }
