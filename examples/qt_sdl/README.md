@@ -49,6 +49,6 @@ git clone --recursive https://github.com/gzbkey/LingDongGUI.git
 
 2、双击Virtual_TFT.pro，启动Qt。
 
-3、项目打开后，会自动复制SDL2的dll文件，到对于的文件内，无需手动操作。
+3、项目打开后，会自动复制SDL2的dll文件到对应的文件内，无需手动操作。
 
 4、直接点击左下角三角形，进行编译、运行。

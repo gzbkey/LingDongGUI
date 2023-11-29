@@ -44,17 +44,17 @@
 #endif
 
 #define KB_SPACE    5
-#define KB_ASCII_RELEASE_COLOR     GLCD_COLOR_WHITE
+#define KB_ASCII_RELEASE_COLOR     LD_COLOR_WHITE
 #define KB_ASCII_PRESS_COLOR     __RGB(188,191,206)
 #define KB_OTHER_RELEASE_COLOR     __RGB(168,176,189)
-#define KB_OTHER_PRESS_COLOR     GLCD_COLOR_WHITE
+#define KB_OTHER_PRESS_COLOR     LD_COLOR_WHITE
 
 #define KB_VALUE_NONE         0
 #define KB_VALUE_QWERTY_MODE  1
 #define KB_VALUE_NUMBER_MODE  2
 #define KB_VALUE_SHIFT        3
 
-static ldColor _shiftColor[3]={GLCD_COLOR_WHITE,GLCD_COLOR_BLACK,GLCD_COLOR_BLUE};
+static ldColor _shiftColor[3]={LD_COLOR_WHITE,LD_COLOR_BLACK,LD_COLOR_BLUE};
 
 static bool _keyboardDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -300,7 +300,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"1",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"1",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -309,7 +309,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"2",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"2",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -318,7 +318,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"3",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"3",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
 
 
@@ -330,7 +330,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"4",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"4",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -339,7 +339,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"5",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"5",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -348,7 +348,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"6",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"6",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
 
 
@@ -359,7 +359,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"7",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"7",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -368,7 +368,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"8",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"8",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -377,7 +377,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"9",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"9",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
 
 
@@ -388,7 +388,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"±",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"±",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -397,7 +397,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"0",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"0",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
                     if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
@@ -408,7 +408,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                         }else{
                             btnColor=KB_ASCII_RELEASE_COLOR;
                         }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)".",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)".",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                     }
                 }
             }
@@ -426,7 +426,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
                     if(gActiveEditType==typeString)
@@ -437,7 +437,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                         }else{
                             btnColor=KB_OTHER_RELEASE_COLOR;
                         }
-                        _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"ABC",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                        _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"ABC",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                     }
                 }
                 __item_vertical(btnW,btnH*2+KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
@@ -447,7 +447,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"Enter",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"Enter",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
             }
         }
@@ -475,7 +475,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='w'-letterOffset;
@@ -485,7 +485,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='e'-letterOffset;
@@ -495,7 +495,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='r'-letterOffset;
@@ -505,7 +505,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='t'-letterOffset;
@@ -515,7 +515,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='y'-letterOffset;
@@ -525,7 +525,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='u'-letterOffset;
@@ -535,7 +535,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='i'-letterOffset;
@@ -545,7 +545,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='o'-letterOffset;
@@ -555,7 +555,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='p'-letterOffset;
@@ -565,7 +565,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
 
 
@@ -580,7 +580,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='s'-letterOffset;
@@ -590,7 +590,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='d'-letterOffset;
@@ -600,7 +600,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='f'-letterOffset;
@@ -610,7 +610,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='g'-letterOffset;
@@ -620,7 +620,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='h'-letterOffset;
@@ -630,7 +630,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='j'-letterOffset;
@@ -640,7 +640,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='k'-letterOffset;
@@ -650,7 +650,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='l'-letterOffset;
@@ -660,7 +660,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
 
 
@@ -683,7 +683,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='x'-letterOffset;
@@ -693,7 +693,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='c'-letterOffset;
@@ -703,7 +703,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='v'-letterOffset;
@@ -713,7 +713,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='b'-letterOffset;
@@ -723,7 +723,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='n'-letterOffset;
@@ -733,7 +733,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='m'-letterOffset;
@@ -743,7 +743,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -752,7 +752,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
 
 
@@ -763,7 +763,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"!@",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"!@",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -772,7 +772,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"123",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"123",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='.';
@@ -782,7 +782,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW+(btnW+KB_SPACE)*2,btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -791,7 +791,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"space",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
                     charBuf[0]='?';
@@ -801,7 +801,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"?",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"?",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
                 __item_horizontal(btnW+(btnW+KB_SPACE),btnH,KB_SPACE,0,KB_SPACE,0) {
                     if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
@@ -810,7 +810,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"Enter",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"Enter",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
             }
         }

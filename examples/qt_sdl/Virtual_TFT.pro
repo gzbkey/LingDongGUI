@@ -9,6 +9,7 @@ SOURCES += \
     ../../src/gui/ldCommon.c \
     ../../src/gui/ldDateTime.c \
     ../../src/gui/ldGauge.c \
+    ../../src/gui/ldGraph.c \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldIconSlider.c \
     ../../src/gui/ldImage.c \
@@ -114,6 +115,7 @@ HEADERS += \
     ../../src/gui/ldCommon.h \
     ../../src/gui/ldDateTime.h \
     ../../src/gui/ldGauge.h \
+    ../../src/gui/ldGraph.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldIconSlider.h \
     ../../src/gui/ldImage.h \

@@ -125,7 +125,7 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
 //        pNewWidget->maskAddr=LD_ADDR_NONE;
         pNewWidget->bgOffset=0;
         pNewWidget->fgOffset=0;
-        pNewWidget->bgColor=GLCD_COLOR_WHITE;
+        pNewWidget->bgColor=LD_COLOR_WHITE;
         pNewWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
         pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
         pNewWidget->permille=0;

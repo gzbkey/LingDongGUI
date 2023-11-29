@@ -465,14 +465,14 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
                             &((arm_2d_tile_t*)pRes)->tRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #else
         arm_2d_draw_pattern((arm_2d_tile_t*)pRes,
                             pTile,
                             &(((arm_2d_tile_t*)pRes)->tRegion),
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #endif
 
         break;
@@ -929,14 +929,14 @@ void ldBaseCharacter(arm_2d_tile_t* pParentTile,arm_2d_region_t* pShowRegion,arm
                             pShowRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #else
         arm_2d_draw_pattern(pResTile,
                             pParentTile,
                             pShowRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #endif
 
         break;

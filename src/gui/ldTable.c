@@ -489,7 +489,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         memset(pItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
         pNewWidget->isBgTransparent=false;
         pNewWidget->bgColor=0;
-        pNewWidget->selectColor=GLCD_COLOR_DARK_GREEN;
+        pNewWidget->selectColor=LD_COLOR_DARK_GREEN;
 
         int16_t w=(width-itemSpace)/columnCount-itemSpace;
         for(uint8_t i=0;i<columnCount;i++)

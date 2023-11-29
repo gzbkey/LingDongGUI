@@ -18,8 +18,9 @@
 #include "ldTable.h"
 #include "ldKeyboard.h"
 #include "ldLineEdit.h"
+#include "ldGraph.h"
 
-ldCommon_t* obj,*kb;
+ldCommon_t* obj,*le,*kb;
 
 #define BG_WIN   0
 
@@ -28,14 +29,55 @@ void userInit(void)
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-    obj=ldLineEditInit(1,BG_WIN,10,10,100,40,WENQUANYI_ZEN_HEI_REGULAR_16,25);
+    le=ldLineEditInit(1,BG_WIN,10,10,100,40,WENQUANYI_ZEN_HEI_REGULAR_16,25);
 
-    ldLineEditSetType(obj,typeString);
+    ldLineEditSetType(le,typeString);
+
+
+
+    obj=ldGraphInit(3,BG_WIN,10, 150, 220, 120,2);
+
+    ldGraphSetAxisOffset(obj,10);
+
+    ldGraphAddSeries(obj,LD_COLOR_SKY_BLUE,10);
+
+    ldGraphAddSeries(obj,LD_COLOR_LIGHT_PINK,20);
+
+    ldGraphSetValue(obj,0,0,15);
+    ldGraphSetValue(obj,0,1,25);
+    ldGraphSetValue(obj,0,2,40);
+    ldGraphSetValue(obj,0,3,35);
+    ldGraphSetValue(obj,0,4,50);
+    ldGraphSetValue(obj,0,5,65);
+    ldGraphSetValue(obj,0,6,85);
+    ldGraphSetValue(obj,0,7,90);
+    ldGraphSetValue(obj,0,8,95);
+    ldGraphSetValue(obj,0,9,99);
+
+    ldGraphSetValue(obj,1,0,0);
+    ldGraphSetValue(obj,1,1,5);
+    ldGraphSetValue(obj,1,2,10);
+    ldGraphSetValue(obj,1,3,15);
+    ldGraphSetValue(obj,1,4,20);
+    ldGraphSetValue(obj,1,5,25);
+    ldGraphSetValue(obj,1,6,30);
+    ldGraphSetValue(obj,1,7,35);
+    ldGraphSetValue(obj,1,8,40);
+    ldGraphSetValue(obj,1,9,45);
+    ldGraphSetValue(obj,1,10,35);
+    ldGraphSetValue(obj,1,11,33);
+    ldGraphSetValue(obj,1,12,30);
+    ldGraphSetValue(obj,1,13,28);
+    ldGraphSetValue(obj,1,14,27);
+    ldGraphSetValue(obj,1,15,26);
+    ldGraphSetValue(obj,1,16,25);
+    ldGraphSetValue(obj,1,17,20);
+    ldGraphSetValue(obj,1,18,15);
+    ldGraphSetValue(obj,1,19,12);
+
 
     kb=ldKeyboardInit(2,BG_WIN,WENQUANYI_ZEN_HEI_REGULAR_16);
-
-    ldLineEditSetKeyboard(obj,kb->nameId);
-//    ldKeyboardSetHidden(obj,false);
+    ldLineEditSetKeyboard(le,kb->nameId);
 }
 
 
@@ -46,10 +88,18 @@ void userInit1(void)
 }
 
 bool isTop=false;
+int64_t timer=0;
+uint16_t tempValue=0;
 void userLoop(void)
 {
-//    if( ldTimeOut(3000, &timer,true))
-//    {
+    if( ldTimeOut(1000, &timer,true))
+    {
+        tempValue+=5;
+        if(tempValue>90)
+        {
+            tempValue=0;
+        }
+        ldGraphMoveAdd(ldGetWidgetById(3),0,tempValue);
 ////        btn0->isPressed=!btn0->isPressed;
 ////        ldGuiJumpPage(1);
 
@@ -62,7 +112,7 @@ void userLoop(void)
 //            ldScrollSelecterSetItem(scroll,9);
 //        }
 //isTop=!isTop;
-//    }
+    }
 
 //    if(xBtnGetState(KEY_NUM_LEFT,BTN_PRESS))
 //    {

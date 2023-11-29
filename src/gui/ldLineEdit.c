@@ -271,7 +271,7 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->isCorner=false;
         pNewWidget->isEditing=false;
-        pNewWidget->textColor=GLCD_COLOR_BLACK;
+        pNewWidget->textColor=LD_COLOR_BLACK;
         pNewWidget->textLen=0;
         pNewWidget->timer=0;
         pNewWidget->blinkFlag=false;
@@ -328,13 +328,13 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     {
         if(pWidget->isCorner)
         {
-            draw_round_corner_box(&tTarget,&tTarget_canvas,GLCD_COLOR_WHITE,255,bIsNewFrame);
-            draw_round_corner_border(&tTarget,&tTarget_canvas,GLCD_COLOR_LIGHT_GREY,(arm_2d_border_opacity_t){255,255,255,255},(arm_2d_corner_opacity_t){255,255,255,255});
+            draw_round_corner_box(&tTarget,&tTarget_canvas,LD_COLOR_WHITE,255,bIsNewFrame);
+            draw_round_corner_border(&tTarget,&tTarget_canvas,LD_COLOR_LIGHT_GREY,(arm_2d_border_opacity_t){255,255,255,255},(arm_2d_corner_opacity_t){255,255,255,255});
         }
         else
         {
-            ldBaseColor(&tTarget,GLCD_COLOR_WHITE,255);
-            arm_2d_draw_box(&tTarget,&tTarget_canvas,1,GLCD_COLOR_LIGHT_GREY,255);
+            ldBaseColor(&tTarget,LD_COLOR_WHITE,255);
+            arm_2d_draw_box(&tTarget,&tTarget_canvas,1,LD_COLOR_LIGHT_GREY,255);
         }
         arm_2d_op_wait_async(NULL);
 
