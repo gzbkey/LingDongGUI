@@ -55,7 +55,13 @@ static bool _graphDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
     {
-        ldFree(((ldGraph_t *)pTarget)->pSeries);
+        ldGraph_t * pWidget=(ldGraph_t *)pTarget;
+        for(uint8_t i=0;i<pWidget->seriesCount;i++)
+        {
+            ldFree(pWidget->pSeries[i].pValueList);
+        }
+        ldFree(pWidget->pSeries);
+
         ldFree(((ldGraph_t *)pTarget));
         xListInfoDel(pEachInfo);
     }
