@@ -1163,26 +1163,42 @@ void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y)
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY=y;
 }
 
-void ldBaseDrawCircle(arm_2d_tile_t *pTile, int centerX, int centerY, int radius, ldColor color)
+void ldBaseDrawCircle(arm_2d_tile_t *pTile, int centerX, int centerY, int radius, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
 {
     int x, y;
+    int opacity;
+
+    if(radius==0)
+    {
+        opacityMin=opacityMax;
+    }
+
     for (y = centerY - radius; y <= centerY + radius; y++)
     {
         for (x = centerX - radius; x <= centerX + radius; x++)
         {
-            if (pow(x - centerX, 2) + pow(y - centerY, 2) <= pow(radius, 2))
-            {
+            int distance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+            int sqrRadius = radius * radius;
+
+            if (distance <= sqrRadius) {
+                if (distance == sqrRadius) {
+                    opacity = opacityMin;
+                } else {
+                    double ratio = (double)distance / sqrRadius;
+                    opacity = (int)(opacityMax - (opacityMax - opacityMin) * ratio);
+                }
+
                 arm_2d_location_t point={
                     .iX=x,
                     .iY=y,
                 };
-                arm_2d_draw_point(pTile,point, color,255);
+                arm_2d_draw_point(pTile,point, color,opacity);
             }
         }
     }
 }
 
-void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color)
+void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
 {
     uint16_t t;
     int32_t xerr=0,yerr=0,delta_x,delta_y,distance;
@@ -1202,7 +1218,7 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     else distance=delta_y;
     for(t=0;t<=distance+1;t++ )//画线输出
     {
-        ldBaseDrawCircle(pTile,xPos,yPos,lineSize/2,color);
+        ldBaseDrawCircle(pTile,xPos,yPos,lineSize/2,color,opacityMax,opacityMin);
         xerr+=delta_x ;
         yerr+=delta_y ;
         if(xerr>distance)

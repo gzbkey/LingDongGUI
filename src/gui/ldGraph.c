@@ -282,15 +282,15 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
                         if(pWidget->pointImgAddr!=LD_ADDR_NONE)
                         {
-                        arm_2d_tile_generate_child(&tTarget,&((arm_2d_region_t){x,y,pWidget->pointImgWidth,pWidget->pointImgWidth}), &pointTile, false);
+                            arm_2d_tile_generate_child(&tTarget,&((arm_2d_region_t){x,y,pWidget->pointImgWidth,pWidget->pointImgWidth}), &pointTile, false);
 
-                        ldBaseMaskImage(&pointTile,pTempRes,pWidget->pSeries[k].seriesColor,255);
+                            ldBaseMaskImage(&pointTile,pTempRes,pWidget->pSeries[k].seriesColor,255);
                         }
 
                         if((i>0)&&(pWidget->pSeries[k].lineSize>0))
                         {
                             yPrev=tTarget_canvas.tSize.iHeight-pWidget->frameSpace-(pWidget->pointImgWidth/2)-(pWidget->pSeries[k].pValueList[i-1]*pWidget->yScale);
-                            ldBaseDrawLine(&tTarget,xPrev+(pWidget->pointImgWidth/2),yPrev+pWidget->pointImgWidth/2,x+(pWidget->pointImgWidth/2),y+pWidget->pointImgWidth/2,pWidget->pSeries[k].lineSize,pWidget->pSeries[k].seriesColor);
+                            ldBaseDrawLine(&tTarget,xPrev+(pWidget->pointImgWidth/2),yPrev+pWidget->pointImgWidth/2,x+(pWidget->pointImgWidth/2),y+pWidget->pointImgWidth/2,pWidget->pSeries[k].lineSize,pWidget->pSeries[k].seriesColor,255,64);
                         }
                     }
                 }
