@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
     ../../src/gui/ldButton.c \
     ../../src/gui/ldCheckBox.c \
+    ../../src/gui/ldComboBox.c \
     ../../src/gui/ldCommon.c \
     ../../src/gui/ldDateTime.c \
     ../../src/gui/ldGauge.c \
@@ -112,6 +113,7 @@ SOURCES += \
 HEADERS += \
     ../../src/gui/ldButton.h \
     ../../src/gui/ldCheckBox.h \
+    ../../src/gui/ldComboBox.h \
     ../../src/gui/ldCommon.h \
     ../../src/gui/ldDateTime.h \
     ../../src/gui/ldGauge.h \
