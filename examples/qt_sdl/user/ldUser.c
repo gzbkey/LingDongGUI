@@ -37,22 +37,25 @@ void userInit(void)
 
     obj=ldGraphInit(3,BG_WIN,10, 150, 220, 120,2);
 
-    ldGraphSetAxisOffset(obj,10);
+//    ldGraphSetPointImageMask(obj,LD_ADDR_NONE,0);
 
-    ldGraphAddSeries(obj,LD_COLOR_SKY_BLUE,10);
+//    ldGraphSetAxisOffset(obj,20);
+    ldGraphSetAxis(obj,200,100,10);
+    ldGraphSetGrid(obj,10);
+    ldGraphAddSeries(obj,LD_COLOR_SKY_BLUE,1,10);
 
-    ldGraphAddSeries(obj,LD_COLOR_LIGHT_PINK,20);
+    ldGraphAddSeries(obj,LD_COLOR_LIGHT_PINK,2,20);
 
-    ldGraphSetValue(obj,0,0,15);
-    ldGraphSetValue(obj,0,1,25);
-    ldGraphSetValue(obj,0,2,40);
-    ldGraphSetValue(obj,0,3,35);
-    ldGraphSetValue(obj,0,4,50);
-    ldGraphSetValue(obj,0,5,65);
-    ldGraphSetValue(obj,0,6,85);
-    ldGraphSetValue(obj,0,7,90);
-    ldGraphSetValue(obj,0,8,95);
-    ldGraphSetValue(obj,0,9,99);
+    ldGraphSetValue(obj,0,0,0);
+    ldGraphSetValue(obj,0,1,10);
+    ldGraphSetValue(obj,0,2,15);
+    ldGraphSetValue(obj,0,3,5);
+    ldGraphSetValue(obj,0,4,40);
+    ldGraphSetValue(obj,0,5,80);
+    ldGraphSetValue(obj,0,6,60);
+    ldGraphSetValue(obj,0,7,70);
+    ldGraphSetValue(obj,0,8,80);
+    ldGraphSetValue(obj,0,9,90);
 
     ldGraphSetValue(obj,1,0,0);
     ldGraphSetValue(obj,1,1,5);
@@ -99,7 +102,7 @@ void userLoop(void)
         {
             tempValue=0;
         }
-        ldGraphMoveAdd(ldGetWidgetById(3),0,tempValue);
+//        ldGraphMoveAdd(ldGetWidgetById(3),0,tempValue);
 ////        btn0->isPressed=!btn0->isPressed;
 ////        ldGuiJumpPage(1);
 

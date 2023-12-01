@@ -390,6 +390,8 @@ uint8_t ldBaseGetChScheme(uint8_t maskType);
 void ldBaseCharacter(arm_2d_tile_t* pParentTile, arm_2d_region_t *pShowRegion, arm_2d_tile_t *pResTile, ldColor textColor, uint8_t opacity);
 arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity);
 
+void ldBaseDrawLine(arm_2d_tile_t *pTile, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color);
+
 #ifdef __cplusplus
 }
 #endif

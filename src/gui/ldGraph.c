@@ -238,10 +238,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             }
 
         }
-
         arm_2d_op_wait_async(NULL);
-
-
 
         if(pWidget->seriesCount>0)
         {
@@ -257,7 +254,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             pTempRes->tRegion.tSize.iHeight=pWidget->pointImgWidth;
             pTempRes->pchBuffer = (uint8_t *)pWidget->pointImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-            ((arm_2d_vres_t*)pTempRes)->pTarget=pWidget->pointerImgAddr;
+            ((arm_2d_vres_t*)pTempRes)->pTarget=pWidget->pointImgAddr;
 #endif
             pTempRes->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
             
@@ -266,7 +263,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 pTempRes->bVirtualResource=false;
             }
             
-            int16_t x=0,y=0;
+            int16_t x=0,y=0,xPrev,yPrev;
             
             xCount=pWidget->xAxisMax/(pWidget->xAxisOffset*pWidget->xScale);
             
@@ -274,17 +271,27 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
             for(uint16_t i=0;i<xCount;i++)
             {
+                xPrev=x;
                 x=pWidget->frameSpace+(pWidget->xAxisOffset*pWidget->xScale)*i-(pWidget->pointImgWidth/2);
 
                 for(uint8_t k=0;k<pWidget->seriesCount;k++)
                 {
                     if(i<pWidget->pSeries[k].valueCountMax)
                     {
-                        y=tTarget_canvas.tSize.iHeight-pWidget->frameSpace-(pWidget->pointImgWidth/2+1)-(pWidget->pSeries[k].pValueList[i]*pWidget->yScale);
+                        y=tTarget_canvas.tSize.iHeight-pWidget->frameSpace-(pWidget->pointImgWidth/2)-(pWidget->pSeries[k].pValueList[i]*pWidget->yScale);
 
+                        if(pWidget->pointImgAddr!=LD_ADDR_NONE)
+                        {
                         arm_2d_tile_generate_child(&tTarget,&((arm_2d_region_t){x,y,pWidget->pointImgWidth,pWidget->pointImgWidth}), &pointTile, false);
 
                         ldBaseMaskImage(&pointTile,pTempRes,pWidget->pSeries[k].seriesColor,255);
+                        }
+
+                        if((i>0)&&(pWidget->pSeries[k].lineSize>0))
+                        {
+                            yPrev=tTarget_canvas.tSize.iHeight-pWidget->frameSpace-(pWidget->pointImgWidth/2)-(pWidget->pSeries[k].pValueList[i-1]*pWidget->yScale);
+                            ldBaseDrawLine(&tTarget,xPrev+(pWidget->pointImgWidth/2),yPrev+pWidget->pointImgWidth/2,x+(pWidget->pointImgWidth/2),y+pWidget->pointImgWidth/2,pWidget->pSeries[k].lineSize,pWidget->pSeries[k].seriesColor);
+                        }
                     }
                 }
             }
@@ -308,9 +315,7 @@ void ldGraphSetPointImageMask(ldGraph_t *pWidget,uint32_t addr,int16_t width)
     }
 }
 
-
-
-int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint16_t valueCountMax)
+int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint8_t lineSize,uint16_t valueCountMax)
 {
     uint16_t *pBuf;
     if (pWidget == NULL)
@@ -325,6 +330,7 @@ int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint16_t valueCou
             pWidget->pSeries[pWidget->seriesCount].pValueList=pBuf;
             pWidget->pSeries[pWidget->seriesCount].valueCountMax=valueCountMax;
             pWidget->pSeries[pWidget->seriesCount].seriesColor=seriesColor;
+            pWidget->pSeries[pWidget->seriesCount].lineSize=lineSize;
             pWidget->seriesCount++;
             return (pWidget->seriesCount-1);
         }
