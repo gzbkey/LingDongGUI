@@ -474,6 +474,8 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                     tempRes.Load = &__disp_adapter0_vres_asset_loader;
                     tempRes.Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
                     ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->selectColor,255);
                 }
                 arm_2d_op_wait_async(NULL);

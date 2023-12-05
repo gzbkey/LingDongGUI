@@ -488,7 +488,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pItemInfo=pItemInfoBuf;
         memset(pItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
         pNewWidget->isBgTransparent=false;
-        pNewWidget->bgColor=0;
+        pNewWidget->bgColor=LD_COLOR_WHITE_SMOKE;
         pNewWidget->selectColor=LD_COLOR_DARK_GREEN;
 
         int16_t w=(width-itemSpace)/columnCount-itemSpace;
@@ -613,6 +613,8 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 {
                     ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
                     ((arm_2d_tile_t*)&tempRes)->tRegion=item->imgRegion;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
                     arm_2d_tile_generate_child(&tItemTile, &item->imgRegion, &tImgTile, false);
 

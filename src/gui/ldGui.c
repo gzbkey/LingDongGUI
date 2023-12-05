@@ -104,6 +104,10 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             prevX=x;
             prevY=y;
         }
+        if(pWidget!=NULL)
+        {
+            xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
+        }
         break;
     }
     case SIGNAL_RELEASE:

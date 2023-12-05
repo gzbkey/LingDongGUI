@@ -77,6 +77,10 @@ const uint8_t checked_png[]={
 
 const arm_2d_tile_t checkBoxCircleMask = {
     .tRegion = {
+        .tLocation = {
+            .iX=0,
+            .iY=0,
+        },
         .tSize = {
             .iWidth = 6,
             .iHeight = 6,
@@ -94,6 +98,10 @@ const arm_2d_tile_t checkBoxCircleMask = {
 
 const arm_2d_tile_t checkBoxCircleSmallMask = {
     .tRegion = {
+        .tLocation = {
+            .iX=0,
+            .iY=0,
+        },
         .tSize = {
             .iWidth = 4,
             .iHeight = 4,
@@ -111,6 +119,10 @@ const arm_2d_tile_t checkBoxCircleSmallMask = {
 
 const arm_2d_tile_t checkBoxCheckedMask = {
     .tRegion = {
+        .tLocation = {
+            .iX=0,
+            .iY=0,
+        },
         .tSize = {
             .iWidth = 10,
             .iHeight = 10,
@@ -392,8 +404,6 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 //借用srcTile生成新tile
                 ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iX=0;
                 ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
-                arm_2d_tile_t tChildTile;
-                arm_2d_tile_generate_child(&tTarget, &((arm_2d_tile_t*)&srcTile)->tRegion, &tChildTile, false);
 
                 if(pWidget->isChecked)
                 {
@@ -401,7 +411,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 #if USE_VIRTUAL_RESOURCE == 1
                     ((arm_2d_vres_t*)&srcTile)->pTarget=pWidget->checkedImgAddr;
 #endif
-                    ldBaseImage(&tChildTile,&srcTile,pWidget->isWithCheckedMask,255);
+                    ldBaseImage(&tTarget,&srcTile,pWidget->isWithCheckedMask,255);
                 }
                 else
                 {
@@ -409,7 +419,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 #if USE_VIRTUAL_RESOURCE == 1
                     ((arm_2d_vres_t*)&srcTile)->pTarget=pWidget->uncheckedImgAddr;
 #endif
-                    ldBaseImage(&tChildTile,&srcTile,pWidget->isWithUncheckedMask,255);
+                    ldBaseImage(&tTarget,&srcTile,pWidget->isWithUncheckedMask,255);
                 }
             }while(0);
         }

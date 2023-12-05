@@ -322,9 +322,6 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,ui
 #else
     arm_2d_vres_t resource =*((arm_2d_vres_t*)pResTile);
 #endif
-    //root tile init
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iX=0;
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iY=0;
 
     if (isWithMask)
     {
@@ -451,9 +448,6 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
     arm_2d_vres_t *pRes;
 #endif
     pRes=&resource;
-    //root tile init
-    ((arm_2d_tile_t*)pRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)pRes)->tRegion.tLocation.iY=0;
 
     switch (((arm_2d_tile_t*)pRes)->tInfo.tColourInfo.chScheme)
     {
@@ -1005,6 +999,13 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
     int16_t textOffsetX=0;
     int16_t bmpH1Max;
 
+    arm_2d_region_t alignSize={0};
+
+    if(pStr==NULL)
+    {
+        return alignSize;
+    }
+
     uint8_t strLen=strlen((char*)pStr);
 
     arm_2d_size_t textSize;
@@ -1023,7 +1024,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
         }
     }
 
-    arm_2d_region_t alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
+    alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resTile = *pResTileTemplate;

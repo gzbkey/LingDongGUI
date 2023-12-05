@@ -52,6 +52,7 @@ static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)
         {
             ldFree(((ldScrollSelecter_t *)pTarget)->ppItemStrGroup[i]);
         }
+        ldFree(((ldScrollSelecter_t *)pTarget)->ppItemStrGroup);
         ldFree(((ldScrollSelecter_t *)pTarget));
         xListInfoDel(pEachInfo);
     }

@@ -26,17 +26,27 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isExpand:1;
+    bool isCorner:1;
+    uint32_t dropdownImgAddr;
+    uint8_t dropdownImgWidth;
+    uint8_t dropdownImgHeight;
     uint8_t itemMax;
     uint8_t itemCount;
     uint8_t itemSelect;
+    uint8_t itemPreSelect;
+    int16_t itemHeight;
+    ldFontDict_t* pFontDict;
+    void **ppItemStrGroup;
+    ldColor charColor;
 
 }ldComboBox_t;
 
-ldComboBox_t* ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+ldComboBox_t* ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);
 void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldComboBoxDel(ldComboBox_t *pWidget);
 
-
+void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);
+void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);
 
 #define ldComboBoxSetHidden          ldBaseSetHidden
 #define ldComboBoxMove               ldBaseMove

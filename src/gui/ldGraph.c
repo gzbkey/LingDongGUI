@@ -181,14 +181,6 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        arm_2d_region_t tBoxRegion = {
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = tTarget_canvas.tSize,
-        };
-
         if(pWidget->isFrame)
         {
             if(pWidget->isCorner)
@@ -203,11 +195,6 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             }
 
             arm_2d_op_wait_async(NULL);
-
-            tBoxRegion.tLocation.iX=pWidget->frameSpace;
-            tBoxRegion.tLocation.iY=pWidget->frameSpace;
-            tBoxRegion.tSize.iWidth=tTarget_canvas.tSize.iWidth-pWidget->frameSpace*2;
-            tBoxRegion.tSize.iHeight=tTarget_canvas.tSize.iHeight-pWidget->frameSpace*2;
         }
 
 #if LD_DEBUG == 1
@@ -256,6 +243,8 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #endif
             tempRes=pWidget->resource;
             arm_2d_tile_t *pTempRes=(arm_2d_tile_t*)&tempRes;
+            pTempRes->tRegion.tLocation.iX=0;
+            pTempRes->tRegion.tLocation.iY=0;
             pTempRes->tRegion.tSize.iWidth=pWidget->pointImgWidth;
             pTempRes->tRegion.tSize.iHeight=pWidget->pointImgWidth;
             pTempRes->pchBuffer = (uint8_t *)pWidget->pointImgAddr;
@@ -272,8 +261,6 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             int16_t x=0,y=0,xPrev,yPrev;
             
             xCount=pWidget->xAxisMax/(pWidget->xAxisOffset*pWidget->xScale);
-            
-            arm_2d_tile_t pointTile;
 
             for(uint16_t i=0;i<xCount;i++)
             {
@@ -288,9 +275,9 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
                         if(pWidget->pointImgAddr!=LD_ADDR_NONE)
                         {
-                            arm_2d_tile_generate_child(&tTarget,&((arm_2d_region_t){x,y,pWidget->pointImgWidth,pWidget->pointImgWidth}), &pointTile, false);
-
-                            ldBaseMaskImage(&pointTile,pTempRes,pWidget->pSeries[k].seriesColor,255);
+                            pTempRes->tRegion.tLocation.iX=x;
+                            pTempRes->tRegion.tLocation.iY=y;
+                            ldBaseMaskImage(&tTarget,pTempRes,pWidget->pSeries[k].seriesColor,255);
                         }
 
                         if((i>0)&&(pWidget->pSeries[k].lineSize>0))
@@ -369,7 +356,7 @@ void ldGraphSetAxis(ldGraph_t *pWidget,uint16_t xAxis,uint16_t yAxis,uint16_t xA
     scale=(float)(pResTile->tRegion.tSize.iWidth-pWidget->frameSpace*2)/xAxis;
     pWidget->xAxisMax=xAxis*scale;
     pWidget->xScale=scale;
-    pWidget->xAxisOffset=xAxisOffset;
+    pWidget->xAxisOffset=xAxisOffset*scale;
 
     scale=(float)(pResTile->tRegion.tSize.iHeight-pWidget->frameSpace*2)/yAxis;
     pWidget->yAxisMax=yAxis*scale;
