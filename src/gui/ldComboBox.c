@@ -16,10 +16,10 @@
 
 /**
  * @file    comboBox.c
- * @author  
- * @brief   
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   下拉框控件
  * @version 0.1
- * @date    
+ * @date    2023-12-05
  */
 
 #include "ldComboBox.h"
@@ -112,13 +112,9 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
 
     uint8_t clickItemNum=SHOW_ITEM_NUM;
 
-
-
     ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)pWidget);
 
     clickItemNum=((y-globalPos.y))/pWidget->itemHeight;
-
-    LOG_DEBUG("clickItemNum %d\n",clickItemNum);
 
     switch (info.signalType) {
     case SIGNAL_PRESS:
@@ -158,6 +154,21 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
     return false;
 }
 
+/**
+ * @brief   下拉框控件初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   pFontDict       字体指针
+ * @param   itemMax         项目最大数量
+ * @return  ldComboBox_t*   新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-05
+ */
 ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict,uint8_t itemMax)
 {
     ldComboBox_t *pNewWidget = NULL;
@@ -237,6 +248,15 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
+/**
+ * @brief   下拉框显示处理函数
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-05
+ */
 void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -380,6 +400,14 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     }
 }
 
+/**
+ * @brief   添加项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            项目显示字符串
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-05
+ */
 void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)

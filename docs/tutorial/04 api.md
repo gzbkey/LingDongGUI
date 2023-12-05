@@ -624,12 +624,198 @@ button widget
 <br>
 
 ---
+# comboBox
+### 简述
+下拉框控件
+### 函数列表
+* ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict,uint8_t itemMax);
+* void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+* void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);
+* void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);
+### 信号列表
+### 函数说明
+#### ldComboBoxInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict,uint8_t itemMax);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    下拉框控件初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="8">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+    <tr>
+        <td>itemMax</td>
+        <td>项目最大数量</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldComboBox_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldComboBoxLoop
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    下拉框显示处理函数        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pParentTile</td>
+        <td>父控件tile对象</td>
+    </tr>
+    <tr>
+        <td>bIsNewFrame</td>
+        <td>新的一帧开始标志</td>
+    </tr>
+</table>
+<br>
+
+#### ldComboBoxAddItem
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    添加项目        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pStr</td>
+        <td>项目显示字符串</td>
+    </tr>
+</table>
+<br>
+
+#### ldComboBoxSetCorner
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    实现圆角显示效果        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>isCorner</td>
+        <td>true=圆角 false=方角</td>
+    </tr>
+</table>
+<br>
+
+---
 # Common
 ### 简述
 通用函数文件
 ### 函数列表
+* void ldBaseDrawLine0(arm_2d_tile_t *pTile,int16_t x0 , int16_t y0 , int16_t x1 , int16_t y1,ldColor color);
 ### 信号列表
 ### 函数说明
+#### ldBaseDrawLine0
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldBaseDrawLine0(arm_2d_tile_t *pTile,int16_t x0 , int16_t y0 , int16_t x1 , int16_t y1,ldColor color);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    吴小林抗锯齿直线算法        </td>
+    </tr>
+    <tr>
+        <td rowspan="6">参数</td>
+        <td>pTile</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>x0</td>
+        <td>直线起始坐标x</td>
+    </tr>
+    <tr>
+        <td>y0</td>
+        <td>直线起始坐标y</td>
+    </tr>
+    <tr>
+        <td>x1</td>
+        <td>直线结束坐标x</td>
+    </tr>
+    <tr>
+        <td>y1</td>
+        <td>直线结束坐标y</td>
+    </tr>
+    <tr>
+        <td>color</td>
+        <td>直线颜色</td>
+    </tr>
+</table>
+<br>
+
 ---
 # DateTime
 ### 简述
@@ -849,6 +1035,13 @@ date time widget
 </table>
 <br>
 
+---
+# graph
+### 简述
+
+### 函数列表
+### 信号列表
+### 函数说明
 ---
 # IconSlider
 ### 简述
