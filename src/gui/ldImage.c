@@ -142,6 +142,8 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->pTarget=imageAddr;
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
+
+        pNewWidget->isStatic=false;
 #endif
 
         LOG_INFO("[image] init,id:%d\n",nameId);

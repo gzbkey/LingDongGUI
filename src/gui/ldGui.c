@@ -456,3 +456,70 @@ void ldGuiJumpPage(uint8_t pageNum)
 {
     pageTarget=pageNum;
 }
+
+static arm_2d_region_t* _ldGuiGetWidgetDirtyRegion(ldCommon_t* pWidget)
+{
+    if(pWidget->widgetType==widgetTypeBackground)
+    {
+        return NULL;
+    }
+
+    return &(*((arm_2d_tile_t*)&(pWidget->resource))).tRegion;
+}
+
+static arm_2d_region_list_item_t* _ldGuiGetDirtyRegion(xListNode* pLink)
+{
+    xListNode *temp_pos,*safePos;
+
+    arm_2d_region_list_item_t **ppNextItem;
+    arm_2d_region_list_item_t *retList=NULL;
+    bool isFirst=true;
+
+    arm_2d_region_t *region;
+    ppNextItem=&retList;
+
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
+        {
+            region=_ldGuiGetWidgetDirtyRegion(((ldCommon_t *)temp_pos->info));
+            if(region!=NULL)
+            {
+                arm_2d_region_list_item_t *dirtyInfo=ldMalloc(sizeof (arm_2d_region_list_item_t));
+                memset(dirtyInfo,0,sizeof (arm_2d_region_list_item_t));
+                dirtyInfo->tRegion=*region;
+
+                if(isFirst)
+                {
+                    retList=dirtyInfo;
+                    isFirst=false;
+                }
+                else
+                {
+                    *ppNextItem=dirtyInfo;
+                }
+                ppNextItem=&dirtyInfo->ptNext;
+            }
+
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            {
+                *ppNextItem=_ldGuiGetDirtyRegion(((ldCommon_t *)temp_pos->info)->childList);
+            }
+        }
+    }
+    return retList;
+}
+
+arm_2d_region_list_item_t * ldGuiGetDirtyRegion(void)
+{
+
+    if(((ldWindow_t*)ldGetWidgetById(0))->isStatic==false)
+    {
+        LOG_INFO("[sys] full screen refresh\n");
+        return NULL;
+    }
+
+    LOG_INFO("[sys] get dirty region\n");
+    return _ldGuiGetDirtyRegion(&ldWidgetLink);
+}
+

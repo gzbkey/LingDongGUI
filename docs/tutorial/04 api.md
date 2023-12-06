@@ -821,8 +821,313 @@ button widget
 ### 简述
 date time widget
 ### 函数列表
+* ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict);
+* void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+* void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent);
+* void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr);
+* void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor);
+* void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align);
+* void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor);
+* void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity);
+* void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint8_t day);
+* void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint8_t second);
 ### 信号列表
 ### 函数说明
+#### ldDateTimeInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    日期时间控件初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="7">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldDateTime_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeLoop
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    日期时间显示处理        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pParentTile</td>
+        <td>父控件tile对象</td>
+    </tr>
+    <tr>
+        <td>bIsNewFrame</td>
+        <td>新的一帧开始标志</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetTransparent
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    控件设置透明        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>isTransparent</td>
+        <td>true=透明 false=不透明</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetFormat
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置时间日期格式        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pStr</td>
+        <td>年:yyyy 月:mm 日:dd 时:hh 分:nn 秒:ss<br>                         例子1: yyyy-mm-dd hh:nn:ss<br>                         例子2: yyyy年mm月dd日 hh时nn分ss秒</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetTextColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>charColor</td>
+        <td>文本颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetAlign
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    文本的对齐方式        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>align</td>
+        <td>LD_ALIGN_CENTER<br>                         LD_ALIGN_TOP<br>                         LD_ALIGN_BOTTOM<br>                         LD_ALIGN_LEFT<br>                         LD_ALIGN_RIGHT</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetBgColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置底色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>底色</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetOpacity
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置不透明度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>opacity</td>
+        <td>0(透明)-255(不透明)</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetDate
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint8_t day);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置日期        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>year</td>
+        <td>年</td>
+    </tr>
+    <tr>
+        <td>month</td>
+        <td>月</td>
+    </tr>
+    <tr>
+        <td>day</td>
+        <td>日</td>
+    </tr>
+</table>
+<br>
+
+#### ldDateTimeSetTime
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint8_t second);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置时间        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>hour</td>
+        <td>时</td>
+    </tr>
+    <tr>
+        <td>minute</td>
+        <td>分</td>
+    </tr>
+    <tr>
+        <td>second</td>
+        <td>秒</td>
+    </tr>
+</table>
+<br>
+
 ---
 # gauge
 ### 简述
@@ -1938,6 +2243,7 @@ window widget 窗体控件可包含其他的控件，实现复合型控件或者
 ### 函数列表
 * ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
 * void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent);
+* void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic);
 ### 信号列表
 ### 函数说明
 #### ldWindowInit
@@ -2007,6 +2313,31 @@ window widget 窗体控件可包含其他的控件，实现复合型控件或者
     <tr>
         <td>isTransparent</td>
         <td>true=透明 false=不透明</td>
+    </tr>
+</table>
+<br>
+
+#### ldWindowSetStatic
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    window控件设置为静态        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>window控件指针</td>
+    </tr>
+    <tr>
+        <td>Static</td>
+        <td>true=不修改颜色或图片 false=需要动态刷图或修改颜色</td>
     </tr>
 </table>
 <br>

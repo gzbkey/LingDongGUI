@@ -159,7 +159,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_background_handler)
     ARM_2D_UNUSED(bIsNewFrame);
     /*-----------------------draw back ground begin-----------------------*/
 
-
+        ldGuiLoop(ptTile,bIsNewFrame);
 
     /*-----------------------draw back ground end  -----------------------*/
     arm_2d_op_wait_async(NULL);
@@ -194,29 +194,29 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
 
-    /*! define dirty regions */
-    IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
+//    /*! define dirty regions */
+//    IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
-        /* a dirty region to be specified at runtime*/
-        ADD_REGION_TO_LIST(s_tDirtyRegions,
-            0  /* initialize at runtime later */
-        ),
+//        /* a dirty region to be specified at runtime*/
+//        ADD_REGION_TO_LIST(s_tDirtyRegions,
+//            0  /* initialize at runtime later */
+//        ),
         
-        /* add the last region:
-         * it is the top left corner for text display 
-         */
-        ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = {
-                .iWidth = __GLCD_CFG_SCEEN_WIDTH__,
-                .iHeight = 8,
-            },
-        ),
+//        /* add the last region:
+//         * it is the top left corner for text display
+//         */
+//        ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
+//            .tLocation = {
+//                .iX = 0,
+//                .iY = 0,
+//            },
+//            .tSize = {
+//                .iWidth = __GLCD_CFG_SCEEN_WIDTH__,
+//                .iHeight = 8,
+//            },
+//        ),
 
-    END_IMPL_ARM_2D_REGION_LIST()
+//    END_IMPL_ARM_2D_REGION_LIST()
     
     /* get the screen region */
     arm_2d_region_t tScreen
@@ -246,7 +246,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .use_as__arm_2d_scene_t = {
             /* Please uncommon the callbacks if you need them
              */
-            //.fnBackground   = &__pfb_draw_scene0_background_handler,
+            .fnBackground   = &__pfb_draw_scene0_background_handler,
             .fnScene        = &__pfb_draw_scene0_handler,
             .ptDirtyRegion  = NULL,//(arm_2d_region_list_item_t *)s_tDirtyRegions,
             
@@ -262,6 +262,15 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     };
 
     ldGuiInit();
+
+    arm_2d_region_list_item_t * plist=ldGuiGetDirtyRegion();
+
+    ptThis->use_as__arm_2d_scene_t.ptDirtyRegion=plist;
+    while(plist!=NULL)
+    {
+        LOG_REGION("",plist->tRegion);
+        plist=plist->ptNext;
+    }
     
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 

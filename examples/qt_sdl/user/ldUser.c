@@ -28,13 +28,18 @@ void* obj,*le,*kb;
 void userInit(void)
 {
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
-    ldWindowSetBgColor(obj,__RGB(220,220,220));
+    ldWindowSetBgColor(obj,__RGB(220,220,0));
+
+    ldWindowSetStatic(obj,true);
 
     obj=ldGraphInit(1,BG_WIN,10,10,220,220,1);
 //    ldGraphSetGridOffset(obj,8);
 //    ldGraphSetAxis(obj,180,180,5);
 
 //    ldGraphSetFrameSpace(obj,0,false);
+
+    obj=ldDateTimeInit(2,BG_WIN,10,250,200,30,WENQUANYI_ZEN_HEI_REGULAR_16);
+
 }
 
 
@@ -51,11 +56,21 @@ void userLoop(void)
 {
     if( ldTimeOut(1000, &timer,true))
     {
-        tempValue+=5;
-        if(tempValue>90)
+//        tempValue+=5;
+//        if(tempValue>90)
+//        {
+//            tempValue=0;
+//        }
+        isTop=!isTop;
+        if(isTop)
         {
-            tempValue=0;
+        ldWindowSetBgColor(ldGetWidgetById(0),0xFF);
         }
+        else
+        {
+        ldWindowSetBgColor(ldGetWidgetById(0),0xFFFF);
+        }
+
 //        ldGraphMoveAdd(ldGetWidgetById(3),0,tempValue);
 ////        btn0->isPressed=!btn0->isPressed;
 ////        ldGuiJumpPage(1);

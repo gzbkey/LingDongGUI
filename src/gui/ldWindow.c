@@ -136,7 +136,22 @@ void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
-
+/**
+ * @brief   window控件设置为静态
+ *
+ * @param   pWidget         window控件指针
+ * @param   Static          true=不修改颜色或图片 false=需要动态刷图或修改颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
+void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+    pWidget->isStatic=isStatic;
+}
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop
