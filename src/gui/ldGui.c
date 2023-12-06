@@ -461,7 +461,10 @@ static arm_2d_region_t* _ldGuiGetWidgetDirtyRegion(ldCommon_t* pWidget)
 {
     if(pWidget->widgetType==widgetTypeBackground)
     {
-        return NULL;
+        if(((ldWindow_t*)pWidget)->isStatic)
+        {
+            return NULL;
+        }
     }
 
     return &(*((arm_2d_tile_t*)&(pWidget->resource))).tRegion;
@@ -512,13 +515,6 @@ static arm_2d_region_list_item_t* _ldGuiGetDirtyRegion(xListNode* pLink)
 
 arm_2d_region_list_item_t * ldGuiGetDirtyRegion(void)
 {
-
-    if(((ldWindow_t*)ldGetWidgetById(0))->isStatic==false)
-    {
-        LOG_INFO("[sys] full screen refresh\n");
-        return NULL;
-    }
-
     LOG_INFO("[sys] get dirty region\n");
     return _ldGuiGetDirtyRegion(&ldWidgetLink);
 }
