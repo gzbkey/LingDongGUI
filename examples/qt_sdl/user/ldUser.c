@@ -21,7 +21,7 @@
 #include "ldGraph.h"
 #include "ldComboBox.h"
 
-ldCommon_t* obj,*le,*kb;
+void* obj,*le,*kb;
 
 #define BG_WIN   0
 
@@ -30,19 +30,11 @@ void userInit(void)
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-    obj=ldComboBoxInit(1,BG_WIN,10,10,100,50,WENQUANYI_ZEN_HEI_REGULAR_16,4);
+    obj=ldGraphInit(1,BG_WIN,10,10,220,220,1);
+//    ldGraphSetGridOffset(obj,8);
+//    ldGraphSetAxis(obj,180,180,5);
 
-    ldComboBoxAddItem(obj,"111");
-    ldComboBoxAddItem(obj,"12345");
-    ldComboBoxAddItem(obj,"987");
-    ldComboBoxAddItem(obj,"23433;-");
-
-    obj=ldComboBoxInit(2,BG_WIN,120,10,100,50,WENQUANYI_ZEN_HEI_REGULAR_16,2);
-
-    ldComboBoxSetCorner(obj,false);
-
-    ldComboBoxAddItem(obj,"AA");
-    ldComboBoxAddItem(obj,"BB23");
+//    ldGraphSetFrameSpace(obj,0,false);
 }
 
 

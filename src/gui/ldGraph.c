@@ -148,7 +148,7 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pSeries=pSeries;
 
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
-        ldGraphSetGrid(pNewWidget,5);
+        ldGraphSetGridOffset(pNewWidget,5);
 
         LOG_INFO("[graph] init,id:%d\n",nameId);
     }
@@ -181,6 +181,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        // draw frame
         if(pWidget->isFrame)
         {
             if(pWidget->isCorner)
@@ -193,14 +194,14 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 ldBaseColor(&tTarget,LD_COLOR_WHITE,255);
                 arm_2d_draw_box(&tTarget,&tTarget_canvas,1,LD_COLOR_LIGHT_GREY,255);
             }
-
-            arm_2d_op_wait_async(NULL);
         }
+        else
+        {
+            ldBaseColor(&tTarget,LD_COLOR_WHITE,255);
+        }
+        arm_2d_op_wait_async(NULL);
 
-#if LD_DEBUG == 1
-        arm_2d_draw_box(&tTarget,&tBoxRegion,1,0,255);
-#endif
-
+        // draw grid
         uint16_t xCount,yCount;
         arm_2d_location_t gridLocal;
 
@@ -215,7 +216,6 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 gridLocal.iY=pWidget->frameSpace+(pWidget->yScale*pWidget->gridOffset*5)*j;
                 arm_2d_draw_point(&tTarget,gridLocal,LD_COLOR_GRAY,128);
             }
-
         }
 
         xCount=pWidget->xAxisMax/(pWidget->xScale*pWidget->gridOffset*5);
@@ -229,9 +229,9 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 gridLocal.iY=pWidget->frameSpace+(pWidget->yScale*pWidget->gridOffset)*j;
                 arm_2d_draw_point(&tTarget,gridLocal,LD_COLOR_GRAY,128);
             }
-
         }
         arm_2d_op_wait_async(NULL);
+
 
         if(pWidget->seriesCount>0)
         {
@@ -288,8 +288,12 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                     }
                 }
             }
+            arm_2d_op_wait_async(NULL);
         }
         
+#if LD_DEBUG == 1
+        arm_2d_draw_box(&tTarget,&tBoxRegion,1,0,255);
+#endif
         arm_2d_op_wait_async(NULL);
     }
 }
@@ -372,16 +376,20 @@ void ldGraphSetAxisOffset(ldGraph_t *pWidget,uint16_t xAxisOffset)
     pWidget->xAxisOffset=xAxisOffset;
 }
 
-void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace)
+void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace,bool isCorner)
 {
     if (pWidget == NULL)
     {
         return ;
     }
+
+    pWidget->isFrame=(frameSpace>0)?true:false;
+
+    pWidget->isCorner=isCorner;
     pWidget->frameSpace=frameSpace;
 }
 
-void ldGraphSetGrid(ldGraph_t *pWidget,uint8_t gridOffset)
+void ldGraphSetGridOffset(ldGraph_t *pWidget,uint8_t gridOffset)
 {
     if (pWidget == NULL)
     {
@@ -393,6 +401,11 @@ void ldGraphSetGrid(ldGraph_t *pWidget,uint8_t gridOffset)
 
 void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue)
 {
+    if (pWidget == NULL)
+    {
+        return ;
+    }
+
     uint16_t *p=pWidget->pSeries[seriesNum].pValueList;
 
     for(int i =0;i < pWidget->pSeries[seriesNum].valueCountMax-1;i++)
