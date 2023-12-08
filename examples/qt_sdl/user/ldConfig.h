@@ -15,7 +15,7 @@ extern "C" {
 #define LD_CFG_COLOR_DEPTH                        16   // 8 16 32
 
 #define USE_OPACITY                               0
-#define USE_TLSF                                  1
+#define USE_TLSF                                  0
 
 #define USE_RADIA_MENU_SCALE                      1
 

@@ -90,7 +90,6 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -102,7 +101,6 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -118,7 +116,6 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isTransparent=true;
         pNewWidget->pStr = NULL;
         pNewWidget->pFontDict = NULL;
@@ -128,6 +125,10 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         LOG_INFO("[label] init,id:%d\n",nameId);
     }

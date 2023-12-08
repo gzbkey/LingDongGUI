@@ -124,7 +124,6 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -169,6 +168,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);

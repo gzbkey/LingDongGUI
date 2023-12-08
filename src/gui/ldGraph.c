@@ -109,7 +109,6 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     if ((pNewWidget != NULL)&&(pSeries != NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -121,7 +120,6 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -137,7 +135,6 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->pointImgAddr=graphDefalutDot_png;
         pNewWidget->pointImgWidth=5;
         pNewWidget->isCorner=true;
@@ -146,6 +143,10 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->seriesMax=seriesMax;
         pNewWidget->seriesCount=0;
         pNewWidget->pSeries=pSeries;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
         ldGraphSetGridOffset(pNewWidget,5);

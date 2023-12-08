@@ -90,7 +90,6 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -102,7 +101,6 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -118,17 +116,19 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->bgAddr=LD_ADDR_NONE;
         pNewWidget->fgAddr=LD_ADDR_NONE;
         pNewWidget->frameAddr=LD_ADDR_NONE;
-//        pNewWidget->maskAddr=LD_ADDR_NONE;
         pNewWidget->bgOffset=0;
         pNewWidget->fgOffset=0;
         pNewWidget->bgColor=LD_COLOR_WHITE;
         pNewWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
         pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
         pNewWidget->permille=0;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
 

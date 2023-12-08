@@ -230,7 +230,6 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -242,7 +241,6 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -258,7 +256,6 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isCorner=false;
         pNewWidget->isChecked=false;
         pNewWidget->bgColor=__RGB(255,255,255);
@@ -272,6 +269,10 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
         pNewWidget->isRadioButton=false;
         pNewWidget->radioButtonGroup=0;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 

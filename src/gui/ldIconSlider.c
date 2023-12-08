@@ -347,7 +347,6 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
     if ((pNewWidget != NULL)&&(pIconInfoBuf != NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -359,7 +358,6 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -375,7 +373,6 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->iconMax=rowCount*columnCount*pageMax;
         pNewWidget->rowCount=rowCount;
         pNewWidget->columnCount=columnCount;
@@ -442,6 +439,10 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
                 }
             }
         }
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);

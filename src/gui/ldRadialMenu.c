@@ -201,7 +201,6 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
     if ((pNewWidget != NULL)&&(pNewItemList != NULL)&&(pNewShowList!=NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -213,7 +212,6 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -229,11 +227,9 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->itemCount=0;
         pNewWidget->pItemList=pNewItemList;
         pNewWidget->itemMax=itemMax;
-
         pNewWidget->originPos.x=tResTile->tRegion.tSize.iWidth>>1;
         pNewWidget->originPos.y=tResTile->tRegion.tSize.iHeight>>1;
         pNewWidget->xAxis=xAxis;
@@ -245,6 +241,10 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);

@@ -145,6 +145,10 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 
         pNewWidget->isStatic=false;
 #endif
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }

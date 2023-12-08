@@ -35,10 +35,11 @@ extern "C" {
 
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
+extern bool isUpdateBackground;
 
-void ldGuiInit(void);
+void ldGuiInit(arm_2d_scene_t *pSence);
 void ldGuiLogicLoop(void);
-void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame);
 void ldGuiQuit(void);
 void ldGuiJumpPage(uint8_t pageNum);
 void ldGuiDelWidget(ldCommon_t *widget);

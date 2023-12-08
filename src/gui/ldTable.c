@@ -451,7 +451,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     if ((pNewWidget != NULL)&&(widthBuf!=NULL)&&(heightBuf!=NULL)&&(pItemInfoBuf!=NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -463,7 +462,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -479,7 +477,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->rowCount= rowCount;
         pNewWidget->columnCount=columnCount;
         pNewWidget->itemSpace=itemSpace;
@@ -490,19 +487,16 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->isBgTransparent=false;
         pNewWidget->bgColor=LD_COLOR_WHITE_SMOKE;
         pNewWidget->selectColor=LD_COLOR_DARK_GREEN;
-
         int16_t w=(width-itemSpace)/columnCount-itemSpace;
         for(uint8_t i=0;i<columnCount;i++)
         {
             pNewWidget->pColumnWidth[i]=w;
         }
-
         int16_t h=(height-itemSpace)/rowCount-itemSpace;
         for(uint8_t i=0;i<rowCount;i++)
         {
             pNewWidget->pRowHeight[i]=h;
         }
-
         for(uint16_t i=0;i<(columnCount*rowCount);i++)
         {
             pNewWidget->pItemInfo[i].textColor=0;
@@ -518,6 +512,10 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].isSelectShow=true;
             pNewWidget->pItemInfo[i].isSelect=false;
         }
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);

@@ -96,7 +96,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -109,7 +108,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
         pNewWidget->bgImgAddr=LD_ADDR_NONE;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -125,7 +123,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isTransparent=false;
         pNewWidget->bgColor=__RGB(255,255,255);
         ldBaseSetFont(&pNewWidget->pTextInfo,pFontDict);
@@ -134,6 +131,11 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
+
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
     else

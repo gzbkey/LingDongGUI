@@ -291,6 +291,7 @@ typedef struct{
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
+                              arm_2d_region_list_item_t dirtyRegion; \
                               bool isHidden:1; \
                               bool isParentHidden:1
 
@@ -391,6 +392,8 @@ void ldBaseCharacter(arm_2d_tile_t* pParentTile, arm_2d_region_t *pShowRegion, a
 arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTemplate,uint8_t *pStr,ldFontDict_t* pFontDict,uint8_t align,ldColor textColor,int16_t scrollOffset,uint8_t opacity);
 
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
+
+void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion);
 
 #ifdef __cplusplus
 }

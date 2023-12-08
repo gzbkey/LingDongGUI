@@ -152,7 +152,6 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -164,7 +163,6 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = true;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=0;
         tResTile->tRegion.tLocation.iY=LD_CFG_SCEEN_HEIGHT/2;
@@ -180,13 +178,16 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isNumber=false;
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->clickPoint.iX=-1;
         pNewWidget->clickPoint.iY=-1;
         pNewWidget->isClick=false;
         pNewWidget->upperState=0;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);

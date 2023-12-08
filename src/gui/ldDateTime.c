@@ -105,7 +105,6 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -117,7 +116,6 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -133,7 +131,6 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->align=LD_ALIGN_CENTER;
         pNewWidget->isTransparent=true;
@@ -146,6 +143,10 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->second=0;
         strcpy((char*)pNewWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
         pNewWidget->formatStrTemp[0]=0;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }

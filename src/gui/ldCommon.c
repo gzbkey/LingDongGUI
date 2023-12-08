@@ -1318,7 +1318,17 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
+void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion)
+{
+    arm_2d_region_list_item_t **pTempDirty;
 
+    pTempDirty=ppSceneDirtyRegion;
+    while(*pTempDirty!=NULL)
+    {
+        pTempDirty=&(*pTempDirty)->ptNext;
+    }
+    *pTempDirty=&pWidget->dirtyRegion;
+}
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

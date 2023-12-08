@@ -177,7 +177,6 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
     if ((pNewWidget != NULL)&&(pNewStrGroup != NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -189,7 +188,6 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -205,11 +203,9 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->itemMax=itemMax;
         pNewWidget->itemCount=0;
         pNewWidget->ppItemStrGroup=pNewStrGroup;
-
         for(uint8_t i=0;i<itemMax;i++)
         {
             pNewWidget->ppItemStrGroup[0]=NULL;
@@ -224,6 +220,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->moveOffset=1;
         pNewWidget->isAutoMove=false;
         pNewWidget->isWaitMove=false;
+        pNewWidget->dirtyRegion.ptNext=NULL;
+        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegion.bIgnore = false;
+        pNewWidget->dirtyRegion.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);

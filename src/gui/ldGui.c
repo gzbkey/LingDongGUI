@@ -56,6 +56,8 @@ static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
+bool isUpdateBackground=false;
+
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *pWidget;
@@ -384,17 +386,40 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
     }
 }
 
+static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
+{
+    xListNode *temp_pos,*safePos;
+
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
+        {
+            ldBaseAddDirtyRegion((ldCommon_t *)temp_pos->info,&pSence->ptDirtyRegion);
+
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            {
+                ldGuiSetDirtyRegion(((ldCommon_t *)temp_pos->info)->childList,pSence);
+            }
+        }
+    }
+}
+
 /**
  * @brief   ldgui的初始化函数
  * 
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiInit(void)
+void ldGuiInit(arm_2d_scene_t *pSence)
 {
     xEmitInit();
     ldUserPageInitFunc[pageNumNow]();
     LOG_INFO("[sys] page %d init\n",pageNumNow);
+
+    ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
+    LOG_INFO("[sys] set dirty region\n");
+
+
 }
 
 /**
@@ -416,8 +441,14 @@ void ldGuiLogicLoop(void)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
+    if(isUpdateBackground)
+    {
+        arm_2d_scene_player_update_scene_background(pSence->ptPlayer);
+        isUpdateBackground=false;
+    }
+
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
 
@@ -456,66 +487,3 @@ void ldGuiJumpPage(uint8_t pageNum)
 {
     pageTarget=pageNum;
 }
-
-static arm_2d_region_t* _ldGuiGetWidgetDirtyRegion(ldCommon_t* pWidget)
-{
-    if(pWidget->widgetType==widgetTypeBackground)
-    {
-        if(((ldWindow_t*)pWidget)->isStatic)
-        {
-            return NULL;
-        }
-    }
-
-    return &(*((arm_2d_tile_t*)&(pWidget->resource))).tRegion;
-}
-
-static arm_2d_region_list_item_t* _ldGuiGetDirtyRegion(xListNode* pLink)
-{
-    xListNode *temp_pos,*safePos;
-
-    arm_2d_region_list_item_t **ppNextItem;
-    arm_2d_region_list_item_t *retList=NULL;
-    bool isFirst=true;
-
-    arm_2d_region_t *region;
-    ppNextItem=&retList;
-
-    list_for_each_safe(temp_pos,safePos, pLink)
-    {
-        if(temp_pos->info!=NULL)
-        {
-            region=_ldGuiGetWidgetDirtyRegion(((ldCommon_t *)temp_pos->info));
-            if(region!=NULL)
-            {
-                arm_2d_region_list_item_t *dirtyInfo=ldMalloc(sizeof (arm_2d_region_list_item_t));
-                memset(dirtyInfo,0,sizeof (arm_2d_region_list_item_t));
-                dirtyInfo->tRegion=*region;
-
-                if(isFirst)
-                {
-                    retList=dirtyInfo;
-                    isFirst=false;
-                }
-                else
-                {
-                    *ppNextItem=dirtyInfo;
-                }
-                ppNextItem=&dirtyInfo->ptNext;
-            }
-
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
-            {
-                *ppNextItem=_ldGuiGetDirtyRegion(((ldCommon_t *)temp_pos->info)->childList);
-            }
-        }
-    }
-    return retList;
-}
-
-arm_2d_region_list_item_t * ldGuiGetDirtyRegion(void)
-{
-    LOG_INFO("[sys] get dirty region\n");
-    return _ldGuiGetDirtyRegion(&ldWidgetLink);
-}
-

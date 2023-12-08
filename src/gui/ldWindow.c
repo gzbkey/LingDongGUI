@@ -105,9 +105,9 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
                 pNewWidget->isTransparent=true;
                 pNewWidget->widgetType=widgetTypeWindow;
             }
+            pNewWidget->dirtyRegion.bIgnore = true;
 
             LOG_INFO("[window] init,id:%d\n",nameId);
-
         }
         else
         {
