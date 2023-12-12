@@ -60,24 +60,24 @@ int64_t timer=0;
 uint16_t tempValue=0;
 void userLoop(void)
 {
-//    if( ldTimeOut(2000, &timer,true))
-//    {
+    if( ldTimeOut(2000, &timer,true))
+    {
 
-//        isTop=!isTop;
-//        if(isTop)
-//        {
+        isTop=!isTop;
+        if(isTop)
+        {
 //        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFF);
-////        ldGraphMove(ldBaseGetWidgetById(1),20,20);
-////        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
-//        }
-//        else
-//        {
+        ldLineEditMove(le,20,20);
+//        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
+        }
+        else
+        {
 //        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFFFF);
-////        ldGraphMove(ldBaseGetWidgetById(1),10,10);
-////        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
-//        }
+        ldLineEditMove(le,50,100);
+//        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
+        }
 
-//    }
+    }
 }
 
 void userLoop1(void)

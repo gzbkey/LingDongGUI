@@ -289,7 +289,6 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 {
                     selectItem=(-1);
                 }
-                LOG_DEBUG("clicked item:%d\n",selectItem);
                 xEmit(slider->nameId,SIGNAL_CLICKED_ITEM,selectItem);
             }
         }
@@ -443,6 +442,8 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);

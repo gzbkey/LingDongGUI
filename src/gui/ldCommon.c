@@ -1334,24 +1334,25 @@ void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSce
     *pTempDirty=&pWidget->dirtyRegionListItem;
 }
 
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *srcRegion,bool bIsNewFrame)
+// pNewRegion和pWidget坐标都是相对父控件来计算
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion,bool bIsNewFrame)
 {
     if(bIsNewFrame)
     {
         switch (pWidget->dirtyRegionState)
         {
-        case waitChange:
+        case waitChange://扩张到新范围
         {
             arm_2d_region_t tempRegion;
-            arm_2d_region_get_minimal_enclosure(srcRegion,&pWidget->dirtyRegionTemp,&tempRegion);
+            arm_2d_region_get_minimal_enclosure(pNewRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
-            pWidget->dirtyRegionTemp=*srcRegion;
+            pWidget->dirtyRegionTemp=*pNewRegion;
             pWidget->dirtyRegionState=waitUpdate;
             break;
         }
-        case waitUpdate:
+        case waitUpdate://缩小到新范围
         {
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,srcRegion);
+            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
             pWidget->dirtyRegionState=none;
             break;
         }

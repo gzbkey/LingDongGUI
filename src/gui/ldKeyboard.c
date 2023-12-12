@@ -470,7 +470,11 @@ static bool slotKBProcess(xConnectInfo_t info)
 
         pWidget->isClick=false;
 
-        LOG_REGION("click region;",_keyboardGetClickRegion(pWidget));
+        pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
+        pWidget->targetDirtyRegion.tLocation.iX+=pResTile->tRegion.tLocation.iX;
+        pWidget->targetDirtyRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
+        pWidget->dirtyRegionState=waitChange;
+
         break;
     }
     case SIGNAL_RELEASE:
@@ -546,6 +550,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=none;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->targetDirtyRegion=tResTile->tRegion;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -593,6 +598,13 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
+        //强制脏矩阵全控件
+        if(pResTile->tRegion.tSize.iWidth!=pWidget->dirtyRegionListItem.tRegion.tSize.iWidth)
+        {
+            pWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pWidget,&((arm_2d_tile_t*)&pWidget->resource)->tRegion);
+            pWidget->dirtyRegionTemp=pResTile->tRegion;
+            pWidget->targetDirtyRegion=pResTile->tRegion;
+        }
         return;
     }
 
@@ -636,7 +648,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
