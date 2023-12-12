@@ -11,7 +11,6 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isWithMask:1;
     bool isTransparent:1;//window专用
-    bool isStatic:1;//window专用
     bool isColor:1;
     ldColor bgColor;
     ldColor specialColor;//maskColor charColor

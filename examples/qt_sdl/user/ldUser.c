@@ -24,21 +24,27 @@
 void* obj,*le,*kb;
 
 #define BG_WIN   0
+extern size_t xFreeBytesRemaining;
+
+//#define LD_PFB(object) ldBaseAddDirtyRegion(object,&pSence->ptDirtyRegion)
 
 void userInit(void)
 {
+    obj=ldMalloc(1);
+    ldFree(obj);
+//    LOG_DEBUG("start :%llu\n",xFreeBytesRemaining);
     obj=ldWindowInit(BG_WIN, BG_WIN, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
-    ldWindowSetBgColor(obj,__RGB(220,220,0));
 
-    ldWindowSetStatic(obj,true);
+    ldWindowSetBgColor(obj,__RGB(220,220,220));
 
-    obj=ldGraphInit(1,BG_WIN,10,10,220,220,1);
-//    ldGraphSetGridOffset(obj,8);
-//    ldGraphSetAxis(obj,180,180,5);
+//    LOG_DEBUG("win :%llu\n",xFreeBytesRemaining);
 
-//    ldGraphSetFrameSpace(obj,0,false);
+    le=ldLineEditInit(1,BG_WIN,10,10,100,50,WENQUANYI_ZEN_HEI_REGULAR_16,10);
 
-    obj=ldDateTimeInit(2,BG_WIN,10,250,200,30,WENQUANYI_ZEN_HEI_REGULAR_16);
+    ldLineEditSetType(le,typeInt);
+    kb=ldKeyboardInit(2,BG_WIN,WENQUANYI_ZEN_HEI_REGULAR_16);
+
+    ldLineEditSetKeyboard(le,((ldCommon_t*)kb)->nameId);
 
 }
 
@@ -54,67 +60,23 @@ int64_t timer=0;
 uint16_t tempValue=0;
 void userLoop(void)
 {
-    if( ldTimeOut(1000, &timer,true))
-    {
-//        tempValue+=5;
-//        if(tempValue>90)
-//        {
-//            tempValue=0;
-//        }
-        isTop=!isTop;
-        if(isTop)
-        {
-        ldWindowSetBgColor(ldGetWidgetById(0),0xFF);
-        }
-        else
-        {
-        ldWindowSetBgColor(ldGetWidgetById(0),0xFFFF);
-        }
+//    if( ldTimeOut(2000, &timer,true))
+//    {
 
-//        ldGraphMoveAdd(ldGetWidgetById(3),0,tempValue);
-////        btn0->isPressed=!btn0->isPressed;
-////        ldGuiJumpPage(1);
-
+//        isTop=!isTop;
 //        if(isTop)
 //        {
-//            ldScrollSelecterSetItem(scroll,0);
+//        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFF);
+////        ldGraphMove(ldBaseGetWidgetById(1),20,20);
+////        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
 //        }
 //        else
 //        {
-//            ldScrollSelecterSetItem(scroll,9);
+//        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFFFF);
+////        ldGraphMove(ldBaseGetWidgetById(1),10,10);
+////        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
 //        }
-//isTop=!isTop;
-    }
 
-//    if(xBtnGetState(KEY_NUM_LEFT,BTN_PRESS))
-//    {
-//        if(targetBtn==btn1)
-//        {
-//            btn0->isSelected=true;
-//            btn1->isSelected=false;
-//            targetBtn=btn0;
-//        }
-//        else
-//        {
-//            btn0->isSelected=false;
-//            btn1->isSelected=true;
-//            targetBtn=btn1;
-//        }
-//    }
-//    if(xBtnGetState(KEY_NUM_RIGHT,BTN_PRESS))
-//    {
-//        if(targetBtn==btn1)
-//        {
-//            btn0->isSelected=true;
-//            btn1->isSelected=false;
-//            targetBtn=btn0;
-//        }
-//        else
-//        {
-//            btn0->isSelected=false;
-//            btn1->isSelected=true;
-//            targetBtn=btn1;
-//        }
 //    }
 }
 

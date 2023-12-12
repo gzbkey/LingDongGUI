@@ -245,16 +245,25 @@ typedef enum{
     widgetTypeLabel,
     widgetTypeTable,
     widgetTypeKeyboard,
-}ldWidgetType;
+}ldWidgetType_t;
+
+typedef enum{
+    none,
+    waitChange,
+    waitUpdate
+}ldDirtyRegionStateType_t;
 
 #if USE_VIRTUAL_RESOURCE == 0
 #define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
-                              ldWidgetType widgetType; \
+                              ldWidgetType_t widgetType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
+                              arm_2d_region_list_item_t dirtyRegionListItem; \
+                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
-                              bool isParentHidden:1
+                              bool isParentHidden:1; \
+                              ldDirtyRegionStateType_t dirtyRegionState:2
 
 typedef struct{
     uint8_t utf8[4];
@@ -287,13 +296,15 @@ typedef struct{
 }ldChar_t;
 #else
 #define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
-                              ldWidgetType widgetType; \
+                              ldWidgetType_t widgetType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
-                              arm_2d_region_list_item_t dirtyRegion; \
+                              arm_2d_region_list_item_t dirtyRegionListItem; \
+                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
-                              bool isParentHidden:1
+                              bool isParentHidden:1; \
+                              ldDirtyRegionStateType_t dirtyRegionState:2
 
 typedef struct{
     uint8_t utf8[4];
@@ -356,10 +367,10 @@ void ldFree(void *p);
 
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
-void* ldGetWidgetById(uint16_t nameId);
-ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget);
-xListNode* ldGetWidgetInfoById(uint16_t nameId);
-xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y);
+void* ldBaseGetWidgetById(uint16_t nameId);
+ldPoint_t ldBaseGetGlobalPos(ldCommon_t *pWidget);
+xListNode* ldBaseGetWidgetInfoById(uint16_t nameId);
+xListNode* ldBaseGetWidgetInfoByPos(int16_t x,int16_t y);
 
 
 
@@ -394,6 +405,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 
 void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion);
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *srcRegion,bool bIsNewFrame);
 
 #ifdef __cplusplus
 }

@@ -73,7 +73,7 @@ void ldImageDel(ldImage_t *pWidget)
     }
     else
     {
-        listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+        listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
         listInfo = ((ldCommon_t *)listInfo->info)->childList;
     }
 
@@ -90,7 +90,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     xListNode *parent_link;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldImage_t);
     if (pNewWidget != NULL)
     {
@@ -142,13 +142,11 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->pTarget=imageAddr;
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-
-        pNewWidget->isStatic=false;
 #endif
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }
@@ -193,6 +191,7 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

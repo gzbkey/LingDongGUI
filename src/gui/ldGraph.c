@@ -86,7 +86,7 @@ void ldGraphDel(ldGraph_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -103,7 +103,7 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     arm_2d_tile_t *tResTile;
     ldGraphSeries_t *pSeries = NULL;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldGraph_t);
     pSeries = ldMalloc(sizeof (ldGraphSeries_t)*seriesMax);
     if ((pNewWidget != NULL)&&(pSeries != NULL))
@@ -143,10 +143,12 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->seriesMax=seriesMax;
         pNewWidget->seriesCount=0;
         pNewWidget->pSeries=pSeries;
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t*)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
         ldGraphSetGridOffset(pNewWidget,5);
@@ -160,7 +162,6 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 
         LOG_ERROR("[graph] init failed,id:%d\n",nameId);
     }
-
     return pNewWidget;
 }
 
@@ -178,6 +179,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

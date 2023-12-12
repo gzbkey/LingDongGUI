@@ -83,7 +83,7 @@ void ldIconSliderDel(ldIconSlider_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -199,7 +199,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     int16_t x,y;
     arm_2d_tile_t *pResTile;
 
-    slider=ldGetWidgetById(info.receiverId);
+    slider=ldBaseGetWidgetById(info.receiverId);
 
     pResTile=(arm_2d_tile_t*)&slider->resource;
 
@@ -253,7 +253,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 uint8_t itemY=0;
 
 
-                ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)slider);
+                ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t *)slider);
                 itemOffsetWidth=slider->iconSpace+slider->iconWidth;
                 itemOffsetHeight=slider->iconSpace+slider->iconWidth+_getStrHeight(slider->pFontDict)+IMG_FONT_SPACE;
 
@@ -338,7 +338,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
     arm_2d_tile_t *tResTile;
     ldIconInfo_t* pIconInfoBuf = NULL;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldIconSlider_t);
     rowCount=MAX(rowCount,1);
     columnCount=MAX(columnCount,1);
@@ -439,10 +439,10 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
                 }
             }
         }
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
@@ -539,6 +539,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         }
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

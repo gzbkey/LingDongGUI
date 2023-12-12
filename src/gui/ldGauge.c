@@ -73,7 +73,7 @@ void ldGaugeDel(ldGauge_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -102,7 +102,7 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldGauge_t);
     if (pNewWidget != NULL)
     {
@@ -143,10 +143,10 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pointerOriginOffsetY=0;
         pNewWidget->angle_x10=0;
         memset(&pNewWidget->op, 0, sizeof (pNewWidget->op));
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -183,6 +183,7 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

@@ -69,7 +69,7 @@ void ldLabelDel(ldLabel_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -85,7 +85,7 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldLabel_t);
     if (pNewWidget != NULL)
     {
@@ -125,10 +125,10 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         LOG_INFO("[label] init,id:%d\n",nameId);
     }
@@ -156,6 +156,7 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

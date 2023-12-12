@@ -55,10 +55,10 @@ with open(hSrcPath,'r',encoding='utf8') as f:
 
 newFileStr=''
 for eachline in alllines:
-    pos=eachline.find('}ldWidgetType;')
+    pos=eachline.find('}ldWidgetType_t;')
     newLineStr=eachline
     if pos>=0 :
-        newLineStr='    widgetType'+upperWidgetName+',\n'+'}ldWidgetType;\n'
+        newLineStr='    widgetType'+upperWidgetName+',\n'+'}ldWidgetType_t;\n'
     newFileStr+=newLineStr
 
 with open(hSrcPath,'w',encoding='utf8') as f:

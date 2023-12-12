@@ -89,7 +89,7 @@ void ldComboBoxDel(ldComboBox_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -105,14 +105,14 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
 
 #define SHOW_ITEM_NUM    (0)
 
-    pWidget=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
     y=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
     uint8_t clickItemNum=SHOW_ITEM_NUM;
 
-    ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)pWidget);
+    ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget);
 
     clickItemNum=((y-globalPos.y))/pWidget->itemHeight;
 
@@ -177,7 +177,7 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     arm_2d_tile_t *tResTile;
     void **pNewStrGroup = NULL;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldComboBox_t);
     pNewStrGroup=(void**)ldMalloc(sizeof (void*)*itemMax);
     if ((pNewWidget != NULL)&&(pNewStrGroup != NULL))
@@ -226,10 +226,10 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         {
             pNewWidget->ppItemStrGroup[0]=NULL;
         }
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
@@ -283,7 +283,7 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
     }
 
-
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

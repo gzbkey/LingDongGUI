@@ -109,7 +109,7 @@ __WEAK void ldFree(void *p)
 //#endif
 //}
 
-static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
+static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
     xListNode *tempPos,*safePos;
     ldCommon_t *pTempWidgetInfo;
@@ -134,7 +134,7 @@ static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nam
                 }
                 else
                 {
-                    if(ldGetInfoByName(pTempWidgetInfo->childList,out_info,nameId)==true)
+                    if(ldBaseGetInfoByName(pTempWidgetInfo->childList,out_info,nameId)==true)
                     {
                         return true;
                     }
@@ -147,27 +147,27 @@ static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nam
 }
 
 
-xListNode* ldGetWidgetInfoById(uint16_t nameId)
+xListNode* ldBaseGetWidgetInfoById(uint16_t nameId)
 {
     xListNode * pListInfo;
-    if(ldGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
+    if(ldBaseGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
     {
         return pListInfo;
     }
     return NULL;
 }
 
-void* ldGetWidgetById(uint16_t nameId)
+void* ldBaseGetWidgetById(uint16_t nameId)
 {
     xListNode * pListInfo;
-    if(ldGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
+    if(ldBaseGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
     {
         return pListInfo->info;
     }
     return NULL;
 }
 
-static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int16_t y)
+static bool ldBaseGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int16_t y)
 {
     xListNode *tempPos,*safePos;
     xListNode *pListInfo2;
@@ -190,7 +190,7 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
                 pTempWidgetInfo=(ldCommon_t*)(tempPos->info);
                 
                 //获取全局坐标，用绝对值坐标进行比较
-                posT= ldGetGlobalPos(pTempWidgetInfo);
+                posT= ldBaseGetGlobalPos(pTempWidgetInfo);
                 widthT=(*(arm_2d_tile_t*)&(pTempWidgetInfo->resource)).tRegion.tSize.iWidth;
                 heightT=(*(arm_2d_tile_t*)&(pTempWidgetInfo->resource)).tRegion.tSize.iHeight;
                     
@@ -209,7 +209,7 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
                         //判断在窗体范围内
                         if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
                         {
-                            if(ldGetInfoByPos(pTempWidgetInfo->childList,&pListInfo2,x,y)==true)
+                            if(ldBaseGetInfoByPos(pTempWidgetInfo->childList,&pListInfo2,x,y)==true)
                             {
                                 *out_info= pListInfo2;
                                 return true;
@@ -229,10 +229,10 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
 }
 
 
-xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
+xListNode* ldBaseGetWidgetInfoByPos(int16_t x,int16_t y)
 {
     xListNode * pListInfo;
-    if(ldGetInfoByPos(&ldWidgetLink,&pListInfo,x,y)==true)
+    if(ldBaseGetInfoByPos(&ldWidgetLink,&pListInfo,x,y)==true)
     {
         return pListInfo;
     }
@@ -240,7 +240,7 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
 }
 
 //获取全局坐标
-ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
+ldPoint_t ldBaseGetGlobalPos(ldCommon_t *pWidget)
 {
     ldPoint_t pos={0,0},posParent={0,0};
 
@@ -256,7 +256,7 @@ ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
     {
         if(((ldCommon_t*)pWidget->parentWidget)->widgetType!=widgetTypeBackground)
         {
-            posParent=ldGetGlobalPos(pWidget->parentWidget);
+            posParent=ldBaseGetGlobalPos(pWidget->parentWidget);
         }
         else
         {
@@ -1087,6 +1087,7 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
         return;
     }
     pWidget->isHidden=isHidden;
+    pWidget->dirtyRegionListItem.bIgnore=isHidden;
 }
 
 void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
@@ -1148,7 +1149,7 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
         parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
     }
     arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
-    ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
+    ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
     outRegion.tLocation.iX=outRegion.tLocation.iX+globalPos.x;
     outRegion.tLocation.iY=outRegion.tLocation.iY+globalPos.y;
     return outRegion;
@@ -1160,6 +1161,9 @@ void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y)
     {
         return;
     }
+
+    pWidget->dirtyRegionState=waitChange;
+
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX=x;
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY=y;
 }
@@ -1327,7 +1331,34 @@ void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSce
     {
         pTempDirty=&(*pTempDirty)->ptNext;
     }
-    *pTempDirty=&pWidget->dirtyRegion;
+    *pTempDirty=&pWidget->dirtyRegionListItem;
+}
+
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *srcRegion,bool bIsNewFrame)
+{
+    if(bIsNewFrame)
+    {
+        switch (pWidget->dirtyRegionState)
+        {
+        case waitChange:
+        {
+            arm_2d_region_t tempRegion;
+            arm_2d_region_get_minimal_enclosure(srcRegion,&pWidget->dirtyRegionTemp,&tempRegion);
+            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
+            pWidget->dirtyRegionTemp=*srcRegion;
+            pWidget->dirtyRegionState=waitUpdate;
+            break;
+        }
+        case waitUpdate:
+        {
+            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,srcRegion);
+            pWidget->dirtyRegionState=none;
+            break;
+        }
+        default:
+            break;
+        }
+    }
 }
 
 #if defined(__clang__)

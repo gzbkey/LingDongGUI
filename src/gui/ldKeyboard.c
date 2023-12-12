@@ -86,7 +86,7 @@ void ldKeyboardDel(ldKeyboard_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -95,12 +95,366 @@ void ldKeyboardDel(ldKeyboard_t *pWidget)
     }
 }
 
+static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
+{
+    arm_2d_region_t retRegion;
+    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+    retRegion.tLocation.iX=0;
+    retRegion.tLocation.iY=0;
+    int16_t btnW,btnH;
+    if(pWidget->isNumber)
+    {
+        btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/4-KB_SPACE;
+        btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+
+        arm_2d_region_t leftRegion=retRegion;
+        leftRegion.tSize.iWidth=leftRegion.tSize.iWidth-btnW-(KB_SPACE*2);
+
+        arm_2d_region_t rightRegion=retRegion;
+        rightRegion.tLocation.iX=rightRegion.tSize.iWidth-btnW-(KB_SPACE*2);
+        rightRegion.tSize.iWidth=btnW+(KB_SPACE*2);
+
+        arm_2d_layout(leftRegion) {
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+
+
+
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+
+
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+
+
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
+                if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
+                {
+                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                        retRegion=__item_region;
+                        break;
+                    }
+                }
+            }
+        }
+
+        arm_2d_layout(rightRegion) {
+            __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
+                if(gActiveEditType==typeString)
+                {
+                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                        retRegion=__item_region;
+                        break;
+                    }
+                }
+            }
+            __item_vertical(btnW,btnH*2+KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/10-KB_SPACE;
+        btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+
+        arm_2d_layout(retRegion) {
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+
+
+
+
+
+            __item_horizontal(btnW,btnH,KB_SPACE+(btnW+KB_SPACE)/2,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+
+
+
+
+            __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+
+
+
+            __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW+(btnW+KB_SPACE)*2,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+            __item_horizontal(btnW+(btnW+KB_SPACE),btnH,KB_SPACE,0,KB_SPACE,0) {
+                if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                    retRegion=__item_region;
+                    break;
+                }
+            }
+        }
+    }
+    return retRegion;
+}
 static bool slotKBProcess(xConnectInfo_t info)
 {
     ldKeyboard_t *pWidget;
     arm_2d_tile_t *pResTile;
 
-    pWidget=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -115,6 +469,8 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iY-=pResTile->tRegion.tLocation.iY;
 
         pWidget->isClick=false;
+
+        LOG_REGION("click region;",_keyboardGetClickRegion(pWidget));
         break;
     }
     case SIGNAL_RELEASE:
@@ -147,7 +503,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldKeyboard_t);
     if (pNewWidget != NULL)
     {
@@ -184,10 +540,12 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         pNewWidget->clickPoint.iY=-1;
         pNewWidget->isClick=false;
         pNewWidget->upperState=0;
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = true;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -278,6 +636,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

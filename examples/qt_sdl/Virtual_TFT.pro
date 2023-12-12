@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+    ../../src/gui/ldArc.c \
     ../../src/gui/ldButton.c \
     ../../src/gui/ldCheckBox.c \
     ../../src/gui/ldComboBox.c \
@@ -111,6 +112,7 @@ SOURCES += \
     user/arm_2d_disp_adapter_0.c
 
 HEADERS += \
+    ../../src/gui/ldArc.h \
     ../../src/gui/ldButton.h \
     ../../src/gui/ldCheckBox.h \
     ../../src/gui/ldComboBox.h \

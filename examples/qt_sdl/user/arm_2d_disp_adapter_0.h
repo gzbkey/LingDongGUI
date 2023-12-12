@@ -51,33 +51,33 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your screen
 #ifndef __DISP0_CFG_COLOUR_DEPTH__
-#   define __DISP0_CFG_COLOUR_DEPTH__                              LD_CFG_COLOR_DEPTH
+#   define __DISP0_CFG_COLOUR_DEPTH__                              16
 #endif
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               LD_CFG_SCEEN_WIDTH
+#   define __DISP0_CFG_SCEEN_WIDTH__                               320
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              LD_CFG_SCEEN_HEIGHT
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              240
 #endif
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           LD_CFG_SCEEN_WIDTH
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           320
 #endif
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          LD_CFG_SCEEN_HEIGHT
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          240
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -179,14 +179,8 @@ extern "C" {
 // <q>Enable the virtual resource helper service
 // <i> Introduce a helper service for loading virtual resources.
 // <i> This feature is disabled by default.
-#if USE_VIRTUAL_RESOURCE == 0
 #ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 #   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   0
-#endif
-#else
-#ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   1
-#endif
 #endif
 
 // <q>Use heap to allocate buffer in the virtual resource helper service

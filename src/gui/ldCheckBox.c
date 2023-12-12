@@ -172,7 +172,7 @@ void ldCheckBoxDel(ldCheckBox_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -184,7 +184,7 @@ void ldCheckBoxDel(ldCheckBox_t *pWidget)
 static bool slotCheckBoxToggle(xConnectInfo_t info)
 {
     ldCheckBox_t *cb;
-    cb=ldGetWidgetById(info.receiverId);
+    cb=ldBaseGetWidgetById(info.receiverId);
     if(info.signalType==SIGNAL_PRESS)
     {
         if(!cb->isRadioButton)
@@ -225,7 +225,7 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldCheckBox_t);
     if (pNewWidget != NULL)
     {
@@ -269,10 +269,10 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
         pNewWidget->isRadioButton=false;
         pNewWidget->radioButtonGroup=0;
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 
@@ -320,6 +320,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

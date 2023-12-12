@@ -76,7 +76,7 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -92,7 +92,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
     static int16_t pressX,pressY,nowX,nowY;
 
     value=info.value;
-    menu=ldGetWidgetById(info.receiverId);
+    menu=ldBaseGetWidgetById(info.receiverId);
 
     switch (info.signalType)
     {
@@ -194,7 +194,7 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
     ldRadialMenuItem_t *pNewItemList;
     uint8_t *pNewShowList;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldRadialMenu_t);
     pNewItemList=ldMalloc(sizeof(ldRadialMenuItem_t)*itemMax);
     pNewShowList=ldMalloc(sizeof (uint8_t)*itemMax);
@@ -241,10 +241,10 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
@@ -337,6 +337,7 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

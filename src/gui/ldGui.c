@@ -41,6 +41,7 @@
 #include "ldLineEdit.h"
 #include "ldGraph.h"
 #include "ldComboBox.h"
+#include "ldArc.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -74,7 +75,7 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         pWidget=NULL;
         if(pWidget==NULL)
         {
-            pNode=ldGetWidgetInfoByPos(x,y);
+            pNode=ldBaseGetWidgetInfoByPos(x,y);
             if(pNode!=NULL)
             {
                 pWidget=pNode->info;
@@ -101,14 +102,11 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             pWidget=prevWidget;//不可以把static变量作为函数变量调用
             if(pWidget!=NULL)
             {
+                xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
                 xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,(((x-pressPoint.x)<<16)&0xFFFF0000)|((y-pressPoint.y)&0xFFFF));
             }
             prevX=x;
             prevY=y;
-        }
-        if(pWidget!=NULL)
-        {
-            xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
         }
         break;
     }
@@ -265,6 +263,11 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldComboBoxDel((ldComboBox_t*)pWidget);
         break;
     }
+    case widgetTypeArc:
+    {
+        ldArcDel((ldArc_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -362,6 +365,11 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
         ldComboBoxLoop((ldComboBox_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
+    case widgetTypeArc:
+    {
+        ldArcLoop((ldArc_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
 /*============================ auto add loop =================================*/
     default:
         break;
@@ -419,7 +427,7 @@ void ldGuiInit(arm_2d_scene_t *pSence)
     ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
     LOG_INFO("[sys] set dirty region\n");
 
-
+    isUpdateBackground=true;
 }
 
 /**
@@ -443,7 +451,7 @@ void ldGuiLogicLoop(void)
  */
 void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    if(isUpdateBackground)
+    if(isUpdateBackground&&bIsNewFrame)
     {
         arm_2d_scene_player_update_scene_background(pSence->ptPlayer);
         isUpdateBackground=false;

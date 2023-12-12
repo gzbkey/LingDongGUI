@@ -16,7 +16,6 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 void ldWindowDel(ldWindow_t *pWidget);
 
 void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent);
-void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic);
 
 #define ldWindowSetHidden        ldBaseSetHidden
 #define ldWindowSetBgColor       ldImageSetBgColor

@@ -75,7 +75,7 @@ void ldTextDel(ldText_t *pWidget)
 
     LOG_INFO("[text] del,id:%d\n",pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -91,7 +91,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldText_t);
     if (pNewWidget != NULL)
     {
@@ -131,10 +131,10 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
@@ -195,6 +195,7 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
         }
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -305,7 +306,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
 {
     ldText_t *txt;
 
-    txt=ldGetWidgetById(info.receiverId);
+    txt=ldBaseGetWidgetById(info.receiverId);
 
 
 

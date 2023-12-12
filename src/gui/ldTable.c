@@ -82,7 +82,7 @@ void ldTableDel(ldTable_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -296,7 +296,7 @@ static bool slotTableProcess(xConnectInfo_t info)
     arm_2d_tile_t *pResTile;
     ldTableItem_t *currentItem;
 
-    pWidget=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -442,7 +442,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     int16_t *heightBuf;
     ldTableItem_t *pItemInfoBuf;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldTable_t);
     widthBuf = ldMalloc(sizeof (int16_t)*columnCount);
     heightBuf = ldMalloc(sizeof (int16_t)*rowCount);
@@ -512,10 +512,10 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].isSelectShow=true;
             pNewWidget->pItemInfo[i].isSelect=false;
         }
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);

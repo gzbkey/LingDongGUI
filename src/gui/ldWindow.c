@@ -64,7 +64,7 @@ void ldWindowDel(ldWindow_t *pWidget)
 
     LOG_INFO("[window] del,id:%d\n",pWidget->nameId);
 
-    listInfo=ldGetWidgetInfoById(pWidget->nameId);
+    listInfo=ldBaseGetWidgetInfoById(pWidget->nameId);
 
     if(listInfo!=NULL)
     {
@@ -105,7 +105,7 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
                 pNewWidget->isTransparent=true;
                 pNewWidget->widgetType=widgetTypeWindow;
             }
-            pNewWidget->dirtyRegion.bIgnore = true;
+            pNewWidget->dirtyRegionListItem.bIgnore = true;
 
             LOG_INFO("[window] init,id:%d\n",nameId);
         }
@@ -134,23 +134,6 @@ void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent)
         return;
     }
     pWidget->isTransparent=isTransparent;
-}
-
-/**
- * @brief   window控件设置为静态
- *
- * @param   pWidget         window控件指针
- * @param   Static          true=不修改颜色或图片 false=需要动态刷图或修改颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic)
-{
-    if (pWidget == NULL)
-    {
-        return;
-    }
-    pWidget->isStatic=isStatic;
 }
 
 #if defined(__clang__)

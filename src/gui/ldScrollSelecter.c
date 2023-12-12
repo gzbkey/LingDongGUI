@@ -77,7 +77,7 @@ void ldScrollSelecterDel(ldScrollSelecter_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -119,7 +119,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
 {
     ldScrollSelecter_t *selecter;
 
-    selecter=ldGetWidgetById(info.receiverId);
+    selecter=ldBaseGetWidgetById(info.receiverId);
 
     switch (info.signalType)
     {
@@ -170,7 +170,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
     arm_2d_tile_t *tResTile;
     void **pNewStrGroup = NULL;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldScrollSelecter_t);
     pNewStrGroup=(void**)ldMalloc(sizeof (void*)*itemMax);
 
@@ -220,10 +220,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->moveOffset=1;
         pNewWidget->isAutoMove=false;
         pNewWidget->isWaitMove=false;
-        pNewWidget->dirtyRegion.ptNext=NULL;
-        pNewWidget->dirtyRegion.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegion.bIgnore = false;
-        pNewWidget->dirtyRegion.bUpdated = true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);
@@ -286,6 +286,7 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
         }
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
