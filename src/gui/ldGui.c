@@ -57,7 +57,7 @@ static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
-bool isUpdateBackground=false;
+//bool isUpdateBackground=false;
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
@@ -427,7 +427,7 @@ void ldGuiInit(arm_2d_scene_t *pSence)
     ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
     LOG_INFO("[sys] set dirty region\n");
 
-    isUpdateBackground=true;
+//    isUpdateBackground=true;
 }
 
 /**
@@ -451,11 +451,11 @@ void ldGuiLogicLoop(void)
  */
 void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    if(isUpdateBackground&&bIsNewFrame)
-    {
-        arm_2d_scene_player_update_scene_background(pSence->ptPlayer);
-        isUpdateBackground=false;
-    }
+//    if(isUpdateBackground&&bIsNewFrame)
+//    {
+//        arm_2d_scene_player_update_scene_background(pSence->ptPlayer);
+//        isUpdateBackground=false;
+//    }
 
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);

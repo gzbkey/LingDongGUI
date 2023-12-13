@@ -35,7 +35,7 @@ extern "C" {
 
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
-extern bool isUpdateBackground;
+//extern bool isUpdateBackground;
 
 void ldGuiInit(arm_2d_scene_t *pSence);
 void ldGuiLogicLoop(void);

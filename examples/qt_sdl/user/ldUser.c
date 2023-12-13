@@ -28,6 +28,8 @@ extern size_t xFreeBytesRemaining;
 
 //#define LD_PFB(object) ldBaseAddDirtyRegion(object,&pSence->ptDirtyRegion)
 
+#define LE_H          200
+
 void userInit(void)
 {
     obj=ldMalloc(1);
@@ -39,7 +41,7 @@ void userInit(void)
 
 //    LOG_DEBUG("win :%llu\n",xFreeBytesRemaining);
 
-    le=ldLineEditInit(1,BG_WIN,10,10,100,50,WENQUANYI_ZEN_HEI_REGULAR_16,10);
+    le=ldLineEditInit(1,BG_WIN,10,LE_H,100,50,WENQUANYI_ZEN_HEI_REGULAR_16,10);
 
     ldLineEditSetType(le,typeInt);
     kb=ldKeyboardInit(2,BG_WIN,WENQUANYI_ZEN_HEI_REGULAR_16);
@@ -67,13 +69,13 @@ void userLoop(void)
         if(isTop)
         {
 //        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFF);
-        ldLineEditMove(le,20,20);
+        ldLineEditMove(le,10,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
         }
         else
         {
 //        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFFFF);
-        ldLineEditMove(le,50,100);
+        ldLineEditMove(le,50,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
         }
 

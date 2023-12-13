@@ -172,7 +172,7 @@ static void _inputAsciiProcess(ldLineEdit_t *pWidget,uint8_t ascii)
     {
         ldBaseSetHidden(ldBaseGetWidgetById(pWidget->kbNameId),true);
         pWidget->isEditing=false;
-        xEmit(pWidget->nameId,SIGNAL_EDITING_FINISHED,0);
+        ldBaseBgMove(0,0);
         break;
     }
     default:
@@ -183,6 +183,7 @@ static void _inputAsciiProcess(ldLineEdit_t *pWidget,uint8_t ascii)
 static bool slotLineEditProcess(xConnectInfo_t info)
 {
     ldLineEdit_t *pWidget;
+    ldCommon_t *kb;
 
     pWidget=ldBaseGetWidgetById(info.receiverId);
 
@@ -195,7 +196,15 @@ static bool slotLineEditProcess(xConnectInfo_t info)
         gActiveEditType=pWidget->editType;
         if(pWidget->kbNameId)
         {
-            ldBaseSetHidden(ldBaseGetWidgetById(pWidget->kbNameId),false);
+            arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+
+            kb=ldBaseGetWidgetById(pWidget->kbNameId);
+            ldBaseSetHidden(kb,false);
+            if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
+            {
+                ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT);
+                ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
+            }
         }
         break;
     }
@@ -204,6 +213,7 @@ static bool slotLineEditProcess(xConnectInfo_t info)
         _inputAsciiProcess(pWidget,info.value);
         break;
     }
+
     default:
         break;
     }
@@ -328,7 +338,7 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->blinkFlag=!pWidget->blinkFlag;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

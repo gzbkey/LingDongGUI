@@ -29,6 +29,7 @@
 #include "ldImage.h"
 #include "ldButton.h"
 #include "ldText.h"
+#include "ldGui.h"
 #if USE_TLSF == 1
 #include "tlsf.h"
 #else
@@ -196,7 +197,7 @@ static bool ldBaseGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x
                     
                 if(pTempWidgetInfo->childList==NULL)//无子控件
                 {
-                    if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
+                    if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT))&&(!pTempWidgetInfo->isHidden))
                     {
                        *out_info= tempPos;//返回控件widget
                        return true;
@@ -1335,17 +1336,27 @@ void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSce
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion,bool bIsNewFrame)
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion,bool isAutoIgnore,bool bIsNewFrame)
 {
     if(bIsNewFrame)
     {
         switch (pWidget->dirtyRegionState)
         {
+        case none:
+        {
+            if(isAutoIgnore)
+            {
+                pWidget->dirtyRegionListItem.bIgnore=true;
+            }
+            break;
+        }
         case waitChange://扩张到新范围
         {
             arm_2d_region_t tempRegion;
             arm_2d_region_get_minimal_enclosure(pNewRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
+            pWidget->dirtyRegionListItem.bIgnore=false;
+            pWidget->dirtyRegionListItem.bUpdated=true;
             pWidget->dirtyRegionTemp=*pNewRegion;
             pWidget->dirtyRegionState=waitUpdate;
             break;
@@ -1353,6 +1364,8 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion
         case waitUpdate://缩小到新范围
         {
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
+            pWidget->dirtyRegionListItem.bIgnore=false;
+            pWidget->dirtyRegionListItem.bUpdated=true;
             pWidget->dirtyRegionState=none;
             break;
         }
@@ -1360,6 +1373,20 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion
             break;
         }
     }
+}
+
+void ldBaseBgMove(int16_t x,int16_t y)
+{
+    ldWindow_t *win=ldBaseGetWidgetById(0);
+    ldBaseMove(win,x,y);
+
+    //只考虑左移和上移
+    ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
+    ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
+    win->isDirtyRegionIgnore=true;
+    win->dirtyRegionListItem.bUpdated=true;
+
+//    isUpdateBackground=true;
 }
 
 #if defined(__clang__)

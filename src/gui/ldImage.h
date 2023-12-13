@@ -12,6 +12,7 @@ typedef struct {
     bool isWithMask:1;
     bool isTransparent:1;//window专用
     bool isColor:1;
+    bool isDirtyRegionIgnore:1;
     ldColor bgColor;
     ldColor specialColor;//maskColor charColor
 #if USE_OPACITY == 1

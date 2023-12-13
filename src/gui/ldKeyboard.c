@@ -462,11 +462,13 @@ static bool slotKBProcess(xConnectInfo_t info)
     {
     case SIGNAL_PRESS:
     {
+        ldPoint_t parentPos=ldBaseGetGlobalPos(pWidget->parentWidget);
+
         pWidget->clickPoint.iX=(int16_t)GET_SIGNAL_VALUE_X(info.value);
         pWidget->clickPoint.iY=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
-        pWidget->clickPoint.iX-=pResTile->tRegion.tLocation.iX;
-        pWidget->clickPoint.iY-=pResTile->tRegion.tLocation.iY;
+        pWidget->clickPoint.iX-=(pResTile->tRegion.tLocation.iX+parentPos.x);
+        pWidget->clickPoint.iY-=(pResTile->tRegion.tLocation.iY+parentPos.y);
 
         pWidget->isClick=false;
 
@@ -474,7 +476,10 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->targetDirtyRegion.tLocation.iX+=pResTile->tRegion.tLocation.iX;
         pWidget->targetDirtyRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
         pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionIgnore=false;
 
+        LOG_DEBUG("%d,%d\n",pResTile->tRegion.tLocation.iY,pWidget->clickPoint.iY);
+LOG_REGION("=======",pWidget->targetDirtyRegion);
         break;
     }
     case SIGNAL_RELEASE:
@@ -483,6 +488,8 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iY=-1;
         pWidget->isClick=true;
         xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionIgnore=true;
     }
     default:
         break;
@@ -551,6 +558,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         pNewWidget->dirtyRegionState=none;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
+        pNewWidget->isDirtyRegionIgnore=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -648,7 +656,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,pWidget->isDirtyRegionIgnore,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
