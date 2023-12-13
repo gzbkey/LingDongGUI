@@ -149,6 +149,7 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=none;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->targetDirtyRegion=tResTile->tRegion;
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -175,6 +176,19 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+    ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->bgImgAddr;
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+
     if (pWidget == NULL)
     {
         return;
@@ -185,18 +199,12 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,false,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        pResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-        ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
-#endif
-        pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-
-        ldBaseImage(&tTarget,pResTile,pWidget->isWithBgMask,255);
+        ldBaseImage(&tTarget,&tempRes,pWidget->isWithBgMask,255);
         arm_2d_op_wait_async(NULL);
 
         do {
@@ -324,6 +332,21 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
             arm_2d_op_wait_async(NULL);
 
+            if(bIsNewFrame)
+            {
+                LOG_REGION("1", pWidget->targetDirtyRegion);
+
+               LOG_REGION("2", *pWidget->op.Target.ptRegion);
+
+               ldPoint_t globalPos= ldBaseGetGlobalPos(pWidget);
+
+               pWidget->targetDirtyRegion=*pWidget->op.Target.ptRegion;
+               pWidget->targetDirtyRegion.tLocation.iX+=globalPos.x;
+               pWidget->targetDirtyRegion.tLocation.iY+=globalPos.y;
+               pWidget->dirtyRegionState=waitChange;
+
+               LOG_REGION("3", pWidget->targetDirtyRegion);
+            }
 //            arm_2d_helper_transform_update_dirty_regions(
 //                        &pWidget->helper,
 //                    &__centre_region,

@@ -214,14 +214,22 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
             }
             else
             {
-                pResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
+#if USE_VIRTUAL_RESOURCE == 0
+                arm_2d_tile_t tempRes=*pResTile;
+#else
+                arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+                ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
+                ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
+                ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->bgImgAddr;
 #endif
 #if USE_OPACITY == 1
-                ldBaseImage(&tTarget,pResTile,false,pWidget->opacity);
+                ldBaseImage(&tTarget,&tempRes,false,pWidget->opacity);
 #else
-                ldBaseImage(&tTarget,pResTile,false,255);
+                ldBaseImage(&tTarget,&tempRes,false,255);
 #endif
             }
             arm_2d_op_wait_async(NULL);

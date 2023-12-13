@@ -38,6 +38,8 @@ typedef struct {
     int16_t angle_x10;
     ldColor keyingOrMaskColor;
     arm_2d_op_trans_msk_opa_t op;
+    arm_2d_region_t targetDirtyRegion;
+
 //    arm_2d_helper_transform_t helper;
 }ldGauge_t;
 

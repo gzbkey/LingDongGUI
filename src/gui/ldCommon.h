@@ -60,7 +60,7 @@ extern "C" {
 #define SWAP(x,y)                               ((x) = (x)+(y),(y)=(x)-(y),(x)=(x)-(y))
 #endif
 
-#define ANGLE_2_RADIAN(angle)    ((angle)*0.017453292519943f)
+#define ANGLE_2_RADIAN(angle)    ((float)(angle)*0.0174533f)
 
 #define ldColor                                 COLOUR_INT
 

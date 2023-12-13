@@ -249,6 +249,14 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
     if (pWidget == NULL)
     {
         return;
@@ -306,11 +314,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
             }
             else
             {
-                pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+                ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
 #if USE_OPACITY == 1
-            ldBaseImage(&tTarget,pResTile,false,pWidget->opacity);
+            ldBaseImage(&tTarget,&tempRes,false,pWidget->opacity);
 #else
-            ldBaseImage(&tTarget,pResTile,false,255);
+            ldBaseImage(&tTarget,&tempRes,false,255);
 #endif
             }
             arm_2d_op_wait_async(NULL);

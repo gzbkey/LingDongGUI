@@ -186,18 +186,11 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t tResTile=pWidget->resource;
-    tResTile.bIsRoot=true;
-    tResTile.bHasEnforcedColour=true;
-    tResTile.tRegion.tLocation.iX=0;
-    tResTile.tRegion.tLocation.iY=0;
 #else
     arm_2d_vres_t tResTile=*((arm_2d_vres_t*)(&pWidget->resource));
-    tResTile.tTile.bIsRoot=true;
-    tResTile.tTile.bHasEnforcedColour=true;
-    tResTile.tTile.bVirtualResource=true;
-    tResTile.tTile.tRegion.tLocation.iX=0;
-    tResTile.tTile.tRegion.tLocation.iY=0;
 #endif
+    ((arm_2d_tile_t*)&tResTile)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tResTile)->tRegion.tLocation.iY=0;
 
     arm_2d_region_t tBarRegion = {
         .tLocation = {

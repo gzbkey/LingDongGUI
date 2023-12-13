@@ -1325,14 +1325,14 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
 
 void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion)
 {
-    arm_2d_region_list_item_t **pTempDirty;
+    arm_2d_region_list_item_t **ppTempDirty;
 
-    pTempDirty=ppSceneDirtyRegion;
-    while(*pTempDirty!=NULL)
+    ppTempDirty=ppSceneDirtyRegion;
+    while(*ppTempDirty!=NULL)
     {
-        pTempDirty=&(*pTempDirty)->ptNext;
+        ppTempDirty=&(*ppTempDirty)->ptNext;
     }
-    *pTempDirty=&pWidget->dirtyRegionListItem;
+    *ppTempDirty=&pWidget->dirtyRegionListItem;
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算
