@@ -24,10 +24,16 @@ extern "C" {
 #include "ldCommon.h"
 #include "qrcodegen.h"
 
+typedef enum {
+    eccLow = 0,
+    eccMedium,
+    eccQuartile,
+    eccHigh,
+}ldQRCodeEcc_t;
+
 typedef struct {
     LD_COMMON_ATTRIBUTES;
-    uint8_t qrEcc;
-    uint8_t qrMask;
+    ldQRCodeEcc_t qrEcc;
     uint8_t qrMaxVersion;
     uint8_t qrZoom;
     ldColor bgColor;
@@ -35,7 +41,8 @@ typedef struct {
     uint8_t* qrText;
 }ldQRCode_t;
 
-ldQRCode_t* ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t *qrText, uint16_t qrColor, uint16_t bgColor, uint8_t qrEcc, uint8_t qrMask, uint8_t qrMaxVersion, uint8_t qrZoom);
+ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom);
+
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldQRCodeDel(ldQRCode_t *pWidget);
 void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText);

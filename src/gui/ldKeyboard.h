@@ -28,14 +28,14 @@ typedef struct {
     bool isNumber:1;
     bool isClick:1;
     uint8_t upperState:2;
-    bool isDirtyRegionIgnore:1;
+    bool isDirtyRegionAutoIgnore:1;
     ldFontDict_t *pFontDict;
     arm_2d_location_t clickPoint;
     arm_2d_region_t targetDirtyRegion;
     uint8_t kbValue;
 }ldKeyboard_t;
 
-ldKeyboard_t* ldKeyboardInit(uint16_t nameId, uint16_t parentNameId, ldFontDict_t *pFontDict);
+ldKeyboard_t* ldKeyboardInit(uint16_t nameId, ldFontDict_t *pFontDict);
 void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldKeyboardDel(ldKeyboard_t *pWidget);
 

@@ -199,7 +199,7 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,false,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -334,26 +334,11 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
             if(bIsNewFrame)
             {
-                LOG_REGION("1", pWidget->targetDirtyRegion);
-
-               LOG_REGION("2", *pWidget->op.Target.ptRegion);
-
-               ldPoint_t globalPos= ldBaseGetGlobalPos(pWidget);
-
                pWidget->targetDirtyRegion=*pWidget->op.Target.ptRegion;
-               pWidget->targetDirtyRegion.tLocation.iX+=globalPos.x;
-               pWidget->targetDirtyRegion.tLocation.iY+=globalPos.y;
+//               pWidget->targetDirtyRegion.tLocation.iX+=pResTile->tRegion.tLocation.iX;
+//               pWidget->targetDirtyRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
                pWidget->dirtyRegionState=waitChange;
-
-               LOG_REGION("3", pWidget->targetDirtyRegion);
             }
-//            arm_2d_helper_transform_update_dirty_regions(
-//                        &pWidget->helper,
-//                    &__centre_region,
-//                    bIsNewFrame);
-
-
-//            arm_2d_op_wait_async(&pWidget->op.use_as__arm_2d_op_core_t);
         } while(0);
     }
 }

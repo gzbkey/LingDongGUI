@@ -303,6 +303,14 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
     if (pWidget == NULL)
     {
         return;
@@ -322,7 +330,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,false,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -397,33 +405,28 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         else
         {
             do{
-#if USE_VIRTUAL_RESOURCE == 0
-                arm_2d_tile_t srcTile=pWidget->resource;
-#else
-                arm_2d_vres_t srcTile=*(arm_2d_vres_t*)&pWidget->resource;
-#endif
-                ((arm_2d_tile_t*)&srcTile)->tRegion.tSize.iWidth=pWidget->boxWidth;
-                ((arm_2d_tile_t*)&srcTile)->tRegion.tSize.iHeight=pWidget->boxWidth;
+                tempRes.tRegion.tSize.iWidth=pWidget->boxWidth;
+                tempRes.tRegion.tSize.iHeight=pWidget->boxWidth;
 
                 //借用srcTile生成新tile
-                ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iX=0;
-                ((arm_2d_tile_t*)&srcTile)->tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
+                tempRes.tRegion.tLocation.iX=0;
+                tempRes.tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
 
                 if(pWidget->isChecked)
                 {
-                    ((arm_2d_tile_t*)&srcTile)->pchBuffer = (uint8_t *)pWidget->checkedImgAddr;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->checkedImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)&srcTile)->pTarget=pWidget->checkedImgAddr;
+                    ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->checkedImgAddr;
 #endif
-                    ldBaseImage(&tTarget,&srcTile,pWidget->isWithCheckedMask,255);
+                    ldBaseImage(&tTarget,&tempRes,pWidget->isWithCheckedMask,255);
                 }
                 else
                 {
-                    ((arm_2d_tile_t*)&srcTile)->pchBuffer = (uint8_t *)pWidget->uncheckedImgAddr;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->uncheckedImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)&srcTile)->pTarget=pWidget->uncheckedImgAddr;
+                    ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->uncheckedImgAddr;
 #endif
-                    ldBaseImage(&tTarget,&srcTile,pWidget->isWithUncheckedMask,255);
+                    ldBaseImage(&tTarget,&tempRes,pWidget->isWithUncheckedMask,255);
                 }
             }while(0);
         }
@@ -484,24 +487,6 @@ void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheck
 }
 
 /**
- * @brief   设置字体
- * 
- * @param   pWidget         目标控件指针
- * @param   pFontDict       字体
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict)
-{
-    if(pWidget==NULL)
-    {
-        return;
-    }
-    pWidget->pFontDict=pFontDict;
-    pWidget->align=LD_ALIGN_LEFT;
-}
-
-/**
  * @brief   设置显示文字
  * 
  * @param   pWidget         目标控件指针
@@ -509,7 +494,7 @@ void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-10
  */
-void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
+void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pStr)
 {
     if(pWidget==NULL)
     {
@@ -518,6 +503,8 @@ void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr)
     ldFree(pWidget->pStr);
     pWidget->pStr=LD_MALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
+    pWidget->pFontDict=pFontDict;
+    pWidget->align=LD_ALIGN_LEFT;
 }
 
 /**

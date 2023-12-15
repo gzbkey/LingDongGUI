@@ -285,7 +285,15 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,false,bIsNewFrame);
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -309,29 +317,22 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             arm_2d_draw_box(&tTarget,&displayRegion,1,LD_COLOR_LIGHT_GREY,255);
         }
 
-#if USE_VIRTUAL_RESOURCE == 0
-        arm_2d_tile_t tempRes;
-#else
-        arm_2d_vres_t tempRes;
-#endif
-        tempRes=pWidget->resource;
-        arm_2d_tile_t *pTempRes=(arm_2d_tile_t*)&tempRes;
-        pTempRes->tRegion.tLocation.iX=pResTile->tRegion.tSize.iWidth-pWidget->dropdownImgWidth-(pWidget->itemHeight-pWidget->dropdownImgWidth)/2;
-        pTempRes->tRegion.tLocation.iY=(pWidget->itemHeight-pWidget->dropdownImgHeight)/2;
-        pTempRes->tRegion.tSize.iWidth=pWidget->dropdownImgWidth;
-        pTempRes->tRegion.tSize.iHeight=pWidget->dropdownImgHeight;
-        pTempRes->pchBuffer = (uint8_t *)pWidget->dropdownImgAddr;
+        tempRes.tRegion.tLocation.iX=pResTile->tRegion.tSize.iWidth-pWidget->dropdownImgWidth-(pWidget->itemHeight-pWidget->dropdownImgWidth)/2;
+        tempRes.tRegion.tLocation.iY=(pWidget->itemHeight-pWidget->dropdownImgHeight)/2;
+        tempRes.tRegion.tSize.iWidth=pWidget->dropdownImgWidth;
+        tempRes.tRegion.tSize.iHeight=pWidget->dropdownImgHeight;
+        tempRes.pchBuffer = (uint8_t *)pWidget->dropdownImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-        ((arm_2d_vres_t*)pTempRes)->pTarget=pWidget->dropdownImgAddr;
+        ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->dropdownImgAddr;
 #endif
-        pTempRes->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        tempRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
 
         if(pWidget->dropdownImgAddr==dropDownV_png)
         {
-            pTempRes->bVirtualResource=false;
+            tempRes.bVirtualResource=false;
         }
 
-        ldBaseMaskImage(&tTarget,pTempRes,LD_COLOR_BLACK,255);
+        ldBaseMaskImage(&tTarget,&tempRes,LD_COLOR_BLACK,255);
 
         arm_2d_op_wait_async(NULL);
 

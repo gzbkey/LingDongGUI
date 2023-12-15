@@ -384,9 +384,6 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
 #else
     arm_2d_vres_t resource =*((arm_2d_vres_t*)pResTile);
 #endif
-    //root tile init
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iX=0;
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iY=0;
     arm_2d_location_t tCentre = {
                     .iX = (*(arm_2d_tile_t*)(&resource)).tRegion.tSize.iWidth >> 1,
                     .iY = (*(arm_2d_tile_t*)(&resource)).tRegion.tSize.iHeight >> 1,
@@ -1138,21 +1135,30 @@ void ldBaseSetAlign(ldChar_t **ppTextInfo,uint8_t align)
 arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTargetRegion)
 {
     arm_2d_region_t parentRegion={{0,0},{0,0}},outRegion;
+    ldPoint_t globalPos;
+    bool flag;
 
     if(pWidget->parentWidget==NULL)
     {
-        parentRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH;
-        parentRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT;
+        parentRegion.tSize.iWidth=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth;
+        parentRegion.tSize.iHeight=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
+        globalPos.x=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+        globalPos.y=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
     }
     else
     {
         parentRegion.tSize.iWidth=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iWidth;
         parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
+        globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
     }
-    arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
-    ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
+    flag=arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
+    if(flag==false)
+    {
+        return (arm_2d_region_t){{0,0},{0,0}};
+    }
     outRegion.tLocation.iX=outRegion.tLocation.iX+globalPos.x;
     outRegion.tLocation.iY=outRegion.tLocation.iY+globalPos.y;
+
     return outRegion;
 }
 
@@ -1336,7 +1342,7 @@ void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSce
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion,bool isAutoIgnore,bool bIsNewFrame)
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame)
 {
     if(bIsNewFrame)
     {
@@ -1344,7 +1350,7 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion
         {
         case none:
         {
-            if(isAutoIgnore)
+            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
             {
                 pWidget->dirtyRegionListItem.bIgnore=true;
             }
@@ -1353,11 +1359,15 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion
         case waitChange://扩张到新范围
         {
             arm_2d_region_t tempRegion;
-            arm_2d_region_get_minimal_enclosure(pNewRegion,&pWidget->dirtyRegionTemp,&tempRegion);
+
+            newRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+            newRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+
+            arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
             pWidget->dirtyRegionListItem.bIgnore=false;
             pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionTemp=*pNewRegion;
+            pWidget->dirtyRegionTemp=newRegion;
             pWidget->dirtyRegionState=waitUpdate;
             break;
         }
@@ -1375,6 +1385,24 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t *pNewRegion
     }
 }
 
+static void ldGuiUpdateDirtyRegion(xListNode* pLink)
+{
+    xListNode *temp_pos,*safePos;
+
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
+        {
+            ((ldCommon_t *)temp_pos->info)->dirtyRegionState=waitChange;
+
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            {
+                ldGuiUpdateDirtyRegion(((ldCommon_t *)temp_pos->info)->childList);
+            }
+        }
+    }
+}
+
 void ldBaseBgMove(int16_t x,int16_t y)
 {
     ldWindow_t *win=ldBaseGetWidgetById(0);
@@ -1383,9 +1411,10 @@ void ldBaseBgMove(int16_t x,int16_t y)
     //只考虑左移和上移
     ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
     ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
-    win->isDirtyRegionIgnore=true;
+    win->isDirtyRegionAutoIgnore=true;
     win->dirtyRegionListItem.bUpdated=true;
 
+    ldGuiUpdateDirtyRegion(&ldWidgetLink);
 //    isUpdateBackground=true;
 }
 

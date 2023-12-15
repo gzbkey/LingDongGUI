@@ -147,9 +147,9 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }
@@ -195,13 +195,14 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
     {
         return;
     }
-    
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
+
     if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
     {
         return;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,pWidget->isDirtyRegionIgnore,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

@@ -304,7 +304,11 @@ static bool slotTableProcess(xConnectInfo_t info)
     {
     case SIGNAL_PRESS:
     {
-        currentItem=ldTableItemAt(pWidget,(int16_t)GET_SIGNAL_VALUE_X(info.value),(int16_t)GET_SIGNAL_VALUE_Y(info.value));
+        ldPoint_t parentPos=ldBaseGetGlobalPos(pWidget->parentWidget);
+        x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-parentPos.x;
+        y=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-parentPos.y;
+
+        currentItem=ldTableItemAt(pWidget,x,y);
 
         _ldTableSelectItem(pWidget,currentItem);
 
@@ -329,9 +333,6 @@ static bool slotTableProcess(xConnectInfo_t info)
         if(currentItem->isButton)
         {
             arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(pWidget,pWidget->currentColumn,pWidget->currentRow);
-
-            x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
-            y=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
             if((x>=cellRegion.tLocation.iX)&&(y>=cellRegion.tLocation.iY)&&
                     (x<(cellRegion.tLocation.iX+cellRegion.tSize.iWidth))&&
@@ -486,7 +487,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         memset(pItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
         pNewWidget->isBgTransparent=false;
         pNewWidget->bgColor=LD_COLOR_WHITE_SMOKE;
-        pNewWidget->selectColor=LD_COLOR_DARK_GREEN;
+        pNewWidget->selectColor=__RGB(65,143,31);
         int16_t w=(width-itemSpace)/columnCount-itemSpace;
         for(uint8_t i=0;i<columnCount;i++)
         {
@@ -560,6 +561,8 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #else
     arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
 #endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     if (pWidget == NULL)
     {
@@ -571,6 +574,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -613,8 +617,6 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 {
                     ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
                     ((arm_2d_tile_t*)&tempRes)->tRegion=item->imgRegion;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
                     arm_2d_tile_generate_child(&tItemTile, &item->imgRegion, &tImgTile, false);
 

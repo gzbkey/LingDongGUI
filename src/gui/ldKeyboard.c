@@ -473,13 +473,11 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->isClick=false;
 
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
-        pWidget->targetDirtyRegion.tLocation.iX+=pResTile->tRegion.tLocation.iX;
-        pWidget->targetDirtyRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
+//        pWidget->targetDirtyRegion.tLocation.iX+=pResTile->tRegion.tLocation.iX;
+//        pWidget->targetDirtyRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionIgnore=false;
+        pWidget->isDirtyRegionAutoIgnore=false;
 
-        LOG_DEBUG("%d,%d\n",pResTile->tRegion.tLocation.iY,pWidget->clickPoint.iY);
-LOG_REGION("=======",pWidget->targetDirtyRegion);
         break;
     }
     case SIGNAL_RELEASE:
@@ -489,7 +487,7 @@ LOG_REGION("=======",pWidget->targetDirtyRegion);
         pWidget->isClick=true;
         xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionIgnore=true;
+        pWidget->isDirtyRegionAutoIgnore=true;
     }
     default:
         break;
@@ -501,20 +499,19 @@ LOG_REGION("=======",pWidget->targetDirtyRegion);
  * @brief   键盘初始化
  * 
  * @param   nameId          目标控件指针
- * @param   parentNameId    父控件id
  * @param   pFontDict       字体指针
  * @return  ldKeyboard_t*   新控件指针
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-23
  */
-ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t *pFontDict)
+ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
 {
     ldKeyboard_t *pNewWidget = NULL;
     xListNode *parentInfo;
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(0);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldKeyboard_t);
     if (pNewWidget != NULL)
     {
@@ -558,7 +555,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         pNewWidget->dirtyRegionState=none;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
-        pNewWidget->isDirtyRegionIgnore=true;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -652,11 +649,10 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 }
             }
         }
-
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,pWidget->isDirtyRegionIgnore,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

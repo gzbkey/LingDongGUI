@@ -197,7 +197,15 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
         }
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,&pResTile->tRegion,false,bIsNewFrame);
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -214,14 +222,6 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
             }
             else
             {
-#if USE_VIRTUAL_RESOURCE == 0
-                arm_2d_tile_t tempRes=*pResTile;
-#else
-                arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-                ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-                ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-
                 ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
                 ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->bgImgAddr;
