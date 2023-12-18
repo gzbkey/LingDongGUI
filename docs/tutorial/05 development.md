@@ -20,27 +20,34 @@ ldGui.c中添加新控件的头文件
 ## 功能库
 
 #### btnAction 按键处理
-
 这是一个独立的多功能按键库，可以对GUI按键和实体按键进行行为检测。ldgui内部已经调用该库，无需用户操作。
 
 ##### 信号
 该库可以检测以下信号/数据
 
 1. BTN_PRESS
+
     按下
 2. BTN_HOLD_DOWN
+
     按住不放
 3. BTN_RELEASE
+
     释放
 4. BTN_DOUBLE_CLICK
+
     双击
 5. BTN_REPEAT_COUNT
+
     获取连击次数
 6. BTN_HOLD_TIME
+
     按住不放的时间
 7. BTN_LONG_START
+
     长按触发一次
 8. BTN_LONG_SHOOT
+
     长按连续触发
 
 ##### 函数列表
@@ -278,15 +285,23 @@ if(xQueueGetLength(emitQueue)>0)
 
 ##### 配置
 * USE_LOG_COLOR
+
     =0 普通打印
+
     =1 彩色打印(需要控制台支持，推荐MobaXterm)
 * SET_LOG_LEVEL
-    #define LOG_LEVEL_NONE           (-1)
-    #define LOG_LEVEL_ERROR          (0)
-    #define LOG_LEVEL_WARNING        (1)
-    #define LOG_LEVEL_INFO           (2)
-    #define LOG_LEVEL_DEBUG          (3)
+
+    =LOG_LEVEL_NONE
+
+    =LOG_LEVEL_ERROR
+
+    =LOG_LEVEL_WARNING
+
+    =LOG_LEVEL_INFO
+
+    =LOG_LEVEL_DEBUG
 * LOG_PRINT
+
     默认为printf，可自定义串口硬件
 
 ##### 函数接口
