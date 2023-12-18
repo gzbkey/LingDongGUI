@@ -73,7 +73,7 @@ void ldImageDel(ldImage_t *pWidget)
     }
     else
     {
-        listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+        listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
         listInfo = ((ldCommon_t *)listInfo->info)->childList;
     }
 
@@ -90,7 +90,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     xListNode *parent_link;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldImage_t);
     if (pNewWidget != NULL)
     {
@@ -143,6 +143,13 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=waitChange;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }
@@ -176,12 +183,21 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
 #endif
 
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     if (pWidget == NULL)
     {
         return;
     }
-    
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
+
     if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
     {
         return;
@@ -197,7 +213,7 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
         }
         else
         {
-            ldBaseImage(&tTarget,pResTile,pWidget->isWithMask,IMG_OPACITY);
+            ldBaseImage(&tTarget,&tempRes,pWidget->isWithMask,IMG_OPACITY);
         }
     }
     arm_2d_op_wait_async(NULL);

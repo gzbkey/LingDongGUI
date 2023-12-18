@@ -39,6 +39,8 @@ void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor);
 void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align);
 void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor);
 void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity);
+void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint8_t day);
+void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint8_t second);
 
 #define ldDateTimeSetHidden          ldBaseSetHidden
 #define ldDateTimeMove               ldBaseMove

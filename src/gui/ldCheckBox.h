@@ -31,8 +31,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 void ldCheckBoxDel(ldCheckBox_t *pWidget);
 void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor);
 void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheckedImgAddr,bool isUncheckedMask,uint32_t checkedImgAddr,bool isCheckedMask);
-void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict);
-void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr);
+void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pStr);
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num);
 void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner);
 void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor);

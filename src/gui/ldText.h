@@ -35,6 +35,8 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset);
 void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue);
 void ldTextSetScroll(ldText_t *pWidget,bool isEnable);
 void ldTextSetOpacity(ldText_t *pWidget, uint8_t opacity);
+void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr);
+void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor);
 
 #define ldTextSetHidden        ldBaseSetHidden
 #define ldTextMove             ldBaseMove

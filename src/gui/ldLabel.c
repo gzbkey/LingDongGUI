@@ -69,7 +69,7 @@ void ldLabelDel(ldLabel_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -85,12 +85,11 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldLabel_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -102,7 +101,6 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -118,7 +116,6 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isTransparent=true;
         pNewWidget->pStr = NULL;
         pNewWidget->pFontDict = NULL;
@@ -128,6 +125,12 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         LOG_INFO("[label] init,id:%d\n",nameId);
     }
@@ -144,6 +147,13 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     if (pWidget == NULL)
     {
@@ -155,6 +165,7 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -171,15 +182,15 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
             }
             else
             {
-                pResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-                pResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
+                ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
+                ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
+                ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->bgImgAddr;
 #endif
 #if USE_OPACITY == 1
-                ldBaseImage(&tTarget,pResTile,false,pWidget->opacity);
+                ldBaseImage(&tTarget,&tempRes,false,pWidget->opacity);
 #else
-                ldBaseImage(&tTarget,pResTile,false,255);
+                ldBaseImage(&tTarget,&tempRes,false,255);
 #endif
 
             }

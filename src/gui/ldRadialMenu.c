@@ -76,7 +76,7 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -87,19 +87,22 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
 
 static bool slotMenuSelect(xConnectInfo_t info)
 {
-    ldRadialMenu_t *menu;
+    ldRadialMenu_t *pWidget;
     size_t value;
-    static int16_t pressX,pressY,nowX,nowY;
+    static int16_t pressX,pressY;
+    int16_t x,y;
 
     value=info.value;
-    menu=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
+
+    ldPoint_t widgetPos=ldBaseGetGlobalPos(pWidget);
 
     switch (info.signalType)
     {
     case SIGNAL_PRESS:
     {
-        pressX=(value>>16)&0xFFFF;
-        pressY=value&0xFFFF;
+        pressX=(int16_t)GET_SIGNAL_VALUE_X(info.value)-widgetPos.x;
+        pressY=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-widgetPos.y;
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
@@ -108,21 +111,17 @@ static bool slotMenuSelect(xConnectInfo_t info)
     }
     case SIGNAL_RELEASE:
     {
-        if((menu->isMove==false)&&(menu->offsetAngle==0))//只允许静止状态下选择
+        if((pWidget->isMove==false)&&(pWidget->offsetAngle==0))//只允许静止状态下选择
         {
-            nowX=(value>>16)&0xFFFF;
-            nowY=value&0xFFFF;
-            nowX-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
-            nowY-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
-            pressX-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iX;
-            pressY-=((arm_2d_tile_t*)&menu->resource)->tRegion.tLocation.iY;
+            x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-widgetPos.x;
+            y=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-widgetPos.y;
 
-            for(int8_t i=menu->itemCount-1;i>=0;i--)
+            for(int8_t i=pWidget->itemCount-1;i>=0;i--)
             {
-                if(((pressX>menu->pItemList[menu->showList[i]].pos.x)&&(pressX<(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(pressY>menu->pItemList[menu->showList[i]].pos.y)&&(pressY<(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1)))&&
-                        ((nowX>menu->pItemList[menu->showList[i]].pos.x)&&(nowX<(menu->pItemList[menu->showList[i]].pos.x+menu->pItemList[menu->showList[i]].size.width-1))&&(nowY>menu->pItemList[menu->showList[i]].pos.y)&&(nowY<(menu->pItemList[menu->showList[i]].pos.y+menu->pItemList[menu->showList[i]].size.height-1))))
+                if(((pressX>pWidget->pItemList[pWidget->showList[i]].pos.x)&&(pressX<(pWidget->pItemList[pWidget->showList[i]].pos.x+pWidget->pItemList[pWidget->showList[i]].size.width-1))&&(pressY>pWidget->pItemList[pWidget->showList[i]].pos.y)&&(pressY<(pWidget->pItemList[pWidget->showList[i]].pos.y+pWidget->pItemList[pWidget->showList[i]].size.height-1)))&&
+                   ((x     >pWidget->pItemList[pWidget->showList[i]].pos.x)&&(x     <(pWidget->pItemList[pWidget->showList[i]].pos.x+pWidget->pItemList[pWidget->showList[i]].size.width-1))&&(y     >pWidget->pItemList[pWidget->showList[i]].pos.y)&&(y     <(pWidget->pItemList[pWidget->showList[i]].pos.y+pWidget->pItemList[pWidget->showList[i]].size.height-1))))
                 {
-                    ldRadialMenuSelectItem(menu,menu->showList[i]);
+                    ldRadialMenuSelectItem(pWidget,pWidget->showList[i]);
                     break;
                 }
             }
@@ -135,44 +134,44 @@ static bool slotMenuSelect(xConnectInfo_t info)
         do{
             float preAngle;
             int8_t offsetItem;
-            nowX=(value>>16)&0xFFFF;
-            preAngle=360.0/menu->itemCount;
+            x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            preAngle=360.0/pWidget->itemCount;
 
-            if((nowX>=preAngle)||(nowX<=(-preAngle)))
+            if((x>=preAngle)||(x<=(-preAngle)))
             {
-                if(nowX>=360)
+                if(x>=360)
                 {
-                    nowX=359;
+                    x=359;
                 }
                 else
                 {
-                    if(nowX<=-360)
+                    if(x<=-360)
                     {
-                        nowX=-359;
+                        x=-359;
                     }
                 }
-                offsetItem=nowX/preAngle;
-                menu->offsetAngle=offsetItem*preAngle;
+                offsetItem=x/preAngle;
+                pWidget->offsetAngle=offsetItem*preAngle;
                 if(offsetItem>0)
                 {
-                    if((menu->selectItem-offsetItem)>=0)
+                    if((pWidget->selectItem-offsetItem)>=0)
                     {
-                        menu->targetItem=menu->selectItem-offsetItem;
+                        pWidget->targetItem=pWidget->selectItem-offsetItem;
                     }
                     else
                     {
-                        menu->targetItem=menu->itemCount+(menu->selectItem-offsetItem);
+                        pWidget->targetItem=pWidget->itemCount+(pWidget->selectItem-offsetItem);
                     }
                 }
                 else
                 {
-                    if((menu->selectItem-offsetItem)<menu->itemCount)
+                    if((pWidget->selectItem-offsetItem)<pWidget->itemCount)
                     {
-                        menu->targetItem=menu->selectItem-offsetItem;
+                        pWidget->targetItem=pWidget->selectItem-offsetItem;
                     }
                     else
                     {
-                        menu->targetItem=-offsetItem-(menu->itemCount-menu->selectItem);
+                        pWidget->targetItem=-offsetItem-(pWidget->itemCount-pWidget->selectItem);
                     }
                 }
             }
@@ -194,14 +193,13 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
     ldRadialMenuItem_t *pNewItemList;
     uint8_t *pNewShowList;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldRadialMenu_t);
     pNewItemList=ldMalloc(sizeof(ldRadialMenuItem_t)*itemMax);
     pNewShowList=ldMalloc(sizeof (uint8_t)*itemMax);
     if ((pNewWidget != NULL)&&(pNewItemList != NULL)&&(pNewShowList!=NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -213,7 +211,6 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -229,11 +226,9 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->itemCount=0;
         pNewWidget->pItemList=pNewItemList;
         pNewWidget->itemMax=itemMax;
-
         pNewWidget->originPos.x=tResTile->tRegion.tSize.iWidth>>1;
         pNewWidget->originPos.y=tResTile->tRegion.tSize.iHeight>>1;
         pNewWidget->xAxis=xAxis;
@@ -245,6 +240,12 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
@@ -337,6 +338,15 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
         return;
     }
 
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -412,6 +422,9 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #else
                     arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
 #endif
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
                     arm_2d_tile_t tempTile = impl_child_tile(tTarget,pWidget->pItemList[pWidget->showList[i]].pos.x,pWidget->pItemList[pWidget->showList[i]].pos.y,pWidget->pItemList[pWidget->showList[i]].size.width,pWidget->pItemList[pWidget->showList[i]].size.height);
 
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=pWidget->pItemList[pWidget->showList[i]].size.width;

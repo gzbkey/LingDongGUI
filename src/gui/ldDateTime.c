@@ -70,7 +70,7 @@ void ldDateTimeDel(ldDateTime_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -79,6 +79,20 @@ void ldDateTimeDel(ldDateTime_t *pWidget)
     }
 }
 
+/**
+ * @brief   日期时间控件初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   pFontDict       字体指针
+ * @return  ldDateTime_t*   新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict)
 {
     ldDateTime_t *pNewWidget = NULL;
@@ -86,12 +100,11 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldDateTime_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -103,7 +116,6 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -119,7 +131,6 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->align=LD_ALIGN_CENTER;
         pNewWidget->isTransparent=true;
@@ -132,6 +143,12 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->second=0;
         strcpy((char*)pNewWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
         pNewWidget->formatStrTemp[0]=0;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }
@@ -145,6 +162,15 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
+/**
+ * @brief   日期时间显示处理
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -158,6 +184,14 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     {
         return;
     }
+
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     if(bIsNewFrame)
     {
@@ -223,6 +257,7 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -247,6 +282,14 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     }
 }
 
+/**
+ * @brief   控件设置透明
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -256,6 +299,16 @@ void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   设置时间日期格式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            年:yyyy 月:mm 日:dd 时:hh 分:nn 秒:ss
+ *                          例子1: yyyy-mm-dd hh:nn:ss
+ *                          例子2: yyyy年mm月dd日 hh时nn分ss秒
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)
@@ -266,6 +319,14 @@ void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr)
     strcpy((char*)pWidget->formatStr,(char*)pStr);
 }
 
+/**
+ * @brief   设置文本颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文本颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
@@ -275,6 +336,18 @@ void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor)
     pWidget->charColor=charColor;
 }
 
+/**
+ * @brief   文本的对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)
@@ -284,6 +357,14 @@ void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align)
     pWidget->align=align;
 }
 
+/**
+ * @brief   设置底色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         底色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor)
 {
     if(pWidget==NULL)
@@ -294,6 +375,14 @@ void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor)
     pWidget->isTransparent=false;
 }
 
+/**
+ * @brief   设置不透明度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   opacity         0(透明)-255(不透明)
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
 void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity)
 {
     if (pWidget == NULL)
@@ -303,6 +392,48 @@ void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity)
 #if USE_OPACITY == 1
     pWidget->opacity=opacity;
 #endif
+}
+
+/**
+ * @brief   设置日期
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   year            年
+ * @param   month           月
+ * @param   day             日
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
+void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint8_t day)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+    pWidget->year=year;
+    pWidget->month=month;
+    pWidget->day=day;
+}
+
+/**
+ * @brief   设置时间
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   hour            时
+ * @param   minute          分
+ * @param   second          秒
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-06
+ */
+void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint8_t second)
+{
+    if (pWidget == NULL)
+    {
+        return;
+    }
+    pWidget->hour=hour;
+    pWidget->minute=minute;
+    pWidget->second=second;
 }
 
 #if defined(__clang__)

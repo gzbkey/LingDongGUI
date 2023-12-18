@@ -70,7 +70,7 @@ void ldQRCodeDel(ldQRCode_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -79,7 +79,29 @@ void ldQRCodeDel(ldQRCode_t *pWidget)
     }
 }
 
-ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, uint8_t qrEcc, uint8_t qrMask, uint8_t qrMaxVersion, uint8_t qrZoom)
+/**
+ * @brief   二维码初始化函数
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   qrText          二维码的内容文本
+ * @param   qrColor         二维码颜色
+ * @param   bgColor         底色
+ * @param   qrEcc           eccLow 容忍错误7%
+ *                          eccMedium 容忍错误15%
+ *                          eccQuartile 容忍错误25%
+ *                          eccHigh 容忍错误30%
+ * @param   qrMaxVersion    二维码版本，0-40，版本越高，尺寸越大
+ * @param   qrZoom          放大二维码倍数，1-255
+ * @return  ldQRCode_t*     新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-14
+ */
+ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom)
 {
     ldQRCode_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -87,14 +109,13 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
     arm_2d_tile_t *tResTile;
     uint8_t *pText = NULL;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldQRCode_t);
     pText = LD_MALLOC_STRING(qrText);
 
     if ((pNewWidget != NULL)&&(pText!=NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -106,7 +127,6 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -122,16 +142,20 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         strcpy((char *)pText,(const char *)qrText);
         pNewWidget->qrText=pText;
         pNewWidget->qrEcc=qrEcc;
-        pNewWidget->qrMask=qrMask;
         qrMaxVersion=(qrMaxVersion==0)?1:qrMaxVersion;
         pNewWidget->qrMaxVersion=qrMaxVersion;
         pNewWidget->qrZoom=qrZoom;
         pNewWidget->qrColor=qrColor;
         pNewWidget->bgColor=bgColor;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }
@@ -146,6 +170,15 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
     return pNewWidget;
 }
 
+/**
+ * @brief   二维码显示处理函数
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-14
+ */
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -159,7 +192,15 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
     {
         return;
     }
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -175,7 +216,7 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 
         if((qr0!=NULL)&&(tempBuffer!=NULL))
         {
-            ret = qrcodegen_encodeText((const char*)pWidget->qrText,tempBuffer, qr0, pWidget->qrEcc,pWidget->qrMaxVersion, pWidget->qrMaxVersion,pWidget->qrMask,true);
+            ret = qrcodegen_encodeText((const char*)pWidget->qrText,tempBuffer, qr0, pWidget->qrEcc,pWidget->qrMaxVersion, pWidget->qrMaxVersion,qrcodegen_Mask_AUTO,true);
 
             if (ret)
             {

@@ -44,17 +44,17 @@
 #endif
 
 #define KB_SPACE    5
-#define KB_ASCII_RELEASE_COLOR     GLCD_COLOR_WHITE
+#define KB_ASCII_RELEASE_COLOR     LD_COLOR_WHITE
 #define KB_ASCII_PRESS_COLOR     __RGB(188,191,206)
 #define KB_OTHER_RELEASE_COLOR     __RGB(168,176,189)
-#define KB_OTHER_PRESS_COLOR     GLCD_COLOR_WHITE
+#define KB_OTHER_PRESS_COLOR     LD_COLOR_WHITE
 
 #define KB_VALUE_NONE         0
 #define KB_VALUE_QWERTY_MODE  1
 #define KB_VALUE_NUMBER_MODE  2
 #define KB_VALUE_SHIFT        3
 
-static ldColor _shiftColor[3]={GLCD_COLOR_WHITE,GLCD_COLOR_BLACK,GLCD_COLOR_BLUE};
+static ldColor _shiftColor[3]={LD_COLOR_WHITE,LD_COLOR_BLACK,LD_COLOR_BLUE};
 
 static bool _keyboardDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -86,7 +86,7 @@ void ldKeyboardDel(ldKeyboard_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -95,12 +95,384 @@ void ldKeyboardDel(ldKeyboard_t *pWidget)
     }
 }
 
+static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
+{
+    arm_2d_region_t retRegion;
+    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+    retRegion.tLocation.iX=0;
+    retRegion.tLocation.iY=0;
+    int16_t btnW,btnH;
+    arm_2d_region_t bufferRegion={0},item_region;
+
+    if(pWidget->isNumber)
+    {
+        btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/4-KB_SPACE;
+        btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+
+        bufferRegion.tLocation.iX=0;
+        bufferRegion.tLocation.iY=0;
+        bufferRegion.tSize.iWidth=0;
+        bufferRegion.tSize.iHeight=0;
+
+        arm_2d_region_t leftRegion=retRegion;
+        leftRegion.tSize.iWidth=leftRegion.tSize.iWidth-btnW-(KB_SPACE*2);
+
+        arm_2d_region_t rightRegion=retRegion;
+        rightRegion.tLocation.iX=rightRegion.tSize.iWidth-btnW-(KB_SPACE*2);
+        rightRegion.tSize.iWidth=btnW+(KB_SPACE*2);
+
+        arm_2d_layout(leftRegion) {
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+
+
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE);
+            if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
+            {
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    retRegion=item_region;
+                    break;
+                }
+            }
+
+        }
+
+        bufferRegion.tLocation.iX=rightRegion.tLocation.iX;
+        bufferRegion.tLocation.iY=0;
+        bufferRegion.tSize.iWidth=0;
+        bufferRegion.tSize.iHeight=0;
+
+        arm_2d_layout(rightRegion) {
+            item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+            if(gActiveEditType==typeString)
+            {
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    retRegion=item_region;
+                    break;
+                }
+            }
+
+            item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH*2+KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+        }
+    }
+    else
+    {
+        btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/10-KB_SPACE;
+        btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+
+        bufferRegion.tLocation.iX=0;
+        bufferRegion.tLocation.iY=0;
+        bufferRegion.tSize.iWidth=0;
+        bufferRegion.tSize.iHeight=0;
+
+        arm_2d_layout(retRegion) {
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+
+
+
+
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE+(btnW+KB_SPACE)/2,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+
+
+
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+
+
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)*2,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+            item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE),btnH,KB_SPACE,0,KB_SPACE,0);
+            if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                retRegion=item_region;
+                break;
+            }
+
+        }
+    }
+    return retRegion;
+}
+
 static bool slotKBProcess(xConnectInfo_t info)
 {
     ldKeyboard_t *pWidget;
     arm_2d_tile_t *pResTile;
 
-    pWidget=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -108,13 +480,19 @@ static bool slotKBProcess(xConnectInfo_t info)
     {
     case SIGNAL_PRESS:
     {
+        ldPoint_t parentPos=ldBaseGetGlobalPos(pWidget->parentWidget);
+
         pWidget->clickPoint.iX=(int16_t)GET_SIGNAL_VALUE_X(info.value);
         pWidget->clickPoint.iY=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
-        pWidget->clickPoint.iX-=pResTile->tRegion.tLocation.iX;
-        pWidget->clickPoint.iY-=pResTile->tRegion.tLocation.iY;
+        pWidget->clickPoint.iX-=(pResTile->tRegion.tLocation.iX+parentPos.x);
+        pWidget->clickPoint.iY-=(pResTile->tRegion.tLocation.iY+parentPos.y);
 
         pWidget->isClick=false;
+
+        pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_RELEASE:
@@ -123,6 +501,8 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iY=-1;
         pWidget->isClick=true;
         xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=true;
     }
     default:
         break;
@@ -134,25 +514,23 @@ static bool slotKBProcess(xConnectInfo_t info)
  * @brief   键盘初始化
  * 
  * @param   nameId          目标控件指针
- * @param   parentNameId    父控件id
  * @param   pFontDict       字体指针
  * @return  ldKeyboard_t*   新控件指针
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-23
  */
-ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t *pFontDict)
+ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
 {
     ldKeyboard_t *pNewWidget = NULL;
     xListNode *parentInfo;
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(0);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldKeyboard_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -164,7 +542,6 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = true;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=0;
         tResTile->tRegion.tLocation.iY=LD_CFG_SCEEN_HEIGHT/2;
@@ -180,13 +557,20 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isNumber=false;
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->clickPoint.iX=-1;
         pNewWidget->clickPoint.iY=-1;
         pNewWidget->isClick=false;
         pNewWidget->upperState=0;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = true;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->targetDirtyRegion=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -213,7 +597,7 @@ static void _ldkeyboardNewButton(ldKeyboard_t *pWidget,arm_2d_tile_t *parentTile
 
 /**
  * @brief   键盘显示处理函数
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   pParentTile     父控件tile对象
  * @param   bIsNewFrame     新的一帧开始标志
@@ -226,6 +610,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     ldColor btnColor;
     uint16_t btnW,btnH;
     uint8_t letterOffset=0;
+    arm_2d_region_t bufferRegion={0},item_region;
 
     if (pWidget == NULL)
     {
@@ -234,6 +619,13 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
+        //强制脏矩阵覆盖控件
+        if(pResTile->tRegion.tSize.iWidth!=pWidget->dirtyRegionListItem.tRegion.tSize.iWidth)
+        {
+            pWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pWidget,&((arm_2d_tile_t*)&pWidget->resource)->tRegion);
+            pWidget->dirtyRegionTemp=pResTile->tRegion;
+            pWidget->targetDirtyRegion=pResTile->tRegion;
+        }
         return;
     }
 
@@ -273,10 +665,10 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 }
             }
         }
-
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -288,129 +680,135 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/4-KB_SPACE;
             btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
 
+            bufferRegion.tLocation.iX=0;
+            bufferRegion.tLocation.iY=0;
+            bufferRegion.tSize.iWidth=0;
+            bufferRegion.tSize.iHeight=0;
+
             arm_2d_region_t leftRegion=tTarget_canvas;
 
             leftRegion.tSize.iWidth=leftRegion.tSize.iWidth-btnW-(KB_SPACE*2);
 
             arm_2d_layout(leftRegion) {
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='1';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"1",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='1';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='2';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"2",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"1",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='2';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='3';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"3",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"2",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='3';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"3",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
 
 
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='4';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"4",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='4';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='5';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"5",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"4",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='5';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='6';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"6",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"5",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='6';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"6",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
 
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='7';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"7",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='7';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='8';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"8",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"7",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='8';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='9';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"9",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"8",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='9';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"9",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
 
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='-';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
+                }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"±",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue='0';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
+                }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"0",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE);
+                if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
+                {
+                    if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='-';
+                        pWidget->kbValue='.';
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"±",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)".",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,KB_SPACE) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue='0';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"0",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
-                }
-                __item_horizontal(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
-                    if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
-                    {
-                        if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                            btnColor=KB_ASCII_PRESS_COLOR;
-                            pWidget->kbValue='.';
-                        }else{
-                            btnColor=KB_ASCII_RELEASE_COLOR;
-                        }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)".",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
-                    }
-                }
+
             }
 
             arm_2d_region_t rightRegion=tTarget_canvas;
@@ -418,43 +816,53 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             rightRegion.tLocation.iX=rightRegion.tSize.iWidth-btnW-(KB_SPACE*2);
             rightRegion.tSize.iWidth=btnW+(KB_SPACE*2);
 
+            bufferRegion.tLocation.iX=rightRegion.tLocation.iX;
+            bufferRegion.tLocation.iY=0;
+            bufferRegion.tSize.iWidth=0;
+            bufferRegion.tSize.iHeight=0;
+
             arm_2d_layout(rightRegion) {
-                __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
+                item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                    pWidget->kbValue=0x08;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
+                }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"<-",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
+                if(gActiveEditType==typeString)
+                {
+                    if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
-                        pWidget->kbValue=0x08;
+                        pWidget->kbValue=KB_VALUE_QWERTY_MODE;
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"ABC",btnColor,LD_COLOR_BLACK,bIsNewFrame);
                 }
-                __item_vertical(btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0) {
-                    if(gActiveEditType==typeString)
-                    {
-                        if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                            btnColor=KB_OTHER_PRESS_COLOR;
-                            pWidget->kbValue=KB_VALUE_QWERTY_MODE;
-                        }else{
-                            btnColor=KB_OTHER_RELEASE_COLOR;
-                        }
-                        _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"ABC",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
-                    }
+
+                item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH*2+KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                    pWidget->kbValue=0x0d;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
                 }
-                __item_vertical(btnW,btnH*2+KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_OTHER_PRESS_COLOR;
-                        pWidget->kbValue=0x0d;
-                    }else{
-                        btnColor=KB_OTHER_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"Enter",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
-                }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"Enter",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
             }
         }
         else
         {
             btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/10-KB_SPACE;
             btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+
+            bufferRegion.tLocation.iX=0;
+            bufferRegion.tLocation.iY=0;
+            bufferRegion.tSize.iWidth=0;
+            bufferRegion.tSize.iHeight=0;
 
             if(pWidget->upperState==0)
             {
@@ -467,351 +875,351 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             uint8_t charBuf[2]={0};
 
             arm_2d_layout(tTarget_canvas) {
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='q'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='q'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='w'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='w'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='e'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='e'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='r'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+                
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='r'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='t'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+                
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='t'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='y'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='y'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='u'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='u'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='i'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='i'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='o'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='o'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='p'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='p'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
 
 
 
 
-                __item_horizontal(btnW,btnH,KB_SPACE+(btnW+KB_SPACE)/2,0,KB_SPACE,0) {
-                    charBuf[0]='a'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE+(btnW+KB_SPACE)/2,0,KB_SPACE,0);
+                charBuf[0]='a'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='s'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='s'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='d'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='d'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='f'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='f'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='g'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='g'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='h'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='h'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='j'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='j'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='k'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='k'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='l'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='l'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
 
 
 
-                __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_OTHER_PRESS_COLOR;
-                        pWidget->kbValue=KB_VALUE_SHIFT;
-                    }else{
-                        btnColor=KB_OTHER_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"shift",btnColor,_shiftColor[pWidget->upperState],bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                    pWidget->kbValue=KB_VALUE_SHIFT;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='z'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"shift",btnColor,_shiftColor[pWidget->upperState],bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='z'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='x'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='x'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='c'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='c'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='v'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='v'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='b'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='b'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='n'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='n'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='m'-letterOffset;
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='m'-letterOffset;
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_OTHER_PRESS_COLOR;
-                        pWidget->kbValue=0x08;
-                    }else{
-                        btnColor=KB_OTHER_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"<-",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                    pWidget->kbValue=0x08;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"<-",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
 
 
-                __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_OTHER_PRESS_COLOR;
-                    }else{
-                        btnColor=KB_OTHER_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"!@",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_OTHER_PRESS_COLOR;
-                        pWidget->kbValue=KB_VALUE_NUMBER_MODE;
-                    }else{
-                        btnColor=KB_OTHER_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"123",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"!@",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                    pWidget->kbValue=KB_VALUE_NUMBER_MODE;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='.';
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,charBuf,btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"123",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='.';
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW+(btnW+KB_SPACE)*2,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=' ';
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"space",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)*2,btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=' ';
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW,btnH,KB_SPACE,0,KB_SPACE,0) {
-                    charBuf[0]='?';
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_ASCII_PRESS_COLOR;
-                        pWidget->kbValue=charBuf[0];
-                    }else{
-                        btnColor=KB_ASCII_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"?",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
+                charBuf[0]='?';
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_ASCII_PRESS_COLOR;
+                    pWidget->kbValue=charBuf[0];
+                }else{
+                    btnColor=KB_ASCII_RELEASE_COLOR;
                 }
-                __item_horizontal(btnW+(btnW+KB_SPACE),btnH,KB_SPACE,0,KB_SPACE,0) {
-                    if(arm_2d_is_point_inside_region(&__item_region,&pWidget->clickPoint)){
-                        btnColor=KB_OTHER_PRESS_COLOR;
-                        pWidget->kbValue=0x0d;
-                    }else{
-                        btnColor=KB_OTHER_RELEASE_COLOR;
-                    }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&__item_region,(uint8_t*)"Enter",btnColor,GLCD_COLOR_BLACK,bIsNewFrame);
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"?",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
+                item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE),btnH,KB_SPACE,0,KB_SPACE,0);
+                if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
+                    btnColor=KB_OTHER_PRESS_COLOR;
+                    pWidget->kbValue=0x0d;
+                }else{
+                    btnColor=KB_OTHER_RELEASE_COLOR;
                 }
+                _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"Enter",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+
             }
         }
 

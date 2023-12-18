@@ -51,33 +51,33 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your screen
 #ifndef __DISP0_CFG_COLOUR_DEPTH__
-#   define __DISP0_CFG_COLOUR_DEPTH__                              LD_CFG_COLOR_DEPTH
+#   define __DISP0_CFG_COLOUR_DEPTH__                              16
 #endif
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               LD_CFG_SCEEN_WIDTH
+#   define __DISP0_CFG_SCEEN_WIDTH__                               320
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              LD_CFG_SCEEN_HEIGHT
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              240
 #endif
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           480
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           320
 #endif
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          272
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          240
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -134,6 +134,18 @@ extern "C" {
 #   define __DISP0_CFG_DEBUG_DIRTY_REGIONS__                       0
 #endif
 
+// <q> Enable Dirty Region Optimization Service
+// <i> Optimize dirty regions to avoid fresh overlapped areas
+#ifndef __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__
+#   define __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__                    1
+#endif
+
+// <o> Dirty Region Pool Size <4-255>
+// <i> The number of dirty region items available for the dirty region optimization service
+#ifndef __DISP0_CFG_DIRTY_REGION_POOL_SIZE__
+#   define __DISP0_CFG_DIRTY_REGION_POOL_SIZE__                    8
+#endif
+
 // <q> Swap the high and low bytes
 // <i> Swap the high and low bytes of the 16bit-pixels
 #ifndef __DISP0_CFG_SWAP_RGB16_HIGH_AND_LOW_BYTES__
@@ -167,14 +179,8 @@ extern "C" {
 // <q>Enable the virtual resource helper service
 // <i> Introduce a helper service for loading virtual resources.
 // <i> This feature is disabled by default.
-#if USE_VIRTUAL_RESOURCE == 0
 #ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 #   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   0
-#endif
-#else
-#ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   1
-#endif
 #endif
 
 // <q>Use heap to allocate buffer in the virtual resource helper service
@@ -344,8 +350,8 @@ bool __disp_adapter0_request_2d_copy(   arm_2d_helper_3fb_t *ptThis,
 
 /*!
  * \brief the handler for the 2d copy complete event.
- * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and
- *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user
+ * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and 
+ *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user 
  *       MUST call this function to notify the PFB helper that the previous
  *       asynchronouse 2d copy is complete. 
  * \note When people using DMA+ISR to offload CPU, this fucntion is called in 
@@ -356,8 +362,8 @@ void disp_adapter0_insert_2d_copy_complete_event_handler(void);
 
 /*!
  * \brief the handler for the dma copy complete event.
- * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and
- *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user
+ * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and 
+ *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user 
  *       MUST call this function to notify the PFB helper that the previous
  *       dma copy is complete. 
  * \note When people using DMA+ISR to offload CPU, this fucntion is called in 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef _LD_KEYBOARD_H_
-#define _LD_KEYBOARD_H_
+#ifndef _LD_ARC_H_
+#define _LD_ARC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,26 +25,20 @@ extern "C" {
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;
-    bool isNumber:1;
-    bool isClick:1;
-    uint8_t upperState:2;
-    bool isDirtyRegionAutoIgnore:1;
-    ldFontDict_t *pFontDict;
-    arm_2d_location_t clickPoint;
-    arm_2d_region_t targetDirtyRegion;
-    uint8_t kbValue;
-}ldKeyboard_t;
+    // add other variable
+}ldArc_t;
 
-ldKeyboard_t* ldKeyboardInit(uint16_t nameId, ldFontDict_t *pFontDict);
-void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-void ldKeyboardDel(ldKeyboard_t *pWidget);
+ldArc_t* ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldArcDel(ldArc_t *pWidget);
 
 
-#define ldKeyboardSetHidden          ldBaseSetHidden
-#define ldKeyboardMove               ldBaseMove
+
+#define ldArcSetHidden          ldBaseSetHidden
+#define ldArcMove               ldBaseMove
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_LD_KEYBOARD_H_
+#endif //_LD_ARC_H_

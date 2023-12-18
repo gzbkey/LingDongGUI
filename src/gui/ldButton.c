@@ -72,7 +72,7 @@ void ldButtonDel(ldButton_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -85,7 +85,7 @@ static bool slotButtonToggle(xConnectInfo_t info)
 {
     ldButton_t *btn;
 
-    btn=ldGetWidgetById(info.receiverId);
+    btn=ldBaseGetWidgetById(info.receiverId);
 
     if(info.signalType==SIGNAL_PRESS)
     {
@@ -119,12 +119,11 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     xListNode *parentList;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldButton_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -169,6 +168,12 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
@@ -182,6 +187,140 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         LOG_ERROR("[button] init failed,id:%d\n",nameId);
     }
     return pNewWidget;
+}
+
+/**
+ * @brief   按键循环处理函数
+ *
+ * @param   pWidget         目标控件指针
+ * @param   pParentTile     父控件tile对象
+ * @param   bIsNewFrame     新的一帧开始标志
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-11-09
+ */
+void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+{
+    uint32_t btnColor;
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
+    if (pWidget == NULL)
+    {
+        return;
+    }
+
+    if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
+    {
+        return;
+    }
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+
+    arm_2d_container(pParentTile,tTarget , &newRegion)
+    {
+        if(!pWidget->isTransparent)
+        {
+            if ((pWidget->releaseImgAddr==LD_ADDR_NONE)&&(pWidget->pressImgAddr==LD_ADDR_NONE))//color
+            {
+                if(pWidget->isPressed)
+                {
+                    btnColor=pWidget->pressColor;
+                }
+                else
+                {
+                    btnColor=pWidget->releaseColor;
+                }
+                if(pWidget->isCorner)
+                {
+                    draw_round_corner_box(&tTarget,
+                                                &((arm_2d_tile_t*)&tempRes)->tRegion,
+                                                btnColor,
+                                                255,
+                                                bIsNewFrame);
+                }
+                else
+                {
+                    ldBaseColor(&tTarget,btnColor,255);
+                }
+            }
+            else
+            {
+                if(pWidget->isPressed)
+                {
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->pressImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                    ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->pressImgAddr;
+#endif
+                    if(!pWidget->isCorner)
+                    {
+                        ldBaseImage(&tTarget,&tempRes,pWidget->isWithPressMask,255);
+                    }
+                }
+                else
+                {
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->releaseImgAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                    ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->releaseImgAddr;
+#endif
+                    if(!pWidget->isCorner)
+                    {
+                        ldBaseImage(&tTarget,&tempRes,pWidget->isWithReleaseMask,255);
+                    }
+                }
+                if(pWidget->isCorner)
+                {
+                    draw_round_corner_image((arm_2d_tile_t*)&tempRes,
+                                            &tTarget,
+                                            &((arm_2d_tile_t*)&tempRes)->tRegion,
+                                            bIsNewFrame);
+                }
+            }
+            arm_2d_op_wait_async(NULL);
+
+            if(pWidget->pStr!=NULL)
+            {
+                ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
+                arm_2d_op_wait_async(NULL);
+            }
+
+            if(pWidget->isSelected)
+            {
+                if (pWidget->selectMaskAddr==LD_ADDR_NONE)
+                {
+                    if(pWidget->isCorner)
+                    {
+                        draw_round_corner_border(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,pWidget->selectColor,
+                                                 (arm_2d_border_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY},
+                                                 (arm_2d_corner_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY});
+                    }
+                    else
+                    {
+                        arm_2d_draw_box(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,3,pWidget->selectColor,SELECT_COLOR_OPACITY);
+                    }
+                }
+                else
+                {
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
+                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
+#if USE_VIRTUAL_RESOURCE == 1
+                    tempRes.pTarget=pWidget->selectMaskAddr;
+#endif
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+                    ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->selectColor,255);
+                }
+                arm_2d_op_wait_async(NULL);
+            }
+        }
+    }
 }
 
 /**
@@ -330,156 +469,6 @@ void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
         return;
     }
     pWidget->isSelected=isSelected;
-}
-
-/**
- * @brief   按键循环处理函数
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
-{
-    uint32_t btnColor;
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes;
-#else
-    arm_2d_vres_t tempRes;
-#endif
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-    
-    if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
-    {
-        return;
-    }
-
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
-
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(!pWidget->isTransparent)
-        {
-            if ((pWidget->releaseImgAddr==LD_ADDR_NONE)&&(pWidget->pressImgAddr==LD_ADDR_NONE))//color
-            {
-                if(pWidget->isPressed)
-                {
-                    btnColor=pWidget->pressColor;
-                }
-                else
-                {
-                    btnColor=pWidget->releaseColor;
-                }
-                if(pWidget->isCorner)
-                {
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = pResTile->tRegion.tSize;//tTarget.tRegion.tSize;
-                    draw_round_corner_box(&tTarget,
-                                                &((arm_2d_tile_t*)&tempRes)->tRegion,
-                                                btnColor,
-                                                255,
-                                                bIsNewFrame);
-                }
-                else
-                {
-                    ldBaseColor(&tTarget,btnColor,255);
-                }
-            }
-            else
-            {
-                if(pWidget->isPressed)
-                {
-                    pResTile->pchBuffer = (uint8_t *)pWidget->pressImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->pressImgAddr;
-#endif
-                    if(!pWidget->isCorner)
-                    {
-                        ldBaseImage(&tTarget,pResTile,pWidget->isWithPressMask,255);
-                    }
-                }
-                else
-                {
-                    pResTile->pchBuffer = (uint8_t *)pWidget->releaseImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->releaseImgAddr;
-#endif
-                    if(!pWidget->isCorner)
-                    {
-                        ldBaseImage(&tTarget,pResTile,pWidget->isWithReleaseMask,255);
-                    }
-                }
-                if(pWidget->isCorner)
-                {
-#if USE_VIRTUAL_RESOURCE == 0
-                    tempRes=*pResTile;
-#else
-                    tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    draw_round_corner_image((arm_2d_tile_t*)&tempRes,
-                                            &tTarget,
-                                            &((arm_2d_tile_t*)&tempRes)->tRegion,
-                                            bIsNewFrame);
-                }
-            }
-            arm_2d_op_wait_async(NULL);
-
-            if(pWidget->pStr!=NULL)
-            {
-                ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
-                arm_2d_op_wait_async(NULL);
-            }
-
-            if(pWidget->isSelected)
-            {
-                if (pWidget->selectMaskAddr==LD_ADDR_NONE)
-                {
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize = pResTile->tRegion.tSize;//tTarget.tRegion.tSize;
-
-                    if(pWidget->isCorner)
-                    {
-                        draw_round_corner_border(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,pWidget->selectColor,
-                                                 (arm_2d_border_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY},
-                                                 (arm_2d_corner_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY});
-                    }
-                    else
-                    {
-                        arm_2d_draw_box(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,3,pWidget->selectColor,SELECT_COLOR_OPACITY);
-                    }
-                }
-                else
-                {
-#if USE_VIRTUAL_RESOURCE == 0
-                    tempRes=*pResTile;
-                    tempRes.tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
-                    tempRes.pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
-#else
-                    tempRes=*((arm_2d_vres_t*)pResTile);
-                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
-                    tempRes.pTarget=pWidget->selectMaskAddr;
-                    tempRes.Load = &__disp_adapter0_vres_asset_loader;
-                    tempRes.Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-                    ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->selectColor,255);
-                }
-                arm_2d_op_wait_async(NULL);
-            }
-        }
-    }
 }
 
 /**

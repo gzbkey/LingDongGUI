@@ -64,7 +64,7 @@ void ldWindowDel(ldWindow_t *pWidget)
 
     LOG_INFO("[window] del,id:%d\n",pWidget->nameId);
 
-    listInfo=ldGetWidgetInfoById(pWidget->nameId);
+    listInfo=ldBaseGetWidgetInfoById(pWidget->nameId);
 
     if(listInfo!=NULL)
     {
@@ -105,9 +105,9 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
                 pNewWidget->isTransparent=true;
                 pNewWidget->widgetType=widgetTypeWindow;
             }
+            pNewWidget->isDirtyRegionAutoIgnore=true;
 
             LOG_INFO("[window] init,id:%d\n",nameId);
-
         }
         else
         {
@@ -135,8 +135,6 @@ void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent)
     }
     pWidget->isTransparent=isTransparent;
 }
-
-
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

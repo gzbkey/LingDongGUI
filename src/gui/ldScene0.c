@@ -132,7 +132,7 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     {
         ldGuiQuit();
         pageNumNow=pageTarget;
-        ldGuiInit();
+        ldGuiInit(ptScene);
 //        arm_2d_scene1_init(&DISP0_ADAPTER);
 //        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
     }
@@ -160,7 +160,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_background_handler)
     /*-----------------------draw back ground begin-----------------------*/
 
 
-
     /*-----------------------draw back ground end  -----------------------*/
     arm_2d_op_wait_async(NULL);
 
@@ -177,7 +176,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
 
-        ldGuiLoop(ptTile,bIsNewFrame);
+        ldGuiLoop(ptThis,ptTile,bIsNewFrame);
 
 
     /*-----------------------draw the foreground end  -----------------------*/
@@ -193,43 +192,6 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 {
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
-
-    /*! define dirty regions */
-    IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
-
-        /* a dirty region to be specified at runtime*/
-        ADD_REGION_TO_LIST(s_tDirtyRegions,
-            0  /* initialize at runtime later */
-        ),
-        
-        /* add the last region:
-         * it is the top left corner for text display 
-         */
-        ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = {
-                .iWidth = __GLCD_CFG_SCEEN_WIDTH__,
-                .iHeight = 8,
-            },
-        ),
-
-    END_IMPL_ARM_2D_REGION_LIST()
-    
-    /* get the screen region */
-    arm_2d_region_t tScreen
-        = arm_2d_helper_pfb_get_display_area(
-            &ptDispAdapter->use_as__arm_2d_helper_pfb_t);
-    
-    /* initialise dirty region 0 at runtime
-     * this demo shows that we create a region in the centre of a screen(320*240)
-     * for a image stored in the tile c_tileCMSISLogoMask
-     */
-//    arm_2d_align_centre(tScreen, c_tileCMSISLogoMask.tRegion.tSize) {
-//        s_tDirtyRegions[0].tRegion = __centre_region;
-//    }
     
     if (NULL == ptThis) {
         ptThis = (user_scene_0_t *)malloc(sizeof(user_scene_0_t));
@@ -248,20 +210,20 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
              */
             //.fnBackground   = &__pfb_draw_scene0_background_handler,
             .fnScene        = &__pfb_draw_scene0_handler,
-            .ptDirtyRegion  = NULL,//(arm_2d_region_list_item_t *)s_tDirtyRegions,
+            .ptDirtyRegion  = NULL,
             
 
             //.fnOnBGStart    = &__on_scene0_background_start,
             //.fnOnBGComplete = &__on_scene0_background_complete,
             .fnOnFrameStart = &__on_scene0_frame_start,
-            .fnBeforeSwitchOut = &__before_scene0_switching_out,
+            //.fnBeforeSwitchOut = &__before_scene0_switching_out,
             .fnOnFrameCPL   = &__on_scene0_frame_complete,
             .fnDepose       = &__on_scene0_depose,
         },
         .bUserAllocated = bUserAllocated,
     };
 
-    ldGuiInit();
+    ldGuiInit(ptThis);
     
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 

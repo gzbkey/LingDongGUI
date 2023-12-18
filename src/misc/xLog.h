@@ -54,10 +54,14 @@ extern "C" {
 #endif
 #if (SET_LOG_LEVEL>=LOG_LEVEL_DEBUG)
 #define LOG_DEBUG(fmt, ...)      LOG_PRINT(ANSI_RESET"[D] " fmt ANSI_RESET,##__VA_ARGS__)
-#define LOG_REGION(str,region)   LOG_PRINT("[REGION] %s %d,%d,%d,%d\n",str,region.tLocation.iX,region.tLocation.iY,region.tSize.iWidth,region.tSize.iHeight);
+#define LOG_REGION(str,region)   LOG_PRINT("[REGION] %s %d,%d,%d,%d\n",str,(region).tLocation.iX,(region).tLocation.iY,(region).tSize.iWidth,(region).tSize.iHeight);
+#define LOG_POINT(str,point)     LOG_PRINT("[POINT] %s x=%d,y=%d\n",str,(point).x,(point).y);
+#define LOG_XY(str,x,y)          LOG_PRINT("[XY] %s x=%d,y=%d\n",str,(x),(y));
 #else
 #define LOG_DEBUG(...)           {}
 #define LOG_REGION(...)          {}
+#define LOG_POINT(...)           {}
+#define LOG_XY(...)              {}
 #endif
 
 

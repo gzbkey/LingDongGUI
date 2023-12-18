@@ -29,6 +29,7 @@
 #include "ldImage.h"
 #include "ldButton.h"
 #include "ldText.h"
+#include "ldGui.h"
 #if USE_TLSF == 1
 #include "tlsf.h"
 #else
@@ -109,7 +110,7 @@ __WEAK void ldFree(void *p)
 //#endif
 //}
 
-static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
+static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
     xListNode *tempPos,*safePos;
     ldCommon_t *pTempWidgetInfo;
@@ -134,7 +135,7 @@ static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nam
                 }
                 else
                 {
-                    if(ldGetInfoByName(pTempWidgetInfo->childList,out_info,nameId)==true)
+                    if(ldBaseGetInfoByName(pTempWidgetInfo->childList,out_info,nameId)==true)
                     {
                         return true;
                     }
@@ -147,27 +148,27 @@ static bool ldGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nam
 }
 
 
-xListNode* ldGetWidgetInfoById(uint16_t nameId)
+xListNode* ldBaseGetWidgetInfoById(uint16_t nameId)
 {
     xListNode * pListInfo;
-    if(ldGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
+    if(ldBaseGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
     {
         return pListInfo;
     }
     return NULL;
 }
 
-void* ldGetWidgetById(uint16_t nameId)
+void* ldBaseGetWidgetById(uint16_t nameId)
 {
     xListNode * pListInfo;
-    if(ldGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
+    if(ldBaseGetInfoByName(&ldWidgetLink,&pListInfo,nameId)==true)
     {
         return pListInfo->info;
     }
     return NULL;
 }
 
-static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int16_t y)
+static bool ldBaseGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int16_t y)
 {
     xListNode *tempPos,*safePos;
     xListNode *pListInfo2;
@@ -190,13 +191,13 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
                 pTempWidgetInfo=(ldCommon_t*)(tempPos->info);
                 
                 //获取全局坐标，用绝对值坐标进行比较
-                posT= ldGetGlobalPos(pTempWidgetInfo);
+                posT= ldBaseGetGlobalPos(pTempWidgetInfo);
                 widthT=(*(arm_2d_tile_t*)&(pTempWidgetInfo->resource)).tRegion.tSize.iWidth;
                 heightT=(*(arm_2d_tile_t*)&(pTempWidgetInfo->resource)).tRegion.tSize.iHeight;
                     
                 if(pTempWidgetInfo->childList==NULL)//无子控件
                 {
-                    if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
+                    if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT))&&(!pTempWidgetInfo->isHidden))
                     {
                        *out_info= tempPos;//返回控件widget
                        return true;
@@ -209,7 +210,7 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
                         //判断在窗体范围内
                         if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT)))
                         {
-                            if(ldGetInfoByPos(pTempWidgetInfo->childList,&pListInfo2,x,y)==true)
+                            if(ldBaseGetInfoByPos(pTempWidgetInfo->childList,&pListInfo2,x,y)==true)
                             {
                                 *out_info= pListInfo2;
                                 return true;
@@ -229,10 +230,10 @@ static bool ldGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x,int
 }
 
 
-xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
+xListNode* ldBaseGetWidgetInfoByPos(int16_t x,int16_t y)
 {
     xListNode * pListInfo;
-    if(ldGetInfoByPos(&ldWidgetLink,&pListInfo,x,y)==true)
+    if(ldBaseGetInfoByPos(&ldWidgetLink,&pListInfo,x,y)==true)
     {
         return pListInfo;
     }
@@ -240,7 +241,7 @@ xListNode* ldGetWidgetInfoByPos(int16_t x,int16_t y)
 }
 
 //获取全局坐标
-ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
+ldPoint_t ldBaseGetGlobalPos(ldCommon_t *pWidget)
 {
     ldPoint_t pos={0,0},posParent={0,0};
 
@@ -256,7 +257,7 @@ ldPoint_t ldGetGlobalPos(ldCommon_t *pWidget)
     {
         if(((ldCommon_t*)pWidget->parentWidget)->widgetType!=widgetTypeBackground)
         {
-            posParent=ldGetGlobalPos(pWidget->parentWidget);
+            posParent=ldBaseGetGlobalPos(pWidget->parentWidget);
         }
         else
         {
@@ -322,9 +323,6 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,ui
 #else
     arm_2d_vres_t resource =*((arm_2d_vres_t*)pResTile);
 #endif
-    //root tile init
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iX=0;
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iY=0;
 
     if (isWithMask)
     {
@@ -386,9 +384,6 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
 #else
     arm_2d_vres_t resource =*((arm_2d_vres_t*)pResTile);
 #endif
-    //root tile init
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iX=0;
-    (*(arm_2d_tile_t*)(&resource)).tRegion.tLocation.iY=0;
     arm_2d_location_t tCentre = {
                     .iX = (*(arm_2d_tile_t*)(&resource)).tRegion.tSize.iWidth >> 1,
                     .iY = (*(arm_2d_tile_t*)(&resource)).tRegion.tSize.iHeight >> 1,
@@ -451,9 +446,6 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
     arm_2d_vres_t *pRes;
 #endif
     pRes=&resource;
-    //root tile init
-    ((arm_2d_tile_t*)pRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)pRes)->tRegion.tLocation.iY=0;
 
     switch (((arm_2d_tile_t*)pRes)->tInfo.tColourInfo.chScheme)
     {
@@ -465,14 +457,14 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
                             &((arm_2d_tile_t*)pRes)->tRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #else
         arm_2d_draw_pattern((arm_2d_tile_t*)pRes,
                             pTile,
                             &(((arm_2d_tile_t*)pRes)->tRegion),
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #endif
 
         break;
@@ -929,14 +921,14 @@ void ldBaseCharacter(arm_2d_tile_t* pParentTile,arm_2d_region_t* pShowRegion,arm
                             pShowRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #else
         arm_2d_draw_pattern(pResTile,
                             pParentTile,
                             pShowRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             textColor,
-                            GLCD_COLOR_BLACK);
+                            LD_COLOR_BLACK);
 #endif
 
         break;
@@ -1005,6 +997,13 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
     int16_t textOffsetX=0;
     int16_t bmpH1Max;
 
+    arm_2d_region_t alignSize={0};
+
+    if(pStr==NULL)
+    {
+        return alignSize;
+    }
+
     uint8_t strLen=strlen((char*)pStr);
 
     arm_2d_size_t textSize;
@@ -1023,7 +1022,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
         }
     }
 
-    arm_2d_region_t alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
+    alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
 
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resTile = *pResTileTemplate;
@@ -1086,6 +1085,7 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
         return;
     }
     pWidget->isHidden=isHidden;
+    pWidget->dirtyRegionListItem.bIgnore=isHidden;
 }
 
 void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
@@ -1135,21 +1135,30 @@ void ldBaseSetAlign(ldChar_t **ppTextInfo,uint8_t align)
 arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTargetRegion)
 {
     arm_2d_region_t parentRegion={{0,0},{0,0}},outRegion;
+    ldPoint_t globalPos;
+    bool flag;
 
     if(pWidget->parentWidget==NULL)
     {
-        parentRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH;
-        parentRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT;
+        parentRegion.tSize.iWidth=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth;
+        parentRegion.tSize.iHeight=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
+        globalPos.x=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+        globalPos.y=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
     }
     else
     {
         parentRegion.tSize.iWidth=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iWidth;
         parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
+        globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
     }
-    arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
-    ldPoint_t globalPos=ldGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
+    flag=arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
+    if(flag==false)
+    {
+        return (arm_2d_region_t){{0,0},{0,0}};
+    }
     outRegion.tLocation.iX=outRegion.tLocation.iX+globalPos.x;
     outRegion.tLocation.iY=outRegion.tLocation.iY+globalPos.y;
+
     return outRegion;
 }
 
@@ -1159,10 +1168,309 @@ void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y)
     {
         return;
     }
+
+    pWidget->dirtyRegionState=waitChange;
+
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX=x;
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY=y;
 }
 
+void ldBaseDrawCircle(arm_2d_tile_t *pTile, int centerX, int centerY, int radius, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
+{
+    int x, y;
+    int opacity;
+
+    if(radius==0)
+    {
+        opacityMin=opacityMax;
+    }
+
+    for (y = centerY - radius; y <= centerY + radius; y++)
+    {
+        for (x = centerX - radius; x <= centerX + radius; x++)
+        {
+            int distance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+            int sqrRadius = radius * radius;
+
+            if (distance <= sqrRadius) {
+                if (distance == sqrRadius) {
+                    opacity = opacityMin;
+                } else {
+                    double ratio = (double)distance / sqrRadius;
+                    opacity = (int)(opacityMax - (opacityMax - opacityMin) * ratio);
+                }
+
+                arm_2d_location_t point={
+                    .iX=x,
+                    .iY=y,
+                };
+                arm_2d_draw_point(pTile,point, color,opacity);
+            }
+        }
+    }
+}
+
+#define ipart_(X) ((int)(X))
+#define round_(X) ((int)(((float)(X))+0.5f))
+#define fpart_(X) (((float)(X))-(float)ipart_(X))
+#define rfpart_(X) (1.0-fpart_(X))
+#define swap_(a,b)    (a=(a)+(b),b=(a)-(b),a=(a)-(b))
+
+static void _setPixelAlpha(arm_2d_tile_t *pTile,int x, int y, float brightness, ldColor color)
+{
+    arm_2d_location_t point={
+        .iX=x,
+        .iY=y,
+    };
+    arm_2d_draw_point(pTile,point, color,brightness*255);
+}
+
+/**
+ * @brief   吴小林抗锯齿直线算法
+ *
+ * @param   pTile           目标控件指针
+ * @param   x0              直线起始坐标x
+ * @param   y0              直线起始坐标y
+ * @param   x1              直线结束坐标x
+ * @param   y1              直线结束坐标y
+ * @param   color           直线颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-04
+ */
+void ldBaseDrawLine0(arm_2d_tile_t *pTile,int16_t x0 , int16_t y0 , int16_t x1 , int16_t y1,ldColor color)
+{
+    int steep = abs(y1 - y0) > abs(x1 - x0) ;
+
+    // swap the co-ordinates if slope > 1 or we
+    // draw backwards
+    if (steep)
+    {
+        swap_(x0, y0);
+        swap_(x1, y1);
+    }
+    if (x0 > x1)
+    {
+        swap_(x0, x1);
+        swap_(y0, y1);
+    }
+
+    //compute the slope
+    float dx = x1-x0;
+    float dy = y1-y0;
+    float gradient = dy/dx;
+    if (dx == 0.0)
+        gradient = 1;
+
+    int xpxl1 = x0;
+    int xpxl2 = x1;
+    float intersectY = y0;
+    int  x;
+
+    if (steep)
+    {
+        for (x = xpxl1; x <= xpxl2; x++)
+        {
+            _setPixelAlpha(pTile,ipart_(intersectY), x, rfpart_(intersectY),color);
+            _setPixelAlpha(pTile,ipart_(intersectY) + 1, x,fpart_(intersectY),color);
+            intersectY += gradient;
+        }
+    }
+    else
+    {
+        for (x = xpxl1; x <= xpxl2; x++)
+        {
+            _setPixelAlpha(pTile,x, ipart_(intersectY),rfpart_(intersectY),color);
+            _setPixelAlpha(pTile,x, ipart_(intersectY)+1,fpart_(intersectY),color);
+            intersectY += gradient;
+        }
+    }
+}
+
+void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
+{
+    if(lineSize<=1)
+    {
+        ldBaseDrawLine0(pTile,x0,y0,x1,y1,color);
+    }
+    else
+    {
+        uint16_t t;
+        int32_t xerr=0,yerr=0,delta_x,delta_y,distance;
+        int32_t incx,incy,xPos,yPos;
+
+        delta_x=x1-x0; //计算坐标增量
+        delta_y=y1-y0;
+        xPos=x0;
+        yPos=y0;
+        if(delta_x>0)incx=1; //设置单步方向
+        else if(delta_x==0)incx=0;//垂直线
+        else {incx=-1;delta_x=-delta_x;}
+        if(delta_y>0)incy=1;
+        else if(delta_y==0)incy=0;//水平线
+        else{incy=-1;delta_y=-delta_y;}
+        if( delta_x>delta_y)distance=delta_x; //选取基本增量坐标轴
+        else distance=delta_y;
+        for(t=0;t<=distance+1;t++ )//画线输出
+        {
+            ldBaseDrawCircle(pTile,xPos,yPos,lineSize/2,color,opacityMax,opacityMin);
+            xerr+=delta_x ;
+            yerr+=delta_y ;
+            if(xerr>distance)
+            {
+                xerr-=distance;
+                xPos+=incx;
+            }
+            if(yerr>distance)
+            {
+                yerr-=distance;
+                yPos+=incy;
+            }
+        }
+    }
+}
+
+void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion)
+{
+    arm_2d_region_list_item_t **ppTempDirty;
+
+    ppTempDirty=ppSceneDirtyRegion;
+    while(*ppTempDirty!=NULL)
+    {
+        ppTempDirty=&(*ppTempDirty)->ptNext;
+    }
+    *ppTempDirty=&pWidget->dirtyRegionListItem;
+}
+
+// pNewRegion和pWidget坐标都是相对父控件来计算
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame)
+{
+    if(bIsNewFrame)
+    {
+        switch (pWidget->dirtyRegionState)
+        {
+        case none:
+        {
+            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
+            {
+                pWidget->dirtyRegionListItem.bIgnore=true;
+            }
+            break;
+        }
+        case waitChange://扩张到新范围
+        {
+            arm_2d_region_t tempRegion;
+
+            newRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+            newRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+
+            arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
+            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
+            pWidget->dirtyRegionListItem.bIgnore=false;
+            pWidget->dirtyRegionListItem.bUpdated=true;
+            pWidget->dirtyRegionTemp=newRegion;
+            pWidget->dirtyRegionState=waitUpdate;
+            break;
+        }
+        case waitUpdate://缩小到新范围
+        {
+            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
+            pWidget->dirtyRegionListItem.bIgnore=false;
+            pWidget->dirtyRegionListItem.bUpdated=true;
+            pWidget->dirtyRegionState=none;
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
+
+static void ldGuiUpdateDirtyRegion(xListNode* pLink)
+{
+    xListNode *temp_pos,*safePos;
+
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
+        {
+            ((ldCommon_t *)temp_pos->info)->dirtyRegionState=waitChange;
+
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            {
+                ldGuiUpdateDirtyRegion(((ldCommon_t *)temp_pos->info)->childList);
+            }
+        }
+    }
+}
+
+void ldBaseBgMove(int16_t x,int16_t y)
+{
+    ldWindow_t *win=ldBaseGetWidgetById(0);
+    ldBaseMove(win,x,y);
+
+    //只考虑左移和上移
+    ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
+    ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
+    win->isDirtyRegionAutoIgnore=true;
+    win->dirtyRegionListItem.bUpdated=true;
+
+    ldGuiUpdateDirtyRegion(&ldWidgetLink);
+//    isUpdateBackground=true;
+}
+
+
+arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace)
+{
+    arm_2d_region_t retRegion;
+    //换行判断
+    if((pBufferRegion->tLocation.iX+leftSpace+width)>pWidgetRegion->tSize.iWidth)
+    {
+        pBufferRegion->tLocation.iX=0;
+        pBufferRegion->tLocation.iY+=pBufferRegion->tSize.iHeight;
+        pBufferRegion->tSize.iHeight=0;
+        pBufferRegion->tSize.iWidth=0;
+    }
+    retRegion=*pBufferRegion;
+    retRegion.tLocation.iX+=leftSpace;
+    retRegion.tLocation.iY+=topSpace;
+    retRegion.tSize.iWidth=width;
+    retRegion.tSize.iHeight=height;
+    //高度最大值判断
+    if(pBufferRegion->tSize.iHeight<(topSpace+height+bottomSpace))
+    {
+        pBufferRegion->tSize.iHeight=topSpace+height+bottomSpace;
+    }
+    //准备下一次使用的起始坐标
+    pBufferRegion->tLocation.iX+=leftSpace+width+rightSpace;
+
+    return retRegion;
+}
+
+arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace)
+{
+    arm_2d_region_t retRegion;
+    //换列判断
+    if((pBufferRegion->tLocation.iY+topSpace+height)>pWidgetRegion->tSize.iHeight)
+    {
+        pBufferRegion->tLocation.iX+=pBufferRegion->tSize.iWidth;
+        pBufferRegion->tLocation.iY=0;
+        pBufferRegion->tSize.iHeight=0;
+        pBufferRegion->tSize.iWidth=0;
+    }
+    retRegion=*pBufferRegion;
+    retRegion.tLocation.iX+=leftSpace;
+    retRegion.tLocation.iY+=topSpace;
+    retRegion.tSize.iWidth=width;
+    retRegion.tSize.iHeight=height;
+    //宽度最大值判断
+    if(pBufferRegion->tSize.iWidth<(leftSpace+width+rightSpace))
+    {
+        pBufferRegion->tSize.iWidth=leftSpace+width+rightSpace;
+    }
+    //准备下一次使用的起始坐标
+    pBufferRegion->tLocation.iY+=topSpace+height+bottomSpace;
+    return retRegion;
+}
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

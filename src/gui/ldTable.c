@@ -82,7 +82,7 @@ void ldTableDel(ldTable_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -296,7 +296,7 @@ static bool slotTableProcess(xConnectInfo_t info)
     arm_2d_tile_t *pResTile;
     ldTableItem_t *currentItem;
 
-    pWidget=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -304,7 +304,11 @@ static bool slotTableProcess(xConnectInfo_t info)
     {
     case SIGNAL_PRESS:
     {
-        currentItem=ldTableItemAt(pWidget,(int16_t)GET_SIGNAL_VALUE_X(info.value),(int16_t)GET_SIGNAL_VALUE_Y(info.value));
+        ldPoint_t parentPos=ldBaseGetGlobalPos(pWidget->parentWidget);
+        x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-parentPos.x;
+        y=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-parentPos.y;
+
+        currentItem=ldTableItemAt(pWidget,x,y);
 
         _ldTableSelectItem(pWidget,currentItem);
 
@@ -329,9 +333,6 @@ static bool slotTableProcess(xConnectInfo_t info)
         if(currentItem->isButton)
         {
             arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(pWidget,pWidget->currentColumn,pWidget->currentRow);
-
-            x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
-            y=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
 
             if((x>=cellRegion.tLocation.iX)&&(y>=cellRegion.tLocation.iY)&&
                     (x<(cellRegion.tLocation.iX+cellRegion.tSize.iWidth))&&
@@ -442,7 +443,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     int16_t *heightBuf;
     ldTableItem_t *pItemInfoBuf;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldTable_t);
     widthBuf = ldMalloc(sizeof (int16_t)*columnCount);
     heightBuf = ldMalloc(sizeof (int16_t)*rowCount);
@@ -451,7 +452,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     if ((pNewWidget != NULL)&&(widthBuf!=NULL)&&(heightBuf!=NULL)&&(pItemInfoBuf!=NULL))
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -463,7 +463,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -479,7 +478,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->rowCount= rowCount;
         pNewWidget->columnCount=columnCount;
         pNewWidget->itemSpace=itemSpace;
@@ -488,21 +486,18 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pItemInfo=pItemInfoBuf;
         memset(pItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
         pNewWidget->isBgTransparent=false;
-        pNewWidget->bgColor=0;
-        pNewWidget->selectColor=GLCD_COLOR_DARK_GREEN;
-
+        pNewWidget->bgColor=LD_COLOR_WHITE_SMOKE;
+        pNewWidget->selectColor=__RGB(65,143,31);
         int16_t w=(width-itemSpace)/columnCount-itemSpace;
         for(uint8_t i=0;i<columnCount;i++)
         {
             pNewWidget->pColumnWidth[i]=w;
         }
-
         int16_t h=(height-itemSpace)/rowCount-itemSpace;
         for(uint8_t i=0;i<rowCount;i++)
         {
             pNewWidget->pRowHeight[i]=h;
         }
-
         for(uint16_t i=0;i<(columnCount*rowCount);i++)
         {
             pNewWidget->pItemInfo[i].textColor=0;
@@ -518,6 +513,12 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].isSelectShow=true;
             pNewWidget->pItemInfo[i].isSelect=false;
         }
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
@@ -560,6 +561,8 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #else
     arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
 #endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     if (pWidget == NULL)
     {
@@ -571,6 +574,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

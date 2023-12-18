@@ -71,7 +71,7 @@ void ldLineEditDel(ldLineEdit_t *pWidget)
 
     xDeleteConnect(pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -170,9 +170,9 @@ static void _inputAsciiProcess(ldLineEdit_t *pWidget,uint8_t ascii)
     }
     case 0x0d://enter
     {
-        ldBaseSetHidden(ldGetWidgetById(pWidget->kbNameId),true);
+        ldBaseSetHidden(ldBaseGetWidgetById(pWidget->kbNameId),true);
         pWidget->isEditing=false;
-        xEmit(pWidget->nameId,SIGNAL_EDITING_FINISHED,0);
+        ldBaseBgMove(0,0);
         break;
     }
     default:
@@ -183,8 +183,9 @@ static void _inputAsciiProcess(ldLineEdit_t *pWidget,uint8_t ascii)
 static bool slotLineEditProcess(xConnectInfo_t info)
 {
     ldLineEdit_t *pWidget;
+    ldCommon_t *kb;
 
-    pWidget=ldGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     switch (info.signalType)
     {
@@ -193,7 +194,18 @@ static bool slotLineEditProcess(xConnectInfo_t info)
         pWidget->isEditing=true;
         pWidget->pText[pWidget->textLen]=' ';
         gActiveEditType=pWidget->editType;
-        ldBaseSetHidden(ldGetWidgetById(pWidget->kbNameId),false);
+        if(pWidget->kbNameId)
+        {
+            arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+
+            kb=ldBaseGetWidgetById(pWidget->kbNameId);
+            ldBaseSetHidden(kb,false);
+            if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
+            {
+                ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT);
+                ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
+            }
+        }
         break;
     }
     case SIGNAL_INPUT_ASCII:
@@ -201,6 +213,7 @@ static bool slotLineEditProcess(xConnectInfo_t info)
         _inputAsciiProcess(pWidget,info.value);
         break;
     }
+
     default:
         break;
     }
@@ -230,13 +243,13 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     arm_2d_tile_t *tResTile;
     uint8_t *pText = NULL;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldLineEdit_t);
     pText = (uint8_t *)ldMalloc((textMax+2)*sizeof(uint8_t));//光标位置+结尾
     if ((pNewWidget != NULL)&&(pText!=NULL))
     {
+        memset((char*)pText,0,textMax+2);
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -248,7 +261,6 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         xListInfoAdd(parentList, pNewWidget);
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -264,22 +276,26 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
-        strset((char*)pText,0);
         pNewWidget->pText=pText;
         pNewWidget->textMax=textMax;
         pNewWidget->pFontDict=pFontDict;
         pNewWidget->isCorner=false;
         pNewWidget->isEditing=false;
-        pNewWidget->textColor=GLCD_COLOR_BLACK;
+        pNewWidget->textColor=LD_COLOR_BLACK;
         pNewWidget->textLen=0;
         pNewWidget->timer=0;
         pNewWidget->blinkFlag=false;
         pNewWidget->editType=typeString;
         pNewWidget->hasFloatPoint=false;
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->kbNameId=0;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
-//        xConnect(nameId,SIGNAL_RELEASE,nameId,slotLineEditProcess);
 
         LOG_INFO("[lineEdit] init,id:%d\n",nameId);
     }
@@ -321,20 +337,28 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     {
         pWidget->blinkFlag=!pWidget->blinkFlag;
     }
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
         if(pWidget->isCorner)
         {
-            draw_round_corner_box(&tTarget,&tTarget_canvas,GLCD_COLOR_WHITE,255,bIsNewFrame);
-            draw_round_corner_border(&tTarget,&tTarget_canvas,GLCD_COLOR_LIGHT_GREY,(arm_2d_border_opacity_t){255,255,255,255},(arm_2d_corner_opacity_t){255,255,255,255});
+            draw_round_corner_box(&tTarget,&tTarget_canvas,LD_COLOR_WHITE,255,bIsNewFrame);
+            draw_round_corner_border(&tTarget,&tTarget_canvas,LD_COLOR_LIGHT_GREY,(arm_2d_border_opacity_t){255,255,255,255},(arm_2d_corner_opacity_t){255,255,255,255});
         }
         else
         {
-            ldBaseColor(&tTarget,GLCD_COLOR_WHITE,255);
-            arm_2d_draw_box(&tTarget,&tTarget_canvas,1,GLCD_COLOR_LIGHT_GREY,255);
+            ldBaseColor(&tTarget,LD_COLOR_WHITE,255);
+            arm_2d_draw_box(&tTarget,&tTarget_canvas,1,LD_COLOR_LIGHT_GREY,255);
         }
         arm_2d_op_wait_async(NULL);
 

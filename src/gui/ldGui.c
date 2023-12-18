@@ -39,6 +39,9 @@
 #include "ldTable.h"
 #include "ldKeyboard.h"
 #include "ldLineEdit.h"
+#include "ldGraph.h"
+#include "ldComboBox.h"
+#include "ldArc.h"
 /*============================ auto add include ==============================*/
 
 uint8_t pageNumNow=0;
@@ -53,6 +56,8 @@ static volatile ldPoint_t pressPoint;
 static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
+
+//bool isUpdateBackground=false;
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
@@ -70,7 +75,7 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         pWidget=NULL;
         if(pWidget==NULL)
         {
-            pNode=ldGetWidgetInfoByPos(x,y);
+            pNode=ldBaseGetWidgetInfoByPos(x,y);
             if(pNode!=NULL)
             {
                 pWidget=pNode->info;
@@ -97,6 +102,7 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             pWidget=prevWidget;//不可以把static变量作为函数变量调用
             if(pWidget!=NULL)
             {
+                xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
                 xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,(((x-pressPoint.x)<<16)&0xFFFF0000)|((y-pressPoint.y)&0xFFFF));
             }
             prevX=x;
@@ -247,6 +253,21 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
         ldLineEditDel((ldLineEdit_t*)pWidget);
         break;
     }
+    case widgetTypeGraph:
+    {
+        ldGraphDel((ldGraph_t*)pWidget);
+        break;
+    }
+    case widgetTypeComboBox:
+    {
+        ldComboBoxDel((ldComboBox_t*)pWidget);
+        break;
+    }
+    case widgetTypeArc:
+    {
+        ldArcDel((ldArc_t*)pWidget);
+        break;
+    }
 /*============================ auto add del ==================================*/
     default:
         break;
@@ -334,6 +355,21 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
         ldLineEditLoop((ldLineEdit_t*)pWidget,ptParent,bIsNewFrame);
         break;
     }
+    case widgetTypeGraph:
+    {
+        ldGraphLoop((ldGraph_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeComboBox:
+    {
+        ldComboBoxLoop((ldComboBox_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
+    case widgetTypeArc:
+    {
+        ldArcLoop((ldArc_t*)pWidget,ptParent,bIsNewFrame);
+        break;
+    }
 /*============================ auto add loop =================================*/
     default:
         break;
@@ -358,17 +394,40 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
     }
 }
 
+static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
+{
+    xListNode *temp_pos,*safePos;
+
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
+        {
+            ldBaseAddDirtyRegion((ldCommon_t *)temp_pos->info,&pSence->ptDirtyRegion);
+
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            {
+                ldGuiSetDirtyRegion(((ldCommon_t *)temp_pos->info)->childList,pSence);
+            }
+        }
+    }
+}
+
 /**
  * @brief   ldgui的初始化函数
  * 
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiInit(void)
+void ldGuiInit(arm_2d_scene_t *pSence)
 {
     xEmitInit();
     ldUserPageInitFunc[pageNumNow]();
     LOG_INFO("[sys] page %d init\n",pageNumNow);
+
+    ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
+    LOG_INFO("[sys] set dirty region\n");
+
+//    isUpdateBackground=true;
 }
 
 /**
@@ -390,8 +449,14 @@ void ldGuiLogicLoop(void)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiLoop(const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
+//    if(isUpdateBackground&&bIsNewFrame)
+//    {
+//        arm_2d_scene_player_update_scene_background(pSence->ptPlayer);
+//        isUpdateBackground=false;
+//    }
+
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
 

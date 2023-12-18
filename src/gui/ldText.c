@@ -75,7 +75,7 @@ void ldTextDel(ldText_t *pWidget)
 
     LOG_INFO("[text] del,id:%d\n",pWidget->nameId);
 
-    listInfo = ldGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
+    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
     listInfo = ((ldCommon_t *)listInfo->info)->childList;
 
     if (listInfo != NULL)
@@ -91,12 +91,11 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     xListNode *parentList = NULL;
     arm_2d_tile_t *tResTile;
 
-    parentInfo = ldGetWidgetInfoById(parentNameId);
+    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
     pNewWidget = LD_MALLOC_WIDGET_INFO(ldText_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
-        
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
         {
@@ -109,7 +108,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->parentWidget = parentInfo->info;
         pNewWidget->isHidden = false;
         pNewWidget->bgImgAddr=LD_ADDR_NONE;
-
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=x;
         tResTile->tRegion.tLocation.iY=y;
@@ -125,7 +123,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-
         pNewWidget->isTransparent=false;
         pNewWidget->bgColor=__RGB(255,255,255);
         ldBaseSetFont(&pNewWidget->pTextInfo,pFontDict);
@@ -134,6 +131,13 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
+        pNewWidget->dirtyRegionListItem.ptNext=NULL;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.bIgnore = false;
+        pNewWidget->dirtyRegionListItem.bUpdated = true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
     else
@@ -193,6 +197,15 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
         }
     }
 
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes=*pResTile;
+#else
+    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#endif
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -209,14 +222,14 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
             }
             else
             {
-                pResTile->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
+                ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->bgImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
-                ((arm_2d_vres_t*)pResTile)->pTarget=pWidget->bgImgAddr;
+                ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->bgImgAddr;
 #endif
 #if USE_OPACITY == 1
-                ldBaseImage(&tTarget,pResTile,false,pWidget->opacity);
+                ldBaseImage(&tTarget,&tempRes,false,pWidget->opacity);
 #else
-                ldBaseImage(&tTarget,pResTile,false,255);
+                ldBaseImage(&tTarget,&tempRes,false,255);
 #endif
             }
             arm_2d_op_wait_async(NULL);
@@ -303,7 +316,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
 {
     ldText_t *txt;
 
-    txt=ldGetWidgetById(info.receiverId);
+    txt=ldBaseGetWidgetById(info.receiverId);
 
 
 
