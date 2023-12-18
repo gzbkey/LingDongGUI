@@ -1418,6 +1418,60 @@ void ldBaseBgMove(int16_t x,int16_t y)
 //    isUpdateBackground=true;
 }
 
+
+arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace)
+{
+    arm_2d_region_t retRegion;
+    //换行判断
+    if((pBufferRegion->tLocation.iX+leftSpace+width)>pWidgetRegion->tSize.iWidth)
+    {
+        pBufferRegion->tLocation.iX=0;
+        pBufferRegion->tLocation.iY+=pBufferRegion->tSize.iHeight;
+        pBufferRegion->tSize.iHeight=0;
+        pBufferRegion->tSize.iWidth=0;
+    }
+    retRegion=*pBufferRegion;
+    retRegion.tLocation.iX+=leftSpace;
+    retRegion.tLocation.iY+=topSpace;
+    retRegion.tSize.iWidth=width;
+    retRegion.tSize.iHeight=height;
+    //高度最大值判断
+    if(pBufferRegion->tSize.iHeight<(topSpace+height+bottomSpace))
+    {
+        pBufferRegion->tSize.iHeight=topSpace+height+bottomSpace;
+    }
+    //准备下一次使用的起始坐标
+    pBufferRegion->tLocation.iX+=leftSpace+width+rightSpace;
+
+    return retRegion;
+}
+
+arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace)
+{
+    arm_2d_region_t retRegion;
+    //换列判断
+    if((pBufferRegion->tLocation.iY+topSpace+height)>pWidgetRegion->tSize.iHeight)
+    {
+        pBufferRegion->tLocation.iX+=pBufferRegion->tSize.iWidth;
+        pBufferRegion->tLocation.iY=0;
+        pBufferRegion->tSize.iHeight=0;
+        pBufferRegion->tSize.iWidth=0;
+    }
+    retRegion=*pBufferRegion;
+    retRegion.tLocation.iX+=leftSpace;
+    retRegion.tLocation.iY+=topSpace;
+    retRegion.tSize.iWidth=width;
+    retRegion.tSize.iHeight=height;
+    //宽度最大值判断
+    if(pBufferRegion->tSize.iWidth<(leftSpace+width+rightSpace))
+    {
+        pBufferRegion->tSize.iWidth=leftSpace+width+rightSpace;
+    }
+    //准备下一次使用的起始坐标
+    pBufferRegion->tLocation.iY+=topSpace+height+bottomSpace;
+    return retRegion;
+}
+
 #if defined(__clang__)
 #   pragma clang diagnostic pop
 #endif

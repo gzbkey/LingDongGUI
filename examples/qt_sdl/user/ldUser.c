@@ -160,6 +160,7 @@ void userInit(void)
     ldComboBoxAddItem(obj,(uint8_t*)"setting");
     ldComboBoxAddItem(obj,(uint8_t*)"about");
 
+    // 120 280
     obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
     ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
     ldLineEditSetKeyboard(obj,ID_KB);
