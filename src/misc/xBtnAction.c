@@ -301,16 +301,15 @@ uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state)
 
 void xBtnClean(void)
 {
-xListNode *temp_pos,*safePos;
+    xListNode *temp_pos,*safePos;
 
-
-        list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
+    list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
+    {
+        if(temp_pos->info!=NULL)
         {
-            if(temp_pos->info!=NULL)
-            {
-                BTN_FREE(xListInfoDel(temp_pos));
-            }
+            BTN_FREE(xListInfoDel(temp_pos));
         }
+    }
 }
 
 

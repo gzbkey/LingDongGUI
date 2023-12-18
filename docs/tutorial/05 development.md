@@ -26,14 +26,22 @@ ldGui.c中添加新控件的头文件
 ##### 信号
 该库可以检测以下信号/数据
 
-1. 按下
-2. 按住不放
-3. 释放
-4. 双击
-5. 获取连击次数
-6. 按住不放的时间
-7. 长按触发一次
-8. 长按连续触发
+1. BTN_PRESS
+    按下
+2. BTN_HOLD_DOWN
+    按住不放
+3. BTN_RELEASE
+    释放
+4. BTN_DOUBLE_CLICK
+    双击
+5. BTN_REPEAT_COUNT
+    获取连击次数
+6. BTN_HOLD_TIME
+    按住不放的时间
+7. BTN_LONG_START
+    长按触发一次
+8. BTN_LONG_SHOOT
+    长按连续触发
 
 ##### 函数列表
 * void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));
@@ -191,3 +199,145 @@ bool vtGetKeyState(size_t value)
         <td colspan="2">清除按键检测的过程数据，一般切换页面的时候使用</td>
     </tr>
 </table>
+
+##### 使用举例
+```c
+//自定义实体按键序号
+#define KEY_NUM_UP   0
+
+//根据按键序号，获取按键状态
+bool vtGetKeyState(size_t value)
+{
+    switch (value)
+    {
+    case KEY_NUM_UP:
+    {
+        return keyUp;
+    }
+    default:
+        break;
+    }
+    return 0;
+}
+
+//初始化按键
+X_BTN_KEY_INIT(KEY_NUM_UP,vtGetKeyState);
+
+//循环处理函数
+void loopFunc(void)
+{
+    //判断按键按下
+    if(xBtnGetState(KEY_NUM_UP,BTN_PRESS))
+    {
+        //按键按下的用户处理代码
+    }
+}
+```
+
+#### queue 队列
+这是一个简单的队列软件库
+
+##### 函数列表
+* xQueue_t* xQueueCreate(uint32_t length, uint32_t itemSize);
+* bool xQueueEnqueue(xQueue_t *queue ,void * pInItem,uint32_t itemSize);
+* bool xQueueDequeue(xQueue_t *queue ,void * pOutItem,uint32_t itemSize);
+* uint32_t xQueueGetLength(xQueue_t *queue);
+* void xQueueClear(xQueue_t* queue);
+
+##### 使用举例
+```c
+typedef struct{
+    uint16_t senderId;
+    uint8_t signalType;
+    size_t value;
+}emitInfo_t;
+
+xQueue_t *emitQueue=NULL;
+emitInfo_t emitInfo;
+
+//创建队列
+emitQueue=xQueueCreate(EMIT_QUEUE_SIZE,sizeof (emitInfo_t));
+
+//写入数据，入队
+emitInfo.senderId=0;
+emitInfo.signalType=1;
+emitInfo.value=10;
+xQueueEnqueue(emitQueue,&emitInfo,sizeof (emitInfo_t));
+
+//判断数据数量
+if(xQueueGetLength(emitQueue)>0)
+{
+    //读取数据，出队
+    if(xQueueDequeue(emitQueue,&emitInfo,sizeof (emitInfo)))
+}
+```
+
+#### log 打印日志
+* 支持普通打印和彩色打印
+* 支持信息等级分类
+
+##### 配置
+* USE_LOG_COLOR
+    =0 普通打印
+    =1 彩色打印(需要控制台支持，推荐MobaXterm)
+* SET_LOG_LEVEL
+    #define LOG_LEVEL_NONE           (-1)
+    #define LOG_LEVEL_ERROR          (0)
+    #define LOG_LEVEL_WARNING        (1)
+    #define LOG_LEVEL_INFO           (2)
+    #define LOG_LEVEL_DEBUG          (3)
+* LOG_PRINT
+    默认为printf，可自定义串口硬件
+
+##### 函数接口
+* LOG_ERROR(fmt, ...)
+* LOG_WARNING(fmt, ...)
+* LOG_INFO(fmt, ...)
+* LOG_DEBUG(fmt, ...)
+
+##### 使用举例
+```c
+LOG_DEBUG("click widget id:%d\n",pWidget->nameId);
+```
+
+#### string 字符串处理
+对字符串进行简单的转换处理
+
+#### 函数接口
+* int32_t xStrToI32(uint8_t * str);
+* uint8_t* xI32ToStr(int32_t inInt32,uint8_t *buf);
+* float xStrToFloat(uint8_t * str);
+* uint8_t* xFloatToStr(float inFloat,uint8_t afterDecimalPointNum,uint8_t *buf);
+
+##### 使用举例
+```c
+int32_t value;
+value = xStrToI32("123");
+// value = 123
+
+uint8_t text[16];
+float fValue=3.1415926;
+text = xFloatToStr(fValue,2,text);
+// text = "3.14"
+```
+
+#### timer 软件定时器
+基于arm2d的基础上衍生的软件定时器
+
+#### 函数接口
+* bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset)
+##### 使用举例
+```c
+//计数变量
+int64_t sysTimer=0;
+
+//循环处理函数
+void loopFunc(void)
+{
+    if(ldTimeOut(10,&sysTimer,true))
+    {
+        //10ms处理一次的用户代码
+    }
+}
+
+```

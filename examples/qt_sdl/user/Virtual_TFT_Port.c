@@ -452,32 +452,26 @@ bool vtGetKeyState(size_t value)
     case KEY_NUM_UP:
     {
         return keyUp;
-        break;
     }
     case KEY_NUM_DOWN:
     {
         return keyDown;
-        break;
     }
     case KEY_NUM_LEFT:
     {
         return keyLeft;
-        break;
     }
     case KEY_NUM_RIGHT:
     {
         return keyRight;
-        break;
     }
     case KEY_NUM_ENTER:
     {
         return keyEnter;
-        break;
     }
     case KEY_NUM_ESC:
     {
         return keyEsc;
-        break;
     }
     default:
         break;
