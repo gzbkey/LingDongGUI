@@ -196,7 +196,7 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
         return;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)(&tempRes))->tRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
 
     if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
     {
@@ -215,8 +215,8 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
         {
             ldBaseImage(&tTarget,&tempRes,pWidget->isWithMask,IMG_OPACITY);
         }
+        arm_2d_op_wait_async(NULL);
     }
-    arm_2d_op_wait_async(NULL);
 }
 
 void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity)

@@ -222,7 +222,10 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             if(gActiveEditType==typeString)
             {
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                    retRegion=item_region;
+                    //change ABC
+                    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+                    retRegion.tLocation.iX=0;
+                    retRegion.tLocation.iY=0;
                     break;
                 }
             }
@@ -434,7 +437,10 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
             item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
             if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                retRegion=item_region;
+                //change 123
+                retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+                retRegion.tLocation.iX=0;
+                retRegion.tLocation.iY=0;
                 break;
             }
 
@@ -1222,7 +1228,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
             }
         }
-
         arm_2d_op_wait_async(NULL);
     }
 }

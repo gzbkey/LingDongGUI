@@ -187,7 +187,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)(&tempRes))->tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -246,19 +246,19 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
         if(pWidget->seriesCount>0)
         {
-            tempRes.tRegion.tLocation.iX=0;
-            tempRes.tRegion.tLocation.iY=0;
-            tempRes.tRegion.tSize.iWidth=pWidget->pointImgWidth;
-            tempRes.tRegion.tSize.iHeight=pWidget->pointImgWidth;
-            tempRes.pchBuffer = (uint8_t *)pWidget->pointImgAddr;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=0;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=0;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iWidth=pWidget->pointImgWidth;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iHeight=pWidget->pointImgWidth;
+            ((arm_2d_tile_t*)(&tempRes))->pchBuffer = (uint8_t *)pWidget->pointImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
             ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->pointImgAddr;
 #endif
-            tempRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+            ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
             
             if(pWidget->pointImgAddr==graphDefalutDot_png)
             {
-                tempRes.bVirtualResource=false;
+                ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
             }
             
             int16_t x=0,y=0,xPrev,yPrev;
@@ -278,8 +278,8 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
                         if(pWidget->pointImgAddr!=LD_ADDR_NONE)
                         {
-                            tempRes.tRegion.tLocation.iX=x;
-                            tempRes.tRegion.tLocation.iY=y;
+                            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=x;
+                            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=y;
                             ldBaseMaskImage(&tTarget,&tempRes,pWidget->pSeries[k].seriesColor,255);
                         }
 
