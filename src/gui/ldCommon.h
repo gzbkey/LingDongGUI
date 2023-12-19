@@ -404,7 +404,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 
-void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion);
+void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t **ppRootDirtyRegionList);
 void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame);
 
 void ldBaseBgMove(int16_t x,int16_t y);

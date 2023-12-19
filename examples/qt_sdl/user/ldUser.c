@@ -59,7 +59,7 @@ void userInit(void)
 
 //    LOG_DEBUG("win :%llu\n",xFreeBytesRemaining);
 
-    obj=ldWindowInit(ID_WIN,ID_BG,50,50,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_WIDTH);
+    obj=ldWindowInit(ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_WIDTH);
 
     obj=ldButtonInit(ID_BUTTON,ID_WIN,10,10,70,30);
     ldButtonSetFont(obj,SIMSUN_REGULAR_12);

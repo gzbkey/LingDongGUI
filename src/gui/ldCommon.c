@@ -1329,16 +1329,16 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
-void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion)
+void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList,arm_2d_region_list_item_t ** ppRootDirtyRegionList)
 {
     arm_2d_region_list_item_t **ppTempDirty;
 
-    ppTempDirty=ppSceneDirtyRegion;
+    ppTempDirty=ppRootDirtyRegionList;
     while(*ppTempDirty!=NULL)
     {
         ppTempDirty=&(*ppTempDirty)->ptNext;
     }
-    *ppTempDirty=&pWidget->dirtyRegionListItem;
+    *ppTempDirty=pItemDirtyRegionList;
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算
@@ -1356,7 +1356,7 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
             }
             break;
         }
-        case waitChange://扩张到新范围
+        case waitChange://扩大到新范围
         {
             arm_2d_region_t tempRegion;
 

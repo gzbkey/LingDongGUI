@@ -8,7 +8,7 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 
-#define USE_VIRTUAL_RESOURCE                      1
+#define USE_VIRTUAL_RESOURCE                      0
 
 #define LD_CFG_SCEEN_WIDTH                        500
 #define LD_CFG_SCEEN_HEIGHT                       500
@@ -29,7 +29,7 @@ extern "C" {
 // PFB尺寸
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_SCEEN_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_SCEEN_HEIGHT
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         1
 
 // 以下不用修改
 #define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
