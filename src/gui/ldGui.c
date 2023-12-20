@@ -423,8 +423,10 @@ void ldGuiInit(arm_2d_scene_t *pSence)
     ldUserPageInitFunc[pageNumNow]();
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 
+#if USE_DIRTY_REGION == 1
     ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
     LOG_INFO("[sys] set dirty region\n");
+#endif
 }
 
 /**
