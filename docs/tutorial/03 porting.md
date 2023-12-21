@@ -19,9 +19,10 @@
                            const uint8_t *bitmap)
     ```
  * 下载ldgui源码
-🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
 
-🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
+    🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
+
+    🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
 
 |ℹ️ 关于github下载慢的问题|
 |:----|

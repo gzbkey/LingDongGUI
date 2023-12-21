@@ -265,6 +265,14 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
     }
 }
 
+/**
+ * @brief   设置背景透明
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -274,6 +282,14 @@ void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   设置文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            字符串指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
 {
     int16_t bmpH1Max;
@@ -287,6 +303,14 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
     pWidget->strHeight=textSize.iHeight;
 }
 
+/**
+ * @brief   设置文本颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文本颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
@@ -296,6 +320,18 @@ void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
     ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
 }
 
+/**
+ * @brief   文本的对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)
@@ -305,6 +341,14 @@ void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
     ldBaseSetAlign(&pWidget->pTextInfo,align);
 }
 
+/**
+ * @brief   设定文本显示位置绝对值
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   offset          位置绝对值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
 {
     if(pWidget==NULL)
@@ -314,6 +358,14 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
     pWidget->scrollOffset=offset;
 }
 
+/**
+ * @brief   设定文本显示偏移值（相对值）
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   moveValue       偏移相对值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
 {
     if(pWidget==NULL)
