@@ -573,7 +573,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = true;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
@@ -601,6 +601,25 @@ static void _ldkeyboardNewButton(ldKeyboard_t *pWidget,arm_2d_tile_t *parentTile
     ldBaseLineText(&btnTile,&pWidget->resource,pStr,pWidget->pFontDict,LD_ALIGN_CENTER,charColor,0,255);
 }
 
+void ldKeyboardFrameStart(ldKeyboard_t* pWidget)
+{
+    if((pWidget->isParentHidden)||(pWidget->isHidden))
+    {
+        //强制脏矩阵覆盖控件
+        if(((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth!=pWidget->dirtyRegionListItem.tRegion.tSize.iWidth)
+        {
+            pWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pWidget,&((arm_2d_tile_t*)&pWidget->resource)->tRegion);
+            pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+            pWidget->targetDirtyRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+        }
+        return;
+    }
+
+    pWidget->targetDirtyRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+    pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 /**
  * @brief   键盘显示处理函数
  *
@@ -625,13 +644,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
-        //强制脏矩阵覆盖控件
-        if(pResTile->tRegion.tSize.iWidth!=pWidget->dirtyRegionListItem.tRegion.tSize.iWidth)
-        {
-            pWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pWidget,&((arm_2d_tile_t*)&pWidget->resource)->tRegion);
-            pWidget->dirtyRegionTemp=pResTile->tRegion;
-            pWidget->targetDirtyRegion=pResTile->tRegion;
-        }
         return;
     }
 
@@ -674,7 +686,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

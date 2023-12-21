@@ -129,8 +129,9 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
 
@@ -292,6 +293,11 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
     }
 }
 
+void ldProgressBarFrameStart(ldProgressBar_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -305,15 +311,14 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
     {
         return;
     }
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+//#if USE_VIRTUAL_RESOURCE == 0
+//    arm_2d_tile_t tempRes=*pResTile;
+//#else
+//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+//#endif
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)(&tempRes))->tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

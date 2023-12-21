@@ -59,7 +59,7 @@ void userInit(void)
 
 //    LOG_DEBUG("win :%llu\n",xFreeBytesRemaining);
 
-    obj=ldWindowInit(ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_WIDTH);
+    obj=ldWindowInit(ID_WIN,ID_BG,20,20,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_WIDTH);
 
     obj=ldButtonInit(ID_BUTTON,ID_WIN,10,10,70,30);
     ldButtonSetFont(obj,SIMSUN_REGULAR_12);
@@ -160,6 +160,14 @@ void userInit(void)
     ldComboBoxAddItem(obj,(uint8_t*)"setting");
     ldComboBoxAddItem(obj,(uint8_t*)"about");
 
+    obj=ldScrollSelecterInit(ID_SCROLL_SELECTER,ID_WIN,320,125,40,40,SIMSUN_REGULAR_12,5);
+    ldScrollSelecterSetBgColor(obj,LD_COLOR_WHITE);
+    ldScrollSelecterAddItem(obj,"1");
+    ldScrollSelecterAddItem(obj,"2");
+    ldScrollSelecterAddItem(obj,"3");
+    ldScrollSelecterAddItem(obj,"4");
+    ldScrollSelecterAddItem(obj,"5");
+
     // 120 280
     obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
     ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
@@ -178,7 +186,7 @@ int64_t timer=0;
 uint16_t tempValue=0;
 void userLoop(void)
 {
-    if( ldTimeOut(2000, &timer,true))
+    if( ldTimeOut(1000, &timer,true))
     {
 
         isTop=!isTop;
@@ -189,7 +197,7 @@ void userLoop(void)
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
 
             ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),30);
-//            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),1);
+            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),1);
         }
         else
         {
@@ -197,7 +205,7 @@ void userLoop(void)
 //        ldLineEditMove(le,50,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
             ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),180);
-//            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),2);
+            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),2);
         }
 
     }

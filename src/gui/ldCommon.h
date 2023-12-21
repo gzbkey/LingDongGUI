@@ -263,7 +263,8 @@ typedef enum{
                               arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
-                              ldDirtyRegionStateType_t dirtyRegionState:2
+                              ldDirtyRegionStateType_t dirtyRegionState:2; \
+                              bool isDirtyRegionAutoIgnore:1
 
 typedef struct{
     uint8_t utf8[4];
@@ -304,7 +305,8 @@ typedef struct{
                               arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
-                              ldDirtyRegionStateType_t dirtyRegionState:2
+                              ldDirtyRegionStateType_t dirtyRegionState:2; \
+                              bool isDirtyRegionAutoIgnore:1
 
 typedef struct{
     uint8_t utf8[4];
@@ -405,7 +407,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 
 void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t **ppRootDirtyRegionList);
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame);
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore);
 
 void ldBaseBgMove(int16_t x,int16_t y);
 

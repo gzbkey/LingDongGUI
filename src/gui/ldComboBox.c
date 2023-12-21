@@ -137,6 +137,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         {
             pWidget->itemSelect=pWidget->itemPreSelect;
             pWidget->isExpand=false;
+            pWidget->dirtyRegionState=waitChange;
         }
 
         break;
@@ -231,8 +232,9 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
@@ -249,6 +251,20 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     }
 
     return pNewWidget;
+}
+
+void ldComboBoxFrameStart(ldComboBox_t* pWidget)
+{
+    if(pWidget->isExpand)
+    {
+        ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight*(pWidget->itemCount+1);
+    }
+    else
+    {
+        ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight;
+    }
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 /**
@@ -274,18 +290,6 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
-    if(bIsNewFrame)
-    {
-        if(pWidget->isExpand)
-        {
-            pResTile->tRegion.tSize.iHeight=pWidget->itemHeight*(pWidget->itemCount+1);
-        }
-        else
-        {
-            pResTile->tRegion.tSize.iHeight=pWidget->itemHeight;
-        }
-    }
-
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t tempRes=*pResTile;
 #else
@@ -294,7 +298,6 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)(&tempRes))->tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)

@@ -244,8 +244,9 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = true;
         pNewWidget->dirtyRegionListItem.bUpdated = false;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
@@ -326,11 +327,9 @@ static void _autoSort(ldRadialMenu_t *pWidget)
     _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
 }
 
-void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame)
+void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,arm_2d_region_t newRegion,bool isAutoIgnore)
 {
 
-    if(bIsNewFrame)
-    {
         switch (pWidget->pItemList[itemNum].dirtyRegionState)
         {
         case none:
@@ -369,6 +368,13 @@ void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,a
         default:
             break;
         }
+}
+
+void ldRadialMenuFrameStart(ldRadialMenu_t* pWidget)
+{
+    for(uint8_t i=0;i<pWidget->itemCount;i++)
+    {
+        ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true);
     }
 }
 
@@ -385,6 +391,12 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
     {
         return;
     }
+
+#if USE_VIRTUAL_RESOURCE == 0
+    arm_2d_tile_t tempRes = *pResTile;
+#else
+    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
+#endif
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
@@ -456,13 +468,8 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
             //刷新item
             for(uint8_t i=0;i<pWidget->itemCount;i++)
             {
-                ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true,bIsNewFrame);
+//                ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true,bIsNewFrame);
                 do {
-#if USE_VIRTUAL_RESOURCE == 0
-                    arm_2d_tile_t tempRes = *pResTile;
-#else
-                    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
-#endif
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
@@ -490,7 +497,7 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
                     arm_2d_op_wait_async(NULL);
                 } while (0);
 
-                ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true,bIsNewFrame);
+//                ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true,bIsNewFrame);
             }
         }
     }

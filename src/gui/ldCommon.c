@@ -1342,10 +1342,8 @@ void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList,arm_2d
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame)
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore)
 {
-    if(bIsNewFrame)
-    {
         switch (pWidget->dirtyRegionState)
         {
         case none:
@@ -1360,8 +1358,8 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
         {
             arm_2d_region_t tempRegion;
 
-            newRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-            newRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+//            newRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+//            newRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
 
             arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
@@ -1382,7 +1380,6 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
         default:
             break;
         }
-    }
 }
 
 static void ldGuiUpdateDirtyRegion(xListNode* pLink)

@@ -174,6 +174,11 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
     pWidget->bgColor=bgColor;
 }
 
+void ldImageFrameStart(ldImage_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)
 {
 #if USE_OPACITY == 1
@@ -195,8 +200,6 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
     {
         return;
     }
-
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)(&tempRes))->tRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
 
     if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
     {
