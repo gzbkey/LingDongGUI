@@ -47,9 +47,10 @@ void* obj,*le,*kb;
 #define ID_Radio2   20
 
 extern size_t xFreeBytesRemaining;
-
+int seed;
 void userInit(void)
 {
+    srand(1);
 //    obj=ldMalloc(1);
 //    ldFree(obj);
 //    LOG_DEBUG("start :%llu\n",xFreeBytesRemaining);
@@ -57,10 +58,16 @@ void userInit(void)
 
     ldWindowSetBgColor(obj,__RGB(220,220,220));
 
+    obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_BG,30,30,200,150,170,100,5);
+    ldRadialMenuAddItem(obj,PRESS_BMP,72,72,0,false);
+    ldRadialMenuAddItem(obj,RELEASE_BMP,72,72,0,false);
+    ldRadialMenuAddItem(obj,PRESS_BMP,72,72,0,false);
+    ldRadialMenuAddItem(obj,RELEASE_BMP,72,72,0,false);
+    
 //    LOG_DEBUG("win :%llu\n",xFreeBytesRemaining);
 
-    obj=ldWindowInit(ID_WIN,ID_BG,10,50,50,50);
-    ldWindowSetBgColor(obj,LD_COLOR_RED);
+//    obj=ldWindowInit(ID_WIN,ID_BG,10,50,50,50);
+//    ldWindowSetBgColor(obj,LD_COLOR_RED);
 
 //    obj=ldButtonInit(ID_BUTTON,ID_WIN,10,10,70,30);
 //    ldButtonSetFont(obj,SIMSUN_REGULAR_12);
@@ -70,7 +77,7 @@ void userInit(void)
 //    ldButtonSetSelectImage(obj,FRAME_PNG,LD_COLOR_BLUE);
 //    ldButtonSetSelect(obj,true);
 
-    obj=ldImageInit(ID_IMAGE,ID_BG,100,50,72,72,PRESS_BMP,false);
+//    obj=ldImageInit(ID_IMAGE,ID_BG,100,50,72,72,PRESS_BMP,false);
 
 //    obj=ldTextInit(ID_TEXT,ID_WIN,10,110,121,121,SIMSUN_REGULAR_12);
 //    ldTextSetBgImage(obj,TREE_BMP);
@@ -178,26 +185,26 @@ int64_t timer=0;
 uint16_t tempValue=0;
 void userLoop(void)
 {
-    if( ldTimeOut(2000, &timer,true))
+    if( ldTimeOut(3000, &timer,true))
     {
 
         isTop=!isTop;
         if(isTop)
         {
-        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFF);
+//        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFF);
 //        ldLineEditMove(le,10,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
 
 //            ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),30);
-//            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),1);
+            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),rand()%4);
         }
         else
         {
-        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFFFF);
+//        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFFFF);
 //        ldLineEditMove(le,50,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
 //            ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),180);
-//            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),2);
+            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),rand()%4);
         }
 
     }

@@ -68,10 +68,7 @@ void gpioDeInit(void)
 }
 
 int main(void)
-{	
-//    uint32_t usbstatus=0;
-//    uint16_t len;
-//    uint16_t t;
+{
 	RCC_ClocksTypeDef clocks;
 	
 	rccInit();
@@ -99,45 +96,6 @@ int main(void)
     {
         disp_adapter0_task();
     }
-//    delay_ms(1800);
-//	USB_Port_Set(0); 	//USB先断开
-//	delay_ms(700);
-//	USB_Port_Set(1);	//USB再次连接
-// 	Set_USBClock();   
-// 	USB_Interrupts_Config();    
-// 	USB_Init();	    
-//	DP_PUUP = 1;
-//	while(1)
-//	{
-//		if(usbstatus!=bDeviceState)//USB连接状态发生了改变.
-//		{
-//			usbstatus=bDeviceState;//记录新的状态
-//			if(usbstatus==CONFIGURED)
-//			{
-////				printf("USB连接成功\n");
-//			}else
-//			{
-////				printf("USB断开连接\n");
-//			}
-//		}
-//		if(USB_USART_RX_STA&0x8000)
-//		{					   
-//			len=USB_USART_RX_STA&0x3FFF;//得到此次接收到的数据长度
-//			usb_printf("\r\n您发送的消息长度为:%d，消息内容为：\r\n",len);
-//			for(t=0;t<len;t++)
-//			{
-//				USB_USART_SendData(USB_USART_RX_BUF[t]);//以字节方式,发送给USB 
-//			}
-//			usb_printf("\r\n\r\n");//插入换行
-//			USB_USART_RX_STA=0;
-//		}
-////        else
-////		{
-////			times++;
-////			if(times%200==0)usb_printf("请输入数据,以回车键结束\r\n");  
-////			delay_ms(10);   
-////		}	
-//	}
 }
 
 __attribute__((used))    //!< 避免下面的处理程序被编译器优化掉

@@ -1,19 +1,13 @@
 #include "ldConfig.h"
-#include "ldWindow.h"
-#include "ldGui.h"
-#include "ldCommon.h"
-#include "xList.h"
-#include "ldImage.h"
 
-/***************************************************************************//**
- * @fn         bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
- * @brief      获取触摸坐标
- * @param      *x,*y  触摸坐标
- * @return     bool 是否有触摸
- * @version    V0.1
- * @date       
- * @details    
- ******************************************************************************/
+/**
+ * @brief   获取触摸坐标
+ * 
+ * @param   x 返回的x坐标
+ * @param   y 返回的y坐标
+ * @return  true 有效触摸
+ * @return  false 无效触摸
+ */
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
 {
     bool touchState=false;

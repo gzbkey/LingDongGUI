@@ -105,14 +105,17 @@
     {
      return 0;
     }
+
     int _sys_close(FILEHANDLE fh)
     {
         return 0;
     }
+
     int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
     {
         return 0;
     }
+
     int _sys_read(FILEHANDLE fh, unsigned char*buf, unsigned len, int mode)
     {
         return 0;
@@ -122,6 +125,7 @@
     {
         return 0;
     }
+
     int _sys_seek(FILEHANDLE fh, long pos)
     {
         return 0;
@@ -136,10 +140,12 @@
     {
         return 0;
     }
+
     void _sys_exit(int status)
     {
         //while(1);
     }
+
     int _sys_tmpnam(char *name, int fileno, unsigned maxlength)
     {
         return 0;
@@ -148,13 +154,15 @@
     void _ttywrch(int ch)
     {
     }
+
     int remove(const char *filename)
     {
         return 0;
     }
+
     char *_sys_command_string(char *cmd, int len)
     {
-     return NULL;
+        return NULL;
     }
 
     void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode) 
@@ -163,7 +171,8 @@
         (void)chLine;
         (void)wErrCode;
         
-        while(1) {
+        while(1) 
+        {
         }
     }
 
@@ -227,9 +236,124 @@
     #include "ldConfig.h" 
     ```
 
-4. 新建ldConfig.c、ldConfig.h、ldUser.c、ldUser.h
+4. 新建ldConfig.c
+    ```c
+    #include "ldConfig.h"
+
+    /**
+     * @brief   获取触摸坐标
+     * 
+     * @param   x 返回的x坐标
+     * @param   y 返回的y坐标
+     * @return  true 有效触摸
+     * @return  false 无效触摸
+     */
+    bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
+    {
+        bool touchState=false;
+        int16_t rx;
+        int16_t ry;
+        
+        //添加触摸函数
+    //    touchState=vtMouseGetPoint(&rx,&ry);
+
+        if((touchState!=0)&&(((rx!=-1)&&(ry!=-1))||((rx!=0)&&(ry!=0))))
+        {
+            if(rx<0)
+            {
+                rx=0;
+            }
+            if(ry<0)
+            {
+                ry=0;
+            }
+            if(rx>LD_CFG_SCEEN_WIDTH)
+            {
+                rx=LD_CFG_SCEEN_WIDTH;
+            }
+            if(ry>LD_CFG_SCEEN_HEIGHT)
+            {
+                ry=LD_CFG_SCEEN_HEIGHT;
+            }
+            *x=rx;
+            *y=ry;
+            touchState=true;
+        }
+        else
+        {
+            touchState=false;
+            *x=-1;
+            *y=-1;
+        }
+        return touchState;
+    }
+    ```
+
+5. 新建ldConfig.h
+```c 
+    #ifndef _LD_CONFIG_H_
+    #define _LD_CONFIG_H_
+
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+
+    #include "stdint.h"
+    #include "stdbool.h"
+    #include "arm_2d_cfg.h"
+    #include "lcd.h"
+
+    #define LD_CFG_SCEEN_WIDTH                        LCD_WIDTH
+    #define LD_CFG_SCEEN_HEIGHT                       LCD_HEIGHT
+    #define LD_CFG_COLOR_DEPTH                        16   // 8 16 32
+
+    #define USE_VIRTUAL_RESOURCE                      0
+
+    #define USE_DIRTY_REGION                          1
+
+    #define USE_OPACITY                               0
+
+    #define USE_TLSF                                  1
+
+    #define USE_RADIA_MENU_SCALE                      1
+
+    #define LD_MEM_SIZE                               (16*1024) //BYTE
+
+    #define LD_DEBUG                                  0
+
+    // arm-2d config
+
+    // PFB尺寸
+    #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_SCEEN_WIDTH
+    #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            16
+    #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
+
+    // 以下不用修改
+    #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
+    #define __DISP0_CFG_SCEEN_WIDTH__                 LD_CFG_SCEEN_WIDTH
+    #define __DISP0_CFG_SCEEN_HEIGHT__                LD_CFG_SCEEN_HEIGHT
+    #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     USE_VIRTUAL_RESOURCE
+
+    #if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
+    #error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
+    #endif
+
+    bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
+
+    #ifdef __cplusplus
+    }
+    #endif
+
+    #endif //_LD_CONFIG_H_
+
+```
+
+6. 新建ldUser.c、ldUser.h
 
 5. xLog.h关闭打印功能
+
+    如果需要使用打印功能，请自定义printf
+
     ```c
     #define SET_LOG_LEVEL            LOG_LEVEL_NONE
     ```
