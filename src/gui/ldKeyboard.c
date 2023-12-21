@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    keyboard.c
+ * @file    ldKeyboard.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   键盘控件，可以切换数字键盘和字母键盘
  * @version 0.1
@@ -620,15 +620,6 @@ void ldKeyboardFrameStart(ldKeyboard_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-/**
- * @brief   键盘显示处理函数
- *
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-23
- */
 void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;

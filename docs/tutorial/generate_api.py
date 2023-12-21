@@ -227,7 +227,8 @@ for filePath in fileList:
     widgetName = ''
     fileComment = getFileComment(filePath)
     outList=getParam(fileComment[0],'@file')
-    widgetName=outList[0].replace(" ", "").lstrip("ld").rstrip(".c")
+    widgetName=outList[0].replace(" ", "")
+    widgetName = widgetName[2:-2]
     if 'scene' in widgetName.lower() or 'gui' in widgetName.lower():
         continue
 

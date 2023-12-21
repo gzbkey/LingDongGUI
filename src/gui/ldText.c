@@ -84,6 +84,20 @@ void ldTextDel(ldText_t *pWidget)
     }
 }
 
+/**
+ * @brief   文本控件初始化函数
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   pFontDict       字体指针
+ * @return  ldText_t*       新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict)
 {
     ldText_t *pNewWidget = NULL;

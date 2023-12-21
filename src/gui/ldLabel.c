@@ -78,6 +78,20 @@ void ldLabelDel(ldLabel_t *pWidget)
     }
 }
 
+/**
+ * @brief   标签文本初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   pFontDict       字体指针
+ * @return  ldLabel_t*      新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict)
 {
     ldLabel_t *pNewWidget = NULL;
@@ -215,6 +229,14 @@ void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
     }
 }
 
+/**
+ * @brief   设置透明
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetTransparent(ldLabel_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -224,6 +246,14 @@ void ldLabelSetTransparent(ldLabel_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   设置文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            文本指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)
@@ -235,6 +265,14 @@ void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr)
     strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
+/**
+ * @brief   设置文本颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文本颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
@@ -244,6 +282,18 @@ void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor)
     pWidget->charColor=charColor;
 }
 
+/**
+ * @brief   文本的对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)
@@ -253,6 +303,14 @@ void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align)
     pWidget->align=align;
 }
 
+/**
+ * @brief   设置背景图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   imageAddr       图片地址
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetBgImage(ldLabel_t *pWidget, uint32_t imageAddr)
 {
     if(pWidget==NULL)
@@ -263,6 +321,14 @@ void ldLabelSetBgImage(ldLabel_t *pWidget, uint32_t imageAddr)
     pWidget->isTransparent=false;
 }
 
+/**
+ * @brief   设置背景颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         背景颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetBgColor(ldLabel_t *pWidget, ldColor bgColor)
 {
     if(pWidget==NULL)
@@ -274,6 +340,14 @@ void ldLabelSetBgColor(ldLabel_t *pWidget, ldColor bgColor)
     pWidget->bgImgAddr=LD_ADDR_NONE;
 }
 
+/**
+ * @brief   设置不透明度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   opacity         0(透明)-255(不透明)
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldLabelSetOpacity(ldLabel_t *pWidget, uint8_t opacity)
 {
     if (pWidget == NULL)

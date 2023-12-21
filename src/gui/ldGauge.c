@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    gauge.c
+ * @file    ldGauge.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   仪表盘控件
  * @version 0.1
@@ -176,15 +176,6 @@ void ldGaugeFrameStart(ldGauge_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-/**
- * @brief   gauge循环处理函数
- *
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
 void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;

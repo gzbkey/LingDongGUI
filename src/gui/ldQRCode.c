@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    QRCode.c
+ * @file    ldQRCode.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   qr code widget
  * @version 0.1
@@ -176,15 +176,6 @@ void ldQRCodeFrameStart(ldQRCode_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-/**
- * @brief   二维码显示处理函数
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-14
- */
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -270,6 +261,14 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
     }
 }
 
+/**
+ * @brief   设置二维码文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pNewText        文本指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText)
 {
     uint8_t *pText;

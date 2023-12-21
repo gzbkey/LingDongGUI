@@ -162,6 +162,21 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
     return false;
 }
 
+/**
+ * @brief   滚动选择器初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   pFontDict       字体指针
+ * @param   itemMax         项目数量最大值
+ * @return  ldScrollSelecter_t* 新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
 {
     ldScrollSelecter_t *pNewWidget = NULL;
@@ -344,7 +359,14 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     }
 }
 
-
+/**
+ * @brief   添加项目内容
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            项目显示的字符串
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
 {
     if(pWidget==NULL)
@@ -363,6 +385,14 @@ void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
     }
 }
 
+/**
+ * @brief   设置文本颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文本颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
@@ -372,6 +402,14 @@ void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor)
     pWidget->charColor=charColor;
 }
 
+/**
+ * @brief   设置背景颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         背景颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor)
 {
     if(pWidget==NULL)
@@ -386,6 +424,14 @@ void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor)
     pWidget->isTransparent=false;
 }
 
+/**
+ * @brief   设置背景图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   imgAddr         背景图片地址
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr)
 {
     if(pWidget==NULL)
@@ -399,6 +445,14 @@ void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr)
     pWidget->isTransparent=false;
 }
 
+/**
+ * @brief   设置为背景透明
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -408,6 +462,14 @@ void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTranspare
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   设置不透明度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   opacity         不透明度 0-255
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
 {
     if (pWidget == NULL)
@@ -419,6 +481,14 @@ void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
 #endif
 }
 
+/**
+ * @brief   设置移动速度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   speed           速度值，最小值:1,最大值：控件高度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
 {
     if (pWidget == NULL)
@@ -436,6 +506,14 @@ void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
     pWidget->moveOffset=speed;
 }
 
+/**
+ * @brief   选中项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   itemNum         项目编号，0开始
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum)
 {
     if (pWidget == NULL)
@@ -450,6 +528,18 @@ void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum)
     pWidget->isWaitMove=true;
 }
 
+/**
+ * @brief   设置文字对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)

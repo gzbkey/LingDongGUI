@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    comboBox.c
+ * @file    ldComboBox.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   下拉框控件
  * @version 0.1
@@ -267,15 +267,6 @@ void ldComboBoxFrameStart(ldComboBox_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-/**
- * @brief   下拉框显示处理函数
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-05
- */
 void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;

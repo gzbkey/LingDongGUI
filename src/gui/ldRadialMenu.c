@@ -184,6 +184,22 @@ static bool slotMenuSelect(xConnectInfo_t info)
     return false;
 }
 
+/**
+ * @brief   旋转菜单初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   xAxis           x轴长度
+ * @param   yAxis           y轴长度
+ * @param   itemMax         项目数量最大值
+ * @return  ldRadialMenu_t* 新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax)
 {
     ldRadialMenu_t *pNewWidget = NULL;
@@ -329,45 +345,44 @@ static void _autoSort(ldRadialMenu_t *pWidget)
 
 void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,arm_2d_region_t newRegion,bool isAutoIgnore)
 {
+    switch (pWidget->pItemList[itemNum].dirtyRegionState)
+    {
+    case none:
+    {
+        if(isAutoIgnore&&(pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore==false))
+        {
+            pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=true;
+        }
+        break;
+    }
+    case waitChange://扩张到新范围
+    {
+        arm_2d_region_t tempRegion;
+        ldPoint_t globalPos;
+        globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
+        newRegion.tLocation.iX+=globalPos.x;
+        newRegion.tLocation.iY+=globalPos.y;
 
-        switch (pWidget->pItemList[itemNum].dirtyRegionState)
-        {
-        case none:
-        {
-            if(isAutoIgnore&&(pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore==false))
-            {
-                pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=true;
-            }
-            break;
-        }
-        case waitChange://扩张到新范围
-        {
-            arm_2d_region_t tempRegion;
-            ldPoint_t globalPos;
-            globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
-            newRegion.tLocation.iX+=globalPos.x;
-            newRegion.tLocation.iY+=globalPos.y;
+        arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->pItemList[itemNum].dirtyRegionTemp,&tempRegion);
 
-            arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->pItemList[itemNum].dirtyRegionTemp,&tempRegion);
-
-            pWidget->pItemList[itemNum].dirtyRegionListItem.tRegion=tempRegion;
-            pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
-            pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
-            pWidget->pItemList[itemNum].dirtyRegionTemp=newRegion;
-            pWidget->pItemList[itemNum].dirtyRegionState=waitUpdate;
-            break;
-        }
-        case waitUpdate://缩小到新范围
-        {
-            pWidget->pItemList[itemNum].dirtyRegionListItem.tRegion=pWidget->pItemList[itemNum].dirtyRegionTemp;
-            pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
-            pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
-            pWidget->pItemList[itemNum].dirtyRegionState=none;
-            break;
-        }
-        default:
-            break;
-        }
+        pWidget->pItemList[itemNum].dirtyRegionListItem.tRegion=tempRegion;
+        pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
+        pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
+        pWidget->pItemList[itemNum].dirtyRegionTemp=newRegion;
+        pWidget->pItemList[itemNum].dirtyRegionState=waitUpdate;
+        break;
+    }
+    case waitUpdate://缩小到新范围
+    {
+        pWidget->pItemList[itemNum].dirtyRegionListItem.tRegion=pWidget->pItemList[itemNum].dirtyRegionTemp;
+        pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
+        pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
+        pWidget->pItemList[itemNum].dirtyRegionState=none;
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void ldRadialMenuFrameStart(ldRadialMenu_t* pWidget)
@@ -503,6 +518,18 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
     }
 }
 
+/**
+ * @brief   添加项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   imageAddr       图片地址
+ * @param   width           图片宽度
+ * @param   height          图片高度
+ * @param   itemSubCount    子图片数量(用于动态视频效果)
+ * @param   isWithMask      图片是否带mask
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask)
 {
     if(pWidget==NULL)
@@ -535,7 +562,6 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
             pWidget->pItemList[i].angle=preAngle*i+ITEM_0_ANGLE_OFFSET;
         }
 
-
         //初始化数据
         _autoSort(pWidget);
 
@@ -554,6 +580,14 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
     }
 }
 
+/**
+ * @brief   选中项目
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   num             项目编号，0开始
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
 {
     if(pWidget==NULL)

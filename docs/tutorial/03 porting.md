@@ -20,6 +20,7 @@
     ```
  * 下载ldgui源码
 🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
+
 🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
 
 |ℹ️ 关于github下载慢的问题|
@@ -169,8 +170,7 @@
 
     ```
 
-8. 
-7. main文件加入如下代码
+8. main文件加入如下代码
     ```c 
     #include "arm_2d.h"
     #include "arm_2d_disp_adapters.h"
@@ -211,7 +211,7 @@
     }
     ```
 
-3. 运行效果
+9. 运行效果
 
    ![arm2d-demo](../tutorial/images/03/arm2d%20demo.gif)
 

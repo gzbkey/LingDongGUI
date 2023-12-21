@@ -18,6 +18,7 @@
  * @file    ldImage.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   image widget
+ *          background、window、image共用控件
  * @version 0.1
  * @date    2023-11-03
  */
@@ -82,7 +83,21 @@ void ldImageDel(ldImage_t *pWidget)
         xListInfoPrevTraverse(listInfo, pWidget, _imageDel);
     }
 }
-
+/**
+ * @brief   图片初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   imageAddr       图片地址
+ * @param   isWithMask      图片是否带mask
+ * @return  ldImage_t*      新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t imageAddr, bool isWithMask)
 {
     ldImage_t *pNewWidget = NULL;
@@ -163,6 +178,14 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
+/**
+ * @brief   设置背景色，window专用
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         背景颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
 {
     if (pWidget == NULL)
@@ -222,6 +245,14 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
     }
 }
 
+/**
+ * @brief   设置不透明度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   opacity         0(透明)-255(不透明)
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity)
 {
     if (pWidget == NULL)
@@ -233,6 +264,15 @@ void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity)
 #endif
 }
 
+/**
+ * @brief   设置图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   imageAddr       图片地址
+ * @param   isWithMask      是否带mask
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask)
 {
     if (pWidget == NULL)

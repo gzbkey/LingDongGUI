@@ -329,6 +329,25 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     return false;
 }
 
+/**
+ * @brief   图标滑动控件初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   iconWidth       图标宽度
+ * @param   iconSpace       图标间距
+ * @param   columnCount     列数
+ * @param   rowCount        行数
+ * @param   pageMax         页数
+ * @param   pFontDict       字体指针
+ * @return  ldIconSlider_t* 新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict)
 {
     ldIconSlider_t *pNewWidget = NULL;
@@ -620,6 +639,15 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
     }
 }
 
+/**
+ * @brief   添加图标
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   imageAddr       图片地址
+ * @param   pNameStr        图标名称字符串指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNameStr)
 {
     if(pWidget==NULL)
@@ -644,6 +672,14 @@ void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNa
 
 }
 
+/**
+ * @brief   滑动方向
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isHorizontal    true=水平滑动 false=纵向滑动
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal)
 {
     if(pWidget==NULL)
@@ -653,6 +689,14 @@ void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal)
     pWidget->isHorizontalScroll=isHorizontal;
 }
 
+/**
+ * @brief   设置移动速度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   speed           速度值，最小值:1,最大值：控件宽度或者高度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldIconSliderSetSpeed(ldIconSlider_t *pWidget, uint8_t speed)
 {
     if (pWidget == NULL)
