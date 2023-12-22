@@ -1346,20 +1346,9 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
 {
         switch (pWidget->dirtyRegionState)
         {
-        case none:
-        {
-            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
-            {
-                pWidget->dirtyRegionListItem.bIgnore=true;
-            }
-            break;
-        }
         case waitChange://扩大到新范围
         {
             arm_2d_region_t tempRegion;
-
-//            newRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-//            newRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
 
             arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
@@ -1375,6 +1364,11 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
             pWidget->dirtyRegionListItem.bIgnore=false;
             pWidget->dirtyRegionListItem.bUpdated=true;
             pWidget->dirtyRegionState=none;
+
+            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
+            {
+                pWidget->dirtyRegionListItem.bIgnore=true;
+            }
             break;
         }
         default:

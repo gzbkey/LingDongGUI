@@ -166,13 +166,13 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 
 void ldGaugeFrameStart(ldGauge_t* pWidget)
 {
-    if(pWidget->op.Target.ptRegion!=NULL)
+    if((pWidget->dirtyRegionState==waitChange)&&(pWidget->op.Target.ptRegion!=NULL))
     {
         pWidget->targetDirtyRegion=*(pWidget->op.Target.ptRegion);
         pWidget->targetDirtyRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
         pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
-        pWidget->dirtyRegionState=waitChange;
     }
+
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -399,6 +399,8 @@ void ldGaugeSetAngle(ldGauge_t *pWidget, float angle)
     }
     pWidget->angle_x10=(int16_t)(angle*10);
     pWidget->angle_x10%=3600;
+
+    pWidget->dirtyRegionState=waitChange;
 }
 
 /**

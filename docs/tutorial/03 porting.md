@@ -60,7 +60,7 @@
 
     部分刷新缓冲块的高度（Height of the PFB Block），配置为8
 
-6. 树目录中的Acceleration，找到arm_2d_disp_adapter_0.h。
+6. 树目录中的Acceleration，找到arm_2d_cfg.h。
     
     编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth、width和height
 

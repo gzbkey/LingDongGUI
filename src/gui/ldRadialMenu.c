@@ -347,14 +347,6 @@ void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,a
 {
     switch (pWidget->pItemList[itemNum].dirtyRegionState)
     {
-    case none:
-    {
-        if(isAutoIgnore&&(pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore==false))
-        {
-            pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=true;
-        }
-        break;
-    }
     case waitChange://扩张到新范围
     {
         arm_2d_region_t tempRegion;
@@ -378,6 +370,11 @@ void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,a
         pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
         pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
         pWidget->pItemList[itemNum].dirtyRegionState=none;
+
+        if(isAutoIgnore&&(pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore==false))
+        {
+            pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=true;
+        }
         break;
     }
     default:

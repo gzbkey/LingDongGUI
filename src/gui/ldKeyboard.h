@@ -28,6 +28,7 @@ typedef struct {
     bool isNumber:1;
     bool isClick:1;
     uint8_t upperState:2;
+    bool isWaitInit:1;
     ldFontDict_t *pFontDict;
     arm_2d_location_t clickPoint;
     arm_2d_region_t targetDirtyRegion;
