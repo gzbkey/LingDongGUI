@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    comboBox.c
+ * @file    ldComboBox.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   下拉框控件
  * @version 0.1
@@ -122,6 +122,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         if(clickItemNum==SHOW_ITEM_NUM)
         {
             pWidget->isExpand=!pWidget->isExpand;
+            pWidget->dirtyRegionState=waitChange;
         }
         else
         {
@@ -136,6 +137,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         {
             pWidget->itemSelect=pWidget->itemPreSelect;
             pWidget->isExpand=false;
+            pWidget->dirtyRegionState=waitChange;
         }
 
         break;
@@ -230,8 +232,9 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
@@ -250,15 +253,20 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-/**
- * @brief   下拉框显示处理函数
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-05
- */
+void ldComboBoxFrameStart(ldComboBox_t* pWidget)
+{
+    if(pWidget->isExpand)
+    {
+        ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight*(pWidget->itemCount+1);
+    }
+    else
+    {
+        ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight;
+    }
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -273,18 +281,6 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
-    if(bIsNewFrame)
-    {
-        if(pWidget->isExpand)
-        {
-            pResTile->tRegion.tSize.iHeight=pWidget->itemHeight*(pWidget->itemCount+1);
-        }
-        else
-        {
-            pResTile->tRegion.tSize.iHeight=pWidget->itemHeight;
-        }
-    }
-
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t tempRes=*pResTile;
 #else
@@ -293,7 +289,6 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -317,19 +312,19 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             arm_2d_draw_box(&tTarget,&displayRegion,1,LD_COLOR_LIGHT_GREY,255);
         }
 
-        tempRes.tRegion.tLocation.iX=pResTile->tRegion.tSize.iWidth-pWidget->dropdownImgWidth-(pWidget->itemHeight-pWidget->dropdownImgWidth)/2;
-        tempRes.tRegion.tLocation.iY=(pWidget->itemHeight-pWidget->dropdownImgHeight)/2;
-        tempRes.tRegion.tSize.iWidth=pWidget->dropdownImgWidth;
-        tempRes.tRegion.tSize.iHeight=pWidget->dropdownImgHeight;
-        tempRes.pchBuffer = (uint8_t *)pWidget->dropdownImgAddr;
+        ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=pResTile->tRegion.tSize.iWidth-pWidget->dropdownImgWidth-(pWidget->itemHeight-pWidget->dropdownImgWidth)/2;
+        ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=(pWidget->itemHeight-pWidget->dropdownImgHeight)/2;
+        ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iWidth=pWidget->dropdownImgWidth;
+        ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iHeight=pWidget->dropdownImgHeight;
+        ((arm_2d_tile_t*)(&tempRes))->pchBuffer = (uint8_t *)pWidget->dropdownImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
         ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->dropdownImgAddr;
 #endif
-        tempRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+        ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
 
         if(pWidget->dropdownImgAddr==dropDownV_png)
         {
-            tempRes.bVirtualResource=false;
+            ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
         }
 
         ldBaseMaskImage(&tTarget,&tempRes,LD_COLOR_BLACK,255);

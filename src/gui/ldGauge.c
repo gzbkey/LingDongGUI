@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    gauge.c
+ * @file    ldGauge.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   仪表盘控件
  * @version 0.1
@@ -147,9 +147,10 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -163,15 +164,18 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
-/**
- * @brief   gauge循环处理函数
- *
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
+void ldGaugeFrameStart(ldGauge_t* pWidget)
+{
+    if((pWidget->dirtyRegionState==waitChange)&&(pWidget->op.Target.ptRegion!=NULL))
+    {
+        pWidget->targetDirtyRegion=*(pWidget->op.Target.ptRegion);
+        pWidget->targetDirtyRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+        pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+    }
+
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -199,7 +203,6 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -332,13 +335,6 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
             arm_2d_op_wait_async(NULL);
 
-            if(bIsNewFrame)
-            {
-               pWidget->targetDirtyRegion=*pWidget->op.Target.ptRegion;
-//               pWidget->targetDirtyRegion.tLocation.iX+=pResTile->tRegion.tLocation.iX;
-//               pWidget->targetDirtyRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
-               pWidget->dirtyRegionState=waitChange;
-            }
         } while(0);
     }
 }
@@ -403,6 +399,8 @@ void ldGaugeSetAngle(ldGauge_t *pWidget, float angle)
     }
     pWidget->angle_x10=(int16_t)(angle*10);
     pWidget->angle_x10%=3600;
+
+    pWidget->dirtyRegionState=waitChange;
 }
 
 /**

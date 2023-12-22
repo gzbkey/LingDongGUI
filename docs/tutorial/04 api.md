@@ -1,3 +1,10 @@
+# Arc
+### 简述
+
+### 函数列表
+### 信号列表
+### 函数说明
+---
 # Button
 ### 简述
 button widget
@@ -11,7 +18,6 @@ button widget
 * void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent);
 * void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner);
 * void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected);
-* void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align);
 * void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict);
 ### 信号列表
@@ -284,35 +290,6 @@ button widget
 </table>
 <br>
 
-#### ldButtonLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    按键循环处理函数        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
-    </tr>
-</table>
-<br>
-
 #### ldButtonSetAlign
 <table>
     <tr>
@@ -369,13 +346,12 @@ button widget
 复选框 + 单选功能，支持自定义图片和文字显示
 ### 函数列表
 * ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
-* void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor);
 * void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheckedImgAddr,bool isUncheckedMask,uint32_t checkedImgAddr,bool isCheckedMask);
-* void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict);
-* void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr);
+* void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pStr);
 * void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num);
 * void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner);
+* void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor);
 ### 信号列表
 ### 函数说明
 #### ldCheckBoxInit
@@ -420,35 +396,6 @@ button widget
         <td>返回</td>
         <td>ldCheckBox_t*</td>
         <td>新控件指针</td>
-    </tr>
-</table>
-<br>
-
-#### ldCheckBoxLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    check                box循环处理函数        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
     </tr>
 </table>
 <br>
@@ -523,37 +470,12 @@ button widget
 </table>
 <br>
 
-#### ldCheckBoxSetFont
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldCheckBoxSetFont(ldCheckBox_t *pWidget,ldFontDict_t *pFontDict);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    设置字体        </td>
-    </tr>
-    <tr>
-        <td rowspan="2">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pFontDict</td>
-        <td>字体</td>
-    </tr>
-</table>
-<br>
-
 #### ldCheckBoxSetText
 <table>
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void ldCheckBoxSetText(ldCheckBox_t* pWidget,uint8_t *pStr);</code></pre>
+            <pre><code class="language-c">void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pStr);</code></pre>
         </td>
     </tr>
     <tr>
@@ -623,13 +545,37 @@ button widget
 </table>
 <br>
 
+#### ldCheckBoxSetCharColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>charColor</td>
+        <td>文本颜色</td>
+    </tr>
+</table>
+<br>
+
 ---
-# comboBox
+# ComboBox
 ### 简述
 下拉框控件
 ### 函数列表
 * ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict,uint8_t itemMax);
-* void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);
 * void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);
 ### 信号列表
@@ -684,35 +630,6 @@ button widget
         <td>返回</td>
         <td>ldComboBox_t*</td>
         <td>新控件指针</td>
-    </tr>
-</table>
-<br>
-
-#### ldComboBoxLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    下拉框显示处理函数        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
     </tr>
 </table>
 <br>
@@ -822,7 +739,6 @@ button widget
 date time widget
 ### 函数列表
 * ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict);
-* void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent);
 * void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr);
 * void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor);
@@ -879,35 +795,6 @@ date time widget
         <td>返回</td>
         <td>ldDateTime_t*</td>
         <td>新控件指针</td>
-    </tr>
-</table>
-<br>
-
-#### ldDateTimeLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    日期时间显示处理        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
     </tr>
 </table>
 <br>
@@ -1129,12 +1016,11 @@ date time widget
 <br>
 
 ---
-# gauge
+# Gauge
 ### 简述
 仪表盘控件
 ### 函数列表
 * ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uint32_t bgImgAddr,bool isBgMask);
-* void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldGaugeSetPointerImage(ldGauge_t *pWidget,uint32_t pointerImgAddr,int16_t pointerWidth,int16_t pointerHeight,int16_t pointerOriginOffsetX,int16_t pointerOriginOffsetY);
 * void ldGaugeSetCenterOffset(ldGauge_t *pWidget, int16_t centreOffsetX, int16_t centreOffsetY);
 * void ldGaugeSetAngle(ldGauge_t *pWidget, float angle);
@@ -1183,35 +1069,6 @@ date time widget
         <td>返回</td>
         <td>ldGauge_t*</td>
         <td>新控件指针</td>
-    </tr>
-</table>
-<br>
-
-#### ldGaugeLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    gauge循环处理函数        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
     </tr>
 </table>
 <br>
@@ -1341,34 +1198,597 @@ date time widget
 <br>
 
 ---
-# graph
+# Graph
 ### 简述
-
+曲线图控件
 ### 函数列表
+* ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height ,uint8_t seriesMax);
+* void ldGraphSetPointImageMask(ldGraph_t *pWidget,uint32_t addr,int16_t width);
+* int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint8_t lineSize,uint16_t valueCountMax);
+* void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value);
+* void ldGraphSetAxis(ldGraph_t *pWidget,uint16_t xAxis,uint16_t yAxis,uint16_t xAxisOffset);
+* void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace,bool isCorner);
+* void ldGraphSetGridOffset(ldGraph_t *pWidget,uint8_t gridOffset);
+* void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue);
 ### 信号列表
 ### 函数说明
+#### ldGraphInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height ,uint8_t seriesMax);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    曲线图初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="7">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>seriesMax</td>
+        <td>曲线数量最大值</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldGraph_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphSetPointImageMask
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldGraphSetPointImageMask(ldGraph_t *pWidget,uint32_t addr,int16_t width);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置圆点mask图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>addr</td>
+        <td>mask图片地址</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>图片宽度</td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphAddSeries
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint8_t lineSize,uint16_t valueCountMax);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    添加曲线缓存        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>seriesColor</td>
+        <td>曲线颜色</td>
+    </tr>
+    <tr>
+        <td>lineSize</td>
+        <td>线条大小：0=无线条，1-255</td>
+    </tr>
+    <tr>
+        <td>valueCountMax</td>
+        <td>储存数据数量，一般为:x轴最大值/x轴间隔</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>int8_t</td>
+        <td></td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphSetValue
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置曲线数据        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>seriesNum</td>
+        <td>曲线序号</td>
+    </tr>
+    <tr>
+        <td>valueNum</td>
+        <td>数据序号</td>
+    </tr>
+    <tr>
+        <td>value</td>
+        <td>数据值</td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphSetAxis
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldGraphSetAxis(ldGraph_t *pWidget,uint16_t xAxis,uint16_t yAxis,uint16_t xAxisOffset);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置波形参考线        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>xAxis</td>
+        <td>x轴数据最大值</td>
+    </tr>
+    <tr>
+        <td>yAxis</td>
+        <td>y轴数据最大值</td>
+    </tr>
+    <tr>
+        <td>xAxisOffset</td>
+        <td>x轴数据间隔</td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphSetFrameSpace
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace,bool isCorner);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置边框间距        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>frameSpace</td>
+        <td>间距值</td>
+    </tr>
+    <tr>
+        <td>isCorner</td>
+        <td>是否圆角</td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphSetGridOffset
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldGraphSetGridOffset(ldGraph_t *pWidget,uint8_t gridOffset);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置栅格间隔        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>gridOffset</td>
+        <td>栅格间距</td>
+    </tr>
+</table>
+<br>
+
+#### ldGraphMoveAdd
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    将最新数据放到最后， <br>    数据达到最大值后，自动向后移动数据，自动丢弃最前边的数据<br>    实现波形自动刷新        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>seriesNum</td>
+        <td>曲线号码</td>
+    </tr>
+    <tr>
+        <td>newValue</td>
+        <td>数据值</td>
+    </tr>
+</table>
+<br>
+
 ---
 # IconSlider
 ### 简述
 icon slider widget
 ### 函数列表
+* ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict);
+* void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNameStr);
+* void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal);
+* void ldIconSliderSetSpeed(ldIconSlider_t *pWidget, uint8_t speed);
 ### 信号列表
 * SIGNAL_CLICKED_ITEM
 ### 函数说明
+#### ldIconSliderInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    图标滑动控件初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="12">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>iconWidth</td>
+        <td>图标宽度</td>
+    </tr>
+    <tr>
+        <td>iconSpace</td>
+        <td>图标间距</td>
+    </tr>
+    <tr>
+        <td>columnCount</td>
+        <td>列数</td>
+    </tr>
+    <tr>
+        <td>rowCount</td>
+        <td>行数</td>
+    </tr>
+    <tr>
+        <td>pageMax</td>
+        <td>页数</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldIconSlider_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldIconSliderAddIcon
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNameStr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    添加图标        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>imageAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>pNameStr</td>
+        <td>图标名称字符串指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldIconSliderSetHorizontalScroll
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    滑动方向        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>isHorizontal</td>
+        <td>true=水平滑动 false=纵向滑动</td>
+    </tr>
+</table>
+<br>
+
+#### ldIconSliderSetSpeed
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldIconSliderSetSpeed(ldIconSlider_t *pWidget, uint8_t speed);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置移动速度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>speed</td>
+        <td>速度值，最小值:1,最大值：控件宽度或者高度</td>
+    </tr>
+</table>
+<br>
+
 ---
 # Image
 ### 简述
-image widget
+image widget background、window、image共用控件
 ### 函数列表
+* ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t imageAddr, bool isWithMask);
+* void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor);
+* void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity);
+* void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask);
 ### 信号列表
 ### 函数说明
+#### ldImageInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t imageAddr, bool isWithMask);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    图片初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="8">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>imageAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>isWithMask</td>
+        <td>图片是否带mask</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldImage_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldImageSetBgColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景色，window专用        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>背景颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldImageSetOpacity
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置不透明度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>opacity</td>
+        <td>0(透明)-255(不透明)</td>
+    </tr>
+</table>
+<br>
+
+#### ldImageSetImage
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>imageAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>isWithMask</td>
+        <td>是否带mask</td>
+    </tr>
+</table>
+<br>
+
 ---
-# keyboard
+# Keyboard
 ### 简述
 键盘控件，可以切换数字键盘和字母键盘
 ### 函数列表
-* ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t *pFontDict);
-* void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+* ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict);
 ### 信号列表
 * SIGNAL_INPUT_ASCII
 ### 函数说明
@@ -1377,7 +1797,7 @@ image widget
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">ldKeyboard_t *ldKeyboardInit(uint16_t nameId, uint16_t parentNameId,ldFontDict_t *pFontDict);</code></pre>
+            <pre><code class="language-c">ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict);</code></pre>
         </td>
     </tr>
     <tr>
@@ -1386,13 +1806,9 @@ image widget
     键盘初始化        </td>
     </tr>
     <tr>
-        <td rowspan="3">参数</td>
+        <td rowspan="2">参数</td>
         <td>nameId</td>
         <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>parentNameId</td>
-        <td>父控件id</td>
     </tr>
     <tr>
         <td>pFontDict</td>
@@ -1406,49 +1822,252 @@ image widget
 </table>
 <br>
 
-#### ldKeyboardLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    键盘显示处理函数        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
-    </tr>
-</table>
-<br>
-
 ---
 # Label
 ### 简述
 label widget
 ### 函数列表
+* ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
+* void ldLabelSetTransparent(ldLabel_t* pWidget,bool isTransparent);
+* void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr);
+* void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor);
+* void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align);
+* void ldLabelSetBgImage(ldLabel_t *pWidget, uint32_t imageAddr);
+* void ldLabelSetBgColor(ldLabel_t *pWidget, ldColor bgColor);
+* void ldLabelSetOpacity(ldLabel_t *pWidget, uint8_t opacity);
 ### 信号列表
 ### 函数说明
+#### ldLabelInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    标签文本初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="7">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldLabel_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetTransparent
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetTransparent(ldLabel_t* pWidget,bool isTransparent);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置透明        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>isTransparent</td>
+        <td>true=透明 false=不透明</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetText
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pStr</td>
+        <td>文本指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetTextColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>charColor</td>
+        <td>文本颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetAlign
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    文本的对齐方式        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>align</td>
+        <td>LD_ALIGN_CENTER<br>                         LD_ALIGN_TOP<br>                         LD_ALIGN_BOTTOM<br>                         LD_ALIGN_LEFT<br>                         LD_ALIGN_RIGHT</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetBgImage
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetBgImage(ldLabel_t *pWidget, uint32_t imageAddr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>imageAddr</td>
+        <td>图片地址</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetBgColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetBgColor(ldLabel_t *pWidget, ldColor bgColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>背景颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldLabelSetOpacity
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldLabelSetOpacity(ldLabel_t *pWidget, uint8_t opacity);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置不透明度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>opacity</td>
+        <td>0(透明)-255(不透明)</td>
+    </tr>
+</table>
+<br>
+
 ---
-# ineEdit
+# LineEdit
 ### 简述
 输入框控件
 ### 函数列表
 * ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t *pFontDict,uint8_t textMax);
-* void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldLineEditSetText(ldLineEdit_t* pWidget,uint8_t *pText);
 * void ldLineEditSetKeyboard(ldLineEdit_t* pWidget,uint16_t kbNameId);
 * void ldLineEditSetType(ldLineEdit_t* pWidget,ldEditType_t editType);
@@ -1504,35 +2123,6 @@ label widget
         <td>返回</td>
         <td>ldLineEdit_t*</td>
         <td>新控件指针</td>
-    </tr>
-</table>
-<br>
-
-#### ldLineEditLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    输入框显示处理        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
     </tr>
 </table>
 <br>
@@ -1617,29 +2207,747 @@ label widget
 ### 简述
 progress bar widget
 ### 函数列表
+* ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
+* void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent);
+* void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove);
+* void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove);
+* void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint16_t frameWidth);
+* void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor);
 ### 信号列表
 ### 函数说明
+#### ldProgressBarInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    进度条初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="6">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldProgressBar_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldProgressBarSetPercent
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置百分比        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>percent</td>
+        <td>百分比</td>
+    </tr>
+</table>
+<br>
+
+#### ldProgressBarSetBgImage
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>bgWidth</td>
+        <td>图片宽度</td>
+    </tr>
+    <tr>
+        <td>isMove</td>
+        <td>图片是否滚动</td>
+    </tr>
+</table>
+<br>
+
+#### ldProgressBarSetFgImage
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置前景图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>fgAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>fgWidth</td>
+        <td>图片宽度</td>
+    </tr>
+    <tr>
+        <td>isMove</td>
+        <td>图片是否滚动</td>
+    </tr>
+</table>
+<br>
+
+#### ldProgressBarSetFrameImage
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint16_t frameWidth);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置边框图片，计为最前边的遮挡图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>frameAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>frameWidth</td>
+        <td>图片宽度</td>
+    </tr>
+</table>
+<br>
+
+#### ldProgressBarSetColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>背景颜色</td>
+    </tr>
+    <tr>
+        <td>fgColor</td>
+        <td>前景颜色</td>
+    </tr>
+    <tr>
+        <td>frameColor</td>
+        <td>边框颜色</td>
+    </tr>
+</table>
+<br>
+
 ---
 # QRCode
 ### 简述
 qr code widget
 ### 函数列表
+* ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom);
+* void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText);
 ### 信号列表
 ### 函数说明
+#### ldQRCodeInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    二维码初始化函数        </td>
+    </tr>
+    <tr>
+        <td rowspan="12">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>qrText</td>
+        <td>二维码的内容文本</td>
+    </tr>
+    <tr>
+        <td>qrColor</td>
+        <td>二维码颜色</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>底色</td>
+    </tr>
+    <tr>
+        <td>qrEcc</td>
+        <td>eccLow 容忍错误7%<br>                         eccMedium 容忍错误15%<br>                         eccQuartile 容忍错误25%<br>                         eccHigh 容忍错误30%</td>
+    </tr>
+    <tr>
+        <td>qrMaxVersion</td>
+        <td>二维码版本，0-40，版本越高，尺寸越大</td>
+    </tr>
+    <tr>
+        <td>qrZoom</td>
+        <td>放大二维码倍数，1-255</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldQRCode_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldQRCodeSetText
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置二维码文本        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pNewText</td>
+        <td>文本指针</td>
+    </tr>
+</table>
+<br>
+
 ---
 # RadialMenu
 ### 简述
 radial menu widget
 ### 函数列表
+* ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax);
+* void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask);
+* void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num);
 ### 信号列表
 ### 函数说明
+#### ldRadialMenuInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    旋转菜单初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="9">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>xAxis</td>
+        <td>x轴长度</td>
+    </tr>
+    <tr>
+        <td>yAxis</td>
+        <td>y轴长度</td>
+    </tr>
+    <tr>
+        <td>itemMax</td>
+        <td>项目数量最大值</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldRadialMenu_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldRadialMenuAddItem
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    添加项目        </td>
+    </tr>
+    <tr>
+        <td rowspan="6">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>imageAddr</td>
+        <td>图片地址</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>图片宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>图片高度</td>
+    </tr>
+    <tr>
+        <td>itemSubCount</td>
+        <td>子图片数量(用于动态视频效果)</td>
+    </tr>
+    <tr>
+        <td>isWithMask</td>
+        <td>图片是否带mask</td>
+    </tr>
+</table>
+<br>
+
+#### ldRadialMenuSelectItem
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    选中项目        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>num</td>
+        <td>项目编号，0开始</td>
+    </tr>
+</table>
+<br>
+
 ---
 # ScrollSelecter
 ### 简述
 scroll selecter widget
 ### 函数列表
+* ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);
+* void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr);
+* void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor);
+* void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
+* void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr);
+* void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
+* void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity);
+* void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
+* void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum);
+* void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align);
 ### 信号列表
 ### 函数说明
+#### ldScrollSelecterInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    滚动选择器初始化        </td>
+    </tr>
+    <tr>
+        <td rowspan="8">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+    <tr>
+        <td>itemMax</td>
+        <td>项目数量最大值</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldScrollSelecter_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterAddItem
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    添加项目内容        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pStr</td>
+        <td>项目显示的字符串</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetTextColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>charColor</td>
+        <td>文本颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetBgColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>背景颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetBgImage
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景图片        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>imgAddr</td>
+        <td>背景图片地址</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetTransparent
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置为背景透明        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>isTransparent</td>
+        <td>true=透明 false=不透明</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetOpacity
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置不透明度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>opacity</td>
+        <td>不透明度 0-255</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetSpeed
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置移动速度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>speed</td>
+        <td>速度值，最小值:1,最大值：控件高度</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetItem
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    选中项目        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>itemNum</td>
+        <td>项目编号，0开始</td>
+    </tr>
+</table>
+<br>
+
+#### ldScrollSelecterSetAlign
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文字对齐方式        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>align</td>
+        <td>LD_ALIGN_CENTER<br>                         LD_ALIGN_TOP<br>                         LD_ALIGN_BOTTOM<br>                         LD_ALIGN_LEFT<br>                         LD_ALIGN_RIGHT</td>
+    </tr>
+</table>
+<br>
+
 ---
 # Table
 ### 简述
@@ -1651,7 +2959,6 @@ scroll selecter widget
 * ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
 * ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
 * ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
-* void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 * void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
 * void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height);
 * void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
@@ -1863,35 +3170,6 @@ scroll selecter widget
         <td>返回</td>
         <td>ldTable_t*</td>
         <td>新控件指针</td>
-    </tr>
-</table>
-<br>
-
-#### ldTableLoop
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    表格显示处理        </td>
-    </tr>
-    <tr>
-        <td rowspan="3">参数</td>
-        <td>pWidget</td>
-        <td>目标控件指针</td>
-    </tr>
-    <tr>
-        <td>pParentTile</td>
-        <td>父控件tile对象</td>
-    </tr>
-    <tr>
-        <td>bIsNewFrame</td>
-        <td>新的一帧开始标志</td>
     </tr>
 </table>
 <br>
@@ -2234,8 +3512,59 @@ scroll selecter widget
 ### 简述
 text widget
 ### 函数列表
+* ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
 ### 信号列表
 ### 函数说明
+#### ldTextInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    文本控件初始化函数        </td>
+    </tr>
+    <tr>
+        <td rowspan="7">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldText_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
 ---
 # Window
 ### 简述
@@ -2243,7 +3572,6 @@ window widget 窗体控件可包含其他的控件，实现复合型控件或者
 ### 函数列表
 * ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
 * void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent);
-* void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic);
 ### 信号列表
 ### 函数说明
 #### ldWindowInit
@@ -2313,31 +3641,6 @@ window widget 窗体控件可包含其他的控件，实现复合型控件或者
     <tr>
         <td>isTransparent</td>
         <td>true=透明 false=不透明</td>
-    </tr>
-</table>
-<br>
-
-#### ldWindowSetStatic
-<table>
-    <tr>
-        <td>函数</td>
-        <td colspan="2">
-            <pre><code class="language-c">void ldWindowSetStatic(ldWindow_t *pWidget,bool isStatic);</code></pre>
-        </td>
-    </tr>
-    <tr>
-        <td>说明</td>
-        <td colspan="2">
-    window控件设置为静态        </td>
-    </tr>
-    <tr>
-        <td rowspan="2">参数</td>
-        <td>pWidget</td>
-        <td>window控件指针</td>
-    </tr>
-    <tr>
-        <td>Static</td>
-        <td>true=不修改颜色或图片 false=需要动态刷图或修改颜色</td>
     </tr>
 </table>
 <br>

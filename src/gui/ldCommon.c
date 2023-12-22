@@ -1329,39 +1329,26 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
-void ldBaseAddDirtyRegion(ldCommon_t *pWidget,arm_2d_region_list_item_t ** ppSceneDirtyRegion)
+void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList,arm_2d_region_list_item_t ** ppRootDirtyRegionList)
 {
     arm_2d_region_list_item_t **ppTempDirty;
 
-    ppTempDirty=ppSceneDirtyRegion;
+    ppTempDirty=ppRootDirtyRegionList;
     while(*ppTempDirty!=NULL)
     {
         ppTempDirty=&(*ppTempDirty)->ptNext;
     }
-    *ppTempDirty=&pWidget->dirtyRegionListItem;
+    *ppTempDirty=pItemDirtyRegionList;
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore,bool bIsNewFrame)
+void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore)
 {
-    if(bIsNewFrame)
-    {
         switch (pWidget->dirtyRegionState)
         {
-        case none:
-        {
-            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
-            {
-                pWidget->dirtyRegionListItem.bIgnore=true;
-            }
-            break;
-        }
-        case waitChange://扩张到新范围
+        case waitChange://扩大到新范围
         {
             arm_2d_region_t tempRegion;
-
-            newRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-            newRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
 
             arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
@@ -1377,12 +1364,16 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
             pWidget->dirtyRegionListItem.bIgnore=false;
             pWidget->dirtyRegionListItem.bUpdated=true;
             pWidget->dirtyRegionState=none;
+
+            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
+            {
+                pWidget->dirtyRegionListItem.bIgnore=true;
+            }
             break;
         }
         default:
             break;
         }
-    }
 }
 
 static void ldGuiUpdateDirtyRegion(xListNode* pLink)

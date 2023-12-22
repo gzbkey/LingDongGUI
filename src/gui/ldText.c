@@ -84,6 +84,20 @@ void ldTextDel(ldText_t *pWidget)
     }
 }
 
+/**
+ * @brief   文本控件初始化函数
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   pFontDict       字体指针
+ * @return  ldText_t*       新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict)
 {
     ldText_t *pNewWidget = NULL;
@@ -135,8 +149,9 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
@@ -148,6 +163,11 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     }
 
     return pNewWidget;
+}
+
+void ldTextFrameStart(ldText_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -205,7 +225,6 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -246,6 +265,14 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
     }
 }
 
+/**
+ * @brief   设置背景透明
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   isTransparent   true=透明 false=不透明
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
 {
     if(pWidget==NULL)
@@ -255,6 +282,14 @@ void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
     pWidget->isTransparent=isTransparent;
 }
 
+/**
+ * @brief   设置文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pStr            字符串指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
 {
     int16_t bmpH1Max;
@@ -268,6 +303,14 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
     pWidget->strHeight=textSize.iHeight;
 }
 
+/**
+ * @brief   设置文本颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文本颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)
@@ -277,6 +320,18 @@ void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
     ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
 }
 
+/**
+ * @brief   文本的对齐方式
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   align           LD_ALIGN_CENTER
+ *                          LD_ALIGN_TOP
+ *                          LD_ALIGN_BOTTOM
+ *                          LD_ALIGN_LEFT
+ *                          LD_ALIGN_RIGHT
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
 {
     if(pWidget==NULL)
@@ -286,6 +341,14 @@ void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
     ldBaseSetAlign(&pWidget->pTextInfo,align);
 }
 
+/**
+ * @brief   设定文本显示位置绝对值
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   offset          位置绝对值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
 {
     if(pWidget==NULL)
@@ -295,6 +358,14 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
     pWidget->scrollOffset=offset;
 }
 
+/**
+ * @brief   设定文本显示偏移值（相对值）
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   moveValue       偏移相对值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
 {
     if(pWidget==NULL)

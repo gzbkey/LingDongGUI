@@ -42,6 +42,7 @@ typedef struct {
 }ldComboBox_t;
 
 ldComboBox_t* ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);
+void ldComboBoxFrameStart(ldComboBox_t* pWidget);
 void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldComboBoxDel(ldComboBox_t *pWidget);
 

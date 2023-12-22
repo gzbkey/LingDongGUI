@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    QRCode.c
+ * @file    ldQRCode.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   qr code widget
  * @version 0.1
@@ -154,8 +154,9 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }
@@ -170,15 +171,11 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
     return pNewWidget;
 }
 
-/**
- * @brief   二维码显示处理函数
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-14
- */
+void ldQRCodeFrameStart(ldQRCode_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -192,15 +189,14 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
     {
         return;
     }
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+//#if USE_VIRTUAL_RESOURCE == 0
+//    arm_2d_tile_t tempRes=*pResTile;
+//#else
+//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+//#endif
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -265,6 +261,14 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
     }
 }
 
+/**
+ * @brief   设置二维码文本
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   pNewText        文本指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText)
 {
     uint8_t *pText;

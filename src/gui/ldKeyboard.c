@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    keyboard.c
+ * @file    ldKeyboard.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   键盘控件，可以切换数字键盘和字母键盘
  * @version 0.1
@@ -222,7 +222,10 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             if(gActiveEditType==typeString)
             {
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                    retRegion=item_region;
+                    //change ABC
+                    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+                    retRegion.tLocation.iX=0;
+                    retRegion.tLocation.iY=0;
                     break;
                 }
             }
@@ -434,7 +437,10 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
             item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
             if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                retRegion=item_region;
+                //change 123
+                retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+                retRegion.tLocation.iX=0;
+                retRegion.tLocation.iY=0;
                 break;
             }
 
@@ -492,17 +498,16 @@ static bool slotKBProcess(xConnectInfo_t info)
 
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_RELEASE:
     {
-        pWidget->clickPoint.iX=-1;
-        pWidget->clickPoint.iY=-1;
+        pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
         pWidget->isClick=true;
         xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=true;
+        pWidget->clickPoint.iX=-1;
+        pWidget->clickPoint.iY=-1;
     }
     default:
         break;
@@ -564,13 +569,14 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->isClick=false;
         pNewWidget->upperState=0;
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.tRegion = (arm_2d_region_t){0};//ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = true;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->isWaitInit=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -595,15 +601,36 @@ static void _ldkeyboardNewButton(ldKeyboard_t *pWidget,arm_2d_tile_t *parentTile
     ldBaseLineText(&btnTile,&pWidget->resource,pStr,pWidget->pFontDict,LD_ALIGN_CENTER,charColor,0,255);
 }
 
-/**
- * @brief   键盘显示处理函数
- *
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-23
- */
+void ldKeyboardFrameStart(ldKeyboard_t* pWidget)
+{
+    if((pWidget->isParentHidden)||(pWidget->isHidden))
+    {
+        //强制脏矩阵覆盖控件
+        if(pWidget->isWaitInit)
+        {
+            pWidget->targetDirtyRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+            pWidget->targetDirtyRegion.tLocation.iX-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+            pWidget->targetDirtyRegion.tLocation.iY-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+            pWidget->isWaitInit=false;
+        }
+        return;
+    }
+
+    if(!pWidget->isWaitInit)
+    {
+        pWidget->isWaitInit=true;
+    }
+
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->targetDirtyRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
+        pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+
+        pWidget->dirtyRegionTemp=pWidget->targetDirtyRegion;
+    }
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -619,13 +646,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
-        //强制脏矩阵覆盖控件
-        if(pResTile->tRegion.tSize.iWidth!=pWidget->dirtyRegionListItem.tRegion.tSize.iWidth)
-        {
-            pWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pWidget,&((arm_2d_tile_t*)&pWidget->resource)->tRegion);
-            pWidget->dirtyRegionTemp=pResTile->tRegion;
-            pWidget->targetDirtyRegion=pResTile->tRegion;
-        }
         return;
     }
 
@@ -668,7 +688,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -1222,7 +1241,6 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
             }
         }
-
         arm_2d_op_wait_async(NULL);
     }
 }

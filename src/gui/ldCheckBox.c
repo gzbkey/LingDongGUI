@@ -273,8 +273,9 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 
@@ -290,15 +291,11 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-/**
- * @brief   check box循环处理函数
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
+void ldCheckBoxFrameStart(ldCheckBox_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -330,7 +327,6 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         }
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -405,12 +401,12 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         else
         {
             do{
-                tempRes.tRegion.tSize.iWidth=pWidget->boxWidth;
-                tempRes.tRegion.tSize.iHeight=pWidget->boxWidth;
+                ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iWidth=pWidget->boxWidth;
+                ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iHeight=pWidget->boxWidth;
 
                 //借用srcTile生成新tile
-                tempRes.tRegion.tLocation.iX=0;
-                tempRes.tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
+                ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=0;
+                ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
 
                 if(pWidget->isChecked)
                 {
@@ -542,6 +538,14 @@ void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
     pWidget->isCorner=isCorner;
 }
 
+/**
+ * @brief   设置文本颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   charColor       文本颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor)
 {
     if(pWidget==NULL)

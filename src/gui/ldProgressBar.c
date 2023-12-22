@@ -78,6 +78,19 @@ void ldProgressBarDel(ldProgressBar_t *pWidget)
     }
 }
 
+/**
+ * @brief   进度条初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @return  ldProgressBar_t* 新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldProgressBar_t *pNewWidget = NULL;
@@ -129,8 +142,9 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
 
@@ -292,6 +306,11 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
     }
 }
 
+void ldProgressBarFrameStart(ldProgressBar_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -305,15 +324,14 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
     {
         return;
     }
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+//#if USE_VIRTUAL_RESOURCE == 0
+//    arm_2d_tile_t tempRes=*pResTile;
+//#else
+//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+//#endif
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -326,10 +344,18 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
         {
             _progressBarImageShow(pWidget,&tTarget,bIsNewFrame);
         }
-
+        arm_2d_op_wait_async(NULL);
     }
 }
 
+/**
+ * @brief   设置百分比
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   percent         百分比
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
 {
     if(pWidget==NULL)
@@ -354,6 +380,16 @@ void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
     }
 }
 
+/**
+ * @brief   设置背景图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgAddr          图片地址
+ * @param   bgWidth         图片宽度
+ * @param   isMove          图片是否滚动
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove)
 {
     if(pWidget==NULL)
@@ -365,6 +401,16 @@ void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t b
     pWidget->isBgMove=isMove;
 }
 
+/**
+ * @brief   设置前景图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   fgAddr          图片地址
+ * @param   fgWidth         图片宽度
+ * @param   isMove          图片是否滚动
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove)
 {
     if(pWidget==NULL)
@@ -376,6 +422,15 @@ void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t f
     pWidget->isFgMove=isMove;
 }
 
+/**
+ * @brief   设置边框图片，计为最前边的遮挡图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   frameAddr       图片地址
+ * @param   frameWidth      图片宽度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint16_t frameWidth)
 {
     if(pWidget==NULL)
@@ -386,6 +441,16 @@ void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint
     pWidget->frameWidth=frameWidth;
 }
 
+/**
+ * @brief   设置颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         背景颜色
+ * @param   fgColor         前景颜色
+ * @param   frameColor      边框颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor)
 {
     if(pWidget==NULL)

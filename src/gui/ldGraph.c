@@ -15,11 +15,11 @@
  */
 
 /**
- * @file    graph.c
- * @author  
- * @brief   
+ * @file    ldGraph.c
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   曲线图控件
  * @version 0.1
- * @date    
+ * @date    2023-12-21
  */
 
 #include "ldGraph.h"
@@ -95,6 +95,20 @@ void ldGraphDel(ldGraph_t *pWidget)
     }
 }
 
+/**
+ * @brief   曲线图初始化
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   seriesMax       曲线数量最大值
+ * @return  ldGraph_t*      新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height ,uint8_t seriesMax)
 {
     ldGraph_t *pNewWidget = NULL;
@@ -147,8 +161,9 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t*)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
 
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
         ldGraphSetGridOffset(pNewWidget,5);
@@ -163,6 +178,11 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         LOG_ERROR("[graph] init failed,id:%d\n",nameId);
     }
     return pNewWidget;
+}
+
+void ldGraphFrameStart(ldGraph_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -187,7 +207,6 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -246,19 +265,19 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
         if(pWidget->seriesCount>0)
         {
-            tempRes.tRegion.tLocation.iX=0;
-            tempRes.tRegion.tLocation.iY=0;
-            tempRes.tRegion.tSize.iWidth=pWidget->pointImgWidth;
-            tempRes.tRegion.tSize.iHeight=pWidget->pointImgWidth;
-            tempRes.pchBuffer = (uint8_t *)pWidget->pointImgAddr;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=0;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=0;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iWidth=pWidget->pointImgWidth;
+            ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iHeight=pWidget->pointImgWidth;
+            ((arm_2d_tile_t*)(&tempRes))->pchBuffer = (uint8_t *)pWidget->pointImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
             ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->pointImgAddr;
 #endif
-            tempRes.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+            ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
             
             if(pWidget->pointImgAddr==graphDefalutDot_png)
             {
-                tempRes.bVirtualResource=false;
+                ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
             }
             
             int16_t x=0,y=0,xPrev,yPrev;
@@ -278,8 +297,8 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
                         if(pWidget->pointImgAddr!=LD_ADDR_NONE)
                         {
-                            tempRes.tRegion.tLocation.iX=x;
-                            tempRes.tRegion.tLocation.iY=y;
+                            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=x;
+                            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=y;
                             ldBaseMaskImage(&tTarget,&tempRes,pWidget->pSeries[k].seriesColor,255);
                         }
 
@@ -301,6 +320,15 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
     }
 }
 
+/**
+ * @brief   设置圆点mask图片
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   addr            mask图片地址
+ * @param   width           图片宽度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldGraphSetPointImageMask(ldGraph_t *pWidget,uint32_t addr,int16_t width)
 {
     if (pWidget == NULL)
@@ -349,6 +377,16 @@ int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint8_t lineSize,
     return -1;
 }
 
+/**
+ * @brief   设置曲线数据
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   seriesNum       曲线序号
+ * @param   valueNum        数据序号
+ * @param   value           数据值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value)
 {
     if (pWidget == NULL)
@@ -400,6 +438,15 @@ void ldGraphSetAxisOffset(ldGraph_t *pWidget,uint16_t xAxisOffset)
     pWidget->xAxisOffset=xAxisOffset;
 }
 
+/**
+ * @brief   设置边框间距
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   frameSpace      间距值
+ * @param   isCorner        是否圆角
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace,bool isCorner)
 {
     if (pWidget == NULL)
@@ -416,8 +463,8 @@ void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace,bool isCorner)
 /**
  * @brief   设置栅格间隔
  * 
- * @param   pWidget         说明
- * @param   gridOffset      说明
+ * @param   pWidget         目标控件指针
+ * @param   gridOffset      栅格间距
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-14
  */
@@ -431,6 +478,17 @@ void ldGraphSetGridOffset(ldGraph_t *pWidget,uint8_t gridOffset)
     pWidget->gridOffset=gridOffset;
 }
 
+/**
+ * @brief   将最新数据放到最后，
+ *          数据达到最大值后，自动向后移动数据，自动丢弃最前边的数据
+ *          实现波形自动刷新
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   seriesNum       曲线号码
+ * @param   newValue        数据值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-21
+ */
 void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue)
 {
     if (pWidget == NULL)

@@ -58,6 +58,7 @@ typedef struct {
 }ldTable_t;
 
 ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
+void ldTableFrameStart(ldTable_t* pWidget);
 void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldTableDel(ldTable_t *pWidget);
 void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);

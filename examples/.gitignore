@@ -6,6 +6,11 @@ Objects
 *.h.00*
 *.py.00*
 *uvguix*
+*_alog.txt
+*_analysis.xlsx
+*_sort_by_flash.csv
+*_sort_by_ram.csv
+!keil5_disp_size_bar.exe
 
 #qt
 build*

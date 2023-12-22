@@ -22,7 +22,6 @@
 /*============================ INCLUDES ======================================*/
 
 //#include "RTE_Components.h"
-#include "ldConfig.h"
 
 #ifdef   __cplusplus
 extern "C" {

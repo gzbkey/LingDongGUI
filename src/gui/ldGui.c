@@ -57,8 +57,6 @@ static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
-//bool isUpdateBackground=false;
-
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *pWidget;
@@ -164,6 +162,7 @@ void ldGuiTouchProcess(void)
         }
     }
     prevState=nowState;
+
     ldGuiClickedAction(touchSignal,x,y);
 }
 
@@ -402,7 +401,7 @@ static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
     {
         if(temp_pos->info!=NULL)
         {
-            ldBaseAddDirtyRegion((ldCommon_t *)temp_pos->info,&pSence->ptDirtyRegion);
+            ldBaseAddDirtyRegion(&((ldCommon_t *)temp_pos->info)->dirtyRegionListItem,&pSence->ptDirtyRegion);
 
             if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {
@@ -424,10 +423,136 @@ void ldGuiInit(arm_2d_scene_t *pSence)
     ldUserPageInitFunc[pageNumNow]();
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 
+#if USE_DIRTY_REGION == 1
     ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
     LOG_INFO("[sys] set dirty region\n");
+#endif
+}
 
-//    isUpdateBackground=true;
+
+static void _frameStart(ldCommon_t *pWidget)
+{
+    switch(pWidget->widgetType)
+    {
+    case widgetTypeBackground:
+    case widgetTypeWindow:
+    case widgetTypeImage:
+    {
+        ldImageFrameStart((ldImage_t*)pWidget);
+        break;
+    }
+    case widgetTypeButton:
+    {
+        ldButtonFrameStart((ldButton_t*)pWidget);
+        break;
+    }
+    case widgetTypeText:
+    {
+        ldTextFrameStart((ldText_t*)pWidget);
+        break;
+    }
+    case widgetTypeProgressBar:
+    {
+        ldProgressBarFrameStart((ldProgressBar_t*)pWidget);
+        break;
+    }
+    case widgetTypeRadialMenu:
+    {
+        ldRadialMenuFrameStart((ldRadialMenu_t*)pWidget);
+        break;
+    }
+    case widgetTypeCheckBox:
+    {
+        ldCheckBoxFrameStart((ldCheckBox_t*)pWidget);
+        break;
+    }
+    case widgetTypeLabel:
+    {
+        ldLabelFrameStart((ldLabel_t*)pWidget);
+        break;
+    }
+    case widgetTypeScrollSelecter:
+    {
+        ldScrollSelecterFrameStart((ldScrollSelecter_t*)pWidget);
+        break;
+    }
+    case widgetTypeDateTime:
+    {
+        ldDateTimeFrameStart((ldDateTime_t*)pWidget);
+        break;
+    }
+    case widgetTypeIconSlider:
+    {
+        ldIconSliderFrameStart((ldIconSlider_t*)pWidget);
+        break;
+    }
+    case widgetTypeGauge:
+    {
+        ldGaugeFrameStart((ldGauge_t*)pWidget);
+        break;
+    }
+    case widgetTypeQRCode:
+    {
+        ldQRCodeFrameStart((ldQRCode_t*)pWidget);
+        break;
+    }
+    case widgetTypeTable:
+    {
+        ldTableFrameStart((ldTable_t*)pWidget);
+        break;
+    }
+    case widgetTypeKeyboard:
+    {
+        ldKeyboardFrameStart((ldKeyboard_t*)pWidget);
+        break;
+    }
+    case widgetTypeLineEdit:
+    {
+        ldLineEditFrameStart((ldLineEdit_t*)pWidget);
+        break;
+    }
+    case widgetTypeGraph:
+    {
+        ldGraphFrameStart((ldGraph_t*)pWidget);
+        break;
+    }
+    case widgetTypeComboBox:
+    {
+        ldComboBoxFrameStart((ldComboBox_t*)pWidget);
+        break;
+    }
+    case widgetTypeArc:
+    {
+        ldArcFrameStart((ldArc_t*)pWidget);
+        break;
+    }
+/*============================ auto add start =================================*/
+    default:
+        break;
+    }
+}
+
+static void _ldGuiFrameStart(xListNode* pLink)
+{
+    xListNode *temp_pos,*safePos;
+
+    list_for_each_safe(temp_pos,safePos, pLink)
+    {
+        if(temp_pos->info!=NULL)
+        {
+            _frameStart((ldCommon_t *)temp_pos->info);
+
+            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            {
+                _ldGuiFrameStart(((ldCommon_t *)temp_pos->info)->childList);
+            }
+        }
+    }
+}
+
+void ldGuiFrameStart(void)
+{
+    _ldGuiFrameStart(&ldWidgetLink);
 }
 
 /**
@@ -451,12 +576,6 @@ void ldGuiLogicLoop(void)
  */
 void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-//    if(isUpdateBackground&&bIsNewFrame)
-//    {
-//        arm_2d_scene_player_update_scene_background(pSence->ptPlayer);
-//        isUpdateBackground=false;
-//    }
-
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
 

@@ -27,6 +27,7 @@ typedef struct {
 }ldCheckBox_t;
 
 ldCheckBox_t* ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+void ldCheckBoxFrameStart(ldCheckBox_t* pWidget);
 void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldCheckBoxDel(ldCheckBox_t *pWidget);
 void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor);

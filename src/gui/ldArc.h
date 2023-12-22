@@ -29,6 +29,7 @@ typedef struct {
 }ldArc_t;
 
 ldArc_t* ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+void ldArcFrameStart(ldArc_t* pWidget);
 void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldArcDel(ldArc_t *pWidget);
 

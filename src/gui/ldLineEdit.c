@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    lineEdit.c
+ * @file    ldLineEdit.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   输入框控件
  * @version 0.1
@@ -291,8 +291,9 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+        pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->kbNameId=0;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
@@ -310,15 +311,11 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-/**
- * @brief   输入框显示处理
- * 
- * @param   pWidget         目标控件指针
- * @param   pParentTile     父控件tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-24
- */
+void ldLineEditFrameStart(ldLineEdit_t* pWidget)
+{
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -337,15 +334,14 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     {
         pWidget->blinkFlag=!pWidget->blinkFlag;
     }
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
+//#if USE_VIRTUAL_RESOURCE == 0
+//    arm_2d_tile_t tempRes=*pResTile;
+//#else
+//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+//#endif
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
+//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,tempRes.tRegion,false,bIsNewFrame);
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -387,9 +383,6 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             showRegion.tSize.iWidth=2;
             arm_2d_draw_box(&tTarget,&showRegion,1,0,255);
         }
-
-
-
         arm_2d_op_wait_async(NULL);
     }
 }

@@ -23,32 +23,18 @@ ldGui.c中添加新控件的头文件
 这是一个独立的多功能按键库，可以对GUI按键和实体按键进行行为检测。ldgui内部已经调用该库，无需用户操作。
 
 ##### 信号
-该库可以检测以下信号/数据
+该库可以检测以下信号
 
-1. BTN_PRESS
-
-    按下
-2. BTN_HOLD_DOWN
-
-    按住不放
-3. BTN_RELEASE
-
-    释放
-4. BTN_DOUBLE_CLICK
-
-    双击
-5. BTN_REPEAT_COUNT
-
-    获取连击次数
-6. BTN_HOLD_TIME
-
-    按住不放的时间
-7. BTN_LONG_START
-
-    长按触发一次
-8. BTN_LONG_SHOOT
-
-    长按连续触发
+|信号|说明|
+|---|---|
+|BTN_PRESS|按下|
+|BTN_HOLD_DOWN|按住不放|
+|BTN_RELEASE|释放|
+|BTN_DOUBLE_CLICK|双击|
+|BTN_REPEAT_COUNT|获取连击次数|
+|BTN_HOLD_TIME|按住不放的时间|
+|BTN_LONG_START|长按触发一次|
+|BTN_LONG_SHOOT|长按连续触发|
 
 ##### 函数列表
 * void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));
