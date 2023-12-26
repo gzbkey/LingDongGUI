@@ -183,22 +183,22 @@ void ldCheckBoxDel(ldCheckBox_t *pWidget)
 
 static bool slotCheckBoxToggle(xConnectInfo_t info)
 {
-    ldCheckBox_t *cb;
-    cb=ldBaseGetWidgetById(info.receiverId);
+    ldCheckBox_t *pWidget=ldBaseGetWidgetById(info.receiverId);
     if(info.signalType==SIGNAL_PRESS)
     {
-        if(!cb->isRadioButton)
+        if(!pWidget->isRadioButton)
         {
-            cb->isChecked=!cb->isChecked;
+            pWidget->isChecked=!pWidget->isChecked;
+            pWidget->dirtyRegionState=waitChange;
         }
         else
         {
-
-            if(cb->isChecked==false)
+            if(pWidget->isChecked==false)
             {
-                cb->isChecked=true;
-                radioButtonValue.group=cb->radioButtonGroup;
-                radioButtonValue.nameId=cb->nameId;
+                pWidget->isChecked=true;
+                radioButtonValue.group=pWidget->radioButtonGroup;
+                radioButtonValue.nameId=pWidget->nameId;
+                pWidget->dirtyRegionState=waitChange;
             }
         }
     }
@@ -275,7 +275,7 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 
@@ -293,6 +293,10 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldCheckBoxFrameStart(ldCheckBox_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 

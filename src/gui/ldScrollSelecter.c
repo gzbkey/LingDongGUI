@@ -117,31 +117,33 @@ static int16_t _scrollOffset;
 
 static bool slotScrollSelecterScroll(xConnectInfo_t info)
 {
-    ldScrollSelecter_t *selecter;
+    ldScrollSelecter_t *pWidget;
 
-    selecter=ldBaseGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     switch (info.signalType)
     {
     case SIGNAL_PRESS:
     {
-        selecter->isWaitMove=false;
-        selecter->isAutoMove=false;
-        _scrollOffset=selecter->scrollOffset;
+        pWidget->isWaitMove=false;
+        pWidget->isAutoMove=false;
+        _scrollOffset=pWidget->scrollOffset;
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        selecter->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
     {
-        if(!selecter->isAutoMove)
+        if(!pWidget->isAutoMove)
         {
-            selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,selecter->scrollOffset);
+            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,pWidget->scrollOffset);
         }
-        selecter->isWaitMove=true;
+        pWidget->isWaitMove=true;
         break;
     }
     case SIGNAL_MOVE_SPEED:
@@ -150,8 +152,8 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
 
         if((ySpeed>MOVE_SPEED_THRESHOLD_VALUE)||(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
-            selecter->itemSelect=_ldScrollSelecterAutoItem(selecter,_scrollOffset+SPEED_2_OFFSET(ySpeed));
-            selecter->isAutoMove=true;
+            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,_scrollOffset+SPEED_2_OFFSET(ySpeed));
+            pWidget->isAutoMove=true;
         }
         break;
     }
@@ -241,7 +243,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);
@@ -263,6 +265,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
 
 void ldScrollSelecterFrameStart(ldScrollSelecter_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -295,6 +301,8 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
+            pWidget->dirtyRegionState=waitChange;
+            pWidget->isDirtyRegionAutoIgnore=true;
         }
         else
         {

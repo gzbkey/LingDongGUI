@@ -122,13 +122,13 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         if(clickItemNum==SHOW_ITEM_NUM)
         {
             pWidget->isExpand=!pWidget->isExpand;
-            pWidget->dirtyRegionState=waitChange;
         }
         else
         {
             pWidget->itemPreSelect=clickItemNum-1;
         }
-
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_RELEASE:
@@ -137,9 +137,9 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         {
             pWidget->itemSelect=pWidget->itemPreSelect;
             pWidget->isExpand=false;
-            pWidget->dirtyRegionState=waitChange;
         }
-
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=true;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -234,7 +234,7 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
@@ -262,6 +262,11 @@ void ldComboBoxFrameStart(ldComboBox_t* pWidget)
     else
     {
         ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight;
+    }
+
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
     }
 
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);

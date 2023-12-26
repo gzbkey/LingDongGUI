@@ -188,7 +188,11 @@ void userLoop(void)
 {
     if( ldTimeOut(1000, &timer,true))
     {
-
+//        ldDateTimeSetTime(ldBaseGetWidgetById(ID_DATE_TIME),12,12,tempValue++);
+//        if(tempValue>=60)
+//        {
+//            tempValue=0;
+//        }
         isTop=!isTop;
         if(isTop)
         {
@@ -196,16 +200,16 @@ void userLoop(void)
 //        ldLineEditMove(le,10,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),1);
 
-            ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),30);
-            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),1);
+//            ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),30);
+//            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),1);
         }
         else
         {
 //        ldWindowSetBgColor(ldBaseGetWidgetById(0),0xFFFF);
 //        ldLineEditMove(le,50,LE_H);
 //        ldGraphSetHidden(ldBaseGetWidgetById(1),0);
-            ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),180);
-            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),2);
+//            ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),180);
+//            ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),2);
         }
 
     }

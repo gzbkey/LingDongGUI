@@ -83,17 +83,26 @@ void ldButtonDel(ldButton_t *pWidget)
 
 static bool slotButtonToggle(xConnectInfo_t info)
 {
-    ldButton_t *btn;
+    ldButton_t *pWidget;
 
-    btn=ldBaseGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
-    if(info.signalType==SIGNAL_PRESS)
+    switch (info.signalType)
     {
-        btn->isPressed=true;
+    case SIGNAL_PRESS:
+    {
+        pWidget->isPressed=true;
+        pWidget->dirtyRegionState=waitChange;
+        break;
     }
-    if(info.signalType==SIGNAL_RELEASE)
+    case SIGNAL_RELEASE:
     {
-        btn->isPressed=false;
+        pWidget->isPressed=false;
+        pWidget->dirtyRegionState=waitChange;
+        break;
+    }
+    default:
+        break;
     }
 
     return false;
@@ -174,7 +183,7 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
@@ -192,6 +201,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 
 void ldButtonFrameStart(ldButton_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 

@@ -164,7 +164,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }
@@ -195,10 +195,15 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
     pWidget->isTransparent=false;
     pWidget->isColor=true;
     pWidget->bgColor=bgColor;
+    pWidget->dirtyRegionState=waitChange;
 }
 
 void ldImageFrameStart(ldImage_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -262,6 +267,7 @@ void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity)
 #if USE_OPACITY == 1
     pWidget->opacity=opacity;
 #endif
+    pWidget->dirtyRegionState=waitChange;
 }
 
 /**
@@ -285,7 +291,7 @@ void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask)
         ((arm_2d_vres_t*)(&pWidget->resource))->pTarget=imageAddr;
 #endif
         ((arm_2d_tile_t*)(&pWidget->resource))->pchBuffer = (uint8_t *)imageAddr;
-
+    pWidget->dirtyRegionState=waitChange;
 }
 
 // grayBit :1 2 4 8

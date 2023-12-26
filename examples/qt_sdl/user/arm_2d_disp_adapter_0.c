@@ -137,7 +137,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_handler)
 
 #if !__DISP0_CFG_DISABLE_NAVIGATION_LAYER__
 __WEAK
-IMPL_PFB_ON_DRAW(__pfb_draw_navigation)
+IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
 {
     ARM_2D_UNUSED(pTarget);
     ARM_2D_UNUSED(bIsNewFrame);

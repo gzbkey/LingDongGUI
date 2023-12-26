@@ -119,7 +119,7 @@ static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t
     {
         return false;
     }
-    
+
     //判断链表是否为空
     if((inList->next!=inList)&&(inList->prev!=inList))
     {
@@ -180,7 +180,7 @@ static bool ldBaseGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x
     {
         return false;
     }
-    
+
     //判断链表是否为空
     if((inList->next!=inList)&&(inList->prev!=inList))
     {
@@ -189,12 +189,12 @@ static bool ldBaseGetInfoByPos(xListNode *inList,xListNode ** out_info,int16_t x
             if(tempPos->info!=NULL)
             {
                 pTempWidgetInfo=(ldCommon_t*)(tempPos->info);
-                
+
                 //获取全局坐标，用绝对值坐标进行比较
                 posT= ldBaseGetGlobalPos(pTempWidgetInfo);
                 widthT=(*(arm_2d_tile_t*)&(pTempWidgetInfo->resource)).tRegion.tSize.iWidth;
                 heightT=(*(arm_2d_tile_t*)&(pTempWidgetInfo->resource)).tRegion.tSize.iHeight;
-                    
+
                 if(pTempWidgetInfo->childList==NULL)//无子控件
                 {
                     if((x>posT.x)&&(x<(posT.x+widthT))&&(y>posT.y)&&(y<(posT.y+heightT))&&(!pTempWidgetInfo->isHidden))
@@ -283,12 +283,12 @@ bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset)
     {
         return false;
     }
-    
+
     lPeriod=arm_2d_helper_convert_ms_to_ticks(ms);
     if (0 == *pTimer) {
         *pTimer = lPeriod;
         *pTimer += lTimestamp;
-        
+
         return false;
     }
 
@@ -370,7 +370,7 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,ui
 #endif
             break;
         }
-            
+
         default:
             break;
         }
@@ -1367,6 +1367,7 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
 
             if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
             {
+                LOG_DEBUG("Ignore %d\n",pWidget->nameId);
                 pWidget->dirtyRegionListItem.bIgnore=true;
             }
             break;
@@ -1396,16 +1397,19 @@ static void ldGuiUpdateDirtyRegion(xListNode* pLink)
 
 void ldBaseBgMove(int16_t x,int16_t y)
 {
-    ldWindow_t *win=ldBaseGetWidgetById(0);
-    ldBaseMove(win,x,y);
+    ldWindow_t *pWidget=ldBaseGetWidgetById(0);
+    ldBaseMove(pWidget,x,y);
 
     //只考虑左移和上移
-    ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
-    ((arm_2d_tile_t*)&win->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
-    win->isDirtyRegionAutoIgnore=true;
-    win->dirtyRegionListItem.bUpdated=true;
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
+
+
 
     ldGuiUpdateDirtyRegion(&ldWidgetLink);
+
+    pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
 //    isUpdateBackground=true;
 }
 

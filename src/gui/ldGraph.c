@@ -163,7 +163,7 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
         ldGraphSetGridOffset(pNewWidget,5);
@@ -182,6 +182,10 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 
 void ldGraphFrameStart(ldGraph_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -314,7 +318,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         }
         
 #if LD_DEBUG == 1
-        arm_2d_draw_box(&tTarget,&tBoxRegion,1,0,255);
+        arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
 #endif
         arm_2d_op_wait_async(NULL);
     }
@@ -397,6 +401,8 @@ void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint
     if(valueNum<pWidget->pSeries[seriesNum].valueCountMax)
     {
         pWidget->pSeries[seriesNum].pValueList[valueNum]=value;
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=true;
     }
 }
 
@@ -503,6 +509,8 @@ void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue)
         p[i] = p[i+1];
     }
     p[pWidget->pSeries[seriesNum].valueCountMax-1] = newValue;
+    pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
 }
 
 #if defined(__clang__)

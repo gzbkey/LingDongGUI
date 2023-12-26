@@ -156,7 +156,7 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }
@@ -173,6 +173,10 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
 
 void ldQRCodeFrameStart(ldQRCode_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -281,6 +285,7 @@ void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText)
     pText=LD_MALLOC_STRING(pNewText);
     strcpy((char *)pText,(const char *)pNewText);
     pWidget->qrText=pText;
+    pWidget->dirtyRegionState=waitChange;
 }
 
 #if defined(__clang__)

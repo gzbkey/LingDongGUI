@@ -149,7 +149,7 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }
@@ -165,6 +165,10 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldDateTimeFrameStart(ldDateTime_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -409,6 +413,7 @@ void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint
     pWidget->year=year;
     pWidget->month=month;
     pWidget->day=day;
+    pWidget->dirtyRegionState=waitChange;
 }
 
 /**
@@ -430,6 +435,7 @@ void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint
     pWidget->hour=hour;
     pWidget->minute=minute;
     pWidget->second=second;
+    pWidget->dirtyRegionState=waitChange;
 }
 
 #if defined(__clang__)

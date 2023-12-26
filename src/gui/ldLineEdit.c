@@ -173,6 +173,8 @@ static void _inputAsciiProcess(ldLineEdit_t *pWidget,uint8_t ascii)
         ldBaseSetHidden(ldBaseGetWidgetById(pWidget->kbNameId),true);
         pWidget->isEditing=false;
         ldBaseBgMove(0,0);
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=true;
         break;
     }
     default:
@@ -206,6 +208,8 @@ static bool slotLineEditProcess(xConnectInfo_t info)
                 ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
             }
         }
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_INPUT_ASCII:
@@ -217,6 +221,7 @@ static bool slotLineEditProcess(xConnectInfo_t info)
     default:
         break;
     }
+
     return false;
 }
 
@@ -293,7 +298,7 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->kbNameId=0;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
@@ -313,6 +318,10 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldLineEditFrameStart(ldLineEdit_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -370,12 +379,8 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             },
         };
 
-
-
         arm_2d_tile_generate_child(&tTarget,&tempRegion,&textTile,false);
         arm_2d_region_t showRegion=ldBaseLineText(&textTile,pResTile,pWidget->pText,pWidget->pFontDict,LD_ALIGN_LEFT_AUTO,pWidget->textColor,0,255);
-
-
 
         if((pWidget->blinkFlag)&&(pWidget->isEditing))
         {
@@ -411,6 +416,8 @@ void ldLineEditSetText(ldLineEdit_t* pWidget,uint8_t *pText)
     pWidget->pText[len]=0;
     pWidget->pText[len+1]=0;
     pWidget->textLen=len;
+    pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
 }
 
 /**
