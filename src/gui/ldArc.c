@@ -16,10 +16,10 @@
 
 /**
  * @file    ldArc.c
- * @author  
- * @brief   
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @brief   圆环控件
  * @version 0.1
- * @date    
+ * @date    2023-12-30
  */
 
 #include "ldArc.h"
@@ -93,6 +93,24 @@ void ldArcFrameUpdate(ldArc_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
+/**
+ * @brief   圆环控件的初始化函数
+ *          圆环素材尺寸建议为单数的像素点，
+ *          例如101x101的圆环，裁剪51x51的左上角图片作为素材
+ * 
+ * @param   nameId          新控件id
+ * @param   parentNameId    父控件id
+ * @param   x               相对坐标x轴
+ * @param   y               相对坐标y轴
+ * @param   width           控件宽度
+ * @param   height          控件高度
+ * @param   srcQuarterAddr  圆环素材左上角(四分之一),mask A8
+ * @param   maskQuarterAddr 圆环素材左上角(四分之一),mask A8，遮挡区域比src的稍大
+ * @param   parentColor     背景颜色
+ * @return  ldArc_t*        新控件指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-30
+ */
 ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uint32_t srcQuarterAddr,uint32_t maskQuarterAddr,ldColor parentColor)
 {
     ldArc_t *pNewWidget = NULL;
@@ -145,8 +163,10 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         pNewWidget->srcAddr=srcQuarterAddr;
         pNewWidget->maskAddr=maskQuarterAddr;
 
-        pNewWidget->startAngle_x10=0;
-        pNewWidget->endAngle_x10=1800;
+        pNewWidget->startAngle_x10[0]=0;
+        pNewWidget->endAngle_x10[0]=3600;
+        pNewWidget->startAngle_x10[1]=0;
+        pNewWidget->endAngle_x10[1]=1800;
         pNewWidget->rotationAngle_x10=0;
 
         LOG_INFO("[arc] init,id:%d\n",nameId);
@@ -166,24 +186,29 @@ arm_2d_location_t _ldArcGetStartEndAreaPos(uint8_t quarterNum,arm_2d_size_t widg
     arm_2d_location_t retPos={0};
     switch (quarterNum)
     {
+    case 7:
     case 3:
     {
         retPos.iX=0;
         retPos.iY=0;
         break;
     }
+    case 8:
+    case 4:
     case 0:
     {
         retPos.iX=widgetFullSize.iWidth>>1;
         retPos.iY=0;
         break;
     }
+    case 5:
     case 1:
     {
         retPos.iX=widgetFullSize.iWidth>>1;
         retPos.iY=widgetFullSize.iHeight>>1;
         break;
     }
+    case 6:
     case 2:
     {
         retPos.iX=0;
@@ -216,19 +241,30 @@ void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFram
         return;
     }
 
-    arm_2d_location_t center;
 
+    //         270                   0
+    //          |                    |
+    //        2 | 1                3 | 0
+    //    180-------0    ==>>  270-------90
+    //        3 | 4                2 | 1
+    //          |                    |
+    //         90                   180
+
+    arm_2d_location_t center;
+    arm_2d_region_t showRegion;
+    float fStartAngle,fEndAngle;
+    arm_2d_location_t maskCenter;
+    uint8_t startQuarter,endQuarter,startQuarter0,endQuarter0;
+    ldColor arcColor;
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-
-
-//            static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB0 = {0};
-//                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB90 = {0};
-//                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB180 = {0};
-//                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB270 = {0};
+        //                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB0 = {0};
+        //                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB90 = {0};
+        //                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB180 = {0};
+        //                static arm_2d_op_fill_cl_msk_opa_trans_t s_tMaskRotateCB270 = {0};
 
         ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->srcAddr;
 #if USE_VIRTUAL_RESOURCE == 1
@@ -242,209 +278,250 @@ void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFram
         center.iX=((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth-1;
         center.iY=((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight-1;
 
-
-/*
-         270                   0
-          |                    |
-        2 | 1                2 | 0
-   180—————0  ==>>  270—————90
-        3 | 4                1 | 0
-          |                    |
-         90                   180
-
-*/
-        arm_2d_region_t showRegion;
-        float fStartAngle,fEndAngle;
-        arm_2d_location_t maskCenter;
-        uint8_t startQuarter,endQuarter,startQuarter0,endQuarter0;
-
         maskCenter.iX=tTarget_canvas.tSize.iWidth>>1;
         maskCenter.iY=tTarget_canvas.tSize.iHeight>>1;
 
-
-
-        fStartAngle=(pWidget->startAngle_x10+ARC_0_OFFSET_X10+pWidget->rotationAngle_x10)/10.0;
-        fEndAngle=(pWidget->endAngle_x10+ARC_0_OFFSET_X10+pWidget->rotationAngle_x10)/10.0;
-//LOG_DEBUG("====%f,%f\n",fStartAngle,fEndAngle);
-//        fStartAngle=120;
-//        fEndAngle=400;
-//        LOG_DEBUG("%f,%f\n",fStartAngle,fEndAngle);
-
-
-        startQuarter = fStartAngle / 90;
-        endQuarter = fEndAngle / 90;
-        startQuarter0=startQuarter;
-        endQuarter0=endQuarter;
-
-        if(startQuarter == 4)
+        for(uint8_t i=0;i<2;i++)
         {
-            startQuarter = 0;
-        }
-        if(endQuarter == 4)
-        {
-            endQuarter = 0;
-        }
-
-
-        LOG_DEBUG("startQuarter %d,  endQuarter %d\n",startQuarter,endQuarter);
-
-        showRegion.tSize.iWidth=(tTarget_canvas.tSize.iWidth>>1)+1;
-        showRegion.tSize.iHeight=(tTarget_canvas.tSize.iHeight>>1)+1;
-
-
-        if(startQuarter==endQuarter)//同一象限
-        {
-            showRegion.tLocation=_ldArcGetStartEndAreaPos (endQuarter,tTarget_canvas.tSize);
-
-            if((fEndAngle-fStartAngle)>90)//大圆弧
+            if((i==1)&&(pWidget->endAngle_x10[i]==0))
             {
+                continue;
+            }
+            if(i==0)//bgArc
+            {
+                arcColor=pWidget->bgColor;
+            }
+            else//fgArc
+            {
+                arcColor=pWidget->fgColor;
+            }
+            fStartAngle=(float)(pWidget->startAngle_x10[i]+ARC_0_OFFSET_X10+pWidget->rotationAngle_x10)/10.0;
+            fEndAngle=(float)(pWidget->endAngle_x10[i]+ARC_0_OFFSET_X10+pWidget->rotationAngle_x10)/10.0;
+            startQuarter = fStartAngle / 90;
+            endQuarter = fEndAngle / 90;
+            startQuarter0=startQuarter;
+            endQuarter0=endQuarter;
 
+            showRegion.tSize.iWidth=(tTarget_canvas.tSize.iWidth>>1)+1;
+            showRegion.tSize.iHeight=(tTarget_canvas.tSize.iHeight>>1)+1;
 
+            if((startQuarter%4)==(endQuarter%4))//同一象限
+            {
+                showRegion.tLocation=_ldArcGetStartEndAreaPos (endQuarter,tTarget_canvas.tSize);
+                if((fEndAngle-fStartAngle)>90)//大圆弧
+                {
+                    if(fEndAngle>=360.0)
+                    {
+                        fEndAngle-=360.0;
+                    }
+                    arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
+                                                                       &tTarget,
+                                                                       &showRegion,
+                                                                       center,
+                                                                       ARM_2D_ANGLE(fEndAngle),
+                                                                       1.0f,
+                                                                       arcColor,
+                                                                       255,
+                                                                       &maskCenter
+                                                                       );
+
+                    fStartAngle+=90;
+                    if(fStartAngle>=360.0)
+                    {
+                        fStartAngle-=360.0;
+                    }
+                    arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
+                                                                       &tTarget,
+                                                                       &showRegion,
+                                                                       center,
+                                                                       ARM_2D_ANGLE(fStartAngle),
+                                                                       1.0f,
+                                                                       arcColor,
+                                                                       255,
+                                                                       &maskCenter
+                                                                       );
+                }
+                else
+                {
+                    if(fEndAngle>=360.0)
+                    {
+                        fEndAngle-=360.0;
+                    }
+                    arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
+                                                                       &tTarget,
+                                                                       &showRegion,
+                                                                       center,
+                                                                       ARM_2D_ANGLE(fEndAngle),
+                                                                       1.0f,
+                                                                       arcColor,
+                                                                       255,
+                                                                       &maskCenter
+                                                                       );
+
+                    if(fStartAngle>=360.0)
+                    {
+                        fStartAngle-=360.0;
+                    }
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->maskAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                    ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->maskAddr;
+#endif
+                    arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
+                                                                       &tTarget,
+                                                                       &showRegion,
+                                                                       center,
+                                                                       ARM_2D_ANGLE(fStartAngle),
+                                                                       1.0f,
+                                                                       pWidget->parentColor,
+                                                                       255,
+                                                                       &maskCenter
+                                                                       );
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->srcAddr;
+#if USE_VIRTUAL_RESOURCE == 1
+                    ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->srcAddr;
+#endif
+                }
+            }
+            else
+            {
+                showRegion.tLocation=_ldArcGetStartEndAreaPos (endQuarter,tTarget_canvas.tSize);
                 if(fEndAngle>=360.0)
                 {
                     fEndAngle-=360.0;
                 }
-
                 arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
                                                                    &tTarget,
                                                                    &showRegion,
                                                                    center,
                                                                    ARM_2D_ANGLE(fEndAngle),
                                                                    1.0f,
-                                                                   pWidget->fgColor,
+                                                                   arcColor,
                                                                    255,
                                                                    &maskCenter
                                                                    );
 
+                showRegion.tLocation=_ldArcGetStartEndAreaPos (startQuarter,tTarget_canvas.tSize);
                 fStartAngle+=90;
                 if(fStartAngle>=360.0)
                 {
                     fStartAngle-=360.0;
                 }
-
                 arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
                                                                    &tTarget,
                                                                    &showRegion,
                                                                    center,
                                                                    ARM_2D_ANGLE(fStartAngle),
                                                                    1.0f,
-                                                                   pWidget->fgColor,
+                                                                   arcColor,
                                                                    255,
                                                                    &maskCenter
                                                                    );
             }
-            else
-            {
-                LOG_DEBUG("small\n");
-                if(fEndAngle>=360.0)
-                {
-                    fEndAngle-=360.0;
-                }
+            arm_2d_op_wait_async(NULL);
 
-                arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
-                                                                   &tTarget,
-                                                                   &showRegion,
-                                                                   center,
-                                                                   ARM_2D_ANGLE(fEndAngle),
-                                                                   1.0f,
-                                                                   pWidget->fgColor,
-                                                                   255,
-                                                                   &maskCenter
-                                                                   );
-
-                if(fStartAngle>=360.0)
-                {
-                    fStartAngle-=360.0;
-                }
-
-                arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
-                                                                   &tTarget,
-                                                                   &showRegion,
-                                                                   center,
-                                                                   ARM_2D_ANGLE(fStartAngle),
-                                                                   1.0f,
-                                                                   pWidget->parentColor,
-                                                                   255,
-                                                                   &maskCenter
-                                                                   );
-            }
-        }
-        else
-        {
-
-            showRegion.tLocation=_ldArcGetStartEndAreaPos (endQuarter,tTarget_canvas.tSize);
-
-            if(fEndAngle>=360.0)
-            {
-                fEndAngle-=360.0;
-            }
-
-            arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
-                                                               &tTarget,
-                                                               &showRegion,
-                                                               center,
-                                                               ARM_2D_ANGLE(fEndAngle),
-                                                               1.0f,
-                                                               pWidget->fgColor,
-                                                               255,
-                                                               &maskCenter
-                                                               );
-
-            showRegion.tLocation=_ldArcGetStartEndAreaPos (startQuarter,tTarget_canvas.tSize);
-
-
-            fStartAngle+=90;
-            if(fStartAngle>=360.0)
-            {
-                fStartAngle-=360.0;
-            }
-
-            arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
-                                                               &tTarget,
-                                                               &showRegion,
-                                                               center,
-                                                               ARM_2D_ANGLE(fStartAngle),
-                                                               1.0f,
-                                                               pWidget->fgColor,
-                                                               255,
-                                                               &maskCenter
-                                                               );
-
-
-
-        }
-
-
-        startQuarter0++;
-        while(startQuarter0<endQuarter0)
-        {
             startQuarter0++;
-
-            arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
-                                                               &tTarget,
-                                                               NULL,
-                                                               center,
-                                                               ARM_2D_ANGLE((startQuarter0)*90.0),
-                                                               1.0f,
-                                                               pWidget->fgColor,
-                                                               255
-                                                               );
+            while(startQuarter0<endQuarter0)
+            {
+                startQuarter0++;
+                arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
+                                                                   &tTarget,
+                                                                   NULL,
+                                                                   center,
+                                                                   ARM_2D_ANGLE((startQuarter0)*90.0),
+                                                                   1.0f,
+                                                                   arcColor,
+                                                                   255
+                                                                   );
+            }
+            arm_2d_op_wait_async(NULL);
         }
-
-        arm_2d_op_wait_async(NULL);
     }
 }
 
-void ldArcSetAngle(ldArc_t *pWidget,float bgStart,float bgEnd,float fgStart,float fgEnd)
+/**
+ * @brief   设定底层圆环角度范围
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgStart         底层圆环起始角度
+ * @param   bgEnd           底层圆环结束角度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-30
+ */
+void ldArcSetBgAngle(ldArc_t *pWidget,float bgStart,float bgEnd)
 {
-    pWidget->startAngle_x10=bgStart*10;
-    pWidget->endAngle_x10=bgEnd*10;
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->startAngle_x10[0]=bgStart*10;
+    pWidget->endAngle_x10[0]=bgEnd*10;
+    pWidget->startAngle_x10[1]=pWidget->startAngle_x10[0];
 }
 
+/**
+ * @brief   设定顶层圆环角度范围
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   fgEnd           顶层圆环结束角度(1-359)
+ *                          必须在底层圆环角度范围内
+ *                          设定为0则屏蔽顶层圆环
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-30
+ */
+void ldArcSetFgAngle(ldArc_t *pWidget,float fgEnd)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->startAngle_x10[1]=pWidget->startAngle_x10[0];
+    pWidget->endAngle_x10[1]=fgEnd*10;
+}
+
+/**
+ * @brief   设定圆环整体旋转角度
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   rotationAngle   旋转角度，0-359
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-30
+ */
 void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle)
 {
+    if(pWidget==NULL)
+    {
+        return;
+    }
     pWidget->rotationAngle_x10=rotationAngle*10;
 }
+
+/**
+ * @brief   设定圆环颜色
+ * 
+ * @param   pWidget         目标控件指针
+ * @param   bgColor         底层颜色
+ * @param   fgColor         顶层颜色
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2023-12-30
+ */
+void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->bgColor=bgColor;
+    pWidget->fgColor=fgColor;
+}
+
+//void ldArcSetDirection(ldArc_t *pWidget,bool isClockwise)
+//{
+//    if(pWidget==NULL)
+//    {
+//        return;
+//    }
+//    pWidget->isClockwise=isClockwise;
+//}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

@@ -24,7 +24,7 @@ extern "C" {
 
 //debug config
 #define LD_DEBUG                                  0
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         1
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
 
 // 以下不用修改
 #define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
