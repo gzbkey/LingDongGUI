@@ -316,7 +316,7 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldLineEditFrameStart(ldLineEdit_t* pWidget)
+void ldLineEditFrameUpdate(ldLineEdit_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

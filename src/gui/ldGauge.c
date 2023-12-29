@@ -164,7 +164,7 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
-void ldGaugeFrameStart(ldGauge_t* pWidget)
+void ldGaugeFrameUpdate(ldGauge_t* pWidget)
 {
     if((pWidget->dirtyRegionState==waitChange)&&(pWidget->op.Target.ptRegion!=NULL))
     {

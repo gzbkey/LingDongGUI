@@ -430,7 +430,7 @@ void ldGuiInit(arm_2d_scene_t *pSence)
 }
 
 
-static void _frameStart(ldCommon_t *pWidget)
+static void _frameUpdate(ldCommon_t *pWidget)
 {
     switch(pWidget->widgetType)
     {
@@ -438,92 +438,92 @@ static void _frameStart(ldCommon_t *pWidget)
     case widgetTypeWindow:
     case widgetTypeImage:
     {
-        ldImageFrameStart((ldImage_t*)pWidget);
+        ldImageFrameUpdate((ldImage_t*)pWidget);
         break;
     }
     case widgetTypeButton:
     {
-        ldButtonFrameStart((ldButton_t*)pWidget);
+        ldButtonFrameUpdate((ldButton_t*)pWidget);
         break;
     }
     case widgetTypeText:
     {
-        ldTextFrameStart((ldText_t*)pWidget);
+        ldTextFrameUpdate((ldText_t*)pWidget);
         break;
     }
     case widgetTypeProgressBar:
     {
-        ldProgressBarFrameStart((ldProgressBar_t*)pWidget);
+        ldProgressBarFrameUpdate((ldProgressBar_t*)pWidget);
         break;
     }
     case widgetTypeRadialMenu:
     {
-        ldRadialMenuFrameStart((ldRadialMenu_t*)pWidget);
+        ldRadialMenuFrameUpdate((ldRadialMenu_t*)pWidget);
         break;
     }
     case widgetTypeCheckBox:
     {
-        ldCheckBoxFrameStart((ldCheckBox_t*)pWidget);
+        ldCheckBoxFrameUpdate((ldCheckBox_t*)pWidget);
         break;
     }
     case widgetTypeLabel:
     {
-        ldLabelFrameStart((ldLabel_t*)pWidget);
+        ldLabelFrameUpdate((ldLabel_t*)pWidget);
         break;
     }
     case widgetTypeScrollSelecter:
     {
-        ldScrollSelecterFrameStart((ldScrollSelecter_t*)pWidget);
+        ldScrollSelecterFrameUpdate((ldScrollSelecter_t*)pWidget);
         break;
     }
     case widgetTypeDateTime:
     {
-        ldDateTimeFrameStart((ldDateTime_t*)pWidget);
+        ldDateTimeFrameUpdate((ldDateTime_t*)pWidget);
         break;
     }
     case widgetTypeIconSlider:
     {
-        ldIconSliderFrameStart((ldIconSlider_t*)pWidget);
+        ldIconSliderFrameUpdate((ldIconSlider_t*)pWidget);
         break;
     }
     case widgetTypeGauge:
     {
-        ldGaugeFrameStart((ldGauge_t*)pWidget);
+        ldGaugeFrameUpdate((ldGauge_t*)pWidget);
         break;
     }
     case widgetTypeQRCode:
     {
-        ldQRCodeFrameStart((ldQRCode_t*)pWidget);
+        ldQRCodeFrameUpdate((ldQRCode_t*)pWidget);
         break;
     }
     case widgetTypeTable:
     {
-        ldTableFrameStart((ldTable_t*)pWidget);
+        ldTableFrameUpdate((ldTable_t*)pWidget);
         break;
     }
     case widgetTypeKeyboard:
     {
-        ldKeyboardFrameStart((ldKeyboard_t*)pWidget);
+        ldKeyboardFrameUpdate((ldKeyboard_t*)pWidget);
         break;
     }
     case widgetTypeLineEdit:
     {
-        ldLineEditFrameStart((ldLineEdit_t*)pWidget);
+        ldLineEditFrameUpdate((ldLineEdit_t*)pWidget);
         break;
     }
     case widgetTypeGraph:
     {
-        ldGraphFrameStart((ldGraph_t*)pWidget);
+        ldGraphFrameUpdate((ldGraph_t*)pWidget);
         break;
     }
     case widgetTypeComboBox:
     {
-        ldComboBoxFrameStart((ldComboBox_t*)pWidget);
+        ldComboBoxFrameUpdate((ldComboBox_t*)pWidget);
         break;
     }
     case widgetTypeArc:
     {
-        ldArcFrameStart((ldArc_t*)pWidget);
+        ldArcFrameUpdate((ldArc_t*)pWidget);
         break;
     }
 /*============================ auto add start =================================*/
@@ -532,7 +532,7 @@ static void _frameStart(ldCommon_t *pWidget)
     }
 }
 
-static void _ldGuiFrameStart(xListNode* pLink)
+static void _ldGuiFrameUpdate(xListNode* pLink)
 {
     xListNode *temp_pos,*safePos;
 
@@ -540,11 +540,11 @@ static void _ldGuiFrameStart(xListNode* pLink)
     {
         if(temp_pos->info!=NULL)
         {
-            _frameStart((ldCommon_t *)temp_pos->info);
+            _frameUpdate((ldCommon_t *)temp_pos->info);
 
             if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {
-                _ldGuiFrameStart(((ldCommon_t *)temp_pos->info)->childList);
+                _ldGuiFrameUpdate(((ldCommon_t *)temp_pos->info)->childList);
             }
         }
     }
@@ -552,7 +552,7 @@ static void _ldGuiFrameStart(xListNode* pLink)
 
 void ldGuiFrameStart(void)
 {
-    _ldGuiFrameStart(&ldWidgetLink);
+    _ldGuiFrameUpdate(&ldWidgetLink);
 
     //检查按键
     if(ldTimeOut(10,&sysTimer,true))

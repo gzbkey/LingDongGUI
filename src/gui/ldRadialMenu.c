@@ -382,7 +382,7 @@ void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,a
     }
 }
 
-void ldRadialMenuFrameStart(ldRadialMenu_t* pWidget)
+void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget)
 {
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {

@@ -50,7 +50,7 @@ typedef struct {
 }ldGraph_t;
 
 ldGraph_t* ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t seriesMax);
-void ldGraphFrameStart(ldGraph_t* pWidget);
+void ldGraphFrameUpdate(ldGraph_t* pWidget);
 void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldGraphDel(ldGraph_t *pWidget);
 

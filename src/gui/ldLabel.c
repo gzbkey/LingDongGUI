@@ -159,7 +159,7 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
-void ldLabelFrameStart(ldLabel_t* pWidget)
+void ldLabelFrameUpdate(ldLabel_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

@@ -140,7 +140,6 @@ static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t
                         return true;
                     }
                 }
-
             }
         }
     }
@@ -1367,7 +1366,6 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
 
             if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
             {
-                LOG_DEBUG("Ignore %d\n",pWidget->nameId);
                 pWidget->dirtyRegionListItem.bIgnore=true;
             }
             break;

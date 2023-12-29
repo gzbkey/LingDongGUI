@@ -171,7 +171,7 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
     return pNewWidget;
 }
 
-void ldQRCodeFrameStart(ldQRCode_t* pWidget)
+void ldQRCodeFrameUpdate(ldQRCode_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

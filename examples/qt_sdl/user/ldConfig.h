@@ -17,7 +17,7 @@ extern "C" {
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 
 #define USE_DIRTY_REGION                          1
-#define USE_VIRTUAL_RESOURCE                      1
+#define USE_VIRTUAL_RESOURCE                      0
 #define USE_OPACITY                               0
 #define USE_TLSF                                  1
 #define USE_RADIA_MENU_SCALE                      1

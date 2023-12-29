@@ -128,7 +128,6 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
     
-    
     if(pageNumNow!=pageTarget)
     {
         ldGuiQuit();

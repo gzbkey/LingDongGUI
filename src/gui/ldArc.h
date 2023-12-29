@@ -25,15 +25,25 @@ extern "C" {
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;
-    // add other variable
+    bool isWaitRefresh:1;
+    ldColor bgColor;
+    ldColor fgColor;
+    ldColor parentColor;
+    uint32_t srcAddr;
+    uint32_t maskAddr;
+    uint16_t startAngle_x10;
+    uint16_t endAngle_x10;
+    uint16_t rotationAngle_x10;
+
 }ldArc_t;
 
-ldArc_t* ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
-void ldArcFrameStart(ldArc_t* pWidget);
+ldArc_t* ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t srcQuarterAddr, uint32_t maskQuarterAddr, uint16_t parentColor);
+void ldArcFrameUpdate(ldArc_t* pWidget);
 void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldArcDel(ldArc_t *pWidget);
 
-
+void ldArcSetAngle(ldArc_t *pWidget,float bgStart,float bgEnd,float fgStart,float fgEnd);
+void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle);
 
 #define ldArcSetHidden          ldBaseSetHidden
 #define ldArcMove               ldBaseMove

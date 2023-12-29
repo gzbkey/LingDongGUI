@@ -487,7 +487,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
     return pNewWidget;
 }
 
-void ldIconSliderFrameStart(ldIconSlider_t* pWidget)
+void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

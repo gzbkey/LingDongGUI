@@ -42,7 +42,7 @@ typedef struct {
 }ldQRCode_t;
 
 ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom);
-void ldQRCodeFrameStart(ldQRCode_t* pWidget);
+void ldQRCodeFrameUpdate(ldQRCode_t* pWidget);
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldQRCodeDel(ldQRCode_t *pWidget);
 void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText);

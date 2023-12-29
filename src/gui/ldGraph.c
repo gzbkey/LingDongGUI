@@ -180,7 +180,7 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
-void ldGraphFrameStart(ldGraph_t* pWidget)
+void ldGraphFrameUpdate(ldGraph_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

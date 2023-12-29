@@ -253,7 +253,7 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldComboBoxFrameStart(ldComboBox_t* pWidget)
+void ldComboBoxFrameUpdate(ldComboBox_t* pWidget)
 {
     if(pWidget->isExpand)
     {

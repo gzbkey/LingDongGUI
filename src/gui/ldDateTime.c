@@ -163,7 +163,7 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldDateTimeFrameStart(ldDateTime_t* pWidget)
+void ldDateTimeFrameUpdate(ldDateTime_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

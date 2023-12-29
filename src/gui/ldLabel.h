@@ -22,7 +22,7 @@ typedef struct {
 }ldLabel_t;
 
 ldLabel_t* ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
-void ldLabelFrameStart(ldLabel_t* pWidget);
+void ldLabelFrameUpdate(ldLabel_t* pWidget);
 void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldLabelDel(ldLabel_t *pWidget);
 

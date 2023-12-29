@@ -263,7 +263,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
     return pNewWidget;
 }
 
-void ldScrollSelecterFrameStart(ldScrollSelecter_t* pWidget)
+void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

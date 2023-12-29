@@ -291,7 +291,7 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldCheckBoxFrameStart(ldCheckBox_t* pWidget)
+void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

@@ -24,7 +24,7 @@ typedef struct {
 }ldText_t;
 
 ldText_t* ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
-void ldTextFrameStart(ldText_t* pWidget);
+void ldTextFrameUpdate(ldText_t* pWidget);
 void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldTextDel(ldText_t *pWidget);
 

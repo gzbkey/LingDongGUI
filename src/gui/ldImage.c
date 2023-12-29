@@ -198,7 +198,7 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
     pWidget->dirtyRegionState=waitChange;
 }
 
-void ldImageFrameStart(ldImage_t* pWidget)
+void ldImageFrameUpdate(ldImage_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {

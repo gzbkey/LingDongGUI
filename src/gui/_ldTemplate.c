@@ -81,6 +81,15 @@ void ldTemplateDel(ldTemplate_t *pWidget)
     }
 }
 
+void ldTemplateFrameUpdate(ldTemplate_t* pWidget)
+{
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
+    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+}
+
 ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldTemplate_t *pNewWidget = NULL;
@@ -125,7 +134,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         // add user init
 

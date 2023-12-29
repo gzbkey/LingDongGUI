@@ -306,7 +306,7 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
     }
 }
 
-void ldProgressBarFrameStart(ldProgressBar_t* pWidget)
+void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget)
 {
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }

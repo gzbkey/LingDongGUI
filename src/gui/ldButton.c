@@ -199,7 +199,7 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     return pNewWidget;
 }
 
-void ldButtonFrameStart(ldButton_t* pWidget)
+void ldButtonFrameUpdate(ldButton_t* pWidget)
 {
     if(pWidget->dirtyRegionState==waitChange)
     {
