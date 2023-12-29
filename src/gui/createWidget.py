@@ -90,6 +90,11 @@ for eachline in alllines:
     if pos>=0 :
         newLineStr='    case widgetType'+upperWidgetName+':\n    {\n        ld'+upperWidgetName+'Loop((ld'+upperWidgetName+'_t*)pWidget,ptParent,bIsNewFrame);\n        break;\n    }\n'+flagStr+'\n'
     
+    flagStr='/*============================ auto add start =================================*/'
+    pos=eachline.find(flagStr)
+    if pos>=0 :
+        newLineStr='    case widgetType'+upperWidgetName+':\n    {\n        ld'+upperWidgetName+'FrameUpdate((ld'+upperWidgetName+'_t*)pWidget);\n        break;\n    }\n'+flagStr+'\n'
+    
     newFileStr+=newLineStr
 
 with open(cSrcPath,'w',encoding='utf8') as f:

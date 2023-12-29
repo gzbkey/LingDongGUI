@@ -43,8 +43,6 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-#define ARC_0_OFFSET_X10      (900)
-
 static bool _arcDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -295,8 +293,8 @@ void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFram
             {
                 arcColor=pWidget->fgColor;
             }
-            fStartAngle=(float)(pWidget->startAngle_x10[i]+ARC_0_OFFSET_X10+pWidget->rotationAngle_x10)/10.0;
-            fEndAngle=(float)(pWidget->endAngle_x10[i]+ARC_0_OFFSET_X10+pWidget->rotationAngle_x10)/10.0;
+            fStartAngle=(float)(pWidget->startAngle_x10[i]+pWidget->rotationAngle_x10)/10.0;
+            fEndAngle=(float)(pWidget->endAngle_x10[i]+pWidget->rotationAngle_x10)/10.0;
             startQuarter = fStartAngle / 90;
             endQuarter = fEndAngle / 90;
             startQuarter0=startQuarter;
@@ -308,7 +306,7 @@ void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFram
             if((startQuarter%4)==(endQuarter%4))//同一象限
             {
                 showRegion.tLocation=_ldArcGetStartEndAreaPos (endQuarter,tTarget_canvas.tSize);
-                if((fEndAngle-fStartAngle)>90)//大圆弧
+                if((fEndAngle-fStartAngle)>90)// 大于270度圆弧
                 {
                     if(fEndAngle>=360.0)
                     {
@@ -341,26 +339,33 @@ void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFram
                                                                        &maskCenter
                                                                        );
                 }
-                else
+                else// 小于90度圆弧
                 {
                     if(fEndAngle>=360.0)
                     {
                         fEndAngle-=360.0;
                     }
-                    arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
-                                                                       &tTarget,
-                                                                       &showRegion,
-                                                                       center,
-                                                                       ARM_2D_ANGLE(fEndAngle),
-                                                                       1.0f,
-                                                                       arcColor,
-                                                                       255,
-                                                                       &maskCenter
-                                                                       );
+//                    if((fEndAngle!=360)&&(fEndAngle!=90)&&(fEndAngle!=180)&&(fEndAngle!=270))
+                    {
+                        arm_2d_fill_colour_with_mask_opacity_and_transform((arm_2d_tile_t*)&tempRes,
+                                                                           &tTarget,
+                                                                           &showRegion,
+                                                                           center,
+                                                                           ARM_2D_ANGLE(fEndAngle),
+                                                                           1.0f,
+                                                                           arcColor,
+                                                                           255,
+                                                                           &maskCenter
+                                                                           );
+                    }
 
                     if(fStartAngle>=360.0)
                     {
                         fStartAngle-=360.0;
+                    }
+                    if((fStartAngle==0)||(fStartAngle==90)||(fStartAngle==180)||(fStartAngle==270))
+                    {
+                        continue;
                     }
                     ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->maskAddr;
 #if USE_VIRTUAL_RESOURCE == 1

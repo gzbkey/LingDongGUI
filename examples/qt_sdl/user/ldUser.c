@@ -196,14 +196,26 @@ void userInit(void)
 //    LOG_DEBUG("win :%llu\n",xFreeBytesRemaining);
 
     obj=ldWindowInit(ID_WIN,ID_BG,20,20,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_WIDTH);
-obj=ldArcInit(ID_ARC,ID_WIN, 10, 10, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
 
-ldArcSetBgAngle(obj,45,180);
-ldArcSetFgAngle(obj,50);
+    obj=ldArcInit(ID_ARC,ID_WIN, 10, 10, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
+    ldArcSetBgAngle(obj,45,180);
+    ldArcSetFgAngle(obj,50);
+    ldArcSetColor(obj,LD_COLOR_GRAY,LD_COLOR_RED);
 
- ldArcSetColor(obj,LD_COLOR_GRAY,LD_COLOR_RED);
+    obj=ldArcInit(ID_ARC+1,ID_WIN, 120, 10, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
+    ldArcSetBgAngle(obj,0,360);
+    ldArcSetFgAngle(obj,120);
+    ldArcSetColor(obj,LD_COLOR_GRAY,LD_COLOR_LIGHT_BLUE);
 
-//ldArcSetRotationAngle(obj,300);
+    obj=ldArcInit(ID_ARC+2,ID_WIN, 240, 10, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
+    ldArcSetBgAngle(obj,0,360);
+    ldArcSetRotationAngle(obj,180);
+    ldArcSetColor(obj,LD_COLOR_GRAY,LD_COLOR_LIGHT_PINK);
+
+    obj=ldArcInit(ID_ARC+3,ID_WIN, 10, 120, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
+    ldArcSetBgAngle(obj,0,360);
+    ldArcSetRotationAngle(obj,180);
+    ldArcSetColor(obj,LD_COLOR_GRAY,LD_COLOR_DARK_GREEN);
 
 //    obj=ldButtonInit(ID_BUTTON,ID_WIN,10,10,70,30);
 //    ldButtonSetFont(obj,SIMSUN_REGULAR_12);
@@ -335,6 +347,7 @@ void userLoop(void)
     if( ldTimeOut(2, &timer,true))
     {
         ldArcSetRotationAngle(ldBaseGetWidgetById(ID_ARC),tempAngle);
+        ldArcSetRotationAngle(ldBaseGetWidgetById(ID_ARC+1),tempAngle);
         tempAngle++;
         if(tempAngle>=360)
         {
@@ -342,6 +355,8 @@ void userLoop(void)
         }
 
         ldArcSetFgAngle(ldBaseGetWidgetById(ID_ARC),tempMoveAngle);
+        ldArcSetFgAngle(ldBaseGetWidgetById(ID_ARC+2),(tempMoveAngle-45)*2);
+        ldArcSetFgAngle(ldBaseGetWidgetById(ID_ARC+3),359-(tempMoveAngle-45)*2);
         tempMoveAngle++;
         if(tempMoveAngle>=180)
         {
