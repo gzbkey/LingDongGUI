@@ -11,6 +11,7 @@ Objects
 *_sort_by_flash.csv
 *_sort_by_ram.csv
 !keil5_disp_size_bar.exe
+!*.lib
 
 #qt
 build*

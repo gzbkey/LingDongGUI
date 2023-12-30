@@ -22,7 +22,6 @@
 /*============================ INCLUDES ======================================*/
 
 //#include "RTE_Components.h"
-#include "ldConfig.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -48,7 +47,7 @@ extern "C" {
 // <i> Note that enabling this feature suffers a non-negligible performance drop.
 // <i> This feature is disabled by default.
 #ifndef __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__
-#   define __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__                      0
+#   define __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__                      1
 #endif
 
 // <q>Enable support for accessing individual colour channels
@@ -121,7 +120,7 @@ extern "C" {
 // <i> This feature is enabled by default. There is no guarantee that the performance will increase or decrease. It is all depends your applications. In most of the case, enabling it helps.
 // <i> This feature has no meaning when the anti-alias transform is disabled or the helium acceleration is available.
 #ifndef __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__
-#   define __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__     0
+#   define __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__     1
 #endif
 
 // <q> Optimize the scaler version of transform operations for hollow out masks
@@ -144,7 +143,7 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your LCD
 // <i> Default: 16
-#   define __GLCD_CFG_COLOUR_DEPTH__                                    LD_CFG_COLOR_DEPTH
+#   define __GLCD_CFG_COLOUR_DEPTH__                                    16
 #endif
 
 // <o> The size of the LCD printf text buffer <16-65535>

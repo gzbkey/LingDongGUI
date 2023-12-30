@@ -165,7 +165,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     return pNewWidget;
 }
 
-void ldTextFrameStart(ldText_t* pWidget)
+void ldTextFrameUpdate(ldText_t* pWidget)
 {
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }

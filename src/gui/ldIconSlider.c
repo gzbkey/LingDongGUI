@@ -195,50 +195,52 @@ static int16_t _scrollOffset;
 
 static bool slotIconSliderScroll(xConnectInfo_t info)
 {
-    ldIconSlider_t *slider;
+    ldIconSlider_t *pWidget;
     int16_t x,y;
     arm_2d_tile_t *pResTile;
 
-    slider=ldBaseGetWidgetById(info.receiverId);
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
-    pResTile=(arm_2d_tile_t*)&slider->resource;
+    pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     switch (info.signalType)
     {
     case SIGNAL_PRESS:
     {
-        slider->isWaitMove=false;
-        slider->isAutoMove=false;
-        slider->isHoldMove=false;
-        _scrollOffset=slider->scrollOffset;
+        pWidget->isWaitMove=false;
+        pWidget->isAutoMove=false;
+        pWidget->isHoldMove=false;
+        _scrollOffset=pWidget->scrollOffset;
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
     {
-        if(slider->isHorizontalScroll)
+        if(pWidget->isHorizontalScroll)
         {
-            slider->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_X(info.value);
         }
         else
         {
-            slider->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
         }
-        slider->isHoldMove=true;
+        pWidget->isHoldMove=true;
         break;
     }
     case SIGNAL_RELEASE:
     {
-        if(!slider->isAutoMove)
+        if(!pWidget->isAutoMove)
         {
-            if(slider->isHoldMove)
+            if(pWidget->isHoldMove)
             {
-                if(isLineScroll(slider))
+                if(isLineScroll(pWidget))
                 {
-                    slider->selectIconOrPage=_ldIconSliderAutoFirstItem(slider,slider->scrollOffset);
+                    pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,pWidget->scrollOffset);
                 }
                 else
                 {
-                    slider->selectIconOrPage=_ldIconSliderAutoSelectPage(slider,slider->scrollOffset);
+                    pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,pWidget->scrollOffset);
                 }
             }
             else
@@ -253,22 +255,22 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 uint8_t itemY=0;
 
 
-                ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t *)slider);
-                itemOffsetWidth=slider->iconSpace+slider->iconWidth;
-                itemOffsetHeight=slider->iconSpace+slider->iconWidth+_getStrHeight(slider->pFontDict)+IMG_FONT_SPACE;
+                ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget);
+                itemOffsetWidth=pWidget->iconSpace+pWidget->iconWidth;
+                itemOffsetHeight=pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict)+IMG_FONT_SPACE;
 
 
                 itemX=((x-globalPos.x))/itemOffsetWidth;
                 itemY=((y-globalPos.y))/itemOffsetHeight;
 
-                if(isLineScroll(slider))
+                if(isLineScroll(pWidget))
                 {
                     uint8_t itemOffsetX=0;
                     uint8_t itemOffsetY=0;
-                    itemOffsetX=(-slider->scrollOffset)/itemOffsetWidth;
-                    itemOffsetY=(-slider->scrollOffset)/itemOffsetHeight;
+                    itemOffsetX=(-pWidget->scrollOffset)/itemOffsetWidth;
+                    itemOffsetY=(-pWidget->scrollOffset)/itemOffsetHeight;
 
-                    if(slider->isHorizontalScroll)
+                    if(pWidget->isHorizontalScroll)
                     {
                         (itemY==0)?(selectItem=itemX+itemOffsetX):(selectItem=(-1));
                     }
@@ -279,26 +281,26 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 }
                 else
                 {
-                    uint8_t pageCount = _ldIconSliderAutoSelectPage(slider,slider->scrollOffset);
+                    uint8_t pageCount = _ldIconSliderAutoSelectPage(pWidget,pWidget->scrollOffset);
 
-                    selectItem=pageCount*slider->rowCount*slider->columnCount;
-                    selectItem+=itemY*slider->columnCount+itemX;
+                    selectItem=pageCount*pWidget->rowCount*pWidget->columnCount;
+                    selectItem+=itemY*pWidget->columnCount+itemX;
                 }
 
-                if(selectItem>=slider->iconCount)
+                if(selectItem>=pWidget->iconCount)
                 {
                     selectItem=(-1);
                 }
-                xEmit(slider->nameId,SIGNAL_CLICKED_ITEM,selectItem);
+                xEmit(pWidget->nameId,SIGNAL_CLICKED_ITEM,selectItem);
             }
         }
-        slider->isWaitMove=true;
+        pWidget->isWaitMove=true;
         break;
     }
     case SIGNAL_MOVE_SPEED:
     {
         int16_t speed;
-        if(slider->isHorizontalScroll)
+        if(pWidget->isHorizontalScroll)
         {
             speed=(int16_t)GET_SIGNAL_VALUE_X(info.value);
         }
@@ -309,23 +311,22 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
 
         if((speed>MOVE_SPEED_THRESHOLD_VALUE)||(speed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
-            if(isLineScroll(slider))
+            if(isLineScroll(pWidget))
             {
-                slider->selectIconOrPage=_ldIconSliderAutoFirstItem(slider,_scrollOffset+SPEED_2_OFFSET(speed));
+                pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
             }
             else
             {
-                slider->selectIconOrPage=_ldIconSliderAutoSelectPage(slider,_scrollOffset+SPEED_2_OFFSET(speed));
+                pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
             }
 
-            slider->isAutoMove=true;
+            pWidget->isAutoMove=true;
         }
         break;
     }
     default:
         break;
     }
-
     return false;
 }
 
@@ -463,7 +464,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
@@ -486,8 +487,12 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
     return pNewWidget;
 }
 
-void ldIconSliderFrameStart(ldIconSlider_t* pWidget)
+void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -545,6 +550,8 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
+            pWidget->dirtyRegionState=waitChange;
+            pWidget->isDirtyRegionAutoIgnore=true;
         }
         else
         {

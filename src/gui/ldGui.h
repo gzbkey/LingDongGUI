@@ -45,6 +45,7 @@ void ldGuiJumpPage(uint8_t pageNum);
 void ldGuiDelWidget(ldCommon_t *widget);
 arm_2d_region_list_item_t * ldGuiGetDirtyRegion(void);
 void ldGuiFrameStart(void);
+void ldGuiFrameComplete(void);
 
 #ifdef __cplusplus
 }

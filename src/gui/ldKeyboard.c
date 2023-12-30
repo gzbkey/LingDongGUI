@@ -601,7 +601,7 @@ static void _ldkeyboardNewButton(ldKeyboard_t *pWidget,arm_2d_tile_t *parentTile
     ldBaseLineText(&btnTile,&pWidget->resource,pStr,pWidget->pFontDict,LD_ALIGN_CENTER,charColor,0,255);
 }
 
-void ldKeyboardFrameStart(ldKeyboard_t* pWidget)
+void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
 {
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {

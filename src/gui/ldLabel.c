@@ -145,7 +145,7 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         LOG_INFO("[label] init,id:%d\n",nameId);
     }
@@ -159,8 +159,12 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     return pNewWidget;
 }
 
-void ldLabelFrameStart(ldLabel_t* pWidget)
+void ldLabelFrameUpdate(ldLabel_t* pWidget)
 {
+    if(pWidget->dirtyRegionState==waitChange)
+    {
+        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+    }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
@@ -263,6 +267,7 @@ void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr)
     ldFree(pWidget->pStr);
     pWidget->pStr=LD_MALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
+    pWidget->dirtyRegionState=waitChange;
 }
 
 /**

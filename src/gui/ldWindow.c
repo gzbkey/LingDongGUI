@@ -97,15 +97,14 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         {
             if(pNewWidget->parentWidget==NULL)
             {
-                pNewWidget->isTransparent=false;
                 pNewWidget->widgetType=widgetTypeBackground;
+                ldImageSetBgColor(pNewWidget,__RGB(240,240,240));
             }
             else
             {
                 pNewWidget->isTransparent=true;
                 pNewWidget->widgetType=widgetTypeWindow;
             }
-            pNewWidget->isDirtyRegionAutoIgnore=true;
 
             LOG_INFO("[window] init,id:%d\n",nameId);
         }

@@ -20,7 +20,7 @@ typedef struct {
 }ldImage_t;
 
 ldImage_t* ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imageAddr,bool isWithMask);
-void ldImageFrameStart(ldImage_t* pWidget);
+void ldImageFrameUpdate(ldImage_t* pWidget);
 void ldImageLoop(ldImage_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldImageDel(ldImage_t *pWidget);
 

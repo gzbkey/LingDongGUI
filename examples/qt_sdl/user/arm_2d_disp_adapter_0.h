@@ -117,7 +117,7 @@ extern "C" {
 // <o>Number of iterations <0-2000>
 // <i> run number of iterations before calculate the FPS.
 #ifndef __DISP0_CFG_ITERATION_CNT__
-#   define __DISP0_CFG_ITERATION_CNT__                             0
+#   define __DISP0_CFG_ITERATION_CNT__                             30
 #endif
 
 // <o>FPS Calculation Mode
@@ -125,7 +125,7 @@ extern "C" {
 //     <1=>     Real FPS
 // <i> Decide the meaning of the real time FPS display
 #ifndef __DISP0_CFG_FPS_CACULATION_MODE__
-#   define __DISP0_CFG_FPS_CACULATION_MODE__                       0
+#   define __DISP0_CFG_FPS_CACULATION_MODE__                       1
 #endif
 
 // <q> Enable Dirty Region Debug Mode
@@ -173,7 +173,7 @@ extern "C" {
 // <q>Disable the navigation layer
 // <i> Remove the navigation layer for this display adapter. NOTE: Disable the navigation layer will also remove the real-time FPS display.
 #ifndef __DISP0_CFG_DISABLE_NAVIGATION_LAYER__
-#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  1
+#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  0
 #endif
 
 // <q>Enable the virtual resource helper service

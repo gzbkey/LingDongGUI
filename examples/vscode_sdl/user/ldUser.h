@@ -5,9 +5,27 @@
 extern "C" {
 #endif
 
-#include "ldCommon.h"
-#include "xList.h"
-#include "ldImage.h"
+#include "ldGui.h"
+#include "image.h"
+
+#include "ldButton.h"
+#include "ldWindow.h"
+#include "ldText.h"
+#include "ldProgressBar.h"
+#include "ldRadialMenu.h"
+#include "ldCheckBox.h"
+#include "ldLabel.h"
+#include "ldScrollSelecter.h"
+#include "ldDateTime.h"
+#include "ldIconSlider.h"
+#include "ldGauge.h"
+#include "ldQRCode.h"
+#include "ldTable.h"
+#include "ldKeyboard.h"
+#include "ldLineEdit.h"
+#include "ldGraph.h"
+#include "ldComboBox.h"
+#include "ldArc.h"
 
 #define LD_PAGE_MAX              (2)
 

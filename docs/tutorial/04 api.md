@@ -1,9 +1,180 @@
 # Arc
 ### 简述
-
+圆环控件
 ### 函数列表
+* ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uint32_t srcQuarterAddr,uint32_t maskQuarterAddr,ldColor parentColor);
+* void ldArcSetBgAngle(ldArc_t *pWidget,float bgStart,float bgEnd);
+* void ldArcSetFgAngle(ldArc_t *pWidget,float fgEnd);
+* void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle);
+* void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor);
 ### 信号列表
 ### 函数说明
+#### ldArcInit
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uint32_t srcQuarterAddr,uint32_t maskQuarterAddr,ldColor parentColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    圆环控件的初始化函数 <br>    圆环素材尺寸建议为单数的像素点，<br>    例如101x101的圆环，裁剪51x51的左上角图片作为素材        </td>
+    </tr>
+    <tr>
+        <td rowspan="9">参数</td>
+        <td>nameId</td>
+        <td>新控件id</td>
+    </tr>
+    <tr>
+        <td>parentNameId</td>
+        <td>父控件id</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>相对坐标x轴</td>
+    </tr>
+    <tr>
+        <td>y</td>
+        <td>相对坐标y轴</td>
+    </tr>
+    <tr>
+        <td>width</td>
+        <td>控件宽度</td>
+    </tr>
+    <tr>
+        <td>height</td>
+        <td>控件高度</td>
+    </tr>
+    <tr>
+        <td>srcQuarterAddr</td>
+        <td>圆环素材左上角(四分之一),mask A8</td>
+    </tr>
+    <tr>
+        <td>maskQuarterAddr</td>
+        <td>圆环素材左上角(四分之一),mask A8，遮挡区域比src的稍大</td>
+    </tr>
+    <tr>
+        <td>parentColor</td>
+        <td>背景颜色</td>
+    </tr>
+    <tr>
+        <td>返回</td>
+        <td>ldArc_t*</td>
+        <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldArcSetBgAngle
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldArcSetBgAngle(ldArc_t *pWidget,float bgStart,float bgEnd);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设定底层圆环角度范围        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgStart</td>
+        <td>底层圆环起始角度</td>
+    </tr>
+    <tr>
+        <td>bgEnd</td>
+        <td>底层圆环结束角度</td>
+    </tr>
+</table>
+<br>
+
+#### ldArcSetFgAngle
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldArcSetFgAngle(ldArc_t *pWidget,float fgEnd);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设定顶层圆环角度范围        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>fgEnd</td>
+        <td>顶层圆环结束角度(1-359)<br>                         必须在底层圆环角度范围内<br>                         设定为0则屏蔽顶层圆环</td>
+    </tr>
+</table>
+<br>
+
+#### ldArcSetRotationAngle
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设定圆环整体旋转角度        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>rotationAngle</td>
+        <td>旋转角度，0-359</td>
+    </tr>
+</table>
+<br>
+
+#### ldArcSetColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设定圆环颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>bgColor</td>
+        <td>底层颜色</td>
+    </tr>
+    <tr>
+        <td>fgColor</td>
+        <td>顶层颜色</td>
+    </tr>
+</table>
+<br>
+
 ---
 # Button
 ### 简述
@@ -3513,6 +3684,12 @@ scroll selecter widget
 text widget
 ### 函数列表
 * ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
+* void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent);
+* void ldTextSetText(ldText_t* pWidget,uint8_t *pStr);
+* void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor);
+* void ldTextSetAlign(ldText_t *pWidget,uint8_t align);
+* void ldTextScrollSeek(ldText_t *pWidget,int16_t offset);
+* void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue);
 ### 信号列表
 ### 函数说明
 #### ldTextInit
@@ -3561,6 +3738,156 @@ text widget
         <td>返回</td>
         <td>ldText_t*</td>
         <td>新控件指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldTextSetTransparent
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置背景透明        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>isTransparent</td>
+        <td>true=透明 false=不透明</td>
+    </tr>
+</table>
+<br>
+
+#### ldTextSetText
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTextSetText(ldText_t* pWidget,uint8_t *pStr);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pStr</td>
+        <td>字符串指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldTextSetTextColor
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设置文本颜色        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>charColor</td>
+        <td>文本颜色</td>
+    </tr>
+</table>
+<br>
+
+#### ldTextSetAlign
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTextSetAlign(ldText_t *pWidget,uint8_t align);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    文本的对齐方式        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>align</td>
+        <td>LD_ALIGN_CENTER<br>                         LD_ALIGN_TOP<br>                         LD_ALIGN_BOTTOM<br>                         LD_ALIGN_LEFT<br>                         LD_ALIGN_RIGHT</td>
+    </tr>
+</table>
+<br>
+
+#### ldTextScrollSeek
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTextScrollSeek(ldText_t *pWidget,int16_t offset);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设定文本显示位置绝对值        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>offset</td>
+        <td>位置绝对值</td>
+    </tr>
+</table>
+<br>
+
+#### ldTextScrollMove
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    设定文本显示偏移值（相对值）        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>moveValue</td>
+        <td>偏移相对值</td>
     </tr>
 </table>
 <br>

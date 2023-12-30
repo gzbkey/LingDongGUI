@@ -33,7 +33,7 @@ typedef struct {
 }ldButton_t;
 
 ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
-void ldButtonFrameStart(ldButton_t* pWidget);
+void ldButtonFrameUpdate(ldButton_t* pWidget);
 void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldButtonDel(ldButton_t *pWidget);
 

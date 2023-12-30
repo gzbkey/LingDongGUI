@@ -41,7 +41,7 @@ typedef struct {
 }ldLineEdit_t;
 
 ldLineEdit_t* ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t textMax);
-void ldLineEditFrameStart(ldLineEdit_t* pWidget);
+void ldLineEditFrameUpdate(ldLineEdit_t* pWidget);
 void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldLineEditDel(ldLineEdit_t *pWidget);
 
