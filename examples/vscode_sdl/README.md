@@ -73,22 +73,24 @@ D:\mingw64
 
 ### 修改配置
 
-通过vscode打开项目文件夹
+1. 通过vscode打开项目文件夹
 
-.vscode\c_cpp_properties.json
+2. 修改对应版本的compilerPath
 
-修改对应版本的compilerPath
+    .vscode\c_cpp_properties.json
 
-.vscode\launch.json
+3. 修改对应版本的miDebuggerPath
 
-修改对应版本的miDebuggerPath
+    .vscode\launch.json
 
-.vscode\tasks.json
+4. 修改对应版本的command
 
-修改对应版本的command
+    .vscode\tasks.json
 
 ### 编译
 
-点击左侧按键"运行和调试"，选择对应版本编译即可
+1. 打开main.c
 
-项目编译前，会自动复制SDL2的dll文件到对应的文件内，无需手动操作。
+2. 点击左侧按键"运行和调试"，选择对应版本编译即可
+
+3. 项目编译前，会自动复制SDL2的dll文件到对应的文件内，无需手动操作。

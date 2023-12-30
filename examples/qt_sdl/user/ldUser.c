@@ -1,26 +1,5 @@
 #include "ldUser.h"
-#include "ldButton.h"
-#include "ldWindow.h"
-#include "ldGui.h"
-#include "ldConfig.h"
-#include "xBtnAction.h"
-#include "image.h"
-#include "ldText.h"
-#include "ldProgressBar.h"
-#include "ldRadialMenu.h"
-#include "ldCheckBox.h"
-#include "ldLabel.h"
-#include "ldScrollSelecter.h"
-#include "ldDateTime.h"
-#include "ldIconSlider.h"
-#include "ldGauge.h"
-#include "ldQRCode.h"
-#include "ldTable.h"
-#include "ldKeyboard.h"
-#include "ldLineEdit.h"
-#include "ldGraph.h"
-#include "ldComboBox.h"
-#include "ldArc.h"
+
 
 void* obj,*le,*kb;
 
@@ -199,7 +178,7 @@ void userInit(void)
 
     obj=ldArcInit(ID_ARC,ID_WIN, 10, 10, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
     ldArcSetBgAngle(obj,45,180);
-    ldArcSetFgAngle(obj,50);
+    ldArcSetFgAngle(obj,45);
     ldArcSetColor(obj,LD_COLOR_GRAY,LD_COLOR_RED);
 
     obj=ldArcInit(ID_ARC+1,ID_WIN, 120, 10, 101, 101,ARC51_PNG,ARCMASK51_PNG,__RGB(240,240,240));
@@ -330,13 +309,6 @@ void userInit(void)
 //    ldLineEditSetKeyboard(obj,ID_KB);
 }
 
-
-void userInit1(void)
-{
-//    win1=ldWindowInit(0, 0, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
-//    img1=ldImageInit(1, 0, 100,120,163,65,(uint32_t)&press_bmp[0],false);
-}
-
 bool isTop=false;
 int64_t timer=0;
 uint16_t tempValue=0;
@@ -385,28 +357,15 @@ void userLoop(void)
     }
 }
 
-void userLoop1(void)
-{
-//    if( ldTimeOut(3000, &timer,true))
-//    {
-//        ldGuiJumpPage(0);
-//    }
-}
-
 void userQuit(void)
 {
 //        pImageDel(img);
 //    ldWindowDel(win0);
 }
 
-void userQuit1(void)
-{
-//        pImageDel(img);
-//    ldWindowDel(win1);
-}
 
-void (*ldUserPageInitFunc[LD_PAGE_MAX])(void)={userInit,userInit1};
-void (*ldUserPageLoopFunc[LD_PAGE_MAX])(void)={userLoop,userLoop1};
-void (*ldUserPageQuitFunc[LD_PAGE_MAX])(void)={userQuit,userQuit1};
+void (*ldUserPageInitFunc[LD_PAGE_MAX])(void)={userInit};
+void (*ldUserPageLoopFunc[LD_PAGE_MAX])(void)={userLoop};
+void (*ldUserPageQuitFunc[LD_PAGE_MAX])(void)={userQuit};
 
 
