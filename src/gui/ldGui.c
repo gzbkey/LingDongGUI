@@ -22,7 +22,6 @@
  * @date    2023-11-03
  */
 #include "ldGui.h"
-#include "ldUser.h"
 #include "ldImage.h"
 #include "ldButton.h"
 #include "ldText.h"
@@ -56,6 +55,22 @@ static volatile ldPoint_t pressPoint;
 static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
+
+void (*ldPageInitFunc[LD_PAGE_MAX])(void)={0};
+void (*ldPageLoopFunc[LD_PAGE_MAX])(void)={0};
+void (*ldPageQuitFunc[LD_PAGE_MAX])(void)={0};
+static uint8_t pageCount=0;
+
+void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
+{
+    if(pageCount<LD_PAGE_MAX)
+    {
+        ldPageInitFunc[pageCount]=init;
+        ldPageLoopFunc[pageCount]=loop;
+        ldPageQuitFunc[pageCount]=quit;
+        pageCount++;
+    }
+}
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
@@ -420,7 +435,10 @@ static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
 void ldGuiInit(arm_2d_scene_t *pSence)
 {
     xEmitInit();
-    ldUserPageInitFunc[pageNumNow]();
+    if(ldPageInitFunc[pageNumNow])
+    {
+        ldPageInitFunc[pageNumNow]();
+    }
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 
 #if USE_DIRTY_REGION == 1
@@ -574,7 +592,10 @@ void ldGuiFrameStart(void)
  */
 void ldGuiLogicLoop(void)
 {
-    ldUserPageLoopFunc[pageNumNow]();
+    if(ldPageLoopFunc[pageNumNow])
+    {
+        ldPageLoopFunc[pageNumNow]();
+    }
 }
 
 /**
@@ -599,7 +620,10 @@ void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
  */
 void ldGuiQuit(void)
 {
-    ldUserPageQuitFunc[pageNumNow]();
+    if(ldPageQuitFunc[pageNumNow])
+    {
+        ldPageQuitFunc[pageNumNow]();
+    }
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 

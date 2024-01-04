@@ -10,13 +10,13 @@ extern "C" {
 #include "arm_2d_cfg.h"
 
 // base config
-#define LD_CFG_COLOR_DEPTH                        16   // 8 16 32
-#define LD_CFG_SCEEN_WIDTH                        500
-#define LD_CFG_SCEEN_HEIGHT                       500
+#define LD_CFG_COLOR_DEPTH                        (16)   // 8 16 32
+#define LD_CFG_SCEEN_WIDTH                        (500)
+#define LD_CFG_SCEEN_HEIGHT                       (500)
 #define LD_CFG_PFB_WIDTH                          LD_CFG_SCEEN_WIDTH
-#define LD_CFG_PFB_HEIGHT                         10
+#define LD_CFG_PFB_HEIGHT                         (10)
 #define LD_MEM_SIZE                               (32*1024) //BYTE
-
+#define LD_PAGE_MAX                               (2)
 #define USE_DIRTY_REGION                          1
 #define USE_VIRTUAL_RESOURCE                      0
 #define USE_OPACITY                               0

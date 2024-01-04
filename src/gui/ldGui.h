@@ -7,7 +7,24 @@ extern "C" {
 
 #include "arm_2d.h"
 #include "ldCommon.h"
-
+#include "ldButton.h"
+#include "ldWindow.h"
+#include "ldText.h"
+#include "ldProgressBar.h"
+#include "ldRadialMenu.h"
+#include "ldCheckBox.h"
+#include "ldLabel.h"
+#include "ldScrollSelecter.h"
+#include "ldDateTime.h"
+#include "ldIconSlider.h"
+#include "ldGauge.h"
+#include "ldQRCode.h"
+#include "ldTable.h"
+#include "ldKeyboard.h"
+#include "ldLineEdit.h"
+#include "ldGraph.h"
+#include "ldComboBox.h"
+#include "ldArc.h"
 
 //btn占用0-9
 #define SIGNAL_NO_OPERATION         BTN_NO_OPERATION
@@ -31,12 +48,18 @@ extern "C" {
 #define GET_SIGNAL_VALUE_X(dat)     ((dat>>16)&0xFFFF)
 #define GET_SIGNAL_VALUE_Y(dat)     (dat&0xFFFF)
 
+typedef void (*pFuncTypedef)(void);
 
-
+extern void (*ldPageInitFunc[LD_PAGE_MAX])(void);
+extern void (*ldPageLoopFunc[LD_PAGE_MAX])(void);
+extern void (*ldPageQuitFunc[LD_PAGE_MAX])(void);
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
 //extern bool isUpdateBackground;
 
+#define LD_ADD_PAGE(pageName)       ldGuiAddPage(pageName##Init,pageName##Loop,pageName##Quit)
+
+void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit);
 void ldGuiInit(arm_2d_scene_t *pSence);
 void ldGuiLogicLoop(void);
 void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame);

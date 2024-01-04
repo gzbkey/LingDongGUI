@@ -106,10 +106,10 @@ SOURCES += \
     ../common/math/arm_sin_q31.c \
     user/image.c \
     user/ldConfig.c \
-    user/ldUser.c \
     user/main.c \
     user/Virtual_TFT_Port.c \
-    user/arm_2d_disp_adapter_0.c
+    user/arm_2d_disp_adapter_0.c \
+    user/uiDemo.c
 
 HEADERS += \
     ../../src/gui/ldArc.h \
@@ -220,7 +220,8 @@ HEADERS += \
     user/arm_2d_user_arch_port.h \
     user/image.h \
     user/ldConfig.h \
-    user/ldUser.h
+    user/uiDemo.h \
+    user/uiHome.h
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
