@@ -1,10 +1,43 @@
-## 如何添加自定义控件
+## 添加UI页面文件
 
-1、运行python脚本，[src/gui/createWidget.py](../../src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h
+1. 复制[tools/createUiFile.py](../../tools/createUiFile.py)到项目中UI页面文件的相同目录中，例如./user
+2. 运行脚本，按提示选择新增页面文件，输入页面名称，例如demo
+3. 按回车后，会自动生成uiDemo.c和uiDemo.h
+4. 将文件导入项目中，main.c中添加头文件uiDemo.h
+5. 在main函数中添加LD_ADD_PAGE(uiDemo);即可设置好页面
+6. 如果有多个页面，请按需要的顺序重复步骤5
+~~~c 
+#include "uiHome.h"
+#include "uiZigbee.h"
+#include "uiWifi.h"
 
-2、添加刚才新建的.c .h文件到项目中(新文件在./src/gui中)
+int main(void)
+{
+    sysInit();
 
-3、修改新控件的.c .h文件
+    LD_ADD_PAGE(uiHome);//Home页面序号为0
+    LD_ADD_PAGE(uiZigbee);//Zigbee页面序号为1
+    LD_ADD_PAGE(uiWifi);//Wifi页面序号为2
+
+    arm_irq_safe {
+        arm_2d_init();
+    }
+
+    ...
+
+    while(1)
+    {
+        ...
+    }
+}
+
+~~~
+
+## 添加自定义控件
+
+1. 运行python脚本，[src/gui/createWidget.py](../../src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h
+2. 添加刚才新建的.c .h文件到项目中(新文件在./src/gui中)
+3. 修改新控件的.c .h文件
 
 ---
 自动处理：
