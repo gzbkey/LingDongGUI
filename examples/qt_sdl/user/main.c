@@ -9,6 +9,7 @@
 #include "xBtnAction.h"
 #include "stdbool.h"
 #include "virtualNor.h"
+#include "uiDemo.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -125,6 +126,8 @@ int main (void)
     X_BTN_KEY_INIT(KEY_NUM_RIGHT,vtGetKeyState);
     X_BTN_KEY_INIT(KEY_NUM_ENTER,vtGetKeyState);
     X_BTN_KEY_INIT(KEY_NUM_ESC,vtGetKeyState);
+
+    LD_ADD_PAGE(uiDemo);
 
     arm_irq_safe {
         arm_2d_init();
