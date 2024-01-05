@@ -217,7 +217,7 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->itemMax=itemMax;
         pNewWidget->itemCount=0;
         pNewWidget->itemSelect=0;
-        pNewWidget->dropdownImgAddr=dropDownV_png;
+        pNewWidget->dropdownImgAddr=(uint32_t)dropDownV_png;
         pNewWidget->dropdownImgWidth=13;
         pNewWidget->dropdownImgHeight=8;
         pNewWidget->pFontDict=pFontDict;
@@ -327,7 +327,7 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 #endif
         ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
 
-        if(pWidget->dropdownImgAddr==dropDownV_png)
+        if(pWidget->dropdownImgAddr==(uint32_t)dropDownV_png)
         {
             ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
         }

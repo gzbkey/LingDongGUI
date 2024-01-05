@@ -5,6 +5,7 @@
 #include "arm_2d.h"
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
+#include "uiDemo.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -84,6 +85,8 @@ int main(void)
     st7789v_clear(0xff);
     ST7789V_BG_ON;
     
+    LD_ADD_PAGE(uiDemo);
+
     arm_irq_safe {
         arm_2d_init();
     }
@@ -91,7 +94,7 @@ int main(void)
     disp_adapter0_init();
     
     arm_2d_scene0_init(&DISP0_ADAPTER);
-    
+
     while(1)
     {
         disp_adapter0_task();

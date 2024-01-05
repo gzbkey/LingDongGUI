@@ -23,7 +23,7 @@
   
   <components>
     <component Cclass="LDGUI" Cversion="0.6.1" Cgroup="ldgui" Csub="Core">
-    <description>A dedicated performance counter for Cortex-M systick.</description>
+    <description>ldgui core files.</description>
     <files>
       <file category="include"    name="src/gui/" />
       <file category="sourceC"    name="src/gui/ldArc.c"/>

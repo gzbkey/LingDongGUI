@@ -514,7 +514,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].isSelect=false;
         }
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
@@ -620,7 +620,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                     {
                         if((!item->isButton)||((item->isButton)&&(item->isChecked==false)))
                         {
-                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=item->releaseImgAddr;
+                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)item->releaseImgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
                             tempRes.pTarget=item->releaseImgAddr;
 #endif
@@ -632,7 +632,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                     {
                         if((item->isButton)&&(item->isChecked==true))
                         {
-                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=item->pressImgAddr;
+                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)item->pressImgAddr;
     #if USE_VIRTUAL_RESOURCE == 1
                             tempRes.pTarget=item->pressImgAddr;
     #endif

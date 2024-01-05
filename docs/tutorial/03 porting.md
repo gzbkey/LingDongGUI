@@ -6,9 +6,16 @@
 
 安装好MDK-ARM，这里使用的版本是5.38。建议使用最新版本
 
-### 移植arm-2d准备
- * 安装arm-2d的pack，最新版本[下载](https://github.com/ARM-software/Arm-2D/releases)
- * 安装perf_counter的pack，最新版本[下载](https://github.com/GorgonMeducer/perf_counter/releases)
+### 移植前的准备
+ * 安装arm-2d的pack
+    * [下载](https://github.com/ARM-software/Arm-2D/releases/)
+ * 安装perf_counter的pack
+    * [下载](https://github.com/GorgonMeducer/perf_counter/releases/)
+ * 安装ldgui的pack
+    * [github下载](https://github.com/gzbkey/LingDongGUI/releases/)
+    * [gitee下载](https://gitee.com/gzbkey/LingDongGUI/releases/)
+ * 安装python,安装时注意勾选添加到系统环境变量的选项
+    * [下载](https://www.python.org/downloads/)
  * 准备带屏幕的开发板，可以正常显示图片的keil项目(lcd_project)
  * 屏幕接口
     ```c 
@@ -32,19 +39,19 @@
 
 1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS，keil中选择Project -> Manage -> Run-Time Environment
 
-    ![keilPackSelect](../tutorial/images/03/arm2d%20Manage%20Run-Time%20Environment.png)
+    ![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
 
 2. 选择ac6编译器，并且选择gnu11
 
-    ![ac6Setting](../tutorial/images/03/ac6%20setting.png)
+    ![ac6Setting](./images/03/ac6%20setting.png)
 
 3. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
 
-    ![ac5Setting](../tutorial/images/03/ac5%20setting.png)
+    ![ac5Setting](./images/03/ac5%20setting.png)
 
 4. 确保keil的CMSIS版本不得低于5.7.0，查看方式，Project -> Manage -> Select Software Packs
 
-    ![cmsisVersion](../tutorial/images/03/cmsis%20version.png)
+    ![cmsisVersion](./images/03/cmsis%20version.png)
 
 5. 树目录中的Acceleration，找到arm_2d_disp_adapter_0.h。
 
@@ -223,11 +230,13 @@
 
 9. 运行效果
 
-   ![arm2d-demo](../tutorial/images/03/arm2d%20demo.gif)
+    ![arm2d-demo](./images/03/arm2d%20demo.gif)
 
 ### 加入ldgui
 
-1. 将ldgui的c文件添加到项目，添加头文件路径。其中_ldTemplate.c为模板文件，请勿添加到项目中。
+1. 在lcd_project中加入ldgui，keil中选择Project -> Manage -> Run-Time Environment
+
+    ![](./images/03/ldgui%20Manage%20Run-Time%20Environment.png)
 
 2. keil中选择Project -> Manage -> Run-Time Environment，Acceleration - Arm-2D Helper中，Scene设置为0
 
@@ -290,7 +299,7 @@
     ```
 
 5. 新建ldConfig.h
-```c 
+    ```c 
     #ifndef _LD_CONFIG_H_
     #define _LD_CONFIG_H_
 
@@ -303,32 +312,28 @@
     #include "arm_2d_cfg.h"
     #include "lcd.h"
 
-    #define LD_CFG_SCEEN_WIDTH                        LCD_WIDTH
-    #define LD_CFG_SCEEN_HEIGHT                       LCD_HEIGHT
-    #define LD_CFG_COLOR_DEPTH                        16   // 8 16 32
-
-    #define USE_VIRTUAL_RESOURCE                      0
-
+    // base config
+    #define LD_CFG_COLOR_DEPTH                        (16)   // 8 16 32
+    #define LD_CFG_SCEEN_WIDTH                        (320)
+    #define LD_CFG_SCEEN_HEIGHT                       (240)
+    #define LD_CFG_PFB_WIDTH                          LD_CFG_SCEEN_WIDTH
+    #define LD_CFG_PFB_HEIGHT                         (10)
+    #define LD_MEM_SIZE                               (12*1024) //BYTE
+    #define LD_PAGE_MAX                               (2)
     #define USE_DIRTY_REGION                          1
-
+    #define USE_VIRTUAL_RESOURCE                      0
     #define USE_OPACITY                               0
-
     #define USE_TLSF                                  1
-
     #define USE_RADIA_MENU_SCALE                      1
 
-    #define LD_MEM_SIZE                               (16*1024) //BYTE
-
+    //debug config
     #define LD_DEBUG                                  0
-
-    // arm-2d config
-
-    // PFB尺寸
-    #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_SCEEN_WIDTH
-    #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            16
     #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
 
     // 以下不用修改
+    #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
+    #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
+    #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
     #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
     #define __DISP0_CFG_SCEEN_WIDTH__                 LD_CFG_SCEEN_WIDTH
     #define __DISP0_CFG_SCEEN_HEIGHT__                LD_CFG_SCEEN_HEIGHT
@@ -345,15 +350,44 @@
     #endif
 
     #endif //_LD_CONFIG_H_
+    ```
 
-```
-
-6. 新建ldUser.c、ldUser.h
-
-5. xLog.h关闭打印功能
-
-    如果需要使用打印功能，请自定义printf
+6. xLog.h关闭打印功能
 
     ```c
     #define SET_LOG_LEVEL            LOG_LEVEL_NONE
     ```
+
+    如果需要使用打印功能，请自定义printf
+
+7. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
+8. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
+9. 将文件导入项目中，main.c中添加页面文件的头文件
+10. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
+    ~~~c
+    #include "uiHome.h"
+    #include "uiZigbee.h"
+    #include "uiWifi.h"
+
+    int main(void)
+    {
+        sysInit();
+
+        LD_ADD_PAGE(uiHome);//Home页面序号为0
+        LD_ADD_PAGE(uiZigbee);//Zigbee页面序号为1
+        LD_ADD_PAGE(uiWifi);//Wifi页面序号为2
+
+        arm_irq_safe {
+            arm_2d_init();
+        }
+
+        disp_adapter0_init();
+
+        arm_2d_scene0_init(&DISP0_ADAPTER);
+
+        while(1)
+        {
+            disp_adapter0_task();
+        }
+    }
+    ~~~
