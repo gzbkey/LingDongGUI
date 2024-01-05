@@ -4,10 +4,9 @@
   <vendor>gzbkey</vendor>
   <name>LingDongGUI</name>
   <description>A gui based on arm-2d.</description>
-  <url>https://raw.githubusercontent.com/gzbkey/LingDongGUI/cmsis-pack/</url>
-  <supportContact></supportContact>
+  <url>https://github.com/gzbkey/LingDongGUI</url>
+  <supportContact>https://github.com/gzbkey/LingDongGUI/issues</supportContact>
   <license>LICENSE</license>
-  
   <repository type="git">https://github.com/gzbkey/LingDongGUI.git</repository>
   <releases>
     <release version="9.9.9" tag="v9.9.9">
@@ -23,7 +22,7 @@
   </keywords>
   
   <components>
-    <component Cclass="LDGUI" Cversion="0.6.0" Cgroup="ldgui" Csub="Core">
+    <component Cclass="LDGUI" Cversion="0.6.1" Cgroup="ldgui" Csub="Core">
     <description>A dedicated performance counter for Cortex-M systick.</description>
     <files>
       <file category="include"    name="src/gui/" />
@@ -59,6 +58,8 @@
       <file category="sourceC"    name="src/misc/xList.c"/>
       <file category="sourceC"    name="src/misc/xQueue.c"/>
       <file category="sourceC"    name="src/misc/xString.c"/>
+
+      <file category="utility"    name="tools/createUiFile.py" attr="config" version="1.0.0"/>
     </files>
     </component>
   </components>
