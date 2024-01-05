@@ -22,6 +22,7 @@ extern "C" {
 #define USE_OPACITY                               0
 #define USE_TLSF                                  1
 #define USE_RADIA_MENU_SCALE                      1
+#define USE_QR_CODE                               0
 
 //debug config
 #define LD_DEBUG                                  0

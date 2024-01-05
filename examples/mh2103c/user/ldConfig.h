@@ -18,11 +18,14 @@ extern "C" {
 #define LD_CFG_PFB_HEIGHT                         (48)
 #define LD_MEM_SIZE                               (16*1024) //BYTE
 #define LD_PAGE_MAX                               (2)
+
 #define USE_DIRTY_REGION                          1
 #define USE_VIRTUAL_RESOURCE                      0
+
 #define USE_OPACITY                               0
 #define USE_TLSF                                  1
 #define USE_RADIA_MENU_SCALE                      1
+#define USE_QRCode                                0
 
 //debug config
 #define LD_DEBUG                                  0

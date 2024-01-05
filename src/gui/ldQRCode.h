@@ -24,6 +24,8 @@ extern "C" {
 #include "ldCommon.h"
 #include "qrcodegen.h"
 
+#if USE_QR_CODE == 1
+
 typedef enum {
     eccLow = 0,
     eccMedium,
@@ -50,6 +52,8 @@ void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText);
 
 #define ldQRCodeSetHidden          ldBaseSetHidden
 #define ldQRCodeMove               ldBaseMove
+
+#endif
 
 #ifdef __cplusplus
 }

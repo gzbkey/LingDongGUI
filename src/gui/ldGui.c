@@ -249,7 +249,9 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
     }
     case widgetTypeQRCode:
     {
+#if USE_QR_CODE == 1
         ldQRCodeDel((ldQRCode_t*)pWidget);
+#endif
         break;
     }
     case widgetTypeTable:
@@ -351,7 +353,9 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     }
     case widgetTypeQRCode:
     {
+#if USE_QR_CODE == 1
         ldQRCodeLoop((ldQRCode_t*)pWidget,ptParent,bIsNewFrame);
+#endif
         break;
     }
     case widgetTypeTable:
@@ -511,7 +515,9 @@ static void _frameUpdate(ldCommon_t *pWidget)
     }
     case widgetTypeQRCode:
     {
+#if USE_QR_CODE == 1
         ldQRCodeFrameUpdate((ldQRCode_t*)pWidget);
+#endif
         break;
     }
     case widgetTypeTable:
