@@ -4,7 +4,7 @@
   <vendor>gzbkey</vendor>
   <name>LingDongGUI</name>
   <description>A gui based on arm-2d.</description>
-  <url>https://github.com/gzbkey/LingDongGUI</url>
+  <url>https://github.com/gzbkey/LingDongGUI/</url>
   <supportContact>https://github.com/gzbkey/LingDongGUI/issues</supportContact>
   <license>LICENSE</license>
   <repository type="git">https://github.com/gzbkey/LingDongGUI.git</repository>
@@ -58,8 +58,6 @@
       <file category="sourceC"    name="src/misc/xList.c"/>
       <file category="sourceC"    name="src/misc/xQueue.c"/>
       <file category="sourceC"    name="src/misc/xString.c"/>
-
-      <file category="utility"    name="tools/createUiFile.py" attr="config" version="1.0.0"/>
     </files>
     </component>
   </components>

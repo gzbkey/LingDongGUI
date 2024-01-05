@@ -6,7 +6,7 @@
 4. 将文件导入项目中，main.c中添加头文件uiDemo.h
 5. 在main函数中添加LD_ADD_PAGE(uiDemo);即可设置好页面
 6. 如果有多个页面，请按需要的顺序重复步骤5
-~~~c 
+~~~c
 #include "uiHome.h"
 #include "uiZigbee.h"
 #include "uiWifi.h"
@@ -30,7 +30,6 @@ int main(void)
         ...
     }
 }
-
 ~~~
 
 ## 添加自定义控件
