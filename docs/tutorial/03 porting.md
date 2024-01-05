@@ -395,5 +395,6 @@
 ### 关于程序体积
 
 * 请善用keil的优化等级
-![](./images/03/keil%20optimization.png)
+
+    ![](./images/03/keil%20optimization.png)
 
