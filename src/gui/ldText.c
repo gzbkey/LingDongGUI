@@ -146,7 +146,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->opacity=255;
 #endif
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;

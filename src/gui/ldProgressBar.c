@@ -139,7 +139,7 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
         pNewWidget->permille=0;
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;

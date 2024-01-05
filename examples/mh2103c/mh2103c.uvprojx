@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\user;.\Libraries\MH210xLib\inc;.\Libraries\MH210xLib\lib;.\user\driver;..\..\src\gui;..\..\src\misc</IncludePath>
+              <IncludePath>.\user;.\Libraries\MH210xLib\inc;.\Libraries\MH210xLib\lib;.\user\driver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

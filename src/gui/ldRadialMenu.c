@@ -257,7 +257,7 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = true;
         pNewWidget->dirtyRegionListItem.bUpdated = false;
         pNewWidget->dirtyRegionState=waitChange;
