@@ -176,7 +176,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
 
-        ldGuiLoop(ptThis,ptTile,bIsNewFrame);
+        ldGuiLoop((arm_2d_scene_t*)ptThis,(arm_2d_tile_t*)ptTile,bIsNewFrame);
 
 
     /*-----------------------draw the foreground end  -----------------------*/
@@ -223,7 +223,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .bUserAllocated = bUserAllocated,
     };
 
-    ldGuiInit(ptThis);
+    ldGuiInit((arm_2d_scene_t*)ptThis);
     
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 

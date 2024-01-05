@@ -216,7 +216,7 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 
         if((qr0!=NULL)&&(tempBuffer!=NULL))
         {
-            ret = qrcodegen_encodeText((const char*)pWidget->qrText,tempBuffer, qr0, pWidget->qrEcc,pWidget->qrMaxVersion, pWidget->qrMaxVersion,qrcodegen_Mask_AUTO,true);
+            ret = qrcodegen_encodeText((const char*)pWidget->qrText,tempBuffer, qr0, (enum qrcodegen_Ecc)pWidget->qrEcc,pWidget->qrMaxVersion, pWidget->qrMaxVersion,qrcodegen_Mask_AUTO,true);
 
             if (ret)
             {

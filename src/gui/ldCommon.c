@@ -1395,20 +1395,17 @@ static void ldGuiUpdateDirtyRegion(xListNode* pLink)
 
 void ldBaseBgMove(int16_t x,int16_t y)
 {
-    ldWindow_t *pWidget=ldBaseGetWidgetById(0);
+    ldCommon_t *pWidget=ldBaseGetWidgetById(0);
     ldBaseMove(pWidget,x,y);
 
     //只考虑左移和上移
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
 
-
-
     ldGuiUpdateDirtyRegion(&ldWidgetLink);
 
     pWidget->dirtyRegionState=waitChange;
     pWidget->isDirtyRegionAutoIgnore=true;
-//    isUpdateBackground=true;
 }
 
 

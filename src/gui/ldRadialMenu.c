@@ -95,7 +95,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
     value=info.value;
     pWidget=ldBaseGetWidgetById(info.receiverId);
 
-    ldPoint_t widgetPos=ldBaseGetGlobalPos(pWidget);
+    ldPoint_t widgetPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
 
     switch (info.signalType)
     {
@@ -322,7 +322,7 @@ static void _sortByYAxis(ldRadialMenuItem_t* arr, uint8_t* indexArr, int size)
 
 static void _autoSort(ldRadialMenu_t *pWidget)
 {
-    ldPoint_t globalPos=ldBaseGetGlobalPos(pWidget);
+    ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
     //计算坐标
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
@@ -562,7 +562,7 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
         //初始化数据
         _autoSort(pWidget);
 
-        ldPoint_t globalPos=ldBaseGetGlobalPos(pWidget);
+        ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
         for(uint8_t i=0;i<pWidget->itemCount;i++)
         {
             pWidget->pItemList[i].dirtyRegionState=waitChange;
