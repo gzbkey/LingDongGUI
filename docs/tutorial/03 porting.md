@@ -2,7 +2,7 @@
 
 本文档以单片机为标准，说明移植过程
 
-## Keil
+## 基于Keil的移植
 
 安装好MDK-ARM，这里使用的版本是5.38。建议使用最新版本
 
@@ -245,114 +245,7 @@
     #include "ldConfig.h" 
     ```
 
-4. 新建ldConfig.c
-    ```c
-    #include "ldConfig.h"
-
-    /**
-     * @brief   获取触摸坐标
-     * 
-     * @param   x 返回的x坐标
-     * @param   y 返回的y坐标
-     * @return  true 有效触摸
-     * @return  false 无效触摸
-     */
-    bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
-    {
-        bool touchState=false;
-        int16_t rx;
-        int16_t ry;
-        
-        //添加触摸函数
-    //    touchState=vtMouseGetPoint(&rx,&ry);
-
-        if((touchState!=0)&&(((rx!=-1)&&(ry!=-1))||((rx!=0)&&(ry!=0))))
-        {
-            if(rx<0)
-            {
-                rx=0;
-            }
-            if(ry<0)
-            {
-                ry=0;
-            }
-            if(rx>LD_CFG_SCEEN_WIDTH)
-            {
-                rx=LD_CFG_SCEEN_WIDTH;
-            }
-            if(ry>LD_CFG_SCEEN_HEIGHT)
-            {
-                ry=LD_CFG_SCEEN_HEIGHT;
-            }
-            *x=rx;
-            *y=ry;
-            touchState=true;
-        }
-        else
-        {
-            touchState=false;
-            *x=-1;
-            *y=-1;
-        }
-        return touchState;
-    }
-    ```
-
-5. 新建ldConfig.h
-    ```c 
-    #ifndef _LD_CONFIG_H_
-    #define _LD_CONFIG_H_
-
-    #ifdef __cplusplus
-    extern "C" {
-    #endif
-
-    #include "stdint.h"
-    #include "stdbool.h"
-    #include "arm_2d_cfg.h"
-    #include "lcd.h"
-
-    // base config
-    #define LD_CFG_COLOR_DEPTH                        (16)   // 8 16 32
-    #define LD_CFG_SCEEN_WIDTH                        (320)
-    #define LD_CFG_SCEEN_HEIGHT                       (240)
-    #define LD_CFG_PFB_WIDTH                          LD_CFG_SCEEN_WIDTH
-    #define LD_CFG_PFB_HEIGHT                         (10)
-    #define LD_MEM_SIZE                               (12*1024) //BYTE
-    #define LD_PAGE_MAX                               (2)
-    #define USE_DIRTY_REGION                          1
-    #define USE_VIRTUAL_RESOURCE                      0
-    #define USE_OPACITY                               0
-    #define USE_TLSF                                  1
-    #define USE_RADIA_MENU_SCALE                      1
-
-    //debug config
-    #define LD_DEBUG                                  0
-    #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
-
-    // 以下不用修改
-    #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
-    #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
-    #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
-    #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
-    #define __DISP0_CFG_SCEEN_WIDTH__                 LD_CFG_SCEEN_WIDTH
-    #define __DISP0_CFG_SCEEN_HEIGHT__                LD_CFG_SCEEN_HEIGHT
-    #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     USE_VIRTUAL_RESOURCE
-
-    #if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
-    #error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
-    #endif
-
-    bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
-
-    #ifdef __cplusplus
-    }
-    #endif
-
-    #endif //_LD_CONFIG_H_
-    ```
-
-6. xLog.h关闭打印功能
+5. xLog.h关闭打印功能
 
     ```c
     #define SET_LOG_LEVEL            LOG_LEVEL_NONE
@@ -360,10 +253,10 @@
 
     如果需要使用打印功能，请自定义printf
 
-7. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
-8. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
-9. 将文件导入项目中，main.c中添加页面文件的头文件
-10. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
+6. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
+7. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
+8. 将文件导入项目中，main.c中添加页面文件的头文件
+9. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
     ~~~c
     #include "uiHome.h"
     #include "uiZigbee.h"

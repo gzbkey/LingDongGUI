@@ -10,7 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -395,11 +395,6 @@
               <FilePath>.\user\Retarget.c</FilePath>
             </File>
             <File>
-              <FileName>ldConfig.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\user\ldConfig.c</FilePath>
-            </File>
-            <File>
               <FileName>uiDemo.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\user\uiDemo.c</FilePath>
@@ -568,7 +563,7 @@
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
-          <GroupName>::LDGUI</GroupName>
+          <GroupName>::LingDongGui</GroupName>
         </Group>
         <Group>
           <GroupName>::Utilities</GroupName>
@@ -628,20 +623,20 @@
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.14.2" condition="CMSISCORE">
-        <package name="CMSIS-DSP" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="1.14.2"/>
+      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.14.0" condition="CMSISCORE">
+        <package name="CMSIS-DSP" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="1.14.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
       <component Cclass="Utilities" Cgroup="perf_counter" Csub="Core" Cvariant="Source" Cvendor="GorgonMeducer" Cversion="2.2.3" condition="CMSIS-CORE">
-        <package name="perf_counter" schemaVersion="1.7.7" url="https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/" vendor="GorgonMeducer" version="2.2.3"/>
+        <package name="perf_counter" schemaVersion="1.7.7" url="https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/" vendor="GorgonMeducer" version="2.2.4"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="LDGUI" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.1">
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev6+g6ce8bd8"/>
+      <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D">
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -749,6 +744,30 @@
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="AIR32F1xx CMSIS Device"/>
         <package name="AIR32F103_DFP" schemaVersion="1.2" url="https://luatos.com/t/air32f103/" vendor="Keil" version="1.1.9"/>
         <targetInfos/>
+      </file>
+      <file attr="config" category="utility" name="tools\createUiFile.py" version="1.0.0">
+        <instance index="0">RTE\LingDongGui\createUiFile.py</instance>
+        <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="sourceC" name="src\template\ldConfig.c" version="1.0.0">
+        <instance index="0">RTE\LingDongGui\ldConfig.c</instance>
+        <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.0.0">
+        <instance index="0">RTE\LingDongGui\ldConfig.h</instance>
+        <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
       </file>
     </files>
   </RTE>

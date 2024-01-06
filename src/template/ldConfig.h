@@ -12,8 +12,8 @@ extern "C" {
 
 // base config
 #define LD_CFG_COLOR_DEPTH                        (16)   // 8 16 32
-#define LD_CFG_SCEEN_WIDTH                        ST7789V_LCD_WIDTH
-#define LD_CFG_SCEEN_HEIGHT                       ST7789V_LCD_HEIGHT
+#define LD_CFG_SCEEN_WIDTH                        LCD_WIDTH
+#define LD_CFG_SCEEN_HEIGHT                       LCD_HEIGHT
 #define LD_CFG_PFB_WIDTH                          LD_CFG_SCEEN_WIDTH
 #define LD_CFG_PFB_HEIGHT                         (48)
 #define LD_MEM_SIZE                               (16*1024) //BYTE

@@ -13,6 +13,7 @@ Objects
 !keil5_disp_size_bar.exe
 !*.lib
 *.bat
+*.scvd
 
 #qt
 build*

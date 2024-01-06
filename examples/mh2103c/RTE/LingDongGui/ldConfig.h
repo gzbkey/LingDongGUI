@@ -57,16 +57,6 @@ extern "C" {
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 
-
-
-
-
-
-
-
-
-
-
 #ifdef __cplusplus
 }
 #endif
