@@ -23,6 +23,8 @@ extern "C" {
 
 #include "ldCommon.h"
 
+#if USE_ARC == 1
+
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isClockwise:1;
@@ -50,8 +52,11 @@ void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor);
 #define ldArcSetHidden          ldBaseSetHidden
 #define ldArcMove               ldBaseMove
 
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif //_LD_ARC_H_
+

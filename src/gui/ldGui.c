@@ -244,7 +244,9 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
     }
     case widgetTypeGauge:
     {
+#if USE_GAUGE == 1
         ldGaugeDel((ldGauge_t*)pWidget);
+#endif
         break;
     }
     case widgetTypeQRCode:
@@ -281,7 +283,9 @@ void ldGuiDelWidget(ldCommon_t *pWidget)
     }
     case widgetTypeArc:
     {
+#if USE_ARC == 1
         ldArcDel((ldArc_t*)pWidget);
+#endif
         break;
     }
 /*============================ auto add del ==================================*/
@@ -348,7 +352,9 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     }
     case widgetTypeGauge:
     {
+#if USE_GAUGE == 1
         ldGaugeLoop((ldGauge_t*)pWidget,ptParent,bIsNewFrame);
+#endif
         break;
     }
     case widgetTypeQRCode:
@@ -385,7 +391,9 @@ static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool b
     }
     case widgetTypeArc:
     {
+#if USE_ARC == 1
         ldArcLoop((ldArc_t*)pWidget,ptParent,bIsNewFrame);
+#endif
         break;
     }
 /*============================ auto add loop =================================*/
@@ -510,7 +518,9 @@ static void _frameUpdate(ldCommon_t *pWidget)
     }
     case widgetTypeGauge:
     {
+#if USE_GAUGE == 1
         ldGaugeFrameUpdate((ldGauge_t*)pWidget);
+#endif
         break;
     }
     case widgetTypeQRCode:
@@ -547,7 +557,9 @@ static void _frameUpdate(ldCommon_t *pWidget)
     }
     case widgetTypeArc:
     {
+#if USE_ARC == 1
         ldArcFrameUpdate((ldArc_t*)pWidget);
+#endif
         break;
     }
 /*============================ auto add start =================================*/

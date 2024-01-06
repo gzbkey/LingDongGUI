@@ -26,6 +26,8 @@
 #include "ldGui.h"
 #include "ldWindow.h"
 
+#if USE_ARC == 1
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -531,3 +533,6 @@ void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor)
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
+
+#endif
+

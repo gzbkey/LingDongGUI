@@ -19,16 +19,29 @@ extern "C" {
 #define LD_PAGE_MAX                               (2)
 #define USE_DIRTY_REGION                          1
 #define USE_VIRTUAL_RESOURCE                      0
+
+// widget config
 #define USE_OPACITY                               0
 #define USE_TLSF                                  1
-#define USE_RADIA_MENU_SCALE                      1
-#define USE_QR_CODE                               0
+#define USE_QRCode                                0
+#define USE_TRANSFORM                             0
+#if USE_TRANSFORM == 1
+#define USE_RADIA_MENU_SCALE                      0
+#define USE_ARC                                   0
+#define USE_GAUGE                                 0
+#endif
 
-//debug config
+// debug config
 #define LD_DEBUG                                  0
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
 
-// 以下不用修改
+// do not eidt below
+#if USE_TRANSFORM == 0
+#define USE_RADIA_MENU_SCALE                      0
+#define USE_ARC                                   0
+#define USE_GAUGE                                 0
+#endif
+
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT

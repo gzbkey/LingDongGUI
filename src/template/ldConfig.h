@@ -8,7 +8,7 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 #include "arm_2d_cfg.h"
-#include "st7789v16bit.h"
+#include "lcd.h"
 
 // base config
 #define LD_CFG_COLOR_DEPTH                        (16)   // 8 16 32
@@ -56,16 +56,6 @@ extern "C" {
 #endif
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
-
-
-
-
-
-
-
-
-
-
 
 #ifdef __cplusplus
 }

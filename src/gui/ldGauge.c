@@ -24,6 +24,8 @@
 #include "ldGauge.h"
 #include "ldGui.h"
 
+#if USE_GAUGE == 1
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -425,3 +427,6 @@ void ldGaugeSetPointerImageType(ldGauge_t *pWidget,gaugePointerType_t pointerImg
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
+
+#endif
+
