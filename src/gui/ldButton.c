@@ -362,6 +362,10 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
  */
 void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
 {
+    if(pWidget==NULL)
+    {
+        return;
+    }
     pWidget->releaseColor=releaseColor;
     pWidget->pressColor=pressColor;
     pWidget->releaseImgAddr=LD_ADDR_NONE;

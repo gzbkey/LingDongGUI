@@ -42,7 +42,7 @@ extern "C" {
 #define CONNECT16(H,L)                          (((H)<<8)+(L))
 #endif
 #ifndef GET32H
-#define   GET32H(data)                          (((data)>>24)&0xFF)
+#define GET32H(data)                          (((data)>>24)&0xFF)
 #endif
 #ifndef GET32MH
 #define GET32MH(data)                           (((data)>>16)&0xFF)
