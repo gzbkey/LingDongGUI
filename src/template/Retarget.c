@@ -38,6 +38,8 @@ struct __FILE
     /* is required. */
 };
 
+#endif
+
 typedef int FILEHANDLE;
 FILEHANDLE _sys_open(const char *name,int openmode)
 {
@@ -107,4 +109,3 @@ void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
 
 #endif
 
-#endif

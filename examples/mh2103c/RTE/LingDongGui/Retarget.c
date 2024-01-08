@@ -15,11 +15,11 @@
 #if defined(__MICROLIB)
 void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode) 
 {
-    ARM_2D_UNUSED(chCond);
-    ARM_2D_UNUSED(chLine);
-    ARM_2D_UNUSED(wErrCode);
+    (void)chCond;
+    (void)chLine;
+    (void)wErrCode;
+    
     while(1) {
-        __NOP();
     }
 }
 #else
@@ -37,8 +37,8 @@ struct __FILE
     /* standard output using printf() for debugging, no file handling */
     /* is required. */
 };
-#endif
 
+#endif
 
 typedef int FILEHANDLE;
 FILEHANDLE _sys_open(const char *name,int openmode)
@@ -108,3 +108,4 @@ void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
 }
 
 #endif
+
