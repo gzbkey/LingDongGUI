@@ -10,31 +10,95 @@ extern "C" {
 #include "arm_2d_cfg.h"
 #include "lcd.h"
 
+//-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
+
 // base config
-#define LD_CFG_COLOR_DEPTH                        (16)   // 8 16 32
+
+// <o> Select the screen colour depth
+//     <8=>     8 Bits
+//     <16=>    16Bits
+//     <32=>    32Bits
+// <i> The colour depth of your screen
+#define LD_CFG_COLOR_DEPTH                        (16)
+
+// <o>Width of the screen <8-32767>
+// <i> The width of your screen
 #define LD_CFG_SCEEN_WIDTH                        LCD_WIDTH
+
+// <o>Height of the screen <8-32767>
+// <i> The height of your screen
 #define LD_CFG_SCEEN_HEIGHT                       LCD_HEIGHT
+
+// <o>Width of the PFB block
+// <i> The width of your PFB block size
 #define LD_CFG_PFB_WIDTH                          LD_CFG_SCEEN_WIDTH
+
+// <o>Height of the PFB block
+// <i> The height of your PFB block size
 #define LD_CFG_PFB_HEIGHT                         (48)
+
+// <o>LingDongGui memory size
+// <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (16*1024) //BYTE
+
+// <o>Number of project pages
+// <i> Maximum number of pages
 #define LD_PAGE_MAX                               (2)
+
+// <q>Dirty Region Function
+// <i> It is recommended to enable this option for applications that do not refresh full screen
 #define USE_DIRTY_REGION                          1
+
+// <q>External NOR support
+// <i> Read external nor, please enable this option
 #define USE_VIRTUAL_RESOURCE                      0
 
 // widget config
+
+// <q>Opacity support
+// <i> There is no need to adjust the opacity of the widget. Please turn off this option
 #define USE_OPACITY                               0
+
+
 #define USE_TLSF                                  1
+
+// <q>QRCode support
+// <i> Do not use QR code. Please turn off this option
 #define USE_QRCode                                0
+
+// <q>Widget transform support
+// <i> Do not use radia menu,arc,gauge. Please turn off this option
 #define USE_TRANSFORM                             0
 #if USE_TRANSFORM == 1
+
+// <q>Radia menu's scale function support
+// <i> Radia menu's scale function support
 #define USE_RADIA_MENU_SCALE                      0
+
+// <q>Arc support
+// <i> Arc support
 #define USE_ARC                                   0
+
+// <q>Gauge support
+// <i> Gauge support
 #define USE_GAUGE                                 0
 #endif
 
 // debug config
+
+// <o> Log output level
+//     <0=>    LOG_LEVEL_NONE
+//     <2=>    LOG_LEVEL_ERROR
+//     <3=>    LOG_LEVEL_WARNING
+//     <4=>    LOG_LEVEL_INFO
+//     <5=>    LOG_LEVEL_DEBUG
+// <i> Do not use log. Please select LOG_LEVEL_NONE
+#define USE_LOG_LEVEL                             LOG_LEVEL_NONE
+
 #define LD_DEBUG                                  0
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
+
+// <<< end of configuration section >>>
 
 // do not eidt below
 #if USE_TRANSFORM == 0

@@ -38,24 +38,19 @@
 ### 先让arm-2d跑起来
 
 1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS，keil中选择Project -> Manage -> Run-Time Environment
-
-    ![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
+![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
 
 2. 选择ac6编译器，并且选择gnu11
-
-    ![ac6Setting](./images/03/ac6%20setting.png)
+![ac6Setting](./images/03/ac6%20setting.png)
 
 3. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
-
-    ![ac5Setting](./images/03/ac5%20setting.png)
+![ac5Setting](./images/03/ac5%20setting.png)
 
 4. 确保keil的CMSIS版本不得低于5.7.0，查看方式，Project -> Manage -> Select Software Packs
-
-    ![cmsisVersion](./images/03/cmsis%20version.png)
+![cmsisVersion](./images/03/cmsis%20version.png)
 
 5. 树目录中的Acceleration，找到arm_2d_disp_adapter_0.h。
-
-    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，根据实际情况配置
+编辑器的左下角选择 Configuration Wizard，进入图形配置界面，根据实际情况配置
 
     颜色位数（Screen Colour Depth）
 
@@ -229,14 +224,12 @@
     ```
 
 9. 运行效果
-
-    ![arm2d-demo](./images/03/arm2d%20demo.gif)
+![arm2d-demo](./images/03/arm2d%20demo.gif)
 
 ### 加入ldgui
 
 1. 在lcd_project中加入ldgui，keil中选择Project -> Manage -> Run-Time Environment
-
-    ![](./images/03/ldgui%20Manage%20Run-Time%20Environment.png)
+![](./images/03/ldgui%20Manage%20Run-Time%20Environment.png)
 
 2. keil中选择Project -> Manage -> Run-Time Environment，Acceleration - Arm-2D Helper中，Scene设置为0
 
@@ -245,15 +238,20 @@
     #include "ldConfig.h" 
     ```
 
-5. xLog.h关闭打印功能
+5. ldConfig配置
 
-    ```c
-    #define SET_LOG_LEVEL            LOG_LEVEL_NONE
-    ```
+    ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
 
-    如果需要使用打印功能，请自定义printf
+    ldConfig.h可以使用keil的图形界面方式进行配置
+
+    如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
+
+    ![configGui](./images/03/config%20gui.png)
 
 6. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
+
+    pack文件也带该脚本，在keil安装目录下，参考路径：Keil_v5\Packs\gzbkey\LingDongGUI\版本号\tools
+
 7. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
 8. 将文件导入项目中，main.c中添加页面文件的头文件
 9. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
@@ -288,6 +286,4 @@
 ### 关于程序体积
 
 * 请善用keil的优化等级
-
-    ![](./images/03/keil%20optimization.png)
-
+![](./images/03/keil%20optimization.png)
