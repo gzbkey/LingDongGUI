@@ -346,6 +346,7 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldFree(pWidget->pStr);
     pWidget->pStr=LD_MALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
@@ -366,6 +367,7 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->releaseColor=releaseColor;
     pWidget->pressColor=pressColor;
     pWidget->releaseImgAddr=LD_ADDR_NONE;
@@ -389,6 +391,7 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->releaseImgAddr=releaseImgAddr;
     pWidget->pressImgAddr=pressImgAddr;
     pWidget->isWithReleaseMask=isReleaseMask;
@@ -410,6 +413,7 @@ void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor 
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->selectMaskAddr=selectMaskAddr;
     pWidget->selectColor=selectColor;
 }
@@ -428,6 +432,7 @@ void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -447,6 +452,7 @@ void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -464,6 +470,7 @@ void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isCorner=isCorner;
 }
 
@@ -481,6 +488,7 @@ void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isSelected=isSelected;
 }
 
@@ -502,6 +510,7 @@ void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 
@@ -519,6 +528,7 @@ void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->pFontDict=pFontDict;
 }
 

@@ -820,6 +820,7 @@ void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t a
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
     {
         ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
@@ -847,6 +848,7 @@ void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
     {
         ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
@@ -883,6 +885,7 @@ void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t 
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
     {
         ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];

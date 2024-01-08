@@ -533,6 +533,7 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     if(pWidget->itemCount<pWidget->itemMax)
     {
@@ -591,6 +592,7 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     if(pWidget->selectItem==num)
     {

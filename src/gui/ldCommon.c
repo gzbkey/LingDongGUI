@@ -1083,6 +1083,7 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isHidden=isHidden;
     pWidget->dirtyRegionListItem.bIgnore=isHidden;
 }

@@ -417,6 +417,7 @@ void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if(pWidget->itemCount<pWidget->itemMax)
     {
         if(pWidget->ppItemStrGroup[pWidget->itemCount]==NULL)
@@ -442,6 +443,7 @@ void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isCorner=isCorner;
 }
 

@@ -247,6 +247,7 @@ void ldLabelSetTransparent(ldLabel_t* pWidget,bool isTransparent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -264,6 +265,7 @@ void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldFree(pWidget->pStr);
     pWidget->pStr=LD_MALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
@@ -284,6 +286,7 @@ void ldLabelSetTextColor(ldLabel_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -305,6 +308,7 @@ void ldLabelSetAlign(ldLabel_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 
@@ -322,6 +326,7 @@ void ldLabelSetBgImage(ldLabel_t *pWidget, uint32_t imageAddr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgImgAddr=imageAddr;
     pWidget->isTransparent=false;
 }
@@ -340,6 +345,7 @@ void ldLabelSetBgColor(ldLabel_t *pWidget, ldColor bgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     pWidget->isTransparent=false;
     pWidget->bgImgAddr=LD_ADDR_NONE;

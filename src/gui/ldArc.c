@@ -460,6 +460,7 @@ void ldArcSetBgAngle(ldArc_t *pWidget,float bgStart,float bgEnd)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->startAngle_x10[0]=bgStart*10;
     pWidget->endAngle_x10[0]=bgEnd*10;
     pWidget->startAngle_x10[1]=pWidget->startAngle_x10[0];
@@ -481,6 +482,7 @@ void ldArcSetFgAngle(ldArc_t *pWidget,float fgEnd)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->startAngle_x10[1]=pWidget->startAngle_x10[0];
     pWidget->endAngle_x10[1]=fgEnd*10;
 }
@@ -499,6 +501,7 @@ void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->rotationAngle_x10=rotationAngle*10;
 }
 
@@ -517,6 +520,7 @@ void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     pWidget->fgColor=fgColor;
 }

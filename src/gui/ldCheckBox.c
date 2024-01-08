@@ -479,6 +479,7 @@ void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheck
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->uncheckedImgAddr=uncheckedImgAddr;
     pWidget->checkedImgAddr=checkedImgAddr;
     pWidget->isWithUncheckedMask=isUncheckedMask;
@@ -500,6 +501,7 @@ void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pS
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldFree(pWidget->pStr);
     pWidget->pStr=LD_MALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
@@ -539,6 +541,7 @@ void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isCorner=isCorner;
 }
 
@@ -556,6 +559,7 @@ void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 

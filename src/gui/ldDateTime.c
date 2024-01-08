@@ -296,6 +296,7 @@ void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -315,6 +316,7 @@ void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     strcpy((char*)pWidget->formatStr,(char*)pStr);
 }
@@ -333,6 +335,7 @@ void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -354,6 +357,7 @@ void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 
@@ -371,6 +375,7 @@ void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     pWidget->isTransparent=false;
 }

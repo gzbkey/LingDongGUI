@@ -362,6 +362,7 @@ void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if(percent>=0)
     {
         if(percent>100)
@@ -396,6 +397,7 @@ void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t b
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgAddr=bgAddr;
     pWidget->bgWidth=bgWidth;
     pWidget->isBgMove=isMove;
@@ -417,6 +419,7 @@ void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t f
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->fgAddr=fgAddr;
     pWidget->fgWidth=fgWidth;
     pWidget->isFgMove=isMove;
@@ -437,6 +440,7 @@ void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->frameAddr=frameAddr;
     pWidget->frameWidth=frameWidth;
 }
@@ -457,6 +461,7 @@ void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgCo
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgAddr=LD_ADDR_NONE;
     pWidget->fgAddr=LD_ADDR_NONE;
     pWidget->bgColor=bgColor;

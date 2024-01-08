@@ -279,6 +279,7 @@ void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -298,6 +299,7 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldBaseSetText(&pWidget->pTextInfo,pStr);
     textSize= ldBaseGetStringSize(pWidget->pTextInfo->pStr,pWidget->pTextInfo->pFontDict,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
     pWidget->strHeight=textSize.iHeight;
@@ -317,6 +319,7 @@ void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
 }
 
@@ -338,6 +341,7 @@ void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldBaseSetAlign(&pWidget->pTextInfo,align);
 }
 
@@ -355,6 +359,7 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->scrollOffset=offset;
 }
 
@@ -372,6 +377,7 @@ void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->scrollOffset+=moveValue;
     if((moveValue>0)&&(pWidget->scrollOffset<0))
     {
@@ -478,6 +484,7 @@ void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgImgAddr=imageAddr;
     pWidget->isTransparent=false;
 }
@@ -488,6 +495,7 @@ void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     pWidget->isTransparent=false;
     pWidget->bgImgAddr=LD_ADDR_NONE;

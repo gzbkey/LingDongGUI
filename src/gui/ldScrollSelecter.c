@@ -381,6 +381,7 @@ void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     if(pWidget->itemCount<pWidget->itemMax)
     {
@@ -407,6 +408,7 @@ void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -424,6 +426,7 @@ void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
@@ -446,6 +449,7 @@ void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)imgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
     ((arm_2d_vres_t*)&pWidget->resource)->pTarget = imgAddr;
@@ -467,6 +471,7 @@ void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTranspare
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -554,6 +559,7 @@ void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 

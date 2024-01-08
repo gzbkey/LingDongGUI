@@ -406,6 +406,7 @@ void ldLineEditSetText(ldLineEdit_t* pWidget,uint8_t *pText)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     int16_t len=strlen((char*)pText);
     if(len>pWidget->textMax)

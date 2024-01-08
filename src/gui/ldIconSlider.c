@@ -661,6 +661,7 @@ void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNa
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if(pWidget->iconCount<pWidget->iconMax)
     {
         pWidget->pIconInfoList[pWidget->iconCount].imgAddr=imageAddr;
