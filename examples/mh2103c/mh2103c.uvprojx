@@ -746,17 +746,15 @@
         <targetInfos/>
       </file>
       <file attr="config" category="utility" name="tools\createUiFile.py" version="1.0.0">
-        <instance index="0">RTE\LingDongGui\createUiFile.py</instance>
+        <instance index="0" removed="1">RTE\LingDongGui\createUiFile.py</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
         <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="src\template\ldConfig.c" version="1.0.0">
         <instance index="0">RTE\LingDongGui\ldConfig.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev15+g8ea0f94"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -764,7 +762,7 @@
       <file attr="config" category="header" name="src\template\ldConfig.h" version="1.0.0">
         <instance index="0">RTE\LingDongGui\ldConfig.h</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev15+g8ea0f94"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
