@@ -26,6 +26,7 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isNumber:1;
+    bool isSymbol:1;
     bool isClick:1;
     uint8_t upperState:2;
     bool isWaitInit:1;
