@@ -1085,7 +1085,6 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
     }
     pWidget->dirtyRegionState=waitChange;
     pWidget->isHidden=isHidden;
-    pWidget->dirtyRegionListItem.bIgnore=isHidden;
 }
 
 void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)

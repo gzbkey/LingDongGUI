@@ -92,7 +92,7 @@ extern "C" {
 //     <4=>    LOG_LEVEL_INFO
 //     <5=>    LOG_LEVEL_DEBUG
 // <i> Do not use log. Please select LOG_LEVEL_NONE
-#define USE_LOG_LEVEL                             LOG_LEVEL_NONE
+#define USE_LOG_LEVEL                             LOG_LEVEL_DEBUG
 
 #define LD_DEBUG                                  0
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
