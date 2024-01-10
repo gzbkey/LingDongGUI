@@ -3,7 +3,7 @@
 #define ID_BG    0
 #define ID_BUTTON   1
 
-void uiDemoInit(void)
+void uiDemoInit(uint8_t page)
 {
     void* obj;
 
@@ -12,10 +12,10 @@ void uiDemoInit(void)
     ldButtonInit(ID_BUTTON,ID_BG,10,10,30,30);
 }
 
-void uiDemoLoop(void)
+void uiDemoLoop(uint8_t page)
 {
 }
 
-void uiDemoQuit(void)
+void uiDemoQuit(uint8_t page)
 {
 }

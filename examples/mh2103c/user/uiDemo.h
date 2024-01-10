@@ -7,9 +7,9 @@ extern "C" {
 
 #include "ldGui.h"
 
-void uiDemoInit(void);
-void uiDemoLoop(void);
-void uiDemoQuit(void);
+void uiDemoInit(uint8_t page);
+void uiDemoLoop(uint8_t page);
+void uiDemoQuit(uint8_t page);
 
 #ifdef __cplusplus
 }

@@ -42,7 +42,7 @@ extern "C" {
 
 // <o>Number of project pages
 // <i> Maximum number of pages
-#define LD_PAGE_MAX                               (2)
+#define LD_PAGE_MAX                               (1)
 
 // <q>Dirty Region Function
 // <i> It is recommended to enable this option for applications that do not refresh full screen

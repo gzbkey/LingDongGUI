@@ -56,9 +56,9 @@ static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
-void (*ldPageInitFunc[LD_PAGE_MAX])(void)={0};
-void (*ldPageLoopFunc[LD_PAGE_MAX])(void)={0};
-void (*ldPageQuitFunc[LD_PAGE_MAX])(void)={0};
+void (*ldPageInitFunc[LD_PAGE_MAX])(uint8_t)={0};
+void (*ldPageLoopFunc[LD_PAGE_MAX])(uint8_t)={0};
+void (*ldPageQuitFunc[LD_PAGE_MAX])(uint8_t)={0};
 static uint8_t pageCount=0;
 
 void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
@@ -447,10 +447,15 @@ static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
 void ldGuiInit(arm_2d_scene_t *pSence)
 {
     xEmitInit();
+
+#if LD_PAGE_MAX > 1
     if(ldPageInitFunc[pageNumNow])
     {
-        ldPageInitFunc[pageNumNow]();
+        ldPageInitFunc[pageNumNow](pageNumNow);
     }
+#else
+    ldPageInitFunc[0](pageNumNow);
+#endif
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 
 #if USE_DIRTY_REGION == 1
@@ -610,10 +615,14 @@ void ldGuiFrameStart(void)
  */
 void ldGuiLogicLoop(void)
 {
+#if LD_PAGE_MAX > 1
     if(ldPageLoopFunc[pageNumNow])
     {
-        ldPageLoopFunc[pageNumNow]();
+        ldPageLoopFunc[pageNumNow](pageNumNow);
     }
+#else
+    ldPageLoopFunc[0](pageNumNow);
+#endif
 }
 
 /**
@@ -638,10 +647,14 @@ void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
  */
 void ldGuiQuit(void)
 {
+#if LD_PAGE_MAX > 1
     if(ldPageQuitFunc[pageNumNow])
     {
-        ldPageQuitFunc[pageNumNow]();
+        ldPageQuitFunc[pageNumNow](pageNumNow);
     }
+#else
+    ldPageQuitFunc[0](pageNumNow);
+#endif
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 

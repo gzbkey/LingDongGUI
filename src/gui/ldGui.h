@@ -48,14 +48,13 @@ extern "C" {
 #define GET_SIGNAL_VALUE_X(dat)     ((dat>>16)&0xFFFF)
 #define GET_SIGNAL_VALUE_Y(dat)     (dat&0xFFFF)
 
-typedef void (*pFuncTypedef)(void);
+typedef void (*pFuncTypedef)(uint8_t);
 
-extern void (*ldPageInitFunc[LD_PAGE_MAX])(void);
-extern void (*ldPageLoopFunc[LD_PAGE_MAX])(void);
-extern void (*ldPageQuitFunc[LD_PAGE_MAX])(void);
+extern void (*ldPageInitFunc[LD_PAGE_MAX])(uint8_t pageNum);
+extern void (*ldPageLoopFunc[LD_PAGE_MAX])(uint8_t pageNum);
+extern void (*ldPageQuitFunc[LD_PAGE_MAX])(uint8_t pageNum);
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
-//extern bool isUpdateBackground;
 
 #define LD_ADD_PAGE(pageName)       ldGuiAddPage(pageName##Init,pageName##Loop,pageName##Quit)
 
