@@ -59,10 +59,14 @@ static void *prevWidget;
 void (*ldPageInitFunc[LD_PAGE_MAX])(uint8_t)={0};
 void (*ldPageLoopFunc[LD_PAGE_MAX])(uint8_t)={0};
 void (*ldPageQuitFunc[LD_PAGE_MAX])(uint8_t)={0};
+
+#if LD_PAGE_MAX > 1
 static uint8_t pageCount=0;
+#endif
 
 void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
 {
+#if LD_PAGE_MAX > 1
     if(pageCount<LD_PAGE_MAX)
     {
         ldPageInitFunc[pageCount]=init;
@@ -70,6 +74,11 @@ void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
         ldPageQuitFunc[pageCount]=quit;
         pageCount++;
     }
+#else
+    ldPageInitFunc[0]=init;
+    ldPageLoopFunc[0]=loop;
+    ldPageQuitFunc[0]=quit;
+#endif
 }
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
@@ -454,7 +463,10 @@ void ldGuiInit(arm_2d_scene_t *pSence)
         ldPageInitFunc[pageNumNow](pageNumNow);
     }
 #else
-    ldPageInitFunc[0](pageNumNow);
+    if(ldPageInitFunc[0])
+    {
+        ldPageInitFunc[0](pageNumNow);
+    }
 #endif
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 
@@ -621,7 +633,11 @@ void ldGuiLogicLoop(void)
         ldPageLoopFunc[pageNumNow](pageNumNow);
     }
 #else
-    ldPageLoopFunc[0](pageNumNow);
+    if(ldPageLoopFunc[0])
+    {
+        ldPageLoopFunc[0](pageNumNow);
+    }
+
 #endif
 }
 
@@ -653,7 +669,11 @@ void ldGuiQuit(void)
         ldPageQuitFunc[pageNumNow](pageNumNow);
     }
 #else
-    ldPageQuitFunc[0](pageNumNow);
+    if(ldPageQuitFunc[0])
+    {
+        ldPageQuitFunc[0](pageNumNow);
+    }
+
 #endif
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
