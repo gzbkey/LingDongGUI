@@ -2,13 +2,13 @@ import os
 import sys
 
 pageCFileStr='#include "uiUser.h"\n\n\
-void uiUserInit(void)\n\
+void uiUserInit(uint8_t page)\n\
 {\n\
 }\n\n\
-void uiUserLoop(void)\n\
+void uiUserLoop(uint8_t page)\n\
 {\n\
 }\n\n\
-void uiUserQuit(void)\n\
+void uiUserQuit(uint8_t page)\n\
 {\n\
 }'
 
@@ -19,9 +19,9 @@ extern "C" {\n\
 #endif\n\n\
 #include "ldGui.h"\n\
 #include "image.h"\n\n\
-void uiUserInit(void);\n\
-void uiUserLoop(void);\n\
-void uiUserQuit(void);\n\n\
+void uiUserInit(uint8_t page);\n\
+void uiUserLoop(uint8_t page);\n\
+void uiUserQuit(uint8_t page);\n\n\
 #ifdef __cplusplus\n\
 }\n\
 #endif\n\n\
@@ -41,6 +41,9 @@ def addNewPage(pageNameList):
             print("Page name already exists! Please choose another.")
             new_name = ''
     return new_name
+
+# version
+print('\n==========   V1.1    ==========\n')
 
 # 预备操作
 file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pageList.txt')

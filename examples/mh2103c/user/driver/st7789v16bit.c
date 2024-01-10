@@ -12,25 +12,25 @@ void st7789v_gpioInit(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     
     GPIO_InitStructure.GPIO_Pin = ST7789V_RST_PIN;
-    GPIO_Init(ST7789V_RST_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_RST_GPIO, &GPIO_InitStructure);
     
     GPIO_InitStructure.GPIO_Pin = ST7789V_RS_PIN;
-    GPIO_Init(ST7789V_RS_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_RS_GPIO, &GPIO_InitStructure);
     
     GPIO_InitStructure.GPIO_Pin = ST7789V_CS_PIN;
-    GPIO_Init(ST7789V_CS_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_CS_GPIO, &GPIO_InitStructure);
     
     GPIO_InitStructure.GPIO_Pin = ST7789V_WR_PIN;
-    GPIO_Init(ST7789V_WR_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_WR_GPIO, &GPIO_InitStructure);
     
     GPIO_InitStructure.GPIO_Pin = ST7789V_RD_PIN;
-    GPIO_Init(ST7789V_RD_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_RD_GPIO, &GPIO_InitStructure);
     
     GPIO_InitStructure.GPIO_Pin = ST7789V_BG_PIN;
-    GPIO_Init(ST7789V_BG_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_BG_GPIO, &GPIO_InitStructure);
     
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;
-    GPIO_Init(ST7789V_DATA_PORT, &GPIO_InitStructure);
+    GPIO_Init(ST7789V_DATA_GPIO, &GPIO_InitStructure);
 
     ST7789V_BG_OFF;
 }

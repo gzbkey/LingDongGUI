@@ -10,7 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -190,7 +190,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -549,6 +549,11 @@
               <FileType>1</FileType>
               <FilePath>.\user\driver\st7789v16bit.c</FilePath>
             </File>
+            <File>
+              <FileName>knob.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\user\driver\knob.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -631,7 +636,7 @@
         </targetInfos>
       </component>
       <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D">
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev19+g49ac5e8"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev22+g6a66659"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -743,7 +748,7 @@
       <file attr="config" category="sourceC" name="src\template\Retarget.c" version="1.0.1">
         <instance index="0">RTE\LingDongGui\Retarget.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev19+g49ac5e8"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev22+g6a66659"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -751,13 +756,13 @@
       <file attr="config" category="utility" name="tools\createUiFile.py" version="1.0.0">
         <instance index="0" removed="1">RTE\LingDongGui\createUiFile.py</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev11+g033c80a"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev12+g925ae79"/>
         <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="src\template\ldConfig.c" version="1.0.0">
         <instance index="0">RTE\LingDongGui\ldConfig.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev19+g49ac5e8"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev22+g6a66659"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -765,10 +770,16 @@
       <file attr="config" category="header" name="src\template\ldConfig.h" version="1.0.1">
         <instance index="0">RTE\LingDongGui\ldConfig.h</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev19+g49ac5e8"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev22+g6a66659"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
+      </file>
+      <file attr="config" category="utility" name="tools\ldLatticeBuilder.exe" version="0.0.0">
+        <instance index="0" removed="1">RTE\LingDongGui\ldLatticeBuilder.exe</instance>
+        <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev12+g925ae79"/>
+        <targetInfos/>
       </file>
     </files>
   </RTE>

@@ -6,6 +6,7 @@
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
 #include "uiDemo.h"
+#include "knob.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -67,7 +68,8 @@ void gpioDeInit(void)
     BKP_TamperPinCmd(DISABLE);
     PWR_BackupAccessCmd(DISABLE);
 }
-
+bool state=0;
+bool state2=0;
 int main(void)
 {
 	RCC_ClocksTypeDef clocks;
@@ -75,7 +77,7 @@ int main(void)
 	rccInit();
 	RCC_GetClocksFreq(&clocks);
     
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
 
     init_cycle_counter(false);
 
@@ -84,6 +86,8 @@ int main(void)
     st7789v_init();
     st7789v_clear(0xff);
     ST7789V_BG_ON;
+    
+    knobInit();
     
     LD_ADD_PAGE(uiDemo);
 
@@ -97,6 +101,8 @@ int main(void)
 
     while(1)
     {
+        state=knobKeyRead(1);
+        state2=knobKeyRead(0);
         disp_adapter0_task();
     }
 }
