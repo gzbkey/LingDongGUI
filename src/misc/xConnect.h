@@ -35,8 +35,8 @@ typedef struct{
 
 bool xEmitInit(void);
 bool xEmit(uint16_t senderId,uint8_t signal,size_t value);
-bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func);
-bool xDisconnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func);
+bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
+bool xDisconnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
 void xDeleteConnect(uint16_t nameId);
 
 void xConnectProcess(void);

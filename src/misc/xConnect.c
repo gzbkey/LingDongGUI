@@ -43,7 +43,7 @@ bool xEmitInit(void)
 bool xEmit(uint16_t senderId,uint8_t signal,size_t value)
 {
     emitInfo_t emitInfo;
-    
+
     emitInfo.senderId=senderId;
     emitInfo.signalType=signal;
     emitInfo.value=value;
@@ -59,23 +59,23 @@ static bool _isConnectSame(xListNode* pEachInfo,void* pRelationInfo)
     {
         return true;
     }
-    
+
     return false;
 }
 
 #define IS_CONNECT_SAME(pRelation)   xListInfoPrevTraverse(&listConnect,pRelation,_isConnectSame)
 
-bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func)
+bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t* pRelation;
-    
+
     pRelation=XMALLOC(sizeof(relationInfo_t));
-    
+
     if(pRelation!=NULL)
     {
     pRelation->senderId=senderId;
     pRelation->receiverId=receiverId;
-    pRelation->signalType=siganl;
+    pRelation->signalType=signal;
     pRelation->receiverFunc=func;
 
     //确定是否重复添加链接
@@ -84,7 +84,7 @@ bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc f
         XFREE(pRelation);
         return false;
     }
-    
+
     //添加链表
     if(xListInfoAdd(&listConnect,pRelation)==NULL)
     {
@@ -96,7 +96,7 @@ bool xConnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc f
     }
 
     return false;
-    
+
 }
 
 static bool _disconnect(xListNode* pEachInfo,void* pRelationInfo)
@@ -114,12 +114,12 @@ static bool _disconnect(xListNode* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-bool xDisconnect(uint16_t senderId,uint8_t siganl,uint16_t receiverId,connectFunc func)
+bool xDisconnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t info;
 
     info.senderId =senderId;
-    info.signalType=siganl;
+    info.signalType=signal;
     info.receiverId=receiverId;
     info.receiverFunc=func;
 
