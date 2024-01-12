@@ -1,5 +1,4 @@
 #include "knob.h"
-
 #include "stdbool.h"
 
 void knobGpioInit(void)
@@ -68,27 +67,31 @@ void knobInit(void)
 //	EXTI_ClearITPendingBit(EXTI_Line2);
 //}
 
+
+    
+	
+    
 bool knobKeyRead(bool isUp)
 {
-    bool ret;
-    //PA15
+    GPIO_InitTypeDef GPIO_InitStructure;
+    
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Pin = KNOB_KEY_PIN;
+
     if(isUp)
     {
-        KNOB_KEY_GPIO->CRH&=!(GPIO_CRH_CNF15|GPIO_CRH_MODE15);
-        KNOB_KEY_GPIO->CRH|=GPIO_CRH_CNF15_1;
-        KNOB_KEY_GPIO->ODR|=GPIO_ODR_ODR15;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     }
     else
     {
-        KNOB_KEY_GPIO->CRH&=!(GPIO_CRH_CNF15|GPIO_CRH_MODE15);
-        KNOB_KEY_GPIO->CRH|=GPIO_CRH_CNF15_0;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     }
-        
+    GPIO_Init(KNOB_KEY_GPIO, &GPIO_InitStructure);
+    
     if(isUp==KNOB_KEY_R)
     {
         return true;
     }
-    
     return false;
 }
 

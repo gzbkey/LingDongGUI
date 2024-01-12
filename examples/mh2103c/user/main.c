@@ -7,6 +7,7 @@
 #include "ldScene0.h"
 #include "uiDemo.h"
 #include "knob.h"
+#include "w25qxx.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -68,8 +69,12 @@ void gpioDeInit(void)
     BKP_TamperPinCmd(DISABLE);
     PWR_BackupAccessCmd(DISABLE);
 }
-bool state=0;
-bool state2=0;
+volatile bool state=0;
+volatile bool state2=0;
+uint16_t id=0;
+uint8_t rbuf[20]={0};
+uint8_t wbuf[20]={11,12,13,4,5,6,7,8,9,10};
+
 int main(void)
 {
 	RCC_ClocksTypeDef clocks;
@@ -88,7 +93,21 @@ int main(void)
     ST7789V_BG_ON;
     
     knobInit();
+    state=knobKeyRead(1);
+        state2=knobKeyRead(0);
     
+    w25qxxInit();
+    
+    id=w25qxxReadID();
+    
+    w25qxxEraseBlock64k(0);
+    
+    w25qxxRead(rbuf,0,10);
+    
+    W25QXX_Write_NoCheck(wbuf,0,10);
+    
+    w25qxxRead(rbuf,0,10);
+
     LD_ADD_PAGE(uiDemo);
 
     arm_irq_safe {
@@ -102,7 +121,9 @@ int main(void)
     while(1)
     {
         state=knobKeyRead(1);
+        delay_ms(1);
         state2=knobKeyRead(0);
+        delay_ms(1);
         disp_adapter0_task();
     }
 }

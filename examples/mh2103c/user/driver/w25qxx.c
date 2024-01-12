@@ -334,6 +334,7 @@ void w25qxxReadFast_1bit(uint8_t* pBuffer,uint32_t ReadAddr,uint16_t NumByteToRe
     W25QXX_CS_OFF;
 }
 
+#if USE_W25QXX_DMA == 1
 void w25qxxRead_1bitDma(uint8_t* pBuffer,uint32_t ReadAddr,uint16_t NumByteToRead)
 {
     uint8_t cmdBuf[4];
@@ -351,7 +352,7 @@ void w25qxxRead_1bitDma(uint8_t* pBuffer,uint32_t ReadAddr,uint16_t NumByteToRea
     spiDmaRead(W25QXX_SPI_X,pBuffer,NumByteToRead);
     W25QXX_CS_OFF;
 }
-
+#endif 
 
 //读取SPI FLASH
 //在指定地址开始读取指定长度的数据

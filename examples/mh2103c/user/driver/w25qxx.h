@@ -1,10 +1,11 @@
 #ifndef _W25QXX_H_
 #define _W25QXX_H_
 
-#include "stdint.h"
+#include "mh210x.h"
+#include "stdbool.h"
 #include "spi.h"
 
-#define USE_W25QXX_DMA           1
+#define USE_W25QXX_DMA           0
 
 #define W25QXX_SPI_X             SPI1
 
@@ -18,10 +19,10 @@
 #define W25QXX_CS_H              GPIO_SetBits(W25QXX_CS_PORT, W25QXX_CS_PIN)
 #define W25QXX_CS_L              GPIO_ResetBits(W25QXX_CS_PORT, W25QXX_CS_PIN)
 
-#define W25QXX_CS_ON              W25QXX_CS_L
-#define W25QXX_CS_OFF             W25QXX_CS_H
+#define W25QXX_CS_ON             W25QXX_CS_L
+#define W25QXX_CS_OFF            W25QXX_CS_H
 
-#define W25QXX_SET_SPEED_MAX     spiSetSpeed(W25QXX_SPI_X,SPI_BaudRatePrescaler_2)
+#define W25QXX_SET_SPEED_MAX     spiSetSpeed(W25QXX_SPI_X,SPI_BaudRatePrescaler_4)
 
 void w25qxxInit(void);
 uint16_t w25qxxReadID(void);
