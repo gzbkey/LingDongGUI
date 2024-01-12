@@ -238,7 +238,6 @@ typedef enum{
     widgetTypeDateTime,
     widgetTypeIconSlider,
     widgetTypeComboBox,
-    widgetTypeNumber,
     widgetTypeArc,
     widgetTypeRadialMenu,
     widgetTypeScrollSelecter,

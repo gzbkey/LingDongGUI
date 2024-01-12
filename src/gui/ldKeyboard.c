@@ -377,7 +377,10 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
                 item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                    retRegion=item_region;
+                    //change shift
+                    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+                    retRegion.tLocation.iX=0;
+                    retRegion.tLocation.iY=0;
                     break;
                 }
 
@@ -662,16 +665,16 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
                 item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                    //change ABC
-                    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
-                    retRegion.tLocation.iX=0;
-                    retRegion.tLocation.iY=0;
+                    retRegion=item_region;
                     break;
                 }
 
                 item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,(btnW<<1)+KB_SPACE,btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
-                    retRegion=item_region;
+                    //change ABC
+                    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+                    retRegion.tLocation.iX=0;
+                    retRegion.tLocation.iY=0;
                     break;
                 }
 
@@ -1343,7 +1346,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"shift",btnColor,_shiftColor[pWidget->upperState],bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"Shift",btnColor,_shiftColor[pWidget->upperState],bIsNewFrame);
 
                     item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
                     charBuf[0]='z'-letterOffset;
@@ -1462,7 +1465,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"Space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
                     item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
                     charBuf[0]='?';
@@ -1822,7 +1825,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,"space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,"Space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
                     item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
                     charBuf[0]='?';
