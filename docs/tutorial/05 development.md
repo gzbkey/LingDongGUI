@@ -52,7 +52,7 @@ ldGui.c中添加新控件的头文件
 ## 功能库
 
 #### btnAction 按键处理
-这是一个独立的多功能按键库，可以对GUI按键和实体按键进行行为检测。ldgui内部已经调用该库，无需用户操作。
+这是一个独立的多功能按键库，可以对GUI按键和实体按键进行行为检测。
 
 ##### 信号
 该库可以检测以下信号
@@ -69,7 +69,7 @@ ldGui.c中添加新控件的头文件
 |BTN_LONG_SHOOT|长按连续触发|
 
 ##### 函数列表
-* void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));
+* void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(uint16_t));
 * void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
 * void xBtnTick(uint8_t cycleMs);
 * uint16_t xBtnGetState(uint16_t id, uint8_t state);
@@ -80,7 +80,7 @@ ldGui.c中添加新控件的头文件
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(size_t));</code></pre>
+            <pre><code class="language-c">void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t));</code></pre>
         </td>
     </tr>
     <tr>
@@ -110,7 +110,7 @@ ldGui.c中添加新控件的头文件
         getBtnStateFunc参考代码如下
         <pre><code class="language-c">
 // 实体按键
-bool vtGetKeyState(size_t value)
+bool vtGetKeyState(uint16_t value)
 {
     switch (value)
     {
@@ -131,7 +131,7 @@ bool vtGetKeyState(size_t value)
 }
 
 // ldgui触摸按键
-bool getKeyState(size_t value)
+bool getKeyState(uint16_t value)
 {
     ldButton_t * pBtn=ldBaseGetWidgetById(value);
     return pBtn->isPressed;
@@ -235,7 +235,7 @@ bool getKeyState(size_t value)
 #define KEY_NUM_UP   1000
 
 //根据按键序号，获取按键状态
-bool vtGetKeyState(size_t value)
+bool vtGetKeyState(uint16_t value)
 {
     switch (value)
     {
@@ -265,7 +265,7 @@ void loopFunc(void)
 
 |ℹ️ Note||
 |---|---|
-|注意|获取按键状态的函数，可以每个按键对应一个函数，也可以多个按键共用一个函数，即上述例子中的bool vtGetKeyState(size_t value)|
+|注意|获取按键状态的函数，可以每个按键对应一个函数，也可以多个按键共用一个函数，即上述例子中的bool vtGetKeyState(uint16_t value)|
 
 #### queue 队列
 这是一个简单的队列软件库
