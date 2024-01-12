@@ -72,7 +72,7 @@ ldGui.c中添加新控件的头文件
 * void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));
 * void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
 * void xBtnTick(uint8_t cycleMs);
-* uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state);
+* uint16_t xBtnGetState(uint16_t id, uint8_t state);
 * void xBtnClean(void);
 
 ##### 函数说明
@@ -80,7 +80,7 @@ ldGui.c中添加新控件的头文件
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));</code></pre>
+            <pre><code class="language-c">void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(size_t));</code></pre>
         </td>
     </tr>
     <tr>
@@ -88,13 +88,9 @@ ldGui.c中添加新控件的头文件
         <td colspan="2">button初始化函数</td>
     </tr>
     <tr>
-        <td rowspan="3">参数</td>
-        <td>addrOrNum</td>
-        <td>按键自定义序号</td>
-    </tr>
-    <tr>
-        <td>nameId</td>
-        <td>外部按键填0</td>
+        <td rowspan="2">参数</td>
+        <td>id</td>
+        <td>按键id或实体按键自定义序号</td>
     </tr>
     <tr>
         <td>getBtnStateFunc</td>
@@ -107,12 +103,13 @@ ldGui.c中添加新控件的头文件
         <td>ℹ️ Note</td>
     </tr>
     <tr>
-        <td>实体按键，可以使用宏定义X_BTN_KEY_INIT(keyNum,func)进行初始化按键。</td>
+        <td>实体按键和ldgui触摸按键混合使用的时候，id不可冲突，建议将实体按键序号从1000开始命名</td>
     </tr>
     <tr>
         <td>
         getBtnStateFunc参考代码如下
         <pre><code class="language-c">
+// 实体按键
 bool vtGetKeyState(size_t value)
 {
     switch (value)
@@ -131,6 +128,13 @@ bool vtGetKeyState(size_t value)
         break;
     }
     return 0;
+}
+
+// ldgui触摸按键
+bool getKeyState(size_t value)
+{
+    ldButton_t * pBtn=ldBaseGetWidgetById(value);
+    return pBtn->isPressed;
 }
         </code></pre>
         </td>
@@ -190,7 +194,7 @@ bool vtGetKeyState(size_t value)
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state);</code></pre>
+            <pre><code class="language-c">uint16_t xBtnGetState(uint16_t id, uint8_t state);</code></pre>
         </td>
     </tr>
     <tr>
@@ -199,8 +203,8 @@ bool vtGetKeyState(size_t value)
     </tr>
     <tr>
         <td rowspan="2">参数</td>
-        <td>nameIdOrNum</td>
-        <td>ldgui内部按键填写nameId，外部实体按键填写自定义的按键编号</td>
+        <td>id</td>
+        <td>ldgui触摸按键填写nameId，外部实体按键填写自定义的按键编号</td>
     </tr>
     <tr>
         <td>state</td>
@@ -228,7 +232,7 @@ bool vtGetKeyState(size_t value)
 ##### 使用举例
 ```c
 //自定义实体按键序号
-#define KEY_NUM_UP   0
+#define KEY_NUM_UP   1000
 
 //根据按键序号，获取按键状态
 bool vtGetKeyState(size_t value)
@@ -258,6 +262,10 @@ void loopFunc(void)
     }
 }
 ```
+
+|ℹ️ Note||
+|---|---|
+|注意|获取按键状态的函数，可以每个按键对应一个函数，也可以多个按键共用一个函数，即上述例子中的bool vtGetKeyState(size_t value)|
 
 #### queue 队列
 这是一个简单的队列软件库
