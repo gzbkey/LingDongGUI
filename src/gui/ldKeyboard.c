@@ -18,8 +18,8 @@
  * @file    ldKeyboard.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   键盘控件，可以切换数字键盘和字母键盘
- * @version 0.1
- * @date    2023-11-23
+ * @version 0.2
+ * @date    2024-01-15
  * @signal  SIGNAL_INPUT_ASCII
  */
 
@@ -841,12 +841,18 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
 {
     if((pWidget->isParentHidden)||(pWidget->isHidden))
     {
-        //强制脏矩阵覆盖控件
         if(pWidget->isWaitInit)
         {
+            //强制脏矩阵覆盖控件
             pWidget->targetDirtyRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
             pWidget->targetDirtyRegion.tLocation.iX-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
             pWidget->targetDirtyRegion.tLocation.iY-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+
+            //强制解除控件关联
+            xDeleteConnect(pWidget->nameId);
+            xConnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotKBProcess);
+            xConnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotKBProcess);
+
             pWidget->isWaitInit=false;
         }
         return;

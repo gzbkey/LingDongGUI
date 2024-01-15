@@ -18,8 +18,9 @@
  * @file    ldComboBox.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   下拉框控件
- * @version 0.1
- * @date    2023-12-05
+ * @version 0.2
+ * @date    2024-01-15
+ * @signal  SIGNAL_CLICKED_ITEM
  */
 
 #include "ldComboBox.h"
@@ -135,8 +136,13 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
     {
         if(clickItemNum!=SHOW_ITEM_NUM)
         {
-            pWidget->itemSelect=pWidget->itemPreSelect;
+            if(pWidget->itemSelect!=pWidget->itemPreSelect)
+            {
+                pWidget->itemSelect=pWidget->itemPreSelect;
+                xEmit(pWidget->nameId,SIGNAL_CLICKED_ITEM,pWidget->itemSelect);
+            }
             pWidget->isExpand=false;
+
         }
         pWidget->dirtyRegionState=waitChange;
         pWidget->isDirtyRegionAutoIgnore=true;

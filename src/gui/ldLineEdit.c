@@ -18,8 +18,8 @@
  * @file    ldLineEdit.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   输入框控件
- * @version 0.1
- * @date    2023-11-24
+ * @version 0.2
+ * @date    2024-01-15
  */
 
 #include "ldLineEdit.h"
@@ -201,6 +201,8 @@ static bool slotLineEditProcess(xConnectInfo_t info)
             arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
             kb=ldBaseGetWidgetById(pWidget->kbNameId);
+            xDisconnect(pWidget->kbNameId,SIGNAL_INPUT_ASCII,pWidget->nameId,slotLineEditProcess);
+            xConnect(pWidget->kbNameId,SIGNAL_INPUT_ASCII,pWidget->nameId,slotLineEditProcess);
             ldBaseSetHidden(kb,false);
             if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
             {
@@ -436,8 +438,6 @@ void ldLineEditSetKeyboard(ldLineEdit_t* pWidget,uint16_t kbNameId)
         return;
     }
     pWidget->kbNameId=kbNameId;
-    xDisconnect(kbNameId,SIGNAL_INPUT_ASCII,pWidget->nameId,slotLineEditProcess);
-    xConnect(kbNameId,SIGNAL_INPUT_ASCII,pWidget->nameId,slotLineEditProcess);
 }
 
 /**
