@@ -22,11 +22,11 @@ extern "C" {
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
-#define LD_CFG_SCEEN_WIDTH                        (500)
+#define LD_CFG_SCEEN_WIDTH                        (320)
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
-#define LD_CFG_SCEEN_HEIGHT                       (500)
+#define LD_CFG_SCEEN_HEIGHT                       (240)
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size
@@ -63,7 +63,7 @@ extern "C" {
 
 // <q>QRCode support
 // <i> Do not use QR code. Please turn off this option
-#define USE_QRCode                                0
+#define USE_QR_CODE                                1
 
 // <q>Widget transform support
 // <i> Do not use radia menu,arc,gauge. Please turn off this option

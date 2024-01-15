@@ -445,7 +445,7 @@ bool vtMouseGetPoint(int16_t *x, int16_t *y)
     return left_button_is_down;
 }
 
-bool vtGetKeyState(size_t value)
+bool vtGetKeyState(uint16_t value)
 {
     switch (value)
     {

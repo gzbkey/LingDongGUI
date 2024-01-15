@@ -349,7 +349,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict)
+ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict)
 {
     ldIconSlider_t *pNewWidget = NULL;
     xListNode *parentInfo;

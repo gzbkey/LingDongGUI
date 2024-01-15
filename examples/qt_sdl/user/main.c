@@ -120,12 +120,12 @@ int main (void)
     printf("====================\n\n");
     vtInit();
 
-    X_BTN_KEY_INIT(KEY_NUM_UP,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_DOWN,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_LEFT,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_RIGHT,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_ENTER,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_ESC,vtGetKeyState);
+    xBtnInit(KEY_NUM_UP,vtGetKeyState);
+    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
+    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
+    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
+    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
+    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
     LD_ADD_PAGE(uiDemo);
 

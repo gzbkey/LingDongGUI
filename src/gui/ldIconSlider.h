@@ -33,8 +33,7 @@ typedef struct {
     uint8_t pageMax;
     uint8_t selectIconOrPage;
     uint8_t moveOffset;
-ldColor charColor;
-
+    ldColor charColor;
 }ldIconSlider_t;
 
 ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict);

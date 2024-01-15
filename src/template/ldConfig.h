@@ -64,7 +64,7 @@ extern "C" {
 
 // <q>QRCode support
 // <i> Do not use QR code. Please turn off this option
-#define USE_QRCode                                0
+#define USE_QR_CODE                               0
 
 // <q>Widget transform support
 // <i> Do not use radia menu,arc,gauge. Please turn off this option
