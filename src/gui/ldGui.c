@@ -637,7 +637,6 @@ void ldGuiLogicLoop(void)
     {
         ldPageLoopFunc[0](pageNumNow);
     }
-
 #endif
 }
 
@@ -661,7 +660,7 @@ void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiQuit(void)
+void ldGuiQuit(arm_2d_scene_t *pSence)
 {
 #if LD_PAGE_MAX > 1
     if(ldPageQuitFunc[pageNumNow])
@@ -673,8 +672,9 @@ void ldGuiQuit(void)
     {
         ldPageQuitFunc[0](pageNumNow);
     }
-
 #endif
+    pSence->ptDirtyRegion=NULL;
+    ldWindowDel(ldBaseGetWidgetById(0));
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 

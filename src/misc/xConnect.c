@@ -32,10 +32,13 @@ NEW_LIST(listConnect);
 
 bool xEmitInit(void)
 {
-    emitQueue=xQueueCreate(EMIT_QUEUE_SIZE,sizeof (emitInfo_t));
-    if(emitQueue)
+    if(emitQueue==NULL)
     {
-        return true;
+        emitQueue=xQueueCreate(EMIT_QUEUE_SIZE,sizeof (emitInfo_t));
+        if(emitQueue)
+        {
+            return true;
+        }
     }
     return false;
 }

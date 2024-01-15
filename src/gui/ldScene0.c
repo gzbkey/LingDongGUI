@@ -130,7 +130,7 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     
     if(pageNumNow!=pageTarget)
     {
-        ldGuiQuit();
+        ldGuiQuit(ptScene);
         pageNumNow=pageTarget;
         ldGuiInit(ptScene);
 //        arm_2d_scene1_init(&DISP0_ADAPTER);

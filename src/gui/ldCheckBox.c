@@ -328,6 +328,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         if((pWidget->radioButtonGroup==radioButtonValue.group)&&(pWidget->nameId!=radioButtonValue.nameId))
         {
             pWidget->isChecked=false;
+            pWidget->dirtyRegionState=waitChange;
         }
     }
 
