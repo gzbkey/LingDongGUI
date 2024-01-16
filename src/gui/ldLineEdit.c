@@ -209,6 +209,10 @@ static bool slotLineEditProcess(xConnectInfo_t info)
                 ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT);
                 ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
             }
+            else
+            {
+                ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+            }
         }
         pWidget->dirtyRegionState=waitChange;
         pWidget->isDirtyRegionAutoIgnore=false;
