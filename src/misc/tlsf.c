@@ -10,7 +10,7 @@
 
 #include "tlsf.h"
 #ifdef NDEBUG
-#define TLSF_PRINT
+#define TLSF_PRINT(...)            {}
 #else
 #define TLSF_PRINT printf
 #endif

@@ -35,7 +35,6 @@ typedef struct {
     uint16_t kbNameId;
     ldColor textColor;
     uint8_t *pText;
-    uint8_t textLen;
     uint8_t textMax;
 
 }ldLineEdit_t;

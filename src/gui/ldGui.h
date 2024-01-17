@@ -36,7 +36,7 @@ extern "C" {
 #define SIGNAL_MOVE_SPEED           11                  // value = x speed(2Byte) + y speed(2Byte)
 #define SIGNAL_CLICKED_ITEM         12                  // value = item num
 
-#define SIGNAL_INPUT_ASCII          13
+//#define SIGNAL_INPUT_ASCII          13
 #define SIGNAL_EDITING_FINISHED     14
 
 //#define SIGNAL_VALUE_CHANGED           7 //数据变化

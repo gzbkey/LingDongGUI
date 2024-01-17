@@ -43,17 +43,18 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-#define KB_SPACE    5
-#define KB_ASCII_RELEASE_COLOR     LD_COLOR_WHITE
-#define KB_ASCII_PRESS_COLOR     __RGB(188,191,206)
-#define KB_OTHER_RELEASE_COLOR     __RGB(168,176,189)
-#define KB_OTHER_PRESS_COLOR     LD_COLOR_WHITE
+#define KB_SPACE                   5
 
-#define KB_VALUE_NONE         0
-#define KB_VALUE_QWERTY_MODE  1
-#define KB_VALUE_NUMBER_MODE  2
-#define KB_VALUE_SHIFT        3
-#define KB_VALUE_SYMBOL_MODE  4
+#define KB_ASCII_RELEASE_COLOR     LD_COLOR_WHITE
+#define KB_ASCII_PRESS_COLOR       __RGB(188,191,206)
+#define KB_OTHER_RELEASE_COLOR     __RGB(168,176,189)
+#define KB_OTHER_PRESS_COLOR       LD_COLOR_WHITE
+
+#define KB_VALUE_NONE              0
+#define KB_VALUE_QWERTY_MODE       1
+#define KB_VALUE_NUMBER_MODE       2
+#define KB_VALUE_SHIFT             3
+#define KB_VALUE_SYMBOL_MODE       4
 
 static ldColor _shiftColor[3]={LD_COLOR_WHITE,LD_COLOR_BLACK,LD_COLOR_BLUE};
 
@@ -197,7 +198,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             }
 
             item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE);
-            if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
+            if((pWidget->editType==typeFloat)||(pWidget->editType==typeString))
             {
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     retRegion=item_region;
@@ -220,7 +221,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             }
 
             item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
-            if(gActiveEditType==typeString)
+            if(pWidget->editType==typeString)
             {
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     //change ABC
@@ -708,6 +709,107 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
     return retRegion;
 }
 
+static bool _addAscii(ldKeyboard_t *pWidget,uint16_t textLen,uint8_t ascii)
+{
+    if(pWidget->strMax==0)
+    {
+        ldFree(pWidget->pStr);
+        ldRealloc(pWidget->pStr,textLen+1);
+    }
+    if((textLen<pWidget->strMax)||(pWidget->strMax==0))
+    {
+        xStringPushBack(pWidget->pStr,textLen,ascii);
+        return true;
+    }
+
+    return false;
+}
+
+static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
+{
+    uint16_t textLen=strlen((char*)pWidget->pStr);
+    if((pWidget->editType==typeInt)||(pWidget->editType==typeFloat))
+    {
+        switch (ascii)
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        {
+            _addAscii(pWidget,textLen,ascii);
+            break;
+        }
+        case '.':
+        {
+            if((pWidget->editType==typeFloat)&&(strstr((char*)pWidget->pStr,".")==NULL))
+            {
+                _addAscii(pWidget,textLen,ascii);
+            }
+            break;
+        }
+        case '-':
+        {
+            if(pWidget->pStr[0]=='-')
+            {
+                xStringRemove(pWidget->pStr,textLen,0,1);
+            }
+            else
+            {
+                if(pWidget->strMax==0)
+                {
+                    ldFree(pWidget->pStr);
+                    ldRealloc(pWidget->pStr,textLen+1);
+                }
+                if((textLen<pWidget->strMax)||(pWidget->strMax==0))
+                {
+                    xStringInsert(pWidget->pStr,textLen,0,(uint8_t*)"-");
+                }
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    else
+    {
+        if((ascii>=0x20)&&(ascii<0x7F))
+        {
+            _addAscii(pWidget,textLen,ascii);
+        }
+        else
+        {
+
+        }
+    }
+
+    switch (ascii) {
+    case 0x08://backspace
+    {
+        xStringPopBack(pWidget->pStr,textLen);
+        break;
+    }
+    case 0x0d://enter
+    {
+        ldBaseSetHidden((ldCommon_t*)pWidget,true);
+        xEmit(0,SIGNAL_EDITING_FINISHED,0);
+        ldBaseBgMove(0,0);
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=true;
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 static bool slotKBProcess(xConnectInfo_t info)
 {
     ldKeyboard_t *pWidget;
@@ -739,10 +841,12 @@ static bool slotKBProcess(xConnectInfo_t info)
     {
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
         pWidget->isClick=true;
-        xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
+//        xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
         pWidget->dirtyRegionState=waitChange;
         pWidget->clickPoint.iX=-1;
         pWidget->clickPoint.iY=-1;
+
+        _inputAsciiProcess(pWidget,pWidget->kbValue);
     }
     default:
         break;
@@ -847,12 +951,6 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
             pWidget->targetDirtyRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
             pWidget->targetDirtyRegion.tLocation.iX-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
             pWidget->targetDirtyRegion.tLocation.iY-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
-
-            //强制解除控件关联
-            xDeleteConnect(pWidget->nameId);
-            xConnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotKBProcess);
-            xConnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotKBProcess);
-
             pWidget->isWaitInit=false;
         }
         return;
@@ -891,7 +989,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
-    if(((gActiveEditType==typeInt)||(gActiveEditType==typeFloat))&&(pWidget->isNumber==false))
+    if(((pWidget->editType==typeInt)||(pWidget->editType==typeFloat))&&(pWidget->isNumber==false))
     {
         pWidget->isNumber=true;
     }
@@ -1066,7 +1164,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"0",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
                 item_region=ldLayoutHorizontal(&leftRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,KB_SPACE);
-                if((gActiveEditType==typeFloat)||(gActiveEditType==typeString))
+                if((pWidget->editType==typeFloat)||(pWidget->editType==typeString))
                 {
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_ASCII_PRESS_COLOR;
@@ -1100,7 +1198,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                 _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"<-",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
                 item_region=ldLayoutVertical(&rightRegion,&bufferRegion,btnW,btnH,KB_SPACE,KB_SPACE,KB_SPACE,0);
-                if(gActiveEditType==typeString)
+                if(pWidget->editType==typeString)
                 {
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;

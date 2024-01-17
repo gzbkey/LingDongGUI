@@ -12,6 +12,7 @@ extern "C" {
 #include "xConnect.h"
 #include "xList.h"
 #include "xLog.h"
+#include "xString.h"
 #include "ldConfig.h"
 
 #ifndef SET_BITS
@@ -358,13 +359,19 @@ typedef enum{
     typeFloat
 }ldEditType_t;
 
+typedef struct{
+    LD_COMMON_ATTRIBUTES;
+    ldEditType_t editType;
+    uint16_t editorId;
+    uint8_t *pStr;
+    uint8_t strMax;
+}ldCommonKB_t;
+
 extern xListNode ldWidgetLink;
 
-extern ldEditType_t gActiveEditType;
-
-void *ldMalloc(uint32_t size);
-void ldFree(void *p);
-//void *ldRealloc(void *ptr,uint32_t newSize);
+extern void *ldMalloc(uint32_t size);
+extern void ldFree(void *p);
+extern void *ldRealloc(void *ptr,uint32_t newSize);
 
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);

@@ -53,8 +53,6 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-ldEditType_t gActiveEditType;
-
 NEW_LIST(ldWidgetLink);
 
 #if USE_TLSF == 1
@@ -101,14 +99,14 @@ __WEAK void ldFree(void *p)
 #endif
 }
 
-//__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
-//{
-//#if USE_TLSF == 1
-//    return tlsf_realloc(pTlsfMem, ptr, newSize);
-//#else
-//    return realloc(ptr,newSize);
-//#endif
-//}
+__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
+{
+#if USE_TLSF == 1
+    return tlsf_realloc(pTlsfMem, ptr, newSize);
+#else
+    return realloc(ptr,newSize);
+#endif
+}
 
 static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
