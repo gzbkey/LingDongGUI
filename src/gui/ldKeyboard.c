@@ -871,7 +871,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(0);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldKeyboard_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldKeyboard_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;

@@ -57,30 +57,29 @@ NEW_LIST(ldWidgetLink);
 
 #if USE_TLSF == 1
 static void * pTlsfMem=NULL;
-__attribute__((aligned (8))) static uint8_t tlsfMemBuf[LD_MEM_SIZE];
 #endif
+
+__attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
+
 extern size_t xFreeBytesRemaining;
-__WEAK void *ldMalloc(uint32_t size)
+__WEAK void *ldCalloc(uint32_t size)
 {
+    void* p=NULL;
 #if USE_TLSF == 1
     if(pTlsfMem==NULL)
     {
-        pTlsfMem = tlsf_create_with_pool((void *)tlsfMemBuf, sizeof (tlsfMemBuf));
+        pTlsfMem = tlsf_create_with_pool((void *)ucHeap, sizeof (ucHeap));
     }
-    void* p=tlsf_malloc(pTlsfMem,size);
+    p=tlsf_malloc(pTlsfMem,size);
+#else
+     p=pvPortMalloc(size);
+//    p=malloc(size);
+#endif
     if(p!=NULL)
     {
         memset(p,0,size);
     }
     return p;
-#else
-//    LOG_DEBUG("malloc:%d\n",size);
-//    LOG_DEBUG("before :%llu\n",xFreeBytesRemaining);
-    return pvPortMalloc(size);
-//    void* p=malloc(size);
-//    memset(p,0,size);
-//    return p;
-#endif
 }
 
 __WEAK void ldFree(void *p)
@@ -93,8 +92,6 @@ __WEAK void ldFree(void *p)
     tlsf_free(pTlsfMem, p);
 #else
     vPortFree(p);
-//    LOG_DEBUG("free\n");
-//    LOG_DEBUG("remaining:%llu\n",xFreeBytesRemaining);
 //    free(p);
 #endif
 }
@@ -104,7 +101,8 @@ __WEAK void *ldRealloc(void *ptr,uint32_t newSize)
 #if USE_TLSF == 1
     return tlsf_realloc(pTlsfMem, ptr, newSize);
 #else
-    return realloc(ptr,newSize);
+    return  pvPortRealloc(ptr,newSize);
+//    return realloc(ptr,newSize);
 #endif
 }
 
@@ -529,7 +527,7 @@ ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo)
 {
     if(*ppCharInfo==NULL)
     {
-        *ppCharInfo=ldMalloc(sizeof(ldChar_t));
+        *ppCharInfo=ldCalloc(sizeof(ldChar_t));
         if(*ppCharInfo==NULL)
         {
             return NULL;
@@ -1101,14 +1099,14 @@ void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
 
         if((*ppTextInfo)->pStr==NULL)
         {
-            (*ppTextInfo)->pStr=ldMalloc(newStrlen);
+            (*ppTextInfo)->pStr=ldCalloc(newStrlen);
             if((*ppTextInfo)->pStr==NULL)
             {
                 return;
             }
             (*ppTextInfo)-> strLen=newStrlen-1;
         }
-        memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
+//        memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
         strcpy((char*)(*ppTextInfo)->pStr,(char*)pStr);
     }
 }

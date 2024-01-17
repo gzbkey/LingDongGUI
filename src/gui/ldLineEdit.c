@@ -155,8 +155,8 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     uint8_t *pText = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldLineEdit_t);
-    pText = (uint8_t *)ldMalloc((textMax+1)*sizeof(uint8_t));//+结尾
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldLineEdit_t);
+    pText = (uint8_t *)ldCalloc((textMax+1)*sizeof(uint8_t));//+结尾
     if ((pNewWidget != NULL)&&(pText!=NULL))
     {
         memset((char*)pText,0,textMax+1);

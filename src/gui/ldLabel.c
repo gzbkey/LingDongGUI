@@ -100,7 +100,7 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldLabel_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldLabel_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -267,7 +267,7 @@ void ldLabelSetText(ldLabel_t* pWidget,uint8_t *pStr)
     }
     pWidget->dirtyRegionState=waitChange;
     ldFree(pWidget->pStr);
-    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    pWidget->pStr=LD_CALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
     pWidget->dirtyRegionState=waitChange;
 }

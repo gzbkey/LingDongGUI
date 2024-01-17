@@ -210,9 +210,9 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
     uint8_t *pNewShowList;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldRadialMenu_t);
-    pNewItemList=ldMalloc(sizeof(ldRadialMenuItem_t)*itemMax);
-    pNewShowList=ldMalloc(sizeof (uint8_t)*itemMax);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldRadialMenu_t);
+    pNewItemList=ldCalloc(sizeof(ldRadialMenuItem_t)*itemMax);
+    pNewShowList=ldCalloc(sizeof (uint8_t)*itemMax);
     if ((pNewWidget != NULL)&&(pNewItemList != NULL)&&(pNewShowList!=NULL))
     {
         pNewWidget->isParentHidden=false;

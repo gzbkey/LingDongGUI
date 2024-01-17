@@ -64,7 +64,7 @@ xListNode *xListInfoAdd(xListNode* pList, void* pInfo)
     {
         return NULL;
     }
-    xListNode * newList = (xListNode *)XMALLOC(sizeof(xListNode));
+    xListNode * newList = (xListNode *)XCALLOC(sizeof(xListNode));
     if(newList!=NULL)
     {
         newList->info=pInfo;
@@ -97,7 +97,7 @@ xListNode* xListMallocNode(xListNode** pListChild)
     xListNode* pNode=NULL;
     if(*pListChild==NULL)
     {
-        pNode=(xListNode *)XMALLOC(sizeof(xListNode));
+        pNode=(xListNode *)XCALLOC(sizeof(xListNode));
         if(pNode!=NULL)
         {
             pNode->next=pNode;

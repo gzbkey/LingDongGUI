@@ -186,8 +186,8 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     void **pNewStrGroup = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldComboBox_t);
-    pNewStrGroup=(void**)ldMalloc(sizeof (void*)*itemMax);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldComboBox_t);
+    pNewStrGroup=(void**)ldCalloc(sizeof (void*)*itemMax);
     if ((pNewWidget != NULL)&&(pNewStrGroup != NULL))
     {
         pNewWidget->isParentHidden=false;
@@ -428,7 +428,7 @@ void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr)
     {
         if(pWidget->ppItemStrGroup[pWidget->itemCount]==NULL)
         {
-            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_MALLOC_STRING(pStr);
+            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_CALLOC_STRING(pStr);
             strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],(char*)pStr);
             pWidget->itemCount++;
         }

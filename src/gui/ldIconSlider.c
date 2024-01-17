@@ -358,11 +358,11 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
     ldIconInfo_t* pIconInfoBuf = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldIconSlider_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldIconSlider_t);
     rowCount=MAX(rowCount,1);
     columnCount=MAX(columnCount,1);
     pageMax=MAX(pageMax,1);
-    pIconInfoBuf = ldMalloc(sizeof (ldIconInfo_t)*(rowCount*columnCount*pageMax));
+    pIconInfoBuf = ldCalloc(sizeof (ldIconInfo_t)*(rowCount*columnCount*pageMax));
     if ((pNewWidget != NULL)&&(pIconInfoBuf != NULL))
     {
         pNewWidget->isParentHidden=false;
@@ -668,7 +668,7 @@ void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNa
 
         if((pWidget->pFontDict!=NULL)&&(pNameStr!=NULL))
         {
-            pWidget->pIconInfoList[pWidget->iconCount].pName=LD_MALLOC_STRING(pNameStr);
+            pWidget->pIconInfoList[pWidget->iconCount].pName=LD_CALLOC_STRING(pNameStr);
             if(pWidget->pIconInfoList[pWidget->iconCount].pName!=NULL)
             {
                 strcpy((char*)pWidget->pIconInfoList[pWidget->iconCount].pName,(char*)pNameStr);

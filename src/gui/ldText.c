@@ -106,7 +106,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldText_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldText_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;

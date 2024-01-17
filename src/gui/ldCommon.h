@@ -65,11 +65,11 @@ extern "C" {
 
 #define ldColor                                 COLOUR_INT
 
-#define XMALLOC                                 ldMalloc
+#define XCALLOC                                 ldCalloc
 #define XFREE                                   ldFree
 
-#define LD_MALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldMalloc(sizeof(widgetTypedef))
-#define LD_MALLOC_STRING(str)                   (uint8_t *)ldMalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
+#define LD_CALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldCalloc(sizeof(widgetTypedef))
+#define LD_CALLOC_STRING(str)                   (uint8_t *)ldCalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
 #define LD_ALIGN_CENTER          0
 #define LD_ALIGN_TOP             _BV(0)
@@ -369,7 +369,7 @@ typedef struct{
 
 extern xListNode ldWidgetLink;
 
-extern void *ldMalloc(uint32_t size);
+extern void *ldCalloc(uint32_t size);
 extern void ldFree(void *p);
 extern void *ldRealloc(void *ptr,uint32_t newSize);
 

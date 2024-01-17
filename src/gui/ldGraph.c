@@ -118,8 +118,8 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     ldGraphSeries_t *pSeries = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldGraph_t);
-    pSeries = ldMalloc(sizeof (ldGraphSeries_t)*seriesMax);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldGraph_t);
+    pSeries = ldCalloc(sizeof (ldGraphSeries_t)*seriesMax);
     if ((pNewWidget != NULL)&&(pSeries != NULL))
     {
         pNewWidget->isParentHidden=false;
@@ -367,7 +367,7 @@ int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint8_t lineSize,
     }
     if(pWidget->seriesCount<pWidget->seriesMax)
     {
-        pBuf=ldMalloc(sizeof (uint16_t)*valueCountMax);
+        pBuf=ldCalloc(sizeof (uint16_t)*valueCountMax);
         if(pBuf!=NULL)
         {
             pWidget->pSeries[pWidget->seriesCount].pValueList=pBuf;

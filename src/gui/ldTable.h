@@ -77,6 +77,7 @@ uint8_t ldTableCurrentRow(ldTable_t *pWidget);
 ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget);
 ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
 ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
+void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict);
 
 #define ldTableSetHidden          ldBaseSetHidden
 #define ldTableMove               ldBaseMove

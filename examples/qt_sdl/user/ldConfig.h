@@ -59,7 +59,7 @@ extern "C" {
 #define USE_OPACITY                               0
 
 
-#define USE_TLSF                                  1
+#define USE_TLSF                                  0
 
 // <q>QRCode support
 // <i> Do not use QR code. Please turn off this option

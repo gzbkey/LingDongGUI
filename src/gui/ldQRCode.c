@@ -112,8 +112,8 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
     uint8_t *pText = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldQRCode_t);
-    pText = LD_MALLOC_STRING(qrText);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldQRCode_t);
+    pText = LD_CALLOC_STRING(qrText);
 
     if ((pNewWidget != NULL)&&(pText!=NULL))
     {
@@ -213,8 +213,8 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
         bool ret;
         ldColor tempColor;
 
-        qr0=ldMalloc(qrcodegen_BUFFER_LEN_FOR_VERSION(pWidget->qrMaxVersion));
-        tempBuffer=ldMalloc(qrcodegen_BUFFER_LEN_FOR_VERSION(pWidget->qrMaxVersion));
+        qr0=ldCalloc(qrcodegen_BUFFER_LEN_FOR_VERSION(pWidget->qrMaxVersion));
+        tempBuffer=ldCalloc(qrcodegen_BUFFER_LEN_FOR_VERSION(pWidget->qrMaxVersion));
 
         if((qr0!=NULL)&&(tempBuffer!=NULL))
         {
@@ -284,7 +284,7 @@ void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText)
         return;
     }
     ldFree(pWidget->qrText);
-    pText=LD_MALLOC_STRING(pNewText);
+    pText=LD_CALLOC_STRING(pNewText);
     strcpy((char *)pText,(const char *)pNewText);
     pWidget->qrText=pText;
     pWidget->dirtyRegionState=waitChange;

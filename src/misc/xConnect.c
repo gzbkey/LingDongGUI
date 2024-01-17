@@ -72,7 +72,7 @@ bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc f
 {
     relationInfo_t* pRelation;
 
-    pRelation=XMALLOC(sizeof(relationInfo_t));
+    pRelation=XCALLOC(sizeof(relationInfo_t));
 
     if(pRelation!=NULL)
     {

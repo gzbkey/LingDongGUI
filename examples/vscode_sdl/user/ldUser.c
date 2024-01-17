@@ -165,7 +165,7 @@ const uint8_t arcMask51_png[]={
 
 void userInit(void)
 {
-//    obj=ldMalloc(1);
+//    obj=ldCalloc(1);
 //    ldFree(obj);
 //    LOG_DEBUG("start :%llu\n",xFreeBytesRemaining);
     obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);

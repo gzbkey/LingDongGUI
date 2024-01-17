@@ -35,7 +35,7 @@
 #define BTN_LONG_START           7 //检测按键长按触发一次的信号
 #define BTN_LONG_SHOOT           8 //检测按键长按触发一次和连续触发的信号
 
-#define BTN_MALLOC               ldMalloc
+#define BTN_CALLOC               ldCalloc
 #define BTN_FREE                 ldFree
 
 typedef struct {

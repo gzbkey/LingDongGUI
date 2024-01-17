@@ -444,10 +444,10 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
     ldTableItem_t *pItemInfoBuf;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldTable_t);
-    widthBuf = ldMalloc(sizeof (int16_t)*columnCount);
-    heightBuf = ldMalloc(sizeof (int16_t)*rowCount);
-    pItemInfoBuf = ldMalloc(sizeof (ldTableItem_t)*columnCount*rowCount);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldTable_t);
+    widthBuf = ldCalloc(sizeof (int16_t)*columnCount);
+    heightBuf = ldCalloc(sizeof (int16_t)*rowCount);
+    pItemInfoBuf = ldCalloc(sizeof (ldTableItem_t)*columnCount*rowCount);
 
     if ((pNewWidget != NULL)&&(widthBuf!=NULL)&&(heightBuf!=NULL)&&(pItemInfoBuf!=NULL))
     {
@@ -724,7 +724,7 @@ void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *p
         if(item->isStaticText==false)
         {
             ldFree(item->pText);
-            item->pText=LD_MALLOC_STRING(pText);
+            item->pText=LD_CALLOC_STRING(pText);
             strcpy((char*)item->pText,(char*)pText);
             item->pFontDict=pFontDict;
         }
@@ -898,6 +898,55 @@ void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t 
         item->isButton=true;
         item->isCheckable=isCheckable;
         item->isSelectShow=false;
+    }
+}
+
+void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
+{
+    uint8_t i,count=0;
+    uint8_t strBuf[2]={0};
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->dirtyRegionState=waitChange;
+
+    ldTableSetBgColor(pWidget,__RGB(219,219,219));
+    strBuf[0]='1';
+    for(i=0;i<pWidget->rowCount;i++)
+    {
+        if(i==0)
+        {
+            ldTableSetItemHeight(pWidget,0,22);
+        }
+        else
+        {
+            ldTableSetItemHeight(pWidget,i,18);
+            if(pFontDict!=NULL)
+            {
+                ldTableSetItemText(pWidget,i,0,strBuf,pFontDict);
+                strBuf[0]++;
+            }
+        }
+        ldTableSetItemColor(pWidget,i,0,LD_COLOR_BLACK,__RGB(238,238,238));
+    }
+    strBuf[0]='A';
+    for(i=1;i<pWidget->columnCount;i++)
+    {
+        if(i==0)
+        {
+            ldTableSetItemWidth(pWidget,0,35);
+        }
+        else
+        {
+            ldTableSetItemWidth(pWidget,i,71);
+            if(pFontDict!=NULL)
+            {
+                ldTableSetItemText(pWidget,0,i,strBuf,pFontDict);
+                strBuf[0]++;
+            }
+        }
+        ldTableSetItemColor(pWidget,0,i,LD_COLOR_BLACK,__RGB(238,238,238));
     }
 }
 

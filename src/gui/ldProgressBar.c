@@ -99,7 +99,7 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldProgressBar_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldProgressBar_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;

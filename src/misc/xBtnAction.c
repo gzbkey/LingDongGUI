@@ -50,7 +50,7 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
 
 void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t))
 {
-    xBtnInfo_t * link = (xBtnInfo_t *)BTN_MALLOC(sizeof(xBtnInfo_t));
+    xBtnInfo_t * link = (xBtnInfo_t *)BTN_CALLOC(sizeof(xBtnInfo_t));
     if(link!=NULL)
     {
         memset(link,0,sizeof(xBtnInfo_t));

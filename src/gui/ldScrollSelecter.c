@@ -188,8 +188,8 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
     void **pNewStrGroup = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldScrollSelecter_t);
-    pNewStrGroup=(void**)ldMalloc(sizeof (void*)*itemMax);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldScrollSelecter_t);
+    pNewStrGroup=(void**)ldCalloc(sizeof (void*)*itemMax);
 
     if ((pNewWidget != NULL)&&(pNewStrGroup != NULL))
     {
@@ -387,7 +387,7 @@ void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
     {
         if(pWidget->ppItemStrGroup[pWidget->itemCount]==NULL)
         {
-            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_MALLOC_STRING(pStr);
+            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_CALLOC_STRING(pStr);
             strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],(char*)pStr);
             pWidget->itemCount++;
         }

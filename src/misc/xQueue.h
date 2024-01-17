@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include "ldCommon.h"
 
-#define X_QUEUE_MALLOC    XMALLOC
+#define X_QUEUE_CALLOC    XCALLOC
 //#define X_QUEUE_FREE      free
 
 typedef struct

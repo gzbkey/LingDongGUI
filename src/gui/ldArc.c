@@ -119,7 +119,7 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldArc_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldArc_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
