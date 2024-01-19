@@ -43,7 +43,7 @@ extern "C" {
 #define CONNECT16(H,L)                          (((H)<<8)+(L))
 #endif
 #ifndef GET32H
-#define GET32H(data)                          (((data)>>24)&0xFF)
+#define GET32H(data)                            (((data)>>24)&0xFF)
 #endif
 #ifndef GET32MH
 #define GET32MH(data)                           (((data)>>16)&0xFF)
@@ -61,25 +61,26 @@ extern "C" {
 #define SWAP(x,y)                               ((x) = (x)+(y),(y)=(x)-(y),(x)=(x)-(y))
 #endif
 
-#define ANGLE_2_RADIAN(angle)    ((float)(angle)*0.0174533f)
+#define ANGLE_2_RADIAN(angle)                   ((float)(angle)*0.0174533f)
 
 #define ldColor                                 COLOUR_INT
 
 #define XCALLOC                                 ldCalloc
 #define XFREE                                   ldFree
 
+#define CURSOR_WIDTH                            2
+
 #define LD_CALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldCalloc(sizeof(widgetTypedef))
 #define LD_CALLOC_STRING(str)                   (uint8_t *)ldCalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
-#define LD_ALIGN_CENTER          0
-#define LD_ALIGN_TOP             _BV(0)
-#define LD_ALIGN_BOTTOM          _BV(1)
-#define LD_ALIGN_LEFT            _BV(2)
-#define LD_ALIGN_RIGHT           _BV(3)
+#define LD_ALIGN_CENTER                         0
+#define LD_ALIGN_TOP                            _BV(0)
+#define LD_ALIGN_BOTTOM                         _BV(1)
+#define LD_ALIGN_LEFT                           _BV(2)
+#define LD_ALIGN_RIGHT                          _BV(3)
+#define LD_ALIGN_LEFT_AUTO                      _BV(4) //GUI内部使用
 
-#define LD_ALIGN_LEFT_AUTO       _BV(4) //GUI内部使用
-
-#define LD_ADDR_NONE             0xffffffffu
+#define LD_ADDR_NONE                            0xffffffffu
 
 #define LD_COLOR_LIGHT_PINK __RGB(255, 182, 193)             // 浅粉红
 #define LD_COLOR_PINK __RGB(255, 192, 203)                   // 粉红
@@ -359,12 +360,14 @@ typedef enum{
     typeFloat
 }ldEditType_t;
 
+#define LD_COMMON_KB_ATTRIBUTES    LD_COMMON_ATTRIBUTES; \
+                                   ldEditType_t editType; \
+                                   uint16_t editorId; \
+                                   uint8_t **ppStr; \
+                                   uint8_t strMax
+
 typedef struct{
-    LD_COMMON_ATTRIBUTES;
-    ldEditType_t editType;
-    uint16_t editorId;
-    uint8_t *pStr;
-    uint8_t strMax;
+    LD_COMMON_KB_ATTRIBUTES;
 }ldCommonKB_t;
 
 extern xListNode ldWidgetLink;

@@ -45,9 +45,9 @@
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
-
 int64_t sysTimer=0;
-
+uint8_t cursorBlinkCount=0;
+bool cursorBlinkFlag=false;
 #define TOUCH_NO_CLICK           0
 #define TOUCH_CLICK              1
 
@@ -608,9 +608,10 @@ void ldGuiFrameStart(void)
     _ldGuiFrameUpdate(&ldWidgetLink);
 
     //检查按键
-    if(ldTimeOut(10,&sysTimer,true))
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,&sysTimer,true))
     {
-        xBtnTick(10);
+        xBtnTick(SYS_TICK_CYCLE_MS);
+        cursorBlinkCount++;
     }
 
     //检查触摸

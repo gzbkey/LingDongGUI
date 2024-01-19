@@ -26,6 +26,8 @@ extern "C" {
 #include "ldComboBox.h"
 #include "ldArc.h"
 
+#define SYS_TICK_CYCLE_MS          10
+
 //btn占用0-9
 #define SIGNAL_NO_OPERATION         BTN_NO_OPERATION
 #define SIGNAL_PRESS                BTN_PRESS           // value = x (2Byte) + y (2Byte)
@@ -55,6 +57,9 @@ extern void (*ldPageLoopFunc[LD_PAGE_MAX])(uint8_t pageNum);
 extern void (*ldPageQuitFunc[LD_PAGE_MAX])(uint8_t pageNum);
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
+extern uint8_t cursorBlinkCount;
+extern bool cursorBlinkFlag;
+#define CURSOR_BLINK_TIMEOUT        50 // 500/SYS_TICK_CYCLE_MS
 
 #define LD_ADD_PAGE(pageName)       ldGuiAddPage(pageName##Init,pageName##Loop,pageName##Quit)
 

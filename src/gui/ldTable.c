@@ -159,8 +159,8 @@ ldPoint_t _ldTableGetItemPos(ldTable_t *pWidget,uint8_t row, uint8_t column)
     {
         if(x<column)
         {
-        offset.x+=pWidget->itemSpace;
-        offset.x+=pWidget->pColumnWidth[x];
+            offset.x+=pWidget->itemSpace;
+            offset.x+=pWidget->pColumnWidth[x];
         }
     }
     offset.x+=pWidget->itemSpace+pWidget->scrollOffsetX;
@@ -169,13 +169,23 @@ ldPoint_t _ldTableGetItemPos(ldTable_t *pWidget,uint8_t row, uint8_t column)
     {
         if(y<row)
         {
-        offset.y+=pWidget->itemSpace;
-        offset.y+=pWidget->pRowHeight[y];
+            offset.y+=pWidget->itemSpace;
+            offset.y+=pWidget->pRowHeight[y];
         }
     }
     offset.y+=pWidget->itemSpace+pWidget->scrollOffsetY;
-
     return offset;
+}
+
+arm_2d_region_t _ldTableGetItemRegion(ldTable_t *pWidget,uint8_t row, uint8_t column)
+{
+    ldPoint_t targetItemPos=_ldTableGetItemPos(pWidget,row,column);
+    arm_2d_region_t itemRegion;
+    itemRegion.tLocation.iX=targetItemPos.x;
+    itemRegion.tLocation.iY=targetItemPos.y;
+    itemRegion.tSize.iWidth=pWidget->pColumnWidth[column];
+    itemRegion.tSize.iHeight=pWidget->pRowHeight[row];
+    return itemRegion;
 }
 
 arm_2d_region_t _ldTableGetItemCellGlobalRegion(ldTable_t *pWidget,uint8_t row, uint8_t column)
@@ -295,6 +305,8 @@ static bool slotTableProcess(xConnectInfo_t info)
     int16_t offsetX,offsetY;
     arm_2d_tile_t *pResTile;
     ldTableItem_t *currentItem;
+    int64_t tempTimer;
+    ldCommonKB_t *kb;
 
     pWidget=ldBaseGetWidgetById(info.receiverId);
 
@@ -332,7 +344,7 @@ static bool slotTableProcess(xConnectInfo_t info)
 
         if(currentItem->isButton)
         {
-            arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(pWidget,pWidget->currentColumn,pWidget->currentRow);
+            arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
 
             if((x>=cellRegion.tLocation.iX)&&(y>=cellRegion.tLocation.iY)&&
                     (x<(cellRegion.tLocation.iX+cellRegion.tSize.iWidth))&&
@@ -342,6 +354,43 @@ static bool slotTableProcess(xConnectInfo_t info)
                 currentItem->isChecked=!currentItem->isChecked;
             }
         }
+
+        tempTimer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+
+        if((tempTimer-pWidget->timer)<500)
+        {
+            currentItem->isEditing=true;
+            if(pWidget->kbNameId)
+            {
+                kb=ldBaseGetWidgetById(pWidget->kbNameId);
+                if(kb!=NULL)
+                {
+                    kb->editType=currentItem->editType;
+                    kb->ppStr=&currentItem->pText;
+                    kb->strMax=currentItem->textMax;
+                    kb->editorId=pWidget->nameId;
+                    cursorBlinkFlag=true;
+                    cursorBlinkCount=0;
+                    ldBaseSetHidden(kb,false);
+
+                    arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
+
+                    if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
+                    {
+                        ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                        ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
+                    }
+                    else
+                    {
+                        ldBaseMove(kb,0,0);
+                    }
+                }
+            }
+            pWidget->dirtyRegionState=waitChange;
+            pWidget->isDirtyRegionAutoIgnore=false;
+        }
+
+        pWidget->timer=tempTimer;
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
@@ -417,6 +466,14 @@ static bool slotTableProcess(xConnectInfo_t info)
     return false;
 }
 
+static bool slotEditEnd(xConnectInfo_t info)
+{
+    ldTable_t *pWidget=ldBaseGetWidgetById(info.receiverId);
+    ldTableItem_t *currentItem=ldTableCurrentItem(pWidget);
+    currentItem->isEditing=false;
+    return false;
+}
+
 /**
  * @brief   表格初始化
  * 
@@ -433,7 +490,7 @@ static bool slotTableProcess(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-16
  */
-ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace)
+ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t* pFontDict)
 {
     ldTable_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -512,6 +569,9 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].isChecked=false;
             pNewWidget->pItemInfo[i].isSelectShow=true;
             pNewWidget->pItemInfo[i].isSelect=false;
+            pNewWidget->pItemInfo[i].editType=typeString;
+            pNewWidget->pItemInfo[i].textMax=0;
+            pNewWidget->pItemInfo[i].pFontDict=pFontDict;
         }
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
@@ -521,9 +581,13 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
 
+        pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+        pNewWidget->kbNameId=0;
+
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotTableProcess);
+        xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
 
         LOG_INFO("[table] init,id:%d\n",nameId);
 
@@ -571,6 +635,8 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
+
+
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -597,16 +663,37 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                     tBoxRegion.tLocation.iX+=pWidget->pColumnWidth[x-1];
                 }
                 tBoxRegion.tLocation.iX+=pWidget->itemSpace;
-
                 tBoxRegion.tSize.iWidth=pWidget->pColumnWidth[x];
                 tBoxRegion.tSize.iHeight=pWidget->pRowHeight[y];
-                arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tItemTile, false);
 
+                arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tItemTile, false);
                 ldTableItem_t *item= &pWidget->pItemInfo[y*pWidget->columnCount+x];
                 ldBaseColor(&tItemTile,item->itemBgColor,255);
-                if(item->pText!=NULL)
+
+                if(((item->pText!=NULL)||(item->isEditing))&&(!item->isStaticText))
                 {
-                    ldBaseLineText(&tItemTile,pResTile,item->pText,item->pFontDict,item->align,item->textColor,0,255);
+                    //预留光标位置
+                    tItemTile.tRegion.tSize.iWidth-=CURSOR_WIDTH;
+
+
+                    arm_2d_region_t showRegion=ldBaseLineText(&tItemTile,pResTile,item->pText,item->pFontDict,item->align,item->textColor,0,255);
+
+                    if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&bIsNewFrame&&item->isEditing)
+                    {
+                        cursorBlinkCount=0;
+                        cursorBlinkFlag=!cursorBlinkFlag;
+                    }
+
+                    if(cursorBlinkFlag&&item->isEditing)
+                    {
+                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
+                        itemRegion.tLocation.iX+=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
+                        itemRegion.tLocation.iY+=showRegion.tLocation.iY;
+                        itemRegion.tSize.iWidth=CURSOR_WIDTH;
+                        itemRegion.tSize.iHeight=item->pFontDict->lineStrHeight;
+                        arm_2d_draw_box(&tTarget,&itemRegion,1,0,255);
+                    }
+                    tItemTile.tRegion.tSize.iWidth+=CURSOR_WIDTH;
                 }
 
                 if((item->releaseImgAddr!=LD_ADDR_NONE)||(item->pressImgAddr!=LD_ADDR_NONE))
@@ -901,9 +988,17 @@ void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t 
     }
 }
 
+/**
+ * @brief   excel风格
+ *
+ * @param   pWidget         目标控件指针
+ * @param   pFontDict       字体指针
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2024-01-17
+ */
 void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
 {
-    uint8_t i,count=0;
+    uint8_t i;
     uint8_t strBuf[2]={0};
     if(pWidget==NULL)
     {
@@ -948,6 +1043,23 @@ void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
         }
         ldTableSetItemColor(pWidget,0,i,LD_COLOR_BLACK,__RGB(238,238,238));
     }
+}
+
+/**
+ * @brief   关联键盘
+ *
+ * @param   pWidget         目标控件指针
+ * @param   kbNameId        目标键盘id
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2024-01-17
+ */
+void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->kbNameId=kbNameId;
 }
 
 #if defined(__clang__)

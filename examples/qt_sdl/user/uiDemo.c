@@ -191,10 +191,13 @@ LOG_DEBUG("2 ====%d\n",xFreeBytesRemaining);
         ldButtonSetText(obj,(uint8_t*)"return");
         xConnect(ID_BUTTON,SIGNAL_RELEASE,ID_BG,slotJumpPage0);
 
-        ldTable_t *pTable=ldTableInit(ID_TABLE,ID_BG,10,50,LD_CFG_SCEEN_WIDTH-20,LD_CFG_SCEEN_HEIGHT-60,10,10,1);
+        ldTable_t *pTable=ldTableInit(ID_TABLE,ID_BG,10,50,LD_CFG_SCEEN_WIDTH-20,LD_CFG_SCEEN_HEIGHT-60,10,10,1,SIMSUN_REGULAR_12);
 
         ldTableSetExcelType(pTable,SIMSUN_REGULAR_12);
 
+        ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
+
+        ldTableSetKeyboard(pTable,ID_KB);
 
         break;
     }

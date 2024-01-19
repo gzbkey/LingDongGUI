@@ -42,8 +42,6 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-#define CURSOR_WIDTH   2
-
 static bool _lineEditDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -107,22 +105,22 @@ static bool slotLineEditProcess(xConnectInfo_t info)
             if(kb!=NULL)
             {
                 kb->editType=pWidget->editType;
-                kb->pStr=pWidget->pText;
+                kb->ppStr=&pWidget->pText;
                 kb->strMax=pWidget->textMax;
                 kb->editorId=pWidget->nameId;
-
+                cursorBlinkFlag=true;
+                cursorBlinkCount=0;
                 ldBaseSetHidden(kb,false);
                 if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
                 {
-                    ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT);
+                    ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
                     ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
                 }
                 else
                 {
-                    ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                    ldBaseMove(kb,0,0);
                 }
             }
-
         }
         pWidget->dirtyRegionState=waitChange;
         pWidget->isDirtyRegionAutoIgnore=false;
@@ -193,8 +191,6 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->isCorner=false;
         pNewWidget->isEditing=false;
         pNewWidget->textColor=LD_COLOR_BLACK;
-        pNewWidget->timer=0;
-        pNewWidget->blinkFlag=false;
         pNewWidget->editType=typeString;
         pNewWidget->hasFloatPoint=false;
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
@@ -245,9 +241,10 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
-    if(ldTimeOut(500,&pWidget->timer,true)&&bIsNewFrame&&pWidget->isEditing)
+    if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&bIsNewFrame&&pWidget->isEditing)
     {
-        pWidget->blinkFlag=!pWidget->blinkFlag;
+        cursorBlinkCount=0;
+        cursorBlinkFlag=!cursorBlinkFlag;
     }
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
@@ -287,10 +284,14 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         arm_2d_tile_generate_child(&tTarget,&tempRegion,&textTile,false);
         arm_2d_region_t showRegion=ldBaseLineText(&textTile,pResTile,pWidget->pText,pWidget->pFontDict,LD_ALIGN_LEFT_AUTO,pWidget->textColor,0,255);
 
-        if((pWidget->blinkFlag)&&(pWidget->isEditing))
+        if((cursorBlinkFlag)&&(pWidget->isEditing))
         {
             showRegion.tLocation.iX=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
             showRegion.tSize.iWidth=CURSOR_WIDTH;
+            if(showRegion.tSize.iHeight==0)
+            {
+                pWidget->pFontDict->lineStrHeight;
+            }
             arm_2d_draw_box(&tTarget,&showRegion,1,0,255);
         }
         arm_2d_op_wait_async(NULL);
@@ -314,8 +315,7 @@ void ldLineEditSetText(ldLineEdit_t* pWidget,uint8_t *pText)
     uint16_t textLen=strlen((char*)pText);
     if(pWidget->textMax==0)
     {
-        ldFree(pWidget->pText);
-        ldRealloc(pWidget->pText,textLen+1);
+        pWidget->pText=ldRealloc(pWidget->pText,textLen+1);
     }
 
     if((textLen<pWidget->textMax)||(pWidget->textMax==0))

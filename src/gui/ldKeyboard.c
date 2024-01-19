@@ -99,10 +99,17 @@ void ldKeyboardDel(ldKeyboard_t *pWidget)
 
 static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 {
-    arm_2d_region_t retRegion;
-    retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
-    retRegion.tLocation.iX=0;
-    retRegion.tLocation.iY=0;
+    arm_2d_region_t retRegion={
+        .tLocation={
+            .iX=0,
+            .iY=0,
+        },
+        .tSize={
+            .iWidth=LD_CFG_SCEEN_WIDTH,
+            .iHeight=LD_CFG_SCEEN_HEIGHT/2,
+        },
+    };
+
     int16_t btnW,btnH;
     arm_2d_region_t bufferRegion={0},item_region;
 
@@ -706,19 +713,40 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             }
         }
     }
+    retRegion.tLocation.iY+=LD_CFG_SCEEN_HEIGHT/2;
+    retRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+
     return retRegion;
 }
 
-static bool _addAscii(ldKeyboard_t *pWidget,uint16_t textLen,uint8_t ascii)
+static bool _addAscii(ldKeyboard_t *pWidget,uint16_t textLen,uint8_t ascii,bool isBack)
 {
+    uint8_t *pBuf;
     if(pWidget->strMax==0)
     {
-        ldFree(pWidget->pStr);
-        ldRealloc(pWidget->pStr,textLen+1);
+        if(textLen>0)
+        {
+            pBuf=ldCalloc(textLen+1);
+            strcpy((char*)pBuf,(char*)(*pWidget->ppStr));
+        }
+        *pWidget->ppStr=ldRealloc(*pWidget->ppStr,textLen+2);
+        if(textLen>0)
+        {
+            strcpy((char*)(*pWidget->ppStr),(char*)pBuf);
+        }
     }
     if((textLen<pWidget->strMax)||(pWidget->strMax==0))
     {
-        xStringPushBack(pWidget->pStr,textLen,ascii);
+        if(isBack)
+        {
+            xStringPushBack(*pWidget->ppStr,textLen,ascii);
+        }
+        else
+        {
+            uint8_t temp[2]={0};
+            temp[0]=ascii;
+            xStringInsert(*pWidget->ppStr,textLen,0,temp);
+        }
         return true;
     }
 
@@ -727,7 +755,16 @@ static bool _addAscii(ldKeyboard_t *pWidget,uint16_t textLen,uint8_t ascii)
 
 static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
 {
-    uint16_t textLen=strlen((char*)pWidget->pStr);
+    uint16_t textLen;
+    if((*pWidget->ppStr)!=NULL)
+    {
+        textLen=strlen((char*)(*pWidget->ppStr));
+    }
+    else
+    {
+        textLen=0;
+    }
+
     if((pWidget->editType==typeInt)||(pWidget->editType==typeFloat))
     {
         switch (ascii)
@@ -743,34 +780,26 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
         case 8:
         case 9:
         {
-            _addAscii(pWidget,textLen,ascii);
+            _addAscii(pWidget,textLen,ascii,true);
             break;
         }
         case '.':
         {
-            if((pWidget->editType==typeFloat)&&(strstr((char*)pWidget->pStr,".")==NULL))
+            if((pWidget->editType==typeFloat)&&(strstr((char*)(*pWidget->ppStr),".")==NULL))
             {
-                _addAscii(pWidget,textLen,ascii);
+                _addAscii(pWidget,textLen,ascii,true);
             }
             break;
         }
         case '-':
         {
-            if(pWidget->pStr[0]=='-')
+            if((*pWidget->ppStr)[0]=='-')
             {
-                xStringRemove(pWidget->pStr,textLen,0,1);
+                xStringRemove(*pWidget->ppStr,textLen,0,1);
             }
             else
             {
-                if(pWidget->strMax==0)
-                {
-                    ldFree(pWidget->pStr);
-                    ldRealloc(pWidget->pStr,textLen+1);
-                }
-                if((textLen<pWidget->strMax)||(pWidget->strMax==0))
-                {
-                    xStringInsert(pWidget->pStr,textLen,0,(uint8_t*)"-");
-                }
+                _addAscii(pWidget,textLen,ascii,false);
             }
             break;
         }
@@ -782,7 +811,7 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
     {
         if((ascii>=0x20)&&(ascii<0x7F))
         {
-            _addAscii(pWidget,textLen,ascii);
+            _addAscii(pWidget,textLen,ascii,true);
         }
         else
         {
@@ -793,7 +822,7 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
     switch (ascii) {
     case 0x08://backspace
     {
-        xStringPopBack(pWidget->pStr,textLen);
+        xStringPopBack(*pWidget->ppStr,textLen);
         break;
     }
     case 0x0d://enter
@@ -812,28 +841,34 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
 
 static bool slotKBProcess(xConnectInfo_t info)
 {
-    ldKeyboard_t *pWidget;
-    arm_2d_tile_t *pResTile;
+    ldKeyboard_t *pWidget=ldBaseGetWidgetById(info.receiverId);
+    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
-    pWidget=ldBaseGetWidgetById(info.receiverId);
+    arm_2d_region_t kbRegion={
+        .tLocation={
+            .iX=0,
+            .iY=LD_CFG_SCEEN_HEIGHT/2,
+        },
+        .tSize={
+            .iWidth=LD_CFG_SCEEN_WIDTH,
+            .iHeight=LD_CFG_SCEEN_HEIGHT/2,
+        },
+    };
 
-    pResTile=(arm_2d_tile_t*)&pWidget->resource;
+    kbRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
 
     switch (info.signalType)
     {
     case SIGNAL_PRESS:
     {
         ldPoint_t parentPos=ldBaseGetGlobalPos(pWidget->parentWidget);
-
         pWidget->clickPoint.iX=(int16_t)GET_SIGNAL_VALUE_X(info.value);
         pWidget->clickPoint.iY=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
-
-        pWidget->clickPoint.iX-=(pResTile->tRegion.tLocation.iX+parentPos.x);
-        pWidget->clickPoint.iY-=(pResTile->tRegion.tLocation.iY+parentPos.y);
-
+        pWidget->clickPoint.iX-=(kbRegion.tLocation.iX+parentPos.x);
+        pWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.y);
         pWidget->isClick=false;
-
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
+        LOG_REGION("=====",pWidget->targetDirtyRegion);
         pWidget->dirtyRegionState=waitChange;
         break;
     }
@@ -841,17 +876,15 @@ static bool slotKBProcess(xConnectInfo_t info)
     {
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
         pWidget->isClick=true;
-//        xEmit(pWidget->nameId,SIGNAL_INPUT_ASCII,pWidget->kbValue);
         pWidget->dirtyRegionState=waitChange;
         pWidget->clickPoint.iX=-1;
         pWidget->clickPoint.iY=-1;
-
         _inputAsciiProcess(pWidget,pWidget->kbValue);
     }
     default:
         break;
     }
-    return false;
+    return true;
 }
 
 /**
@@ -888,9 +921,9 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->isHidden = true;
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=0;
-        tResTile->tRegion.tLocation.iY=LD_CFG_SCEEN_HEIGHT/2;
+        tResTile->tRegion.tLocation.iY=0;
         tResTile->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH;
-        tResTile->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT/2;
+        tResTile->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT;
         tResTile->tInfo.bIsRoot = true;
         tResTile->tInfo.bHasEnforcedColour = true;
         tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
@@ -949,8 +982,6 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
         {
             //强制脏矩阵覆盖控件
             pWidget->targetDirtyRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
-            pWidget->targetDirtyRegion.tLocation.iX-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-            pWidget->targetDirtyRegion.tLocation.iY-=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
             pWidget->isWaitInit=false;
         }
         return;
@@ -963,9 +994,6 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
 
     if(pWidget->dirtyRegionState==waitChange)
     {
-        pWidget->targetDirtyRegion.tLocation.iX+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-        pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
-
         pWidget->dirtyRegionTemp=pWidget->targetDirtyRegion;
     }
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
@@ -1035,7 +1063,19 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         pWidget->kbValue=KB_VALUE_NONE;
     }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+    arm_2d_region_t kbRegion={
+        .tLocation={
+            .iX=0,
+            .iY=LD_CFG_SCEEN_HEIGHT/2,
+        },
+        .tSize={
+            .iWidth=LD_CFG_SCEEN_WIDTH,
+            .iHeight=LD_CFG_SCEEN_HEIGHT/2,
+        },
+    };
+    kbRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
+
+    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&kbRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {

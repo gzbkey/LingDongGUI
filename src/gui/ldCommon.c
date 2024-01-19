@@ -61,7 +61,6 @@ static void * pTlsfMem=NULL;
 
 __attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
 
-extern size_t xFreeBytesRemaining;
 __WEAK void *ldCalloc(uint32_t size)
 {
     void* p=NULL;
@@ -98,12 +97,18 @@ __WEAK void ldFree(void *p)
 
 __WEAK void *ldRealloc(void *ptr,uint32_t newSize)
 {
+    void* p=NULL;
 #if USE_TLSF == 1
-    return tlsf_realloc(pTlsfMem, ptr, newSize);
+    p = tlsf_realloc(pTlsfMem, ptr, newSize);
 #else
-    return  pvPortRealloc(ptr,newSize);
+    p = pvPortRealloc(ptr,newSize);
 //    return realloc(ptr,newSize);
 #endif
+    if(p!=NULL)
+    {
+        memset(p,0,newSize);
+    }
+    return p;
 }
 
 static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
@@ -993,17 +998,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
     int16_t bmpH1Max;
 
     arm_2d_region_t alignSize={0};
-
-    if(pStr==NULL)
-    {
-        return alignSize;
-    }
-
-    uint8_t strLen=strlen((char*)pStr);
-
-    arm_2d_size_t textSize;
-
-    textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
+    arm_2d_size_t textSize={0};
 
     if(align==LD_ALIGN_LEFT_AUTO)
     {
@@ -1016,6 +1011,17 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
             align=LD_ALIGN_LEFT;
         }
     }
+
+    if(pStr==NULL)
+    {
+        textSize.iHeight=pFontDict->lineStrHeight;
+        alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
+        return alignSize;
+    }
+
+    uint8_t strLen=strlen((char*)pStr);
+
+    textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
 
     alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
 

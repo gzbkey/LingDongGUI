@@ -27,11 +27,9 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isEditing:1;
     bool isCorner:1;
-    bool blinkFlag:1;
     ldEditType_t editType:2;
     bool hasFloatPoint:1;
     ldFontDict_t *pFontDict;
-    int64_t timer;
     uint16_t kbNameId;
     ldColor textColor;
     uint8_t *pText;

@@ -24,13 +24,7 @@ extern "C" {
 #include "ldCommon.h"
 
 typedef struct {
-    struct{
-        LD_COMMON_ATTRIBUTES;
-        ldEditType_t editType;
-        uint16_t editorId;
-        uint8_t *pStr;
-        uint8_t strMax;
-    };
+        LD_COMMON_KB_ATTRIBUTES;
     bool isNumber:1;
     bool isSymbol:1;
     bool isClick:1;
