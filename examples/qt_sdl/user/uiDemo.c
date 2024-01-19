@@ -73,7 +73,6 @@ void uiDemoInit(uint8_t page)
     timer=0;
     tempValue=0;
 
-    LOG_DEBUG("before ====%d\n",xFreeBytesRemaining);
     switch (page)
     {
     case 0:
@@ -83,12 +82,12 @@ void uiDemoInit(uint8_t page)
         obj=ldLabelInit(ID_LABEL,ID_BG,0,0,LD_CFG_SCEEN_WIDTH,30,SIMSUN_REGULAR_12);
         ldLabelSetText(obj,(uint8_t*)"ldgui demo");
         ldLabelSetBgColor(obj,LD_COLOR_BEIGE);
-LOG_DEBUG("1 ====%d\n",xFreeBytesRemaining);
+
         obj=ldTextInit(ID_TEXT,ID_BG,30,70,150,90,SIMSUN_REGULAR_12);
         ldTextSetAlign(obj,LD_ALIGN_LEFT|LD_ALIGN_TOP);
         ldTextSetScroll(obj,true);
         ldTextSetText(obj,(uint8_t*)"LDGUI is developed based on ARM-2D,greatly reducing the difficulty of using ARM-2D.\nSlide or click on the icon below.");
-LOG_DEBUG("2 ====%d\n",xFreeBytesRemaining);
+
         obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,0,40,LD_CFG_SCEEN_WIDTH,20,SIMSUN_REGULAR_12);
         ldDateTimeSetDate(obj,2024,1,15);
         ldDateTimeSetTextColor(obj,LD_COLOR_DARK_BLUE);
@@ -199,12 +198,12 @@ LOG_DEBUG("2 ====%d\n",xFreeBytesRemaining);
 
         ldTableSetKeyboard(pTable,ID_KB);
 
+        ldTableSetItemButton(pTable,1,1,20,5,52,52,ICON_BMP,BBG_BMP,false);
         break;
     }
     default:
         break;
     }
-    LOG_DEBUG("after ====%d\n",xFreeBytesRemaining);
 
 }
 

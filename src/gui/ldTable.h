@@ -31,6 +31,7 @@ typedef struct{
     bool isSelectShow:1;
     bool isSelect:1;
     uint8_t align:4;
+    bool isEditable:1;
     bool isEditing:1;
     ldEditType_t editType:2;
     uint8_t *pText;

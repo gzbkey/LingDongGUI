@@ -355,42 +355,45 @@ static bool slotTableProcess(xConnectInfo_t info)
             }
         }
 
-        tempTimer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
-
-        if((tempTimer-pWidget->timer)<500)
+        if(currentItem->isEditable)
         {
-            currentItem->isEditing=true;
-            if(pWidget->kbNameId)
+            tempTimer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+
+            if((tempTimer-pWidget->timer)<500)
             {
-                kb=ldBaseGetWidgetById(pWidget->kbNameId);
-                if(kb!=NULL)
+                currentItem->isEditing=true;
+                if(pWidget->kbNameId)
                 {
-                    kb->editType=currentItem->editType;
-                    kb->ppStr=&currentItem->pText;
-                    kb->strMax=currentItem->textMax;
-                    kb->editorId=pWidget->nameId;
-                    cursorBlinkFlag=true;
-                    cursorBlinkCount=0;
-                    ldBaseSetHidden(kb,false);
-
-                    arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
-
-                    if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
+                    kb=ldBaseGetWidgetById(pWidget->kbNameId);
+                    if(kb!=NULL)
                     {
-                        ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
-                        ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
-                    }
-                    else
-                    {
-                        ldBaseMove(kb,0,0);
+                        kb->editType=currentItem->editType;
+                        kb->ppStr=&currentItem->pText;
+                        kb->strMax=currentItem->textMax;
+                        kb->editorId=pWidget->nameId;
+                        cursorBlinkFlag=true;
+                        cursorBlinkCount=0;
+                        ldBaseSetHidden(kb,false);
+
+                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
+
+                        if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
+                        {
+                            ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                            ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
+                        }
+                        else
+                        {
+                            ldBaseMove(kb,0,0);
+                        }
                     }
                 }
+                pWidget->dirtyRegionState=waitChange;
+                pWidget->isDirtyRegionAutoIgnore=false;
             }
-            pWidget->dirtyRegionState=waitChange;
-            pWidget->isDirtyRegionAutoIgnore=false;
-        }
 
-        pWidget->timer=tempTimer;
+            pWidget->timer=tempTimer;
+        }
         break;
     }
     case SIGNAL_TOUCH_HOLD_MOVE:
@@ -453,10 +456,11 @@ static bool slotTableProcess(xConnectInfo_t info)
     {
         currentItem=ldTableCurrentItem(pWidget);
         _isStopMove=false;
-        if(!currentItem->isCheckable)
+        if((!currentItem->isCheckable)&&(currentItem->isButton))
         {
-            currentItem->isChecked=!currentItem->isChecked;
+            currentItem->isChecked=false;
         }
+
         break;
     }
     default:
@@ -572,6 +576,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].editType=typeString;
             pNewWidget->pItemInfo[i].textMax=0;
             pNewWidget->pItemInfo[i].pFontDict=pFontDict;
+            pNewWidget->pItemInfo[i].isEditable=true;
         }
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
@@ -635,8 +640,6 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         return;
     }
 
-
-
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
@@ -699,7 +702,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                 if((item->releaseImgAddr!=LD_ADDR_NONE)||(item->pressImgAddr!=LD_ADDR_NONE))
                 {
                     ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion=item->imgRegion;
+                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize=item->imgRegion.tSize;
 
                     arm_2d_tile_generate_child(&tItemTile, &item->imgRegion, &tImgTile, false);
 
@@ -720,9 +723,9 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                         if((item->isButton)&&(item->isChecked==true))
                         {
                             ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)item->pressImgAddr;
-    #if USE_VIRTUAL_RESOURCE == 1
+#if USE_VIRTUAL_RESOURCE == 1
                             tempRes.pTarget=item->pressImgAddr;
-    #endif
+#endif
                             ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,false,255);
                         }
                     }
@@ -737,6 +740,7 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #if LD_DEBUG == 1
                 arm_2d_draw_box(&tTarget,&tItemTile.tRegion,1,0,255);
 #endif
+                arm_2d_op_wait_async(NULL);
             }
         }
 #if LD_DEBUG == 1
@@ -846,6 +850,7 @@ void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint
         item->isStaticText=true;
         item->pText=pText;
         item->pFontDict=pFontDict;
+        item->isEditable=false;
     }
 }
 
@@ -947,6 +952,7 @@ void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x
         item->pressImgAddr=LD_ADDR_NONE;
         item->isButton=false;
         item->isSelectShow=false;
+        item->isEditable=false;
     }
 }
 
@@ -985,6 +991,7 @@ void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t 
         item->isButton=true;
         item->isCheckable=isCheckable;
         item->isSelectShow=false;
+        item->isEditable=false;
     }
 }
 
