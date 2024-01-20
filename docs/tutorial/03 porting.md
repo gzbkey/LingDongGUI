@@ -72,7 +72,7 @@
 
 7. 树目录中的Acceleration，找到arm_2d_cfg.h。
     
-    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth、width和height
+    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth
 
 9. main文件加入如下代码
     ```c 
@@ -123,10 +123,13 @@
 
 1. keil中选择Project -> Manage -> Run-Time Environment，Acceleration - Arm-2D Helper中，Scene设置为0
 
-2. arm_2d_disp_adapter_0.h中添加ldgui配置头文件
-    ```c
-    #include "ldConfig.h" 
-    ```
+2. arm_2d_disp_adapter_0.h修改
+    * 添加ldgui配置头文件
+        ```c
+        #include "ldConfig.h" 
+        ```
+    * 勾选Disable the default scene
+    * 勾选Disable the navigation layer
 
 3. ldConfig配置
 
