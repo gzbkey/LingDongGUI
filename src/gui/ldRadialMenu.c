@@ -592,11 +592,15 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
 
     if(pWidget->selectItem==num)
     {
         return;
+    }
+
+    for(uint8_t i=0;i<pWidget->itemCount;i++)
+    {
+        pWidget->pItemList[i].dirtyRegionState=waitChange;
     }
 
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
