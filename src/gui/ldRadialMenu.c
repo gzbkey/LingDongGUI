@@ -598,6 +598,8 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
         return;
     }
 
+    num=num%pWidget->itemCount;
+
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
         pWidget->pItemList[i].dirtyRegionState=waitChange;
