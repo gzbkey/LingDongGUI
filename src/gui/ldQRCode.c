@@ -24,8 +24,6 @@
 #include "ldQRCode.h"
 #include "ldGui.h"
 
-#if USE_QR_CODE == 1
-
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -302,6 +300,4 @@ void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText)
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
-#endif
-
 #endif
