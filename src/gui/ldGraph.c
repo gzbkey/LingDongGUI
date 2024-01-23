@@ -55,9 +55,9 @@ void ldGraphDel(ldGraph_t *pWidget);
 void ldGraphFrameUpdate(ldGraph_t* pWidget);
 void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldGraphCommonFunc={
-    ldGraphDel,
-    ldGraphLoop,
-    ldGraphFrameUpdate,
+    (ldDelFunc_t)ldGraphDel,
+    (ldLoopFunc_t)ldGraphLoop,
+    (ldUpdateFunc_t)ldGraphFrameUpdate,
 };
 
 static bool _graphDel(xListNode *pEachInfo, void *pTarget)

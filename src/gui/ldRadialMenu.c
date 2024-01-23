@@ -49,9 +49,9 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget);
 void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget);
 void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldRadialMenuCommonFunc={
-    ldRadialMenuDel,
-    ldRadialMenuLoop,
-    ldRadialMenuFrameUpdate,
+    (ldDelFunc_t)ldRadialMenuDel,
+    (ldLoopFunc_t)ldRadialMenuLoop,
+    (ldUpdateFunc_t)ldRadialMenuFrameUpdate,
 };
 
 static bool _radialMenuDel(xListNode *pEachInfo, void *pTarget)

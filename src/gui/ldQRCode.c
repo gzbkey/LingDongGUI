@@ -47,9 +47,9 @@ void ldQRCodeDel(ldQRCode_t *pWidget);
 void ldQRCodeFrameUpdate(ldQRCode_t* pWidget);
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldQRCodeCommonFunc={
-    ldQRCodeDel,
-    ldQRCodeLoop,
-    ldQRCodeFrameUpdate,
+    (ldDelFunc_t)ldQRCodeDel,
+    (ldLoopFunc_t)ldQRCodeLoop,
+    (ldUpdateFunc_t)ldQRCodeFrameUpdate,
 };
 
 static bool _QRCodeDel(xListNode *pEachInfo, void *pTarget)

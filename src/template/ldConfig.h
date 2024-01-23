@@ -62,10 +62,6 @@ extern "C" {
 
 #define USE_TLSF                                  1
 
-// <q>QRCode support
-// <i> Do not use QR code. Please turn off this option
-#define USE_QR_CODE                               0
-
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
 #define USE_RADIA_MENU_SCALE                      0

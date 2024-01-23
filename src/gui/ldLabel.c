@@ -44,9 +44,9 @@ void ldLabelDel(ldLabel_t *pWidget);
 void ldLabelFrameUpdate(ldLabel_t* pWidget);
 void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldLabelCommonFunc={
-    ldLabelDel,
-    ldLabelLoop,
-    ldLabelFrameUpdate,
+    (ldDelFunc_t)ldLabelDel,
+    (ldLoopFunc_t)ldLabelLoop,
+    (ldUpdateFunc_t)ldLabelFrameUpdate,
 };
 
 static bool _labelDel(xListNode *pEachInfo, void *pTarget)

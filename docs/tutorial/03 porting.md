@@ -7,17 +7,19 @@
 安装好MDK-ARM，这里使用的版本是5.38。建议使用最新版本
 
 ### 移植前的准备
- * 安装arm-2d的pack
+* 安装cmsis-dsp
+    * [下载](https://github.com/ARM-software/CMSIS-DSP/releases/)
+* 安装arm-2d的pack
     * [下载](https://github.com/ARM-software/Arm-2D/releases/)
- * 安装perf_counter的pack
+* 安装perf_counter的pack
     * [下载](https://github.com/GorgonMeducer/perf_counter/releases/)
- * 安装ldgui的pack
+* 安装ldgui的pack
     * [github下载](https://github.com/gzbkey/LingDongGUI/releases/)
     * [gitee下载](https://gitee.com/gzbkey/LingDongGUI/releases/)
- * 安装python,安装时注意勾选添加到系统环境变量的选项
+* 安装python,安装时注意勾选添加到系统环境变量的选项
     * [下载](https://www.python.org/downloads/)
- * 准备带屏幕的开发板，可以正常显示图片的keil项目(lcd_project)
- * 屏幕接口
+* 准备带屏幕的开发板，可以正常显示图片的keil项目(lcd_project)
+* 屏幕接口
     ```c 
     void Disp0_DrawBitmap (uint32_t x, 
                            uint32_t y, 
@@ -25,7 +27,7 @@
                            uint32_t height, 
                            const uint8_t *bitmap)
     ```
- * 下载ldgui源码
+* 下载ldgui源码
 
     🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
 
@@ -118,6 +120,11 @@
 10. 运行效果
 
     ![arm2d-demo](./images/03/arm2d%20demo.gif)
+
+|ℹ️ 出现Undefined symbol错误|
+|:----|
+|如果硬要勾选microLib，编译后，提示找不到__aeabi_h2f 、__aeabi_f2h，请升级编译器(安装新版本keil)|
+
 
 ### 加入ldgui
 

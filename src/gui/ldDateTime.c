@@ -44,9 +44,9 @@ void ldDateTimeDel(ldDateTime_t *pWidget);
 void ldDateTimeFrameUpdate(ldDateTime_t* pWidget);
 void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldDateTimeCommonFunc={
-    ldDateTimeDel,
-    ldDateTimeLoop,
-    ldDateTimeFrameUpdate,
+    (ldDelFunc_t)ldDateTimeDel,
+    (ldLoopFunc_t)ldDateTimeLoop,
+    (ldUpdateFunc_t)ldDateTimeFrameUpdate,
 };
 
 static bool _dateTimeDel(xListNode *pEachInfo, void *pTarget)

@@ -48,9 +48,9 @@ void ldTextDel(ldText_t *pWidget);
 void ldTextFrameUpdate(ldText_t* pWidget);
 void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldTextCommonFunc={
-    ldTextDel,
-    ldTextLoop,
-    ldTextFrameUpdate,
+    (ldDelFunc_t)ldTextDel,
+    (ldLoopFunc_t)ldTextLoop,
+    (ldUpdateFunc_t)ldTextFrameUpdate,
 };
 
 static bool _textDel(xListNode *pEachInfo, void *pTarget)

@@ -48,9 +48,9 @@ void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
 void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldScrollSelecterCommonFunc={
-    ldScrollSelecterDel,
-    ldScrollSelecterLoop,
-    ldScrollSelecterFrameUpdate,
+    (ldDelFunc_t)ldScrollSelecterDel,
+    (ldLoopFunc_t)ldScrollSelecterLoop,
+    (ldUpdateFunc_t)ldScrollSelecterFrameUpdate,
 };
 
 static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)

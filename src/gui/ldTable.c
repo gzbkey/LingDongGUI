@@ -45,9 +45,9 @@ void ldTableDel(ldTable_t *pWidget);
 void ldTableFrameUpdate(ldTable_t* pWidget);
 void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldTableCommonFunc={
-    ldTableDel,
-    ldTableLoop,
-    ldTableFrameUpdate,
+    (ldDelFunc_t)ldTableDel,
+    (ldLoopFunc_t)ldTableLoop,
+    (ldUpdateFunc_t)ldTableFrameUpdate,
 };
 
 static bool _tableDel(xListNode *pEachInfo, void *pTarget)
@@ -382,18 +382,18 @@ static bool slotTableProcess(xConnectInfo_t info)
                         kb->editorId=pWidget->nameId;
                         cursorBlinkFlag=true;
                         cursorBlinkCount=0;
-                        ldBaseSetHidden(kb,false);
+                        ldBaseSetHidden((ldCommon_t*)kb,false);
 
                         arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
 
                         if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
                         {
-                            ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                            ldBaseMove((ldCommon_t*)kb,0,LD_CFG_SCEEN_HEIGHT/2);
                             ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
                         }
                         else
                         {
-                            ldBaseMove(kb,0,0);
+                            ldBaseMove((ldCommon_t*)kb,0,0);
                         }
                     }
                 }

@@ -45,9 +45,9 @@ void ldProgressBarDel(ldProgressBar_t *pWidget);
 void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget);
 void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldProgressBarCommonFunc={
-    ldProgressBarDel,
-    ldProgressBarLoop,
-    ldProgressBarFrameUpdate,
+    (ldDelFunc_t)ldProgressBarDel,
+    (ldLoopFunc_t)ldProgressBarLoop,
+    (ldUpdateFunc_t)ldProgressBarFrameUpdate,
 };
 
 static bool _progressBarDel(xListNode *pEachInfo, void *pTarget)

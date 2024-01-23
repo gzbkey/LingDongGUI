@@ -61,9 +61,9 @@ void ldComboBoxDel(ldComboBox_t *pWidget);
 void ldComboBoxFrameUpdate(ldComboBox_t* pWidget);
 void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldComboBoxCommonFunc={
-    ldComboBoxDel,
-    ldComboBoxLoop,
-    ldComboBoxFrameUpdate,
+    (ldDelFunc_t)ldComboBoxDel,
+    (ldLoopFunc_t)ldComboBoxLoop,
+    (ldUpdateFunc_t)ldComboBoxFrameUpdate,
 };
 
 static bool _comboBoxDel(xListNode *pEachInfo, void *pTarget)

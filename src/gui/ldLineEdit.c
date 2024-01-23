@@ -46,9 +46,9 @@ void ldLineEditDel(ldLineEdit_t *pWidget);
 void ldLineEditFrameUpdate(ldLineEdit_t* pWidget);
 void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldLineEditCommonFunc={
-    ldLineEditDel,
-    ldLineEditLoop,
-    ldLineEditFrameUpdate,
+    (ldDelFunc_t)ldLineEditDel,
+    (ldLoopFunc_t)ldLineEditLoop,
+    (ldUpdateFunc_t)ldLineEditFrameUpdate,
 };
 
 static bool _lineEditDel(xListNode *pEachInfo, void *pTarget)
@@ -119,15 +119,15 @@ static bool slotLineEditProcess(xConnectInfo_t info)
                 kb->editorId=pWidget->nameId;
                 cursorBlinkFlag=true;
                 cursorBlinkCount=0;
-                ldBaseSetHidden(kb,false);
+                ldBaseSetHidden((ldCommon_t*)kb,false);
                 if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
                 {
-                    ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                    ldBaseMove((ldCommon_t*)kb,0,LD_CFG_SCEEN_HEIGHT/2);
                     ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
                 }
                 else
                 {
-                    ldBaseMove(kb,0,0);
+                    ldBaseMove((ldCommon_t*)kb,0,0);
                 }
             }
         }

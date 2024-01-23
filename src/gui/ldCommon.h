@@ -254,10 +254,14 @@ typedef enum{
     waitUpdate
 }ldDirtyRegionStateType_t;
 
+typedef void (*ldDelFunc_t)(void *);
+typedef void (*ldLoopFunc_t)(void *,void *,bool);
+typedef void (*ldUpdateFunc_t)(void *);
+
 typedef struct {
-    void (*del)(void *);
-    void (*loop)(void *,void *,bool);
-    void (*update)(void *);
+    ldDelFunc_t del;
+    ldLoopFunc_t loop;
+    ldUpdateFunc_t update;
 }ldGuiCommonFunc_t;
 
 #if USE_VIRTUAL_RESOURCE == 0

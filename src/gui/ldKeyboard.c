@@ -62,9 +62,9 @@ void ldKeyboardDel(ldKeyboard_t *pWidget);
 void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget);
 void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldKeyboardCommonFunc={
-    ldKeyboardDel,
-    ldKeyboardLoop,
-    ldKeyboardFrameUpdate,
+    (ldDelFunc_t)ldKeyboardDel,
+    (ldLoopFunc_t)ldKeyboardLoop,
+    (ldUpdateFunc_t)ldKeyboardFrameUpdate,
 };
 
 static bool _keyboardDel(xListNode *pEachInfo, void *pTarget)
@@ -1959,7 +1959,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_OTHER_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,"ABC",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t *)"ABC",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
                     item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
                     charBuf[0]='.';
@@ -1979,7 +1979,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }else{
                         btnColor=KB_ASCII_RELEASE_COLOR;
                     }
-                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,"Space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
+                    _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t *)"Space",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
                     item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE,0,KB_SPACE,0);
                     charBuf[0]='?';

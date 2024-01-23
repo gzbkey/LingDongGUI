@@ -50,9 +50,9 @@ void ldIconSliderDel(ldIconSlider_t *pWidget);
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget);
 void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldIconSliderCommonFunc={
-    ldIconSliderDel,
-    ldIconSliderLoop,
-    ldIconSliderFrameUpdate,
+    (ldDelFunc_t)ldIconSliderDel,
+    (ldLoopFunc_t)ldIconSliderLoop,
+    (ldUpdateFunc_t)ldIconSliderFrameUpdate,
 };
 
 static bool _iconSliderDel(xListNode *pEachInfo, void *pTarget)

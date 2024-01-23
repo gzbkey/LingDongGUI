@@ -147,9 +147,9 @@ void ldCheckBoxDel(ldCheckBox_t *pWidget);
 void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget);
 void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldCheckBoxCommonFunc={
-    ldCheckBoxDel,
-    ldCheckBoxLoop,
-    ldCheckBoxFrameUpdate,
+    (ldDelFunc_t)ldCheckBoxDel,
+    (ldLoopFunc_t)ldCheckBoxLoop,
+    (ldUpdateFunc_t)ldCheckBoxFrameUpdate,
 };
 
 static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)

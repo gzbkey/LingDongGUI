@@ -47,9 +47,9 @@ void ldGaugeDel(ldGauge_t *pWidget);
 void ldGaugeFrameUpdate(ldGauge_t* pWidget);
 void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldGaugeCommonFunc={
-    ldGaugeDel,
-    ldGaugeLoop,
-    ldGaugeFrameUpdate,
+    (ldDelFunc_t)ldGaugeDel,
+    (ldLoopFunc_t)ldGaugeLoop,
+    (ldUpdateFunc_t)ldGaugeFrameUpdate,
 };
 
 static bool _gaugeDel(xListNode *pEachInfo, void *pTarget)

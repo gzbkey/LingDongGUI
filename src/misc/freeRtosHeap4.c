@@ -87,6 +87,7 @@ task.h is included from an application file. */
 #include "freeRtosHeap4.h"
 #include "stdio.h"
 #include "ldConfig.h"
+#include "string.h"
 
 #ifndef LD_MEM_SIZE
 #define LD_MEM_SIZE                                 (1024)

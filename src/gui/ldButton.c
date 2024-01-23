@@ -47,9 +47,9 @@ void ldButtonDel(ldButton_t *pWidget);
 void ldButtonFrameUpdate(ldButton_t* pWidget);
 void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldButtonCommonFunc={
-    ldButtonDel,
-    ldButtonLoop,
-    ldButtonFrameUpdate,
+    (ldDelFunc_t)ldButtonDel,
+    (ldLoopFunc_t)ldButtonLoop,
+    (ldUpdateFunc_t)ldButtonFrameUpdate,
 };
 
 static bool _buttonDel(xListNode *pEachInfo, void *pTarget)

@@ -47,9 +47,9 @@ void ldArcDel(ldArc_t *pWidget);
 void ldArcFrameUpdate(ldArc_t* pWidget);
 void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldArcCommonFunc={
-    ldArcDel,
-    ldArcLoop,
-    ldArcFrameUpdate,
+    (ldDelFunc_t)ldArcDel,
+    (ldLoopFunc_t)ldArcLoop,
+    (ldUpdateFunc_t)ldArcFrameUpdate,
 };
 
 static bool _arcDel(xListNode *pEachInfo, void *pTarget)

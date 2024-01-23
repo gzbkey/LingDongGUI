@@ -46,9 +46,9 @@ void ldImageDel(ldImage_t *pWidget);
 void ldImageFrameUpdate(ldImage_t* pWidget);
 void ldImageLoop(ldImage_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldImageCommonFunc={
-    ldImageDel,
-    ldImageLoop,
-    ldImageFrameUpdate,
+    (ldDelFunc_t)ldImageDel,
+    (ldLoopFunc_t)ldImageLoop,
+    (ldUpdateFunc_t)ldImageFrameUpdate,
 };
 
 static bool _imageDel(xListNode *pEachInfo, void *pTarget)
