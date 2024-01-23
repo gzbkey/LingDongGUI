@@ -57,6 +57,15 @@ const uint8_t dropDownV_png[]={
 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x2D, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
+void ldComboBoxDel(ldComboBox_t *pWidget);
+void ldComboBoxFrameUpdate(ldComboBox_t* pWidget);
+void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldComboBoxCommonFunc={
+    ldComboBoxDel,
+    ldComboBoxLoop,
+    ldComboBoxFrameUpdate,
+};
+
 static bool _comboBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -241,6 +250,7 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldComboBoxCommonFunc;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);

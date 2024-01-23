@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "ldCommon.h"
+#include "ldGui.h"
 
 typedef struct {
     LD_COMMON_ATTRIBUTES;

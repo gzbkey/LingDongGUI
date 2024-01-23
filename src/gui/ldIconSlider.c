@@ -46,6 +46,15 @@
 #define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
 #define IMG_FONT_SPACE                 (1)           //图片和文字的间隔
 
+void ldIconSliderDel(ldIconSlider_t *pWidget);
+void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget);
+void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldIconSliderCommonFunc={
+    ldIconSliderDel,
+    ldIconSliderLoop,
+    ldIconSliderFrameUpdate,
+};
+
 static bool _iconSliderDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -465,6 +474,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldIconSliderCommonFunc;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);

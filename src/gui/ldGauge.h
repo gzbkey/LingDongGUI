@@ -23,8 +23,6 @@ extern "C" {
 
 #include "ldCommon.h"
 
-#if USE_GAUGE == 1
-
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isWithBgMask:1;
@@ -63,8 +61,6 @@ void ldGaugeSetPointerImageType(ldGauge_t *pWidget,gaugePointerType_t pointerImg
 
 #define ldGaugeSetHidden          ldBaseSetHidden
 #define ldGaugeMove               ldBaseMove
-
-#endif
 
 #ifdef __cplusplus
 }

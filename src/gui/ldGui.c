@@ -190,228 +190,7 @@ void ldGuiTouchProcess(void)
     ldGuiClickedAction(touchSignal,x,y);
 }
 
-
-void ldGuiDelWidget(ldCommon_t *pWidget)
-{
-    switch(pWidget->widgetType)
-    {
-    case widgetTypeBackground:
-    case widgetTypeWindow:
-    {
-        ldWindowDel((ldWindow_t*)pWidget);
-        break;
-    }
-    case widgetTypeImage:
-    {
-        ldImageDel((ldImage_t*)pWidget);
-        break;
-    }
-    case widgetTypeButton:
-    {
-        ldButtonDel((ldButton_t*)pWidget);
-        break;
-    }
-    case widgetTypeText:
-    {
-        ldTextDel((ldText_t*)pWidget);
-        break;
-    }
-    case widgetTypeProgressBar:
-    {
-        ldProgressBarDel((ldProgressBar_t*)pWidget);
-        break;
-    }
-    case widgetTypeRadialMenu:
-    {
-        ldRadialMenuDel((ldRadialMenu_t*)pWidget);
-        break;
-    }
-    case widgetTypeCheckBox:
-    {
-        ldCheckBoxDel((ldCheckBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeLabel:
-    {
-        ldLabelDel((ldLabel_t*)pWidget);
-        break;
-    }
-    case widgetTypeScrollSelecter:
-    {
-        ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
-        break;
-    }
-    case widgetTypeDateTime:
-    {
-        ldDateTimeDel((ldDateTime_t*)pWidget);
-        break;
-    }
-    case widgetTypeIconSlider:
-    {
-        ldIconSliderDel((ldIconSlider_t*)pWidget);
-        break;
-    }
-    case widgetTypeGauge:
-    {
-#if USE_GAUGE == 1
-        ldGaugeDel((ldGauge_t*)pWidget);
-#endif
-        break;
-    }
-    case widgetTypeQRCode:
-    {
-#if USE_QR_CODE == 1
-        ldQRCodeDel((ldQRCode_t*)pWidget);
-#endif
-        break;
-    }
-    case widgetTypeTable:
-    {
-        ldTableDel((ldTable_t*)pWidget);
-        break;
-    }
-    case widgetTypeKeyboard:
-    {
-        ldKeyboardDel((ldKeyboard_t*)pWidget);
-        break;
-    }
-    case widgetTypeLineEdit:
-    {
-        ldLineEditDel((ldLineEdit_t*)pWidget);
-        break;
-    }
-    case widgetTypeGraph:
-    {
-        ldGraphDel((ldGraph_t*)pWidget);
-        break;
-    }
-    case widgetTypeComboBox:
-    {
-        ldComboBoxDel((ldComboBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeArc:
-    {
-#if USE_ARC == 1
-        ldArcDel((ldArc_t*)pWidget);
-#endif
-        break;
-    }
-/*============================ auto add del ==================================*/
-    default:
-        break;
-    }
-}
-
-static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
-{
-    switch(pWidget->widgetType)
-    {
-    case widgetTypeBackground:
-    case widgetTypeWindow:
-    case widgetTypeImage:
-    {
-        ldImageLoop((ldImage_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeButton:
-    {
-        ldButtonLoop((ldButton_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeText:
-    {
-        ldTextLoop((ldText_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeProgressBar:
-    {
-        ldProgressBarLoop((ldProgressBar_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeRadialMenu:
-    {
-        ldRadialMenuLoop((ldRadialMenu_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeCheckBox:
-    {
-        ldCheckBoxLoop((ldCheckBox_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeLabel:
-    {
-        ldLabelLoop((ldLabel_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeScrollSelecter:
-    {
-        ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeDateTime:
-    {
-        ldDateTimeLoop((ldDateTime_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeIconSlider:
-    {
-        ldIconSliderLoop((ldIconSlider_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeGauge:
-    {
-#if USE_GAUGE == 1
-        ldGaugeLoop((ldGauge_t*)pWidget,ptParent,bIsNewFrame);
-#endif
-        break;
-    }
-    case widgetTypeQRCode:
-    {
-#if USE_QR_CODE == 1
-        ldQRCodeLoop((ldQRCode_t*)pWidget,ptParent,bIsNewFrame);
-#endif
-        break;
-    }
-    case widgetTypeTable:
-    {
-        ldTableLoop((ldTable_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeKeyboard:
-    {
-        ldKeyboardLoop((ldKeyboard_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeLineEdit:
-    {
-        ldLineEditLoop((ldLineEdit_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeGraph:
-    {
-        ldGraphLoop((ldGraph_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeComboBox:
-    {
-        ldComboBoxLoop((ldComboBox_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeArc:
-    {
-#if USE_ARC == 1
-        ldArcLoop((ldArc_t*)pWidget,ptParent,bIsNewFrame);
-#endif
-        break;
-    }
-/*============================ auto add loop =================================*/
-    default:
-        break;
-    }
-}
-
-static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
+static void _ldGuiLoop(xListNode* pLink,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
     xListNode *temp_pos,*safePos;
 
@@ -419,7 +198,7 @@ static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNe
     {
         if(temp_pos->info!=NULL)
         {
-            _widgetLoop(temp_pos->info,ptParent,bIsNewFrame);
+            (((ldCommon_t *)temp_pos->info)->pFunc)->loop(temp_pos->info,ptParent,bIsNewFrame);
             
             if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {
@@ -476,115 +255,6 @@ void ldGuiInit(arm_2d_scene_t *pSence)
 #endif
 }
 
-
-static void _frameUpdate(ldCommon_t *pWidget)
-{
-    switch(pWidget->widgetType)
-    {
-    case widgetTypeBackground:
-    case widgetTypeWindow:
-    case widgetTypeImage:
-    {
-        ldImageFrameUpdate((ldImage_t*)pWidget);
-        break;
-    }
-    case widgetTypeButton:
-    {
-        ldButtonFrameUpdate((ldButton_t*)pWidget);
-        break;
-    }
-    case widgetTypeText:
-    {
-        ldTextFrameUpdate((ldText_t*)pWidget);
-        break;
-    }
-    case widgetTypeProgressBar:
-    {
-        ldProgressBarFrameUpdate((ldProgressBar_t*)pWidget);
-        break;
-    }
-    case widgetTypeRadialMenu:
-    {
-        ldRadialMenuFrameUpdate((ldRadialMenu_t*)pWidget);
-        break;
-    }
-    case widgetTypeCheckBox:
-    {
-        ldCheckBoxFrameUpdate((ldCheckBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeLabel:
-    {
-        ldLabelFrameUpdate((ldLabel_t*)pWidget);
-        break;
-    }
-    case widgetTypeScrollSelecter:
-    {
-        ldScrollSelecterFrameUpdate((ldScrollSelecter_t*)pWidget);
-        break;
-    }
-    case widgetTypeDateTime:
-    {
-        ldDateTimeFrameUpdate((ldDateTime_t*)pWidget);
-        break;
-    }
-    case widgetTypeIconSlider:
-    {
-        ldIconSliderFrameUpdate((ldIconSlider_t*)pWidget);
-        break;
-    }
-    case widgetTypeGauge:
-    {
-#if USE_GAUGE == 1
-        ldGaugeFrameUpdate((ldGauge_t*)pWidget);
-#endif
-        break;
-    }
-    case widgetTypeQRCode:
-    {
-#if USE_QR_CODE == 1
-        ldQRCodeFrameUpdate((ldQRCode_t*)pWidget);
-#endif
-        break;
-    }
-    case widgetTypeTable:
-    {
-        ldTableFrameUpdate((ldTable_t*)pWidget);
-        break;
-    }
-    case widgetTypeKeyboard:
-    {
-        ldKeyboardFrameUpdate((ldKeyboard_t*)pWidget);
-        break;
-    }
-    case widgetTypeLineEdit:
-    {
-        ldLineEditFrameUpdate((ldLineEdit_t*)pWidget);
-        break;
-    }
-    case widgetTypeGraph:
-    {
-        ldGraphFrameUpdate((ldGraph_t*)pWidget);
-        break;
-    }
-    case widgetTypeComboBox:
-    {
-        ldComboBoxFrameUpdate((ldComboBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeArc:
-    {
-#if USE_ARC == 1
-        ldArcFrameUpdate((ldArc_t*)pWidget);
-#endif
-        break;
-    }
-/*============================ auto add start =================================*/
-    default:
-        break;
-    }
-}
-
 static void _ldGuiFrameUpdate(xListNode* pLink)
 {
     xListNode *temp_pos,*safePos;
@@ -593,7 +263,8 @@ static void _ldGuiFrameUpdate(xListNode* pLink)
     {
         if(temp_pos->info!=NULL)
         {
-            _frameUpdate((ldCommon_t *)temp_pos->info);
+            (((ldCommon_t *)temp_pos->info)->pFunc)->update(temp_pos->info);
+//            _frameUpdate((ldCommon_t *)temp_pos->info);
 
             if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {
@@ -651,6 +322,7 @@ void ldGuiLogicLoop(void)
  */
 void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
+    (void*)pSence;
     //遍历控件
     _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
 }

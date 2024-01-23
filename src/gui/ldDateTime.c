@@ -40,6 +40,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldDateTimeDel(ldDateTime_t *pWidget);
+void ldDateTimeFrameUpdate(ldDateTime_t* pWidget);
+void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldDateTimeCommonFunc={
+    ldDateTimeDel,
+    ldDateTimeLoop,
+    ldDateTimeFrameUpdate,
+};
+
 static bool _dateTimeDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -150,6 +159,7 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldDateTimeCommonFunc;
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }

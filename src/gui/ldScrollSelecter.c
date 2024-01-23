@@ -44,6 +44,15 @@
 #define MOVE_SPEED_THRESHOLD_VALUE     (20)          //触摸移动速度超过此值，则产生惯性滑动效果
 #define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
 
+void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
+void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
+void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldScrollSelecterCommonFunc={
+    ldScrollSelecterDel,
+    ldScrollSelecterLoop,
+    ldScrollSelecterFrameUpdate,
+};
+
 static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -244,6 +253,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);

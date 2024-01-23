@@ -58,6 +58,15 @@
 
 static ldColor _shiftColor[3]={LD_COLOR_WHITE,LD_COLOR_BLACK,LD_COLOR_BLUE};
 
+void ldKeyboardDel(ldKeyboard_t *pWidget);
+void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget);
+void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldKeyboardCommonFunc={
+    ldKeyboardDel,
+    ldKeyboardLoop,
+    ldKeyboardFrameUpdate,
+};
+
 static bool _keyboardDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -950,6 +959,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->isWaitInit=true;
         pNewWidget->isSymbol=false;
+        pNewWidget->pFunc=&ldKeyboardCommonFunc;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);

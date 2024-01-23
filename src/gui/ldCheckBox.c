@@ -143,6 +143,15 @@ struct {
     uint8_t group;
 }radioButtonValue;
 
+void ldCheckBoxDel(ldCheckBox_t *pWidget);
+void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget);
+void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldCheckBoxCommonFunc={
+    ldCheckBoxDel,
+    ldCheckBoxLoop,
+    ldCheckBoxFrameUpdate,
+};
+
 static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -276,6 +285,7 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldCheckBoxCommonFunc;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 

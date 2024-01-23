@@ -41,6 +41,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldTableDel(ldTable_t *pWidget);
+void ldTableFrameUpdate(ldTable_t* pWidget);
+void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldTableCommonFunc={
+    ldTableDel,
+    ldTableLoop,
+    ldTableFrameUpdate,
+};
+
 static bool _tableDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -585,7 +594,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
-
+        pNewWidget->pFunc=&ldTableCommonFunc;
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
 

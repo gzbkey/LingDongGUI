@@ -66,23 +66,9 @@ extern "C" {
 // <i> Do not use QR code. Please turn off this option
 #define USE_QR_CODE                               0
 
-// <q>Widget transform support
-// <i> Do not use radia menu,arc,gauge. Please turn off this option
-#define USE_TRANSFORM                             0
-#if USE_TRANSFORM == 1
-
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
 #define USE_RADIA_MENU_SCALE                      0
-
-// <q>Arc support
-// <i> Arc support
-#define USE_ARC                                   0
-
-// <q>Gauge support
-// <i> Gauge support
-#define USE_GAUGE                                 0
-#endif
 
 // debug config
 
@@ -101,11 +87,6 @@ extern "C" {
 // <<< end of configuration section >>>
 
 // do not eidt below
-#if USE_TRANSFORM == 0
-#define USE_RADIA_MENU_SCALE                      0
-#define USE_ARC                                   0
-#define USE_GAUGE                                 0
-#endif
 
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH

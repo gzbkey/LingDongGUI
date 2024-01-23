@@ -26,8 +26,6 @@
 #include "ldGui.h"
 #include "ldWindow.h"
 
-#if USE_ARC == 1
-
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -44,6 +42,15 @@
 #pragma clang diagnostic ignored "-Wmissing-declarations"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
+
+void ldArcDel(ldArc_t *pWidget);
+void ldArcFrameUpdate(ldArc_t* pWidget);
+void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldArcCommonFunc={
+    ldArcDel,
+    ldArcLoop,
+    ldArcFrameUpdate,
+};
 
 static bool _arcDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -168,6 +175,7 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         pNewWidget->startAngle_x10[1]=0;
         pNewWidget->endAngle_x10[1]=1800;
         pNewWidget->rotationAngle_x10=0;
+        pNewWidget->pFunc=&ldArcCommonFunc;
 
         LOG_INFO("[arc] init,id:%d\n",nameId);
     }
@@ -537,6 +545,3 @@ void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor)
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
-
-#endif
-

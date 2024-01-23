@@ -42,6 +42,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldImageDel(ldImage_t *pWidget);
+void ldImageFrameUpdate(ldImage_t* pWidget);
+void ldImageLoop(ldImage_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldImageCommonFunc={
+    ldImageDel,
+    ldImageLoop,
+    ldImageFrameUpdate,
+};
+
 static bool _imageDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -165,6 +174,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldImageCommonFunc;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }

@@ -41,6 +41,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldProgressBarDel(ldProgressBar_t *pWidget);
+void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget);
+void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldProgressBarCommonFunc={
+    ldProgressBarDel,
+    ldProgressBarLoop,
+    ldProgressBarFrameUpdate,
+};
+
 static bool _progressBarDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -145,8 +154,8 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
-
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
+        pNewWidget->pFunc=&ldProgressBarCommonFunc;
 
         LOG_INFO("[progressBar] init,id:%d\n",nameId);
     }

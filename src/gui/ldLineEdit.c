@@ -42,6 +42,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldLineEditDel(ldLineEdit_t *pWidget);
+void ldLineEditFrameUpdate(ldLineEdit_t* pWidget);
+void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldLineEditCommonFunc={
+    ldLineEditDel,
+    ldLineEditLoop,
+    ldLineEditFrameUpdate,
+};
+
 static bool _lineEditDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -201,6 +210,7 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->kbNameId=0;
+        pNewWidget->pFunc=&ldLineEditCommonFunc;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
         xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);

@@ -24,8 +24,6 @@
 #include "ldGauge.h"
 #include "ldGui.h"
 
-#if USE_GAUGE == 1
-
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -44,6 +42,15 @@
 #endif
 
 #define ANGLE_OFFSET       180 //调整指针起始位置
+
+void ldGaugeDel(ldGauge_t *pWidget);
+void ldGaugeFrameUpdate(ldGauge_t* pWidget);
+void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldGaugeCommonFunc={
+    ldGaugeDel,
+    ldGaugeLoop,
+    ldGaugeFrameUpdate,
+};
 
 static bool _gaugeDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -153,6 +160,7 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->pFunc=&ldGaugeCommonFunc;
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -427,6 +435,3 @@ void ldGaugeSetPointerImageType(ldGauge_t *pWidget,gaugePointerType_t pointerImg
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
-
-#endif
-

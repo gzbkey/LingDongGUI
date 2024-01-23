@@ -42,9 +42,18 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldWindowDel(ldWindow_t *pWidget);
+void ldImageFrameUpdate(ldWindow_t* pWidget);
+void ldImageLoop(ldWindow_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldWindowCommonFunc={
+    ldWindowDel,
+    ldImageLoop,
+    ldImageFrameUpdate,
+};
+
 static bool _windowDel(xListNode* pEachInfo,void* pTarget)
 {
-    ldGuiDelWidget(pEachInfo->info);
+    ((ldCommon_t*)pEachInfo->info)->pFunc->del(pEachInfo->info);
     return false;
 }
 
@@ -105,6 +114,7 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
                 pNewWidget->isTransparent=true;
                 pNewWidget->widgetType=widgetTypeWindow;
             }
+            pNewWidget->pFunc=&ldWindowCommonFunc;
 
             LOG_INFO("[window] init,id:%d\n",nameId);
         }

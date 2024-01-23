@@ -43,6 +43,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldQRCodeDel(ldQRCode_t *pWidget);
+void ldQRCodeFrameUpdate(ldQRCode_t* pWidget);
+void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldQRCodeCommonFunc={
+    ldQRCodeDel,
+    ldQRCodeLoop,
+    ldQRCodeFrameUpdate,
+};
+
 static bool _QRCodeDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -159,6 +168,7 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldQRCodeCommonFunc;
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }

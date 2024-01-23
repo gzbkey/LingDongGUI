@@ -42,6 +42,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldTemplateDel(ldTemplate_t *pWidget);
+void ldTemplateFrameUpdate(ldTemplate_t* pWidget);
+void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldTemplateCommonFunc={
+    ldTemplateDel,
+    ldTemplateLoop,
+    ldTemplateFrameUpdate,
+};
+
 static bool _templateDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -135,6 +144,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldTemplateCommonFunc;
 
         // add user init
 

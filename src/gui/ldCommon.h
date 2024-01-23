@@ -224,7 +224,7 @@ extern "C" {
 #define LD_COLOR_BLACK __RGB(0, 0, 0)                        // 纯黑
 
 typedef enum{
-    widgetTypeNone,
+//    widgetTypeNone,
     widgetTypeBackground,
     widgetTypeWindow,
     widgetTypeButton,
@@ -254,8 +254,15 @@ typedef enum{
     waitUpdate
 }ldDirtyRegionStateType_t;
 
+typedef struct {
+    void (*del)(void *);
+    void (*loop)(void *,void *,bool);
+    void (*update)(void *);
+}ldGuiCommonFunc_t;
+
 #if USE_VIRTUAL_RESOURCE == 0
-#define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
+#define LD_COMMON_ATTRIBUTES  const ldGuiCommonFunc_t *pFunc; \
+                              arm_2d_tile_t resource; \
                               ldWidgetType_t widgetType; \
                               void * parentWidget; \
                               xListNode *childList; \
@@ -297,7 +304,8 @@ typedef struct{
     uint8_t align:4;
 }ldChar_t;
 #else
-#define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
+#define LD_COMMON_ATTRIBUTES  const ldGuiCommonFunc_t *pFunc; \
+                              arm_2d_vres_t resource; \
                               ldWidgetType_t widgetType; \
                               void * parentWidget; \
                               xListNode *childList; \
@@ -348,11 +356,6 @@ typedef struct{
     int16_t x;
     int16_t y;
 }ldPoint_t;
-
-typedef struct{
-    int16_t width;
-    int16_t height;
-}ldSize_t;
 
 typedef enum{
     typeString,

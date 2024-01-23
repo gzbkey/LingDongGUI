@@ -40,6 +40,15 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldLabelDel(ldLabel_t *pWidget);
+void ldLabelFrameUpdate(ldLabel_t* pWidget);
+void ldLabelLoop(ldLabel_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldLabelCommonFunc={
+    ldLabelDel,
+    ldLabelLoop,
+    ldLabelFrameUpdate,
+};
+
 static bool _labelDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -146,6 +155,7 @@ ldLabel_t *ldLabelInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldLabelCommonFunc;
 
         LOG_INFO("[label] init,id:%d\n",nameId);
     }

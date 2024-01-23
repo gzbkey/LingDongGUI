@@ -44,6 +44,15 @@
 static int16_t _pressY,_scrollOffset;
 static bool _isTopScroll=false,_isBottomScroll=false;
 
+void ldTextDel(ldText_t *pWidget);
+void ldTextFrameUpdate(ldText_t* pWidget);
+void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldTextCommonFunc={
+    ldTextDel,
+    ldTextLoop,
+    ldTextFrameUpdate,
+};
+
 static bool _textDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -152,6 +161,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->pFunc=&ldTextCommonFunc;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }

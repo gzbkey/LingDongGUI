@@ -45,6 +45,15 @@
 #define MOVE_CYCLE_MS            0
 #define SKIP_ANGLE               5
 
+void ldRadialMenuDel(ldRadialMenu_t *pWidget);
+void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget);
+void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldRadialMenuCommonFunc={
+    ldRadialMenuDel,
+    ldRadialMenuLoop,
+    ldRadialMenuFrameUpdate,
+};
+
 static bool _radialMenuDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -263,6 +272,7 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->pFunc=&ldRadialMenuCommonFunc;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);

@@ -51,6 +51,15 @@ const static uint8_t graphDefalutDot_png[]={
     0x00, 0x63, 0x7F, 0x63, 0x00
 };
 
+void ldGraphDel(ldGraph_t *pWidget);
+void ldGraphFrameUpdate(ldGraph_t* pWidget);
+void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldGraphCommonFunc={
+    ldGraphDel,
+    ldGraphLoop,
+    ldGraphFrameUpdate,
+};
+
 static bool _graphDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -164,6 +173,7 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldGraphCommonFunc;
 
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
         ldGraphSetGridOffset(pNewWidget,5);
