@@ -72,7 +72,7 @@ void uiDemoInit(uint8_t page)
 
     timer=0;
     tempValue=0;
-
+LOG_DEBUG("before ========================== %d\n",xFreeBytesRemaining);
     switch (page)
     {
     case 0:
@@ -92,7 +92,7 @@ void uiDemoInit(uint8_t page)
         ldDateTimeSetDate(obj,2024,1,15);
         ldDateTimeSetTextColor(obj,LD_COLOR_DARK_BLUE);
 
-        ldQRCodeInit(ID_QR_CODE,ID_BG,205,70,100,100,(uint8_t*)"https://gitee.com/gzbkey/LingDongGUI",LD_COLOR_LIGHT_BLUE,LD_COLOR_WHITE,eccLow,7,2);
+//        ldQRCodeInit(ID_QR_CODE,ID_BG,205,70,100,100,(uint8_t*)"https://gitee.com/gzbkey/LingDongGUI",LD_COLOR_LIGHT_BLUE,LD_COLOR_DARK_MAGENTA,eccLow,7,2);
 
 
         obj=ldLabelInit(ID_LABEL_INFO,ID_BG,200,160,100,20,SIMSUN_REGULAR_12);
@@ -201,28 +201,140 @@ void uiDemoInit(uint8_t page)
         ldTableSetItemButton(pTable,1,1,20,5,52,52,ICON_BMP,BBG_BMP,false);
         break;
     }
+    case 4:
+    {
+        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+
+        obj=ldButtonInit(ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
+        ldButtonSetRoundCorner(obj,true);
+        ldButtonSetFont(obj,SIMSUN_REGULAR_12);
+        ldButtonSetText(obj,(uint8_t*)"return");
+        xConnect(ID_BUTTON,SIGNAL_RELEASE,ID_BG,slotJumpPage0);
+
+        obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_BG,10,40,300,200,220,100,5);
+
+        ldRadialMenuAddItem(obj,ICON_BMP,52,52,0,false);
+        ldRadialMenuAddItem(obj,BBG_BMP,52,52,0,false);
+        ldRadialMenuAddItem(obj,ICON_BMP,52,52,0,false);
+        ldRadialMenuAddItem(obj,BBG_BMP,52,52,0,false);
+        ldRadialMenuAddItem(obj,ICON_BMP,52,52,0,false);
+//        ldRadialMenuAddItem(obj,BBG_BMP,52,52,0,false);
+
+
+        break;
+    }
+    case 5:
+    {
+        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        ldWindowSetBgColor(obj,LD_COLOR_LAVENDER_BLUSH);
+
+        obj=ldButtonInit(ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
+        ldButtonSetRoundCorner(obj,true);
+        ldButtonSetFont(obj,SIMSUN_REGULAR_12);
+        ldButtonSetText(obj,(uint8_t*)"return");
+        xConnect(ID_BUTTON,SIGNAL_RELEASE,ID_BG,slotJumpPage0);
+
+        obj=ldGraphInit(ID_GRAPH,ID_BG,10,20,120,120,2);
+        ldGraphSetAxis(obj,100,100,10);
+        ldGraphAddSeries(obj,LD_COLOR_DARK_BLUE,1,10);
+        ldGraphSetValue(obj,0,0,10);
+        ldGraphSetValue(obj,0,1,50);
+        ldGraphSetValue(obj,0,2,80);
+        ldGraphSetValue(obj,0,3,60);
+        ldGraphSetValue(obj,0,4,10);
+        ldGraphSetValue(obj,0,5,70);
+        ldGraphSetValue(obj,0,6,85);
+        ldGraphSetValue(obj,0,7,72);
+        ldGraphSetValue(obj,0,8,95);
+        ldGraphSetValue(obj,0,9,50);
+
+        ldGraphAddSeries(obj,LD_COLOR_CYAN,5,10);
+        ldGraphSetValue(obj,1,0,30);
+        ldGraphSetValue(obj,1,1,20);
+        ldGraphSetValue(obj,1,2,50);
+        ldGraphSetValue(obj,1,3,40);
+        ldGraphSetValue(obj,1,4,60);
+        ldGraphSetValue(obj,1,5,50);
+        ldGraphSetValue(obj,1,6,55);
+        ldGraphSetValue(obj,1,7,12);
+        ldGraphSetValue(obj,1,8,45);
+        ldGraphSetValue(obj,1,9,30);
+
+        obj=ldArcInit(ID_ARC,ID_BG,160,40,100,100,ARC51_PNG,ARC51_PNG,LD_COLOR_BLUE);
+
+        ldArcSetBgAngle(obj,30,330);
+        ldArcSetFgAngle(obj,270);
+
+        break;
+    }
     default:
         break;
     }
-
+LOG_DEBUG("after ========================== %d\n",xFreeBytesRemaining);
 }
 
+#define BTN_ID_POW 0
+#define BTN_ID_KNOB 1
+
+int8_t page=0;
+uint8_t counter=0;
+int64_t p5Timer=0;
+float arcAngle=0;
 void uiDemoLoop(uint8_t page)
 {
-//    switch (page) {
-//    case 0:
-////        if(ldTimeOut(100,&timer,true))
-////        {
-////            tempValue++;
-////            ldLabelSetText(ldBaseGetWidgetById(ID_LABEL_TEMP_VALUE),xI32ToStr(tempValue,tempBuf));
-////            if(tempValue>=100)
-////            {
-////                tempValue=-99;
-////            }
-////        }
-//        break;
-//    default:
-//        break;
+//    if(ldTimeOut(5000,&timer,true))
+////    if(xBtnGetState(BTN_ID_POW,BTN_PRESS))
+//    {
+//        if(page==4)
+//        {
+//            if(counter<4)
+//            {
+//                counter++;
+//                ldRadialMenuSelectItem(ldBaseGetWidgetById(ID_RADIAL_MENU),counter+1);
+//            }
+//            else
+//            {
+//                counter=0;
+//                page++;
+//                ldGuiJumpPage(page);
+//            }
+//        }
+//        else
+//        {
+//            page++;
+//            if(page>=5)
+//            {
+//                page=0;
+//            }
+//        ldGuiJumpPage(page);
+//        }
+
+
+
+
+//    }
+
+//    if(page==5)
+//    {
+//        if(ldTimeOut(10,&p5Timer,true))
+//        {
+//            ldArcSetRotationAngle(ldBaseGetWidgetById(ID_ARC),arcAngle++);
+//        }
+//    }
+//    else
+//    {
+//        p5Timer=0;
+//    }
+//    if(xBtnGetState(BTN_ID_POW,BTN_PRESS))
+//    {
+//        page--;
+//        if(page<0)
+//        {
+//            page=3;
+//        }
+//         ldGuiJumpPage(page);
+//
+//
 //    }
 }
 

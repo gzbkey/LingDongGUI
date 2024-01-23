@@ -35,7 +35,7 @@ extern "C" {
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
-#define LD_CFG_PFB_HEIGHT                         (48)
+#define LD_CFG_PFB_HEIGHT                         (32)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
@@ -43,7 +43,7 @@ extern "C" {
 
 // <o>Number of project pages
 // <i> Maximum number of pages
-#define LD_PAGE_MAX                               (2)
+#define LD_PAGE_MAX                               (1)
 
 // <q>Dirty Region Function
 // <i> It is recommended to enable this option for applications that do not refresh full screen
@@ -62,27 +62,9 @@ extern "C" {
 
 #define USE_TLSF                                  1
 
-// <q>QRCode support
-// <i> Do not use QR code. Please turn off this option
-#define USE_QRCode                                0
-
-// <q>Widget transform support
-// <i> Do not use radia menu,arc,gauge. Please turn off this option
-#define USE_TRANSFORM                             0
-#if USE_TRANSFORM == 1
-
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      0
-
-// <q>Arc support
-// <i> Arc support
-#define USE_ARC                                   0
-
-// <q>Gauge support
-// <i> Gauge support
-#define USE_GAUGE                                 0
-#endif
+#define USE_RADIA_MENU_SCALE                      1
 
 // debug config
 
@@ -101,11 +83,6 @@ extern "C" {
 // <<< end of configuration section >>>
 
 // do not eidt below
-#if USE_TRANSFORM == 0
-#define USE_RADIA_MENU_SCALE                      0
-#define USE_ARC                                   0
-#define USE_GAUGE                                 0
-#endif
 
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH

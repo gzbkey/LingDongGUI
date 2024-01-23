@@ -71,13 +71,13 @@ extern "C" {
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           160
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           320
 #endif
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          8
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          240
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -137,7 +137,7 @@ extern "C" {
 // <q> Enable Dirty Region Optimization Service
 // <i> Optimize dirty regions to avoid fresh overlapped areas
 #ifndef __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__
-#   define __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__                    0
+#   define __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__                    1
 #endif
 
 // <o> Dirty Region Pool Size <4-255>
@@ -173,7 +173,7 @@ extern "C" {
 // <q>Disable the navigation layer
 // <i> Remove the navigation layer for this display adapter. NOTE: Disable the navigation layer will also remove the real-time FPS display.
 #ifndef __DISP0_CFG_DISABLE_NAVIGATION_LAYER__
-#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  0
+#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  1
 #endif
 
 // <q>Enable the virtual resource helper service

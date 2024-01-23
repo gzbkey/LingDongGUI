@@ -23,7 +23,6 @@
 
 #include "RTE_Components.h"
 
-
 #ifdef   __cplusplus
 extern "C" {
 #endif
@@ -48,7 +47,7 @@ extern "C" {
 // <i> Note that enabling this feature suffers a non-negligible performance drop.
 // <i> This feature is disabled by default.
 #ifndef __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__
-#   define __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__                      1
+#   define __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__                      0
 #endif
 
 // <q>Enable support for accessing individual colour channels
@@ -94,6 +93,7 @@ extern "C" {
             |   ARM_2D_LOG_CHN_HELPER_PFB                                       \
             |   ARM_2D_LOG_CHN_SCENE_PLAYER                                     \
             |   ARM_2D_LOG_CHN_DIRTY_REGION_OPTIMISATION                        \
+            |   ARM_2D_LOG_CHN_STATISTICS                                       \
             |   ARM_2D_LOG_CHN_APP)
 #endif
 // </h>

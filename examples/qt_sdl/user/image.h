@@ -82,6 +82,12 @@ extern const uint8_t release_bmp[];
 #define SIMSUN_REGULAR_12 (&dict_SimSun_Regular_12)
 extern ldFontDict_t dict_SimSun_Regular_12;
 
+//arc51.png w:51 h:51 < A8 >
+#if USE_VIRTUAL_RESOURCE == 0
+extern const uint8_t arc51_png[];
+#define ARC51_PNG (uint32_t)&arc51_png[0]
+#endif
+
 #ifdef __cplusplus
 }
 #endif

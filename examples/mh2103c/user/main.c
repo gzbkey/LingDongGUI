@@ -75,6 +75,14 @@ uint16_t id=0;
 uint8_t rbuf[20]={0};
 uint8_t wbuf[20]={11,12,13,4,5,6,7,8,9,10};
 
+#define BTN_ID_POW 0
+#define BTN_ID_KNOB 1
+
+bool getBtnState(uint16_t id)
+{
+    return knobKeyRead(id);
+}
+
 int main(void)
 {
 	RCC_ClocksTypeDef clocks;
@@ -91,22 +99,25 @@ int main(void)
     st7789v_init();
     st7789v_clear(0xff);
     ST7789V_BG_ON;
-    
-    knobInit();
-    state=knobKeyRead(1);
-        state2=knobKeyRead(0);
+//    
+//    knobInit();
+//    state=knobKeyRead(1);
+//        state2=knobKeyRead(0);
     
     w25qxxInit();
     
     id=w25qxxReadID();
     
-    w25qxxEraseBlock64k(0);
-    
-    w25qxxRead(rbuf,0,10);
-    
-    W25QXX_Write_NoCheck(wbuf,0,10);
-    
-    w25qxxRead(rbuf,0,10);
+//    w25qxxEraseBlock64k(0);
+//    
+//    w25qxxRead(rbuf,0,10);
+//    
+//    W25QXX_Write_NoCheck(wbuf,0,10);
+//    
+//    w25qxxRead(rbuf,0,10);
+
+//    xBtnInit(BTN_ID_POW,getBtnState);
+//    xBtnInit(BTN_ID_KNOB,getBtnState);
 
     LD_ADD_PAGE(uiDemo);
 
@@ -120,10 +131,10 @@ int main(void)
 
     while(1)
     {
-        state=knobKeyRead(1);
-        delay_ms(1);
-        state2=knobKeyRead(0);
-        delay_ms(1);
+//        state=knobKeyRead(1);
+//        delay_ms(1);
+//        state2=knobKeyRead(0);
+//        delay_ms(1);
         disp_adapter0_task();
     }
 }

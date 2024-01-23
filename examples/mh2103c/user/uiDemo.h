@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "ldGui.h"
+#include "image.h"
 
 void uiDemoInit(uint8_t page);
 void uiDemoLoop(uint8_t page);

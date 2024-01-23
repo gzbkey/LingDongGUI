@@ -10,37 +10,37 @@ void knobGpioInit(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     
-//    GPIO_InitStructure.GPIO_Pin = KNOB_DIR_PIN;
-//    GPIO_Init(KNOB_DIR_GPIO, &GPIO_InitStructure);
-//    
-//    GPIO_InitStructure.GPIO_Pin = KNOB_INT_PIN;
-//    GPIO_Init(KNOB_INT_GPIO, &GPIO_InitStructure);
-    
     GPIO_InitStructure.GPIO_Pin = KNOB_KEY_PIN;
     GPIO_Init(KNOB_KEY_GPIO, &GPIO_InitStructure);
     
     
-    
-    
-    
-//    GPIO_InitStructure.GPIO_Pin = KNOB_INT_PIN;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	
-//	GPIO_Init(KNOB_INT_GPIO, &GPIO_InitStructure);
+//    
+//    
+//    
+//    GPIO_InitStructure.GPIO_Pin = KNOB_A_PIN;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	
+//    GPIO_Init(KNOB_A_GPIO, &GPIO_InitStructure);
+//    
+//    GPIO_InitStructure.GPIO_Pin = KNOB_B_PIN;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	
+//    GPIO_Init(KNOB_B_GPIO, &GPIO_InitStructure);
+//    
 //	
-//	GPIO_EXTILineConfig(KNOB_INT_PortSource, KNOB_INT_PinSource);
-//	
-//	NVIC_InitStructure.NVIC_IRQChannel = KNOB_INT_EXTI_IRQ;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//	NVIC_Init(&NVIC_InitStructure);
-//	
-//	EXTI_InitStructure.EXTI_Line=KNOB_INT_EXTI_Line;
-//	EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-//	EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;
-//	EXTI_InitStructure.EXTI_LineCmd=ENABLE;
-//	EXTI_Init(&EXTI_InitStructure);
+//    GPIO_EXTILineConfig(KNOB_A_PortSource, KNOB_A_PinSource);
+//    
+//    EXTI_InitStructure.EXTI_Line=KNOB_A_EXTI_Line;
+//    EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
+//    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Rising;
+//    EXTI_InitStructure.EXTI_LineCmd=ENABLE;
+//    EXTI_Init(&EXTI_InitStructure);
+//    
+//    NVIC_InitStructure.NVIC_IRQChannel = KNOB_A_EXTI_IRQ;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//    NVIC_Init(&NVIC_InitStructure);
 }
 
 
@@ -50,19 +50,22 @@ void knobInit(void)
     knobGpioInit();
 }
 
-//extern uint8_t changeFleg;
+//uint8_t changeFleg;
+//uint8_t A[10]={9,9,9,9,9,9,9,9,9,9},B[10]={9,9,9,9,9,9,9,9,9,9};
+//uint8_t count=0;
 //void EXTI2_IRQHandler(void)
 //{
 //	if(EXTI_GetITStatus(EXTI_Line2)==SET)
 //	{
-//		if(KNOB_INT_R==Bit_SET)
-//		{
-//            if(changeFleg>=0x80)
-//            {
-//                changeFleg-=0x80;
-//            }
-//			changeFleg++;
-//		}	
+//        if(count<10)
+//        {
+//           A[count]=KNOB_A_R;
+//        B[count]=KNOB_B_R;
+//        count++;
+//        }
+//        
+//        
+//		
 //	}
 //	EXTI_ClearITPendingBit(EXTI_Line2);
 //}
