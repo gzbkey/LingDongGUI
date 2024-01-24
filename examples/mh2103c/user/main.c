@@ -52,6 +52,8 @@ void rccInit(void)
 	while(RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
 	RCC_HSICmd(ENABLE);
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+    
+    SystemCoreClock=216000000;
 }
 
 void gpioDeInit(void)
@@ -97,7 +99,6 @@ int main(void)
     gpioDeInit();
     
     st7789v_init();
-    st7789v_clear(0xff);
     ST7789V_BG_ON;
 //    
 //    knobInit();
