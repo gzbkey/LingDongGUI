@@ -872,7 +872,7 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
             fontTile = *((arm_2d_vres_t*)&pTextInfo->fontTile);
             fontTile.tTile.tRegion.tSize.iWidth=width;
             fontTile.tTile.tRegion.tSize.iHeight=height;
-            fontTile.tTile.pchBuffer=imgAddr;
+            fontTile.tTile.pchBuffer=(uint8_t*)imgAddr;
             fontTile.pTarget=imgAddr;
 #endif
             int16_t tempHeight;
@@ -1051,7 +1051,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 #else
         ((arm_2d_tile_t*)&resTile)->tRegion.tSize.iWidth=width;
         ((arm_2d_tile_t*)&resTile)->tRegion.tSize.iHeight=height;
-        ((arm_2d_tile_t*)&resTile)->pchBuffer=imgAddr;
+        ((arm_2d_tile_t*)&resTile)->pchBuffer=(uint8_t*)imgAddr;
         ((arm_2d_tile_t*)&resTile)->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pFontDict->maskType);
         resTile.pTarget=imgAddr;
 #endif

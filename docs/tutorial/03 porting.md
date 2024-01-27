@@ -135,18 +135,15 @@
         ```c
         #include "ldConfig.h" 
         ```
-    * 勾选Disable the default scene
-    * 勾选Disable the navigation layer
 
 3. ldConfig配置
+    * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
+    * ldConfig.h可以使用keil的图形界面方式进行配置
+    * 如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
 
-    ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
+        ![configGui](./images/03/config%20gui.png)
 
-    ldConfig.h可以使用keil的图形界面方式进行配置
-
-    如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
-
-    ![configGui](./images/03/config%20gui.png)
+    * 补全ldConfig.c中的函数Disp0_DrawBitmap
 
 4. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
 
@@ -182,6 +179,11 @@
         }
     }
     ~~~
+
+### 使用外部NOR
+1. ldConfig.h中USE_VIRTUAL_RESOURCE = 1
+2. ldConfig.c中__disp_adapter0_vres_read_memory添加读取nor的函数
+3. arm_2d_disp_adapter_0.c中的__user_scene_player_init函数，+ 3改为+2，.FrameBuffer.u4PoolReserve = 3改为 =2
 
 ### 关于程序体积
 
