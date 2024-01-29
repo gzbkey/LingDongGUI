@@ -26,16 +26,9 @@ void st7789v_gpioInit(void)
     GPIO_InitStructure.GPIO_Pin = ST7789V_RD_PIN;
     GPIO_Init(ST7789V_RD_GPIO, &GPIO_InitStructure);
     
-    GPIO_InitStructure.GPIO_Pin = ST7789V_BG_PIN;
-    GPIO_Init(ST7789V_BG_GPIO, &GPIO_InitStructure);
-    
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;
     GPIO_Init(ST7789V_DATA_GPIO, &GPIO_InitStructure);
-
-    ST7789V_BG_OFF;
 }
-
-
 
 /* 写命令：根据时序写 */
 #if 0
@@ -289,8 +282,6 @@ void st7789v_init(void)
     st7789v_writeData(0x1d);
     st7789v_writeData(0x1e);
     st7789v_writeCmd(0x29);
-
-    ST7789V_BG_ON;
 }
 
 //在指定区域内填充指定颜色块

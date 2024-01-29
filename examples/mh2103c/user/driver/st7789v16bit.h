@@ -30,9 +30,6 @@ extern "C" {
 
 #define ST7789V_DATA_GPIO         GPIOB
 
-#define ST7789V_BG_GPIO           GPIOA
-#define ST7789V_BG_PIN            GPIO_Pin_0
-
 #define ST7789V_CS_L             ST7789V_CS_GPIO->BRR = ST7789V_CS_PIN
 #define ST7789V_RS_L             ST7789V_RS_GPIO->BRR = ST7789V_RS_PIN
 #define ST7789V_RD_L             ST7789V_RD_GPIO->BRR = ST7789V_RD_PIN
@@ -47,12 +44,6 @@ extern "C" {
 
 #define ST7789V_DATA_W(dat)      ST7789V_DATA_GPIO->ODR=(dat)
 #define ST7789V_DATA_R           ST7789V_DATA_GPIO->IDR
-
-#define ST7789V_BG_H             GPIO_SetBits(ST7789V_BG_GPIO, ST7789V_BG_PIN)
-#define ST7789V_BG_L             GPIO_ResetBits(ST7789V_BG_GPIO, ST7789V_BG_PIN)
-
-#define ST7789V_BG_ON            ST7789V_BG_H
-#define ST7789V_BG_OFF           ST7789V_BG_L
 
 
 #define ST7789V_ANGLE             90

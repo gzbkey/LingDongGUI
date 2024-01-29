@@ -35,7 +35,7 @@ extern "C" {
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
-#define LD_CFG_PFB_HEIGHT                         (32)
+#define LD_CFG_PFB_HEIGHT                         (48)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
@@ -64,7 +64,7 @@ extern "C" {
 
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      1
+#define USE_RADIA_MENU_SCALE                      0
 
 // debug config
 
@@ -75,7 +75,7 @@ extern "C" {
 //     <4=>    LOG_LEVEL_INFO
 //     <5=>    LOG_LEVEL_DEBUG
 // <i> Do not use log. Please select LOG_LEVEL_NONE
-#define USE_LOG_LEVEL                             LOG_LEVEL_NONE
+#define USE_LOG_LEVEL                             0
 
 #define LD_DEBUG                                  0
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
@@ -85,6 +85,7 @@ extern "C" {
 // do not eidt below
 
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
+#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       1
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH

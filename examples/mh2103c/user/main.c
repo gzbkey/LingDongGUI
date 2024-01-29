@@ -7,7 +7,6 @@
 #include "ldScene0.h"
 #include "uiDemo.h"
 #include "knob.h"
-#include "w25qxx.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -71,19 +70,32 @@ void gpioDeInit(void)
     BKP_TamperPinCmd(DISABLE);
     PWR_BackupAccessCmd(DISABLE);
 }
-volatile bool state=0;
-volatile bool state2=0;
-uint16_t id=0;
-uint8_t rbuf[20]={0};
-uint8_t wbuf[20]={11,12,13,4,5,6,7,8,9,10};
 
-#define BTN_ID_POW 0
-#define BTN_ID_KNOB 1
+#define BTN_ID_KNOB 0
+#define BTN_ID_POW  1
 
 bool getBtnState(uint16_t id)
 {
-    return knobKeyRead(id);
+    uint8_t value=knobKeyRead();
+    
+    switch(id)
+    {
+        case BTN_ID_KNOB:
+        {
+            return GETBIT(value,0);
+            break;
+        }
+        case BTN_ID_POW:
+        {
+            return GETBIT(value,1);
+            break;
+        }
+        default:
+            break;
+    }
+    return 0;
 }
+
 
 int main(void)
 {
@@ -94,31 +106,17 @@ int main(void)
     
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
 
-    init_cycle_counter(false);
+    SysTick_Config(SystemCoreClock/100);
+    init_cycle_counter(true);
 
     gpioDeInit();
     
     st7789v_init();
-    ST7789V_BG_ON;
-//    
-//    knobInit();
-//    state=knobKeyRead(1);
-//        state2=knobKeyRead(0);
     
-    w25qxxInit();
+    knobInit();
     
-    id=w25qxxReadID();
-    
-//    w25qxxEraseBlock64k(0);
-//    
-//    w25qxxRead(rbuf,0,10);
-//    
-//    W25QXX_Write_NoCheck(wbuf,0,10);
-//    
-//    w25qxxRead(rbuf,0,10);
-
-//    xBtnInit(BTN_ID_POW,getBtnState);
-//    xBtnInit(BTN_ID_KNOB,getBtnState);
+    xBtnInit(BTN_ID_POW,getBtnState);
+    xBtnInit(BTN_ID_KNOB,getBtnState);
 
     LD_ADD_PAGE(uiDemo);
 
@@ -130,12 +128,10 @@ int main(void)
     
     arm_2d_scene0_init(&DISP0_ADAPTER);
 
+
+
     while(1)
     {
-//        state=knobKeyRead(1);
-//        delay_ms(1);
-//        state2=knobKeyRead(0);
-//        delay_ms(1);
         disp_adapter0_task();
     }
 }
@@ -143,13 +139,7 @@ int main(void)
 __attribute__((used))    //!< 避免下面的处理程序被编译器优化掉
 void SysTick_Handler(void)
 {
-
-
-}
-
-void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap) 
-{
-    st7789v_colorFill(x,y,x+width-1,y+height-1,(uint16_t *)bitmap);
+    knobTick(10);
 }
 
 

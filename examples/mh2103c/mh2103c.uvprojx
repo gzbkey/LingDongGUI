@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -333,7 +333,7 @@
             <v6LangP>4</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>1</v6Lto>
+            <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
@@ -559,16 +559,6 @@
               <FileType>1</FileType>
               <FilePath>.\user\driver\knob.c</FilePath>
             </File>
-            <File>
-              <FileName>w25qxx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\user\driver\w25qxx.c</FilePath>
-            </File>
-            <File>
-              <FileName>spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\user\driver\spi.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -651,7 +641,7 @@
         </targetInfos>
       </component>
       <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D">
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev44+g31bdaad"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev49+g04708c9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -769,7 +759,7 @@
       <file attr="config" category="sourceC" name="src\template\Retarget.c" version="1.0.1">
         <instance index="0">RTE\LingDongGui\Retarget.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev45+gd9b1471"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev49+g04708c9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -780,18 +770,18 @@
         <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev12+g925ae79"/>
         <targetInfos/>
       </file>
-      <file attr="config" category="sourceC" name="src\template\ldConfig.c" version="1.0.0">
+      <file attr="config" category="sourceC" name="src\template\ldConfig.c" version="1.0.1">
         <instance index="0">RTE\LingDongGui\ldConfig.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev45+gd9b1471"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev49+g04708c9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.0.3">
+      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.0.5">
         <instance index="0">RTE\LingDongGui\ldConfig.h</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.6.2" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev45+gd9b1471"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.6.2-dev49+g04708c9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
