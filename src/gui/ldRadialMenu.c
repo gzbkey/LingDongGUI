@@ -648,6 +648,35 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
     pWidget->offsetAngle=pWidget->offsetAngle%360;
 }
 
+/**
+ * @brief   基于当前选中项目，进行偏移选择
+ *
+ * @param   pWidget         目标控件指针
+ * @param   offset          偏移值
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2024-01-30
+ */
+void ldRadialMenuOffsetItem(ldRadialMenu_t *pWidget,int8_t offset)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+
+    if(offset==0)
+    {
+        return;
+    }
+
+    offset=offset%pWidget->itemCount;
+    offset=pWidget->selectItem+offset;
+    if(offset<0)
+    {
+        offset=pWidget->itemCount+offset;
+    }
+    ldRadialMenuSelectItem(pWidget,offset);
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
