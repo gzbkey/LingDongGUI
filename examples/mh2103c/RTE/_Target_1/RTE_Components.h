@@ -18,9 +18,9 @@
 
 /* ARM::Acceleration:Arm-2D Extras:Controls@1.5.7 */
 #define RTE_Acceleration_Arm_2D_Extra_Controls
-/* ARM::Acceleration:Arm-2D Extras:LCD ASCII Printf@2.2.0 */
+/* ARM::Acceleration:Arm-2D Extras:LCD ASCII Printf@2.2.1 */
 #define RTE_Acceleration_Arm_2D_Extra_LCD_printf__
-/* ARM::Acceleration:Arm-2D Helper:Display Adapter@1.9.1 */
+/* ARM::Acceleration:Arm-2D Helper:Display Adapter@2.0.0 */
 #define RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
     #define __RTE_ACCELERATION_ARM_2D_HELPER_DISP_ADAPTER0__  /* this macro is deprecated, please use the macro above in your code */
 
