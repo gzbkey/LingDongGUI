@@ -8,7 +8,7 @@
 #include "xLog.h"
 #include "xBtnAction.h"
 #include "stdbool.h"
-#include "virtualNor.h"
+#include "uiDemo.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -30,25 +30,6 @@
 #   pragma GCC diagnostic ignored "-Wformat="
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
-
-
-
-void __disp_adapter0_vres_read_memory( intptr_t pObj,
-                                       void *pBuffer,
-                                       uintptr_t pAddress,
-                                       size_t nSizeInByte)
-{
-    ARM_2D_UNUSED(pObj);
-    norRead(pBuffer,pAddress,nSizeInByte);
-}
-
-uintptr_t __disp_adapter0_vres_get_asset_address(
-    uintptr_t pObj,
-    arm_2d_vres_t *ptVRES)
-{
-    return pObj;
-}
-
 
 void scene0_loader(void)
 {
@@ -119,12 +100,14 @@ int main (void)
     printf("====================\n\n");
     vtInit();
 
-    X_BTN_KEY_INIT(KEY_NUM_UP,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_DOWN,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_LEFT,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_RIGHT,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_ENTER,vtGetKeyState);
-    X_BTN_KEY_INIT(KEY_NUM_ESC,vtGetKeyState);
+    xBtnInit(KEY_NUM_UP,vtGetKeyState);
+    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
+    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
+    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
+    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
+    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
+
+    LD_ADD_PAGE(uiDemo);
 
     arm_irq_safe {
         arm_2d_init();
