@@ -264,13 +264,6 @@ uint32_t vtTimerCallback(uint32_t interval, void *param)
     return interval;
 }
 
-int32_t Disp0_DrawBitmap(int16_t x, int16_t y, int16_t width, int16_t height, const uint8_t *bitmap)
-{
-    vtFillMultipleColors(x, y, x + width - 1, y + height - 1, (color_typedef *)bitmap);
-
-    return 0;
-}
-
 void vtSdlFlush(int32_t nMS)
 {
     nMS = MAX(1, nMS);
@@ -281,22 +274,6 @@ void vtSdlFlush(int32_t nMS)
     sdl_refr_cpl = false;
     sdl_refr_qry = true;
 }
-
-#if 0
-void __disp_adapter0_request_async_flushing( 
-        void *pTarget,
-        bool bIsNewFrame,
-        int16_t iX,
-        int16_t iY,
-        int16_t iWidth,
-        int16_t iHeight,
-        const COLOUR_INT *pBuffer)
-{
-
-    VT_Fill_Multiple_Colors(iX, iY,iX+iWidth-1,iY+iHeight-1,(color_typedef*) pBuffer);
-    s_bRequestAsyncFlush = true;
-}
-#endif
 
 #if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
 int64_t arm_2d_helper_get_system_timestamp(void)

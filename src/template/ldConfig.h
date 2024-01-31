@@ -23,19 +23,19 @@ extern "C" {
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
-#define LD_CFG_SCEEN_WIDTH                        LCD_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (LCD_WIDTH)
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
-#define LD_CFG_SCEEN_HEIGHT                       LCD_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (LCD_HEIGHT)
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size
-#define LD_CFG_PFB_WIDTH                          LD_CFG_SCEEN_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
-#define LD_CFG_PFB_HEIGHT                         (48)
+#define LD_CFG_PFB_HEIGHT                         (24)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
@@ -47,24 +47,25 @@ extern "C" {
 
 // <q>Dirty Region Function
 // <i> It is recommended to enable this option for applications that do not refresh full screen
-#define USE_DIRTY_REGION                          1
+#define USE_DIRTY_REGION                          (1)
 
 // <q>External NOR support
 // <i> Read external nor, please enable this option
-#define USE_VIRTUAL_RESOURCE                      0
+#define USE_VIRTUAL_RESOURCE                      (0)
 
 // widget config
 
 // <q>Opacity support
 // <i> There is no need to adjust the opacity of the widget. Please turn off this option
-#define USE_OPACITY                               0
+#define USE_OPACITY                               (0)
 
-
-#define USE_TLSF                                  1
+// <q>tlsf support
+// <i> Two Level Segregated Fit memory allocator
+#define USE_TLSF                                  (0)
 
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      0
+#define USE_RADIA_MENU_SCALE                      (0)
 
 // debug config
 
@@ -75,23 +76,27 @@ extern "C" {
 //     <4=>    LOG_LEVEL_INFO
 //     <5=>    LOG_LEVEL_DEBUG
 // <i> Do not use log. Please select LOG_LEVEL_NONE
-#define USE_LOG_LEVEL                             0
+#define USE_LOG_LEVEL                             (0)
 
-#define LD_DEBUG                                  0
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
+#define LD_DEBUG                                  (0)
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 
 // <<< end of configuration section >>>
 
 // do not eidt below
 
-#define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    1
-#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       1
+#define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    (1)
+#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
 #define __DISP0_CFG_SCEEN_WIDTH__                 LD_CFG_SCEEN_WIDTH
 #define __DISP0_CFG_SCEEN_HEIGHT__                LD_CFG_SCEEN_HEIGHT
-#define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     USE_VIRTUAL_RESOURCE
+#if USE_VIRTUAL_RESOURCE == 0
+#define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (0)
+#else
+#define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (2)
+#endif
 
 #if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
 #error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH

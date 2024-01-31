@@ -68,6 +68,24 @@ extern "C" {
 #   define __DISP0_CFG_SCEEN_HEIGHT__                              240
 #endif
 
+/*
+  ARM_SCREEN_NO_ROTATION   0
+  ARM_SCREEN_ROTATE_90     1
+  ARM_SCREEN_ROTATE_180    2
+  ARM_SCREEN_ROTATE_270    3
+ */
+
+// <o>Rotate the Screen
+//     <0=>  NO Rotation
+//     <1=>    90 Degree
+//     <2=>   180 Degree
+//     <3=>   270 Degree
+// <i> Rotate the Screen for specified degrees.
+// <i> NOTE: This is extremely slow. Please avoid using it whenever it is possible.
+#ifndef __DISP0_CFG_ROTATE_SCREEN__
+#   define __DISP0_CFG_ROTATE_SCREEN__                             0
+#endif
+
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
@@ -125,7 +143,7 @@ extern "C" {
 //     <1=>     Real FPS
 // <i> Decide the meaning of the real time FPS display
 #ifndef __DISP0_CFG_FPS_CACULATION_MODE__
-#   define __DISP0_CFG_FPS_CACULATION_MODE__                       1
+#   define __DISP0_CFG_FPS_CACULATION_MODE__                       0
 #endif
 
 // <q> Enable Dirty Region Debug Mode
@@ -167,7 +185,7 @@ extern "C" {
 // <q>Disable the default scene
 // <i> Remove the default scene for this display adapter. We highly recommend you to disable the default scene when creating real applications.
 #ifndef __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     1
+#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     0
 #endif
 
 // <q>Disable the navigation layer
@@ -176,7 +194,11 @@ extern "C" {
 #   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  0
 #endif
 
-// <q>Enable the virtual resource helper service
+// <o>Maximum number of Virtual Resources used per API
+//     <0=>     NO Virtual Resource
+//     <1=>     1 Per API
+//     <2=>     2 Per API
+//     <3=>     3 Per API
 // <i> Introduce a helper service for loading virtual resources.
 // <i> This feature is disabled by default.
 #ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
@@ -191,11 +213,20 @@ extern "C" {
 #endif
 // <<< end of configuration section >>>
 
+#ifndef __DISP0_COLOUR_FORMAT__
+#   if      __DISP0_CFG_COLOUR_DEPTH__ == 8
+#       define __DISP0_COLOUR_FORMAT__  ARM_2D_COLOUR_GRAY8
+#   elif    __DISP0_CFG_COLOUR_DEPTH__ == 16
+#       define __DISP0_COLOUR_FORMAT__  ARM_2D_COLOUR_RGB565
+#   elif    __DISP0_CFG_COLOUR_DEPTH__ == 32
+#       define __DISP0_COLOUR_FORMAT__  ARM_2D_COLOUR_CCCN888
+#   endif
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#define disp_adapter0_impl_vres(__COLOUR_FORMAT, __WIDTH, __HEIGHT,...)\
+#define disp_adapter0_impl_vres(__COLOUR_FORMAT, __WIDTH, __HEIGHT,...)         \
 {                                                                               \
     .tTile = {                                                                  \
         .tRegion = {                                                            \
@@ -213,11 +244,32 @@ extern "C" {
             },                                                                  \
         },                                                                      \
     },                                                                          \
-    .Load       = &__disp_adapter0_vres_asset_loader,                  \
-    .Depose     = &__disp_adapter0_vres_buffer_deposer,                \
+    .Load       = &__disp_adapter0_vres_asset_loader,                           \
+    .Depose     = &__disp_adapter0_vres_buffer_deposer,                         \
     __VA_ARGS__                                                                 \
 }
 #endif
+
+#define disp_adapter0_task(...)                                                 \
+        ({                                                                      \
+        static bool ARM_2D_SAFE_NAME(s_bRefreshLCD) = false;                    \
+        arm_fsm_rt_t ARM_2D_SAFE_NAME(ret) = arm_fsm_rt_on_going;               \
+        if (!__ARM_VA_NUM_ARGS(__VA_ARGS__)) {                                  \
+            ARM_2D_SAFE_NAME(ret) = __disp_adapter0_task();                     \
+        } else {                                                                \
+            if (!ARM_2D_SAFE_NAME(s_bRefreshLCD)) {                             \
+                /* lock framerate */                                            \
+                if (arm_2d_helper_is_time_out(1000 / (1000,##__VA_ARGS__))) {   \
+                    ARM_2D_SAFE_NAME(s_bRefreshLCD) = true;                     \
+                }                                                               \
+            } else {                                                            \
+                ARM_2D_SAFE_NAME(ret) = __disp_adapter0_task();                 \
+                if (arm_fsm_rt_cpl == ARM_2D_SAFE_NAME(ret)) {                  \
+                    ARM_2D_SAFE_NAME(s_bRefreshLCD) = false;                    \
+                }                                                               \
+            }                                                                   \
+        };                                                                      \
+        ARM_2D_SAFE_NAME(ret);})
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -231,7 +283,7 @@ extern
 void disp_adapter0_init(void);
 
 extern
-arm_fsm_rt_t disp_adapter0_task(void);
+arm_fsm_rt_t __disp_adapter0_task(void);
 
 
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
@@ -306,9 +358,8 @@ void __disp_adapter0_vres_read_memory( intptr_t pObj,
 
 /*!
  * \brief An user implemented interface for DMA memory-to-memory copy.
- *        If you have a DMA, you can implement this function by using
- *        __OVERRIDE_WEAK. 
  *        You should implement an ISR for copy-complete event and call
+ *        disp_adapter0_insert_dma_copy_complete_event_handler() or
  *        arm_2d_helper_3fb_report_dma_copy_complete() to notify the 
  *        3FB (direct mode) helper service.
  * 
@@ -337,6 +388,10 @@ void __disp_adapter0_request_dma_copy(  arm_2d_helper_3fb_t *ptThis,
  * \param[in] iHeight the safe height of the source image
  * \retval true the 2D copy is complete when leaving this function
  * \retval false An async 2D copy request is sent to the DMA
+ *
+ * \note if false is replied, you have to call 
+ *       disp_adapter0_insert_2d_copy_complete_event_handler() to report
+ *       the completion of the 2d-copy. 
  */
 bool __disp_adapter0_request_2d_copy(   arm_2d_helper_3fb_t *ptThis,
                                         void *pObj,

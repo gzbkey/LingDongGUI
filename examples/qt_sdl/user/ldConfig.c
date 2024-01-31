@@ -5,16 +5,16 @@
 #include "ldCommon.h"
 #include "xList.h"
 #include "ldImage.h"
+#include "virtualNor.h"
 
-/***************************************************************************//**
- * @fn         bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
- * @brief      获取触摸坐标
- * @param      *x,*y  触摸坐标
- * @return     bool 是否有触摸
- * @version    V0.1
- * @date       
- * @details    
- ******************************************************************************/
+/**
+ * @brief   获取触摸坐标
+ * 
+ * @param   x 返回的x坐标
+ * @param   y 返回的y坐标
+ * @return  true 有效触摸
+ * @return  false 无效触摸
+ */
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
 {
     bool touchState=false;
@@ -54,3 +54,50 @@ bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
     }
     return touchState;
 }
+
+#if USE_VIRTUAL_RESOURCE == 1
+void __disp_adapter0_vres_read_memory( intptr_t pObj,
+                                       void *pBuffer,
+                                       uintptr_t pAddress,
+                                       size_t nSizeInByte)
+{
+    (void)pObj;
+    norRead(pBuffer,pAddress,nSizeInByte);
+}
+
+uintptr_t __disp_adapter0_vres_get_asset_address(
+    uintptr_t pObj,
+    arm_2d_vres_t *ptVRES)
+{
+    (void)ptVRES;
+    return pObj;
+}
+#endif
+
+void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap) 
+{
+    //对接屏幕驱动的彩色填充函数
+    //参考1
+    //函数原型 void lcd_colorFill(uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1,uint16_t *color)
+    //填写 lcd_colorFill(x,y,x+width-1,y+height-1,(uint16_t *)bitmap);
+    //参考2
+    //函数原型 void lcd_colorFill(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint16_t *color)
+    //填写 lcd_colorFill(x,y,width,height,(uint16_t *)bitmap);
+    vtFillMultipleColors(x, y, x + width - 1, y + height - 1, (color_typedef *)bitmap);
+}
+
+#if 0
+void __disp_adapter0_request_async_flushing(
+        void *pTarget,
+        bool bIsNewFrame,
+        int16_t iX,
+        int16_t iY,
+        int16_t iWidth,
+        int16_t iHeight,
+        const COLOUR_INT *pBuffer)
+{
+
+    VT_Fill_Multiple_Colors(iX, iY,iX+iWidth-1,iY+iHeight-1,(color_typedef*) pBuffer);
+    s_bRequestAsyncFlush = true;
+}
+#endif

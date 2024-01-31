@@ -12,10 +12,10 @@ extern "C" {
 //
 // 虚拟屏幕设定参数,即需要一个什么样的屏幕
 //
-#define VT_WIDTH           LD_CFG_SCEEN_WIDTH
-#define VT_HEIGHT          LD_CFG_SCEEN_HEIGHT
-#define VT_COLOR_DEPTH     LD_CFG_COLOR_DEPTH
-#define VT_VIRTUAL_MACHINE 0                   /*Different rendering should be used if running in a Virtual machine*/
+#define VT_WIDTH                 320
+#define VT_HEIGHT                240
+#define VT_COLOR_DEPTH           16
+#define VT_VIRTUAL_MACHINE       0                   /*Different rendering should be used if running in a Virtual machine*/
 
 #if VT_COLOR_DEPTH == 1 || VT_COLOR_DEPTH == 8 || VT_COLOR_DEPTH == 16 || VT_COLOR_DEPTH == 24 || VT_COLOR_DEPTH == 32
 #if VT_COLOR_DEPTH == 1 || VT_COLOR_DEPTH == 8
