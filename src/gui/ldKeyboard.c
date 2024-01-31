@@ -960,6 +960,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->isWaitInit=true;
         pNewWidget->isSymbol=false;
         pNewWidget->pFunc=&ldKeyboardCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);

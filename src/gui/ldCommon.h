@@ -276,7 +276,8 @@ typedef struct {
                               bool isHidden:1; \
                               bool isParentHidden:1; \
                               ldDirtyRegionStateType_t dirtyRegionState:2; \
-                              bool isDirtyRegionAutoIgnore:1
+                              bool isDirtyRegionAutoIgnore:1; \
+                              bool isIgnoreSysSlider:1
 
 typedef struct{
     uint8_t utf8[4];

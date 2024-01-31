@@ -175,6 +175,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldImageCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }

@@ -475,6 +475,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldIconSliderCommonFunc;
+        pNewWidget->isIgnoreSysSlider=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);

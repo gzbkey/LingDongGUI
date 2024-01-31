@@ -145,6 +145,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldTemplateCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         // add user init
 

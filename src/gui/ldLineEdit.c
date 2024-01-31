@@ -211,6 +211,7 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->kbNameId=0;
         pNewWidget->pFunc=&ldLineEditCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
         xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);

@@ -161,6 +161,7 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldGaugeCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }

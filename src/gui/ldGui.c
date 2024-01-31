@@ -81,6 +81,51 @@ void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
 #endif
 }
 
+#define SYS_SLIDER_NONE   0
+#define SYS_SLIDER_LEFT   1
+#define SYS_SLIDER_RIGHT   2
+#define SYS_SLIDER_UP      3
+#define SYS_SLIDER_DOWN    4
+
+uint8_t ldGuiGetSlideDir(int16_t startX,int16_t startY,int16_t endX,int16_t endY)
+{
+    int16_t delta_x = endX - startX;
+    int16_t delta_y = endY - startY;
+
+    int16_t distance_x = abs(delta_x);
+    int16_t distance_y = abs(delta_y);
+
+    int16_t distance = (distance_x > distance_y) ? distance_x : distance_y;
+
+    if(distance<30)
+    {
+        return SYS_SLIDER_NONE;
+    }
+
+    if (distance_x > distance_y)
+    {
+        if (delta_x > 0)
+        {
+            return SYS_SLIDER_RIGHT;
+        }
+        else
+        {
+            return SYS_SLIDER_LEFT;
+        }
+    }
+    else
+    {
+        if (delta_y > 0)
+        {
+            return SYS_SLIDER_DOWN;
+        }
+        else
+        {
+            return SYS_SLIDER_UP;
+        }
+    }
+}
+
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *pWidget;
@@ -137,6 +182,34 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         pWidget=prevWidget;
         if(pWidget!=NULL)
         {
+            if(!pWidget->isIgnoreSysSlider)
+            {
+                switch(ldGuiGetSlideDir(pressPoint.x,pressPoint.y,prevX,prevY))
+                {
+                case SYS_SLIDER_LEFT:
+                {
+                    xEmit(0,SIGNAL_SYS_SLIDER_LEFT,0);
+                    break;
+                }
+                case SYS_SLIDER_RIGHT:
+                {
+                    xEmit(0,SIGNAL_SYS_SLIDER_RIGHT,0);
+                    break;
+                }
+                case SYS_SLIDER_UP:
+                {
+                    xEmit(0,SIGNAL_SYS_SLIDER_UP,0);
+                    break;
+                }
+                case SYS_SLIDER_DOWN:
+                {
+                    xEmit(0,SIGNAL_SYS_SLIDER_DOWN,0);
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
             //cal speed
             deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
             pressPoint.x=(prevX-pressPoint.x);
@@ -264,7 +337,6 @@ static void _ldGuiFrameUpdate(xListNode* pLink)
         if(temp_pos->info!=NULL)
         {
             (((ldCommon_t *)temp_pos->info)->pFunc)->update(temp_pos->info);
-//            _frameUpdate((ldCommon_t *)temp_pos->info);
 
             if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
             {

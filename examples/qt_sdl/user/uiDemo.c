@@ -65,6 +65,26 @@ bool slotChangeItem(xConnectInfo_t info)
     }
     return false;
 }
+
+bool slotSlideJumpPage(xConnectInfo_t info)
+{
+    if(info.signalType==SIGNAL_SYS_SLIDER_LEFT)
+    {
+        if(pageTarget<5)
+        {
+            ldGuiJumpPage(pageTarget+1);
+        }
+    }
+    if(info.signalType==SIGNAL_SYS_SLIDER_RIGHT)
+    {
+        if(pageTarget>0)
+        {
+            ldGuiJumpPage(pageTarget-1);
+        }
+    }
+    return false;
+}
+
 extern size_t xFreeBytesRemaining;
 void uiDemoInit(uint8_t page)
 {
@@ -270,6 +290,9 @@ LOG_DEBUG("before ========================== %d\n",xFreeBytesRemaining);
     default:
         break;
     }
+
+    xConnect(0,SIGNAL_SYS_SLIDER_LEFT,0,slotSlideJumpPage);
+    xConnect(0,SIGNAL_SYS_SLIDER_RIGHT,0,slotSlideJumpPage);
 LOG_DEBUG("after ========================== %d\n",xFreeBytesRemaining);
 }
 

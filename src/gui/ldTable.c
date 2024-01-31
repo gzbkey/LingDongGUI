@@ -595,6 +595,7 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldTableCommonFunc;
+        pNewWidget->isIgnoreSysSlider=true;
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
 

@@ -162,6 +162,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldTextCommonFunc;
+        pNewWidget->isIgnoreSysSlider=true;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }

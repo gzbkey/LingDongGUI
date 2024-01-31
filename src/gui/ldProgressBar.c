@@ -156,6 +156,7 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
         pNewWidget->pFunc=&ldProgressBarCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         LOG_INFO("[progressBar] init,id:%d\n",nameId);
     }
