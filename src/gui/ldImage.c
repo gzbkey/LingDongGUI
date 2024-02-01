@@ -255,7 +255,14 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
         }
         else
         {
-            ldBaseImage(&tTarget,&tempRes,pWidget->isWithMask,IMG_OPACITY);
+            if(pResTile->tInfo.tColourInfo.chScheme <= ARM_2D_COLOUR_MASK_A8)
+            {
+                ldBaseMaskImage(&tTarget,&tempRes,pWidget->specialColor,IMG_OPACITY);
+            }
+            else
+            {
+                ldBaseImage(&tTarget,&tempRes,pWidget->isWithMask,IMG_OPACITY);
+            }
         }
         arm_2d_op_wait_async(NULL);
     }

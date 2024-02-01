@@ -436,7 +436,7 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
     }
 }
 
-void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor color,uint8_t opacity)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*pResTile;
@@ -456,14 +456,14 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
                             pTile,
                             &((arm_2d_tile_t*)pRes)->tRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
-                            textColor,
+                            color,
                             LD_COLOR_BLACK);
 #else
         arm_2d_draw_pattern((arm_2d_tile_t*)pRes,
                             pTile,
                             &(((arm_2d_tile_t*)pRes)->tRegion),
                             ARM_2D_DRW_PATN_MODE_COPY,
-                            textColor,
+                            color,
                             LD_COLOR_BLACK);
 #endif
 
@@ -475,13 +475,13 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
         arm_2d_fill_colour_with_a2_mask_and_opacity(pTile,
                                                     &((arm_2d_tile_t*)pRes)->tRegion,
                                                     (arm_2d_tile_t*)pRes,
-                                                    (__arm_2d_color_t){textColor},
+                                                    (__arm_2d_color_t){color},
                                                     opacity);
 #else
         arm_2d_fill_colour_with_a2_mask(pTile,
                                         &(((arm_2d_tile_t*)pRes)->tRegion),
                                         (arm_2d_tile_t*)pRes,
-                                        (__arm_2d_color_t){textColor});
+                                        (__arm_2d_color_t){color});
 #endif
         break;
     }
@@ -491,13 +491,13 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
         arm_2d_fill_colour_with_a4_mask_and_opacity(pTile,
                                                     &((arm_2d_tile_t*)pRes)->tRegion,
                                                     (arm_2d_tile_t*)pRes,
-                                                    (__arm_2d_color_t){textColor},
+                                                    (__arm_2d_color_t){color},
                                                     opacity);
 #else
         arm_2d_fill_colour_with_a4_mask(pTile,
                                         &(((arm_2d_tile_t*)pRes)->tRegion),
                                         (arm_2d_tile_t*)pRes,
-                                        (__arm_2d_color_t){textColor});
+                                        (__arm_2d_color_t){color});
 #endif
         break;
     }
@@ -507,13 +507,13 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
         arm_2d_fill_colour_with_mask_and_opacity(pTile,
                                                  &((arm_2d_tile_t*)pRes)->tRegion,
                                                  (arm_2d_tile_t*)pRes,
-                                                 (__arm_2d_color_t){textColor},
+                                                 (__arm_2d_color_t){color},
                                                  opacity);
 #else
         arm_2d_fill_colour_with_mask(pTile,
                                      &(((arm_2d_tile_t*)pRes)->tRegion),
                                      (arm_2d_tile_t*)pRes,
-                                     (__arm_2d_color_t){textColor});
+                                     (__arm_2d_color_t){color});
 #endif
         break;
     }

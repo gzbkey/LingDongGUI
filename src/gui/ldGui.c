@@ -106,10 +106,12 @@ uint8_t ldGuiGetSlideDir(int16_t startX,int16_t startY,int16_t endX,int16_t endY
     {
         if (delta_x > 0)
         {
+            LOG_DEBUG("sys slide right\n");
             return SYS_SLIDER_RIGHT;
         }
         else
         {
+            LOG_DEBUG("sys slide left\n");
             return SYS_SLIDER_LEFT;
         }
     }
@@ -117,10 +119,12 @@ uint8_t ldGuiGetSlideDir(int16_t startX,int16_t startY,int16_t endX,int16_t endY
     {
         if (delta_y > 0)
         {
+            LOG_DEBUG("sys slide down\n");
             return SYS_SLIDER_DOWN;
         }
         else
         {
+            LOG_DEBUG("sys slide up\n");
             return SYS_SLIDER_UP;
         }
     }

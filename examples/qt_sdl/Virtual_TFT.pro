@@ -109,7 +109,7 @@ SOURCES += \
     user/main.c \
     user/Virtual_TFT_Port.c \
     user/arm_2d_disp_adapter_0.c \
-    user/uiDemo.c
+    user/uiWatch.c
 
 HEADERS += \
     ../../src/gui/ldArc.h \
@@ -220,7 +220,7 @@ HEADERS += \
     user/arm_2d_user_arch_port.h \
     user/image.h \
     user/ldConfig.h \
-    user/uiDemo.h \
+    user/uiWatch.h \
     user/uiHome.h
 
 INCLUDEPATH += $$PWD/../common/Arm-2D

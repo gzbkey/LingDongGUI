@@ -576,6 +576,8 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].pText=NULL;
             pNewWidget->pItemInfo[i].align=LD_ALIGN_CENTER;
             pNewWidget->pItemInfo[i].releaseImgAddr=LD_ADDR_NONE;
+            pNewWidget->pItemInfo[i].isReleaseImgMask=false;
+            pNewWidget->pItemInfo[i].isReleaseImgWithMask=false;
             pNewWidget->pItemInfo[i].pressImgAddr=LD_ADDR_NONE;
             pNewWidget->pItemInfo[i].isButton=false;
             pNewWidget->pItemInfo[i].isCheckable=false;
@@ -724,7 +726,16 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #if USE_VIRTUAL_RESOURCE == 1
                             tempRes.pTarget=item->releaseImgAddr;
 #endif
-                            ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,false,255);
+                            if(item->isReleaseImgMask)
+                            {
+                                ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
+                                ldBaseMaskImage(&tImgTile,(arm_2d_tile_t*)&tempRes,item->releaseImgMaskColor,255);
+                            }
+                            else
+                            {
+                                ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,item->isReleaseImgWithMask,255);
+                            }
+
                         }
                     }
 
@@ -944,7 +955,7 @@ void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t a
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-21
  */
-void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr)
+void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr,bool isWithMask,ldColor maskColor,bool isMask)
 {
     if(pWidget==NULL)
     {
@@ -959,6 +970,9 @@ void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x
         item->imgRegion.tSize.iWidth=width;
         item->imgRegion.tSize.iHeight=height;
         item->releaseImgAddr=imgAddr;
+        item->isReleaseImgWithMask=isWithMask;
+        item->isReleaseImgMask=isMask;
+        item->releaseImgMaskColor=maskColor;
         item->pressImgAddr=LD_ADDR_NONE;
         item->isButton=false;
         item->isSelectShow=false;

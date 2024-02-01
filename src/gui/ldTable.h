@@ -34,9 +34,12 @@ typedef struct{
     bool isEditable:1;
     bool isEditing:1;
     ldEditType_t editType:2;
+    bool isReleaseImgWithMask:1;
+    bool isReleaseImgMask:1;
     uint8_t *pText;
     ldColor textColor;
     ldColor itemBgColor;
+    ldColor releaseImgMaskColor;
     uint32_t releaseImgAddr;
     uint32_t pressImgAddr;
     arm_2d_region_t imgRegion;
@@ -75,7 +78,7 @@ void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *p
 void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
 void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
 void ldTableSetItemAlign(ldTable_t *pWidget, uint8_t row, uint8_t column, uint8_t align);
-void ldTableSetItemImage(ldTable_t *pWidget, uint8_t row, uint8_t column, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t imgAddr);
+void ldTableSetItemImage(ldTable_t *pWidget, uint8_t row, uint8_t column, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t imgAddr, bool isWithMask,ldColor maskColor,bool isMask);
 void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isCheckable);
 
 uint8_t ldTableCurrentColumn(ldTable_t *pWidget);
