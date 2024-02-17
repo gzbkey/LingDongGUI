@@ -276,8 +276,7 @@ typedef struct {
                               bool isHidden:1; \
                               bool isParentHidden:1; \
                               ldDirtyRegionStateType_t dirtyRegionState:2; \
-                              bool isDirtyRegionAutoIgnore:1; \
-                              bool isIgnoreSysSlider:1
+                              bool isDirtyRegionAutoIgnore:1
 
 typedef struct{
     uint8_t utf8[4];
@@ -426,7 +425,7 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
 void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t **ppRootDirtyRegionList);
 void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore);
 
-void ldBaseBgMove(int16_t x,int16_t y);
+void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
 
 arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
 arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);

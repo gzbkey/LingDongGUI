@@ -114,30 +114,11 @@ static bool slotMenuSelect(xConnectInfo_t info)
         pressY=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-widgetPos.y;
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
         break;
     }
     case SIGNAL_RELEASE:
-    {
-        if((pWidget->isMove==false)&&(pWidget->offsetAngle==0))//只允许静止状态下选择
-        {
-            x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-widgetPos.x;
-            y=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-widgetPos.y;
-
-            for(int8_t i=pWidget->itemCount-1;i>=0;i--)
-            {
-                if(((pressX>pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX)&&(pressX<(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth-1))&&(pressY>pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)&&(pressY<(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight-1)))&&
-                   ((x     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX)&&(x     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth-1))&&(y     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)&&(y     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight-1))))
-                {
-                    ldRadialMenuSelectItem(pWidget,pWidget->showList[i]);
-                    break;
-                }
-            }
-        }
-        break;
-    }
-    case SIGNAL_MOVE_SPEED:
     {
         //将移动速度强制转换成item数量，并且限制360度内
         do{
@@ -185,6 +166,21 @@ static bool slotMenuSelect(xConnectInfo_t info)
                 }
             }
         }while(0);
+        if((pWidget->isMove==false)&&(pWidget->offsetAngle==0))//只允许静止状态下选择
+        {
+            x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-widgetPos.x;
+            y=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-widgetPos.y;
+
+            for(int8_t i=pWidget->itemCount-1;i>=0;i--)
+            {
+                if(((pressX>pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX)&&(pressX<(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth-1))&&(pressY>pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)&&(pressY<(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight-1)))&&
+                   ((x     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX)&&(x     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth-1))&&(y     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)&&(y     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight-1))))
+                {
+                    ldRadialMenuSelectItem(pWidget,pWidget->showList[i]);
+                    break;
+                }
+            }
+        }
         break;
     }
     default:break;
@@ -273,12 +269,10 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldRadialMenuCommonFunc;
-        pNewWidget->isIgnoreSysSlider=true;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
-        xConnect(nameId,SIGNAL_TOUCH_HOLD_MOVE,nameId,slotMenuSelect);
-        xConnect(nameId,SIGNAL_MOVE_SPEED,nameId,slotMenuSelect);
+        xConnect(nameId,SIGNAL_HOLD_DOWN,nameId,slotMenuSelect);
 
         LOG_INFO("[radialMenu] init,id:%d\n",nameId);
     }

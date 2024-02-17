@@ -162,7 +162,6 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldTextCommonFunc;
-        pNewWidget->isIgnoreSysSlider=true;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
@@ -418,9 +417,9 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
         _isBottomScroll=false;
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
-        txt->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        txt->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
@@ -477,13 +476,13 @@ void ldTextSetScroll(ldText_t *pWidget,bool isEnable)
         if(isEnable)
         {
             xConnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
-            xConnect(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pWidget->nameId,slotTextVerticalScroll);
+            xConnect(pWidget->nameId,SIGNAL_HOLD_DOWN,pWidget->nameId,slotTextVerticalScroll);
             xConnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
         }
         else
         {
             xDisconnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
-            xDisconnect(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pWidget->nameId,slotTextVerticalScroll);
+            xDisconnect(pWidget->nameId,SIGNAL_HOLD_DOWN,pWidget->nameId,slotTextVerticalScroll);
             xDisconnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
         }
     }

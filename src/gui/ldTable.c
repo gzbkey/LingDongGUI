@@ -389,7 +389,7 @@ static bool slotTableProcess(xConnectInfo_t info)
                         if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
                         {
                             ldBaseMove((ldCommon_t*)kb,0,LD_CFG_SCEEN_HEIGHT/2);
-                            ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
+                            ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
                         }
                         else
                         {
@@ -405,14 +405,14 @@ static bool slotTableProcess(xConnectInfo_t info)
         }
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
         if(_isStopMove)
         {
             break;
         }
-        offsetX=(int16_t)GET_SIGNAL_VALUE_X(info.value);
-        offsetY=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        offsetX=(int16_t)GET_SIGNAL_OFFSET_X(info.value);
+        offsetY=(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
 
 
         offsetX=abs(offsetX);
@@ -420,7 +420,7 @@ static bool slotTableProcess(xConnectInfo_t info)
 
         if(offsetX>=offsetY)
         {
-            pWidget->scrollOffsetX=_scrollOffsetX+(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            pWidget->scrollOffsetX=_scrollOffsetX+(int16_t)GET_SIGNAL_OFFSET_X(info.value);
             if(pWidget->scrollOffsetX>0)
             {
                 pWidget->scrollOffsetX=0;
@@ -440,7 +440,7 @@ static bool slotTableProcess(xConnectInfo_t info)
         }
         else
         {
-            pWidget->scrollOffsetY=_scrollOffsetY+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+            pWidget->scrollOffsetY=_scrollOffsetY+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
             if(pWidget->scrollOffsetY>0)
             {
                 pWidget->scrollOffsetY=0;
@@ -597,13 +597,12 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldTableCommonFunc;
-        pNewWidget->isIgnoreSysSlider=true;
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
-        xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotTableProcess);
+        xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotTableProcess);
         xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
 
         LOG_INFO("[table] init,id:%d\n",nameId);

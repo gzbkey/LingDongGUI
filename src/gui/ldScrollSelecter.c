@@ -141,29 +141,25 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
         pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
-        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
     {
-        if(!pWidget->isAutoMove)
-        {
-            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,pWidget->scrollOffset);
-        }
-        pWidget->isWaitMove=true;
-        break;
-    }
-    case SIGNAL_MOVE_SPEED:
-    {
-        int16_t ySpeed=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        int16_t ySpeed=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
 
         if((ySpeed>MOVE_SPEED_THRESHOLD_VALUE)||(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
             pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,_scrollOffset+SPEED_2_OFFSET(ySpeed));
             pWidget->isAutoMove=true;
         }
+        if(!pWidget->isAutoMove)
+        {
+            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,pWidget->scrollOffset);
+        }
+        pWidget->isWaitMove=true;
         break;
     }
     default:
@@ -254,12 +250,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
-        pNewWidget->isIgnoreSysSlider=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
-        xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);
+        xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotScrollSelecterScroll);
-        xConnect(pNewWidget->nameId,SIGNAL_MOVE_SPEED,pNewWidget->nameId,slotScrollSelecterScroll);
 
         LOG_INFO("[scrollSelecter] init,id:%d\n",nameId);
     }

@@ -119,6 +119,8 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
+
+
     ldGuiFrameStart();
     ldGuiLogicLoop();
 }
@@ -160,7 +162,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
-        arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_WHITE);
 
         ldGuiLoop((arm_2d_scene_t*)ptThis,(arm_2d_tile_t*)ptTile,bIsNewFrame);
 
@@ -171,7 +172,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
     return arm_fsm_rt_cpl;
 }
-
+arm_2d_scene_t *gpScene;
 ARM_NONNULL(1)
 user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter, 
                                         user_scene_0_t *ptThis)
@@ -213,8 +214,8 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
     /* ------------   initialize members of user_scene_0_t begin ---------------*/
 
-	    ldGuiInit((arm_2d_scene_t*)ptThis);
-    
+        ldGuiInit((arm_2d_scene_t*)ptThis);
+    gpScene=ptThis;
     /* ------------   initialize members of user_scene_0_t end   ---------------*/
 
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 

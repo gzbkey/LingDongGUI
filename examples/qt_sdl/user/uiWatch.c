@@ -8,50 +8,131 @@
 #define ID_IMAGE_POS1   4
 #define ID_IMAGE_POS2   5
 #define ID_TABLE        6
+#define ID_ICON_SLIDER   7
 
 #define SCEEN_WIDTH          240
 #define SCEEN_HEIGHT         240
 
-uint8_t gPage=1;
+uint8_t gPage=0;
+uint8_t moveDir=0;
+
+static bool slotBgReset(xConnectInfo_t info)
+{
+    int16_t x,y;
+
+
+
+    if(moveDir=='-')
+    {
+    x=(int16_t)GET_SIGNAL_SPEED_X(info.value);
+    y=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
+
+    if(x>0)
+    {
+        if(gPage>0)
+        {
+            gPage--;
+        }
+
+    }
+    else
+    {
+        if(gPage<2)
+        {
+            gPage++;
+        }
+    }
+
+    switch (gPage)
+    {
+    case 0:
+    {
+        ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,0,0);
+        break;
+    }
+    case 1:
+    {
+        ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,-SCEEN_WIDTH,0);
+        break;
+    }
+    case 2:
+    {
+        ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,-(SCEEN_WIDTH<<1),0);
+        break;
+    }
+
+    default:
+        break;
+    }
+    }
+    moveDir=0;
+    return false;
+}
 
 static bool slotBgMove(xConnectInfo_t info)
 {
-    switch (gPage) {
+    int16_t offsetX,offsetY;
+
+    offsetX=(int16_t)GET_SIGNAL_OFFSET_X(info.value);
+    offsetY=(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
+
+    // cal dir
+    switch (moveDir)
+    {
     case 0:
     {
-        if(info.signalType==SIGNAL_SYS_SLIDER_LEFT)
+        if((abs(offsetX)>10)&&(abs(offsetX)>abs(offsetY)))
         {
-            ldBaseBgMove(-SCEEN_WIDTH,0);
-            gPage=1;
+            moveDir='-';
+        }
+
+        if((abs(offsetY)>10)&&(abs(offsetX)<abs(offsetY)))
+        {
+            moveDir='|';
         }
         break;
     }
-    case (1):
+    case '-':
     {
-        if(info.signalType==SIGNAL_SYS_SLIDER_RIGHT)
+        if((abs(offsetX)>10)&&(abs(offsetX)>abs(offsetY)))
         {
-            ldBaseBgMove(0,0);
-            gPage=0;
-        }
-        if(info.signalType==SIGNAL_SYS_SLIDER_LEFT)
-        {
-            ldBaseBgMove(-(SCEEN_WIDTH<<1),0);
-            gPage=2;
-        }
-        break;
-    }
-    case (2):
-    {
-        if(info.signalType==SIGNAL_SYS_SLIDER_RIGHT)
-        {
-            ldBaseBgMove(-SCEEN_WIDTH,0);
-            gPage=1;
+            switch (gPage)
+            {
+            case 0:
+            {
+                if(offsetX<0)
+                {
+                    ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,offsetX,0);
+                }
+                break;
+            }
+            case 1:
+            {
+                ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,-SCEEN_WIDTH+offsetX,0);
+                break;
+            }
+            case 2:
+            {
+                if(offsetX>0)
+                {
+                    ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,-(SCEEN_WIDTH<<1)+offsetX,0);
+                }
+                break;
+            }
+            default:
+                break;
+            }
         }
         break;
     }
     default:
         break;
     }
+
+
+
+
+
 
     return false;
 }
@@ -77,10 +158,10 @@ void uiWatchInit(uint8_t page)
     case 0:
 
         // common
-        obj=ldWindowInit(ID_BG,ID_BG,-SCEEN_WIDTH,0,SCEEN_WIDTH*3,SCEEN_HEIGHT);
+        obj=ldWindowInit(ID_BG,ID_BG,0,0,SCEEN_WIDTH*3,SCEEN_HEIGHT);
+        xConnect(ID_BG,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
+        xConnect(ID_BG,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
-        xConnect(0,SIGNAL_SYS_SLIDER_LEFT,0,slotBgMove);
-        xConnect(0,SIGNAL_SYS_SLIDER_RIGHT,0,slotBgMove);
 
         // phonebook page
         obj=ldImageInit(ID_IMAGE_POS0,ID_BG,70,10,100,30,POS1_PNG,true);
@@ -97,6 +178,10 @@ void uiWatchInit(uint8_t page)
             ldTableSetItemAlign(obj,i,0,LD_ALIGN_LEFT);
         }
 
+        xConnect(ID_TABLE,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
+        xConnect(ID_TABLE,SIGNAL_RELEASE,ID_BG,slotBgReset);
+
+
 
 
         // main page
@@ -110,9 +195,32 @@ void uiWatchInit(uint8_t page)
         ldDateTimeSetFormat(obj,"hh:nn:ss");
         ldDateTimeSetTextColor(obj,LD_COLOR_PURPLE);
 
+        xConnect(ID_IMAGE,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
+        xConnect(ID_IMAGE,SIGNAL_RELEASE,ID_BG,slotBgReset);
+
+        xConnect(ID_DATE_TIME,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
+        xConnect(ID_DATE_TIME,SIGNAL_RELEASE,ID_BG,slotBgReset);
+
+
         // app page
         obj=ldImageInit(ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
+
+        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,10,1,HARMONYOS_SANS_SC_MEDIUM_12);
+        ldIconSliderAddIcon(obj,ICON_BMP,"app1");
+        ldIconSliderAddIcon(obj,ICON_BMP,"app2");
+        ldIconSliderAddIcon(obj,ICON_BMP,"app3");
+        ldIconSliderAddIcon(obj,ICON_BMP,"app4");
+        ldIconSliderAddIcon(obj,ICON_BMP,"app5");
+        ldIconSliderSetHorizontalScroll(obj,false);
+
+
+        xConnect(ID_ICON_SLIDER,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
+        xConnect(ID_ICON_SLIDER,SIGNAL_RELEASE,ID_BG,slotBgReset);
+
+        //move to main page
+        ldBaseBgMove(SCEEN_WIDTH*3,SCEEN_HEIGHT,-SCEEN_WIDTH,0);
+        gPage=1;
 
         break;
     default:
@@ -130,7 +238,7 @@ void uiWatchLoop(uint8_t page)
     if(ldTimeOut(1000,&timer1s,true))
     {
 
-        pClock=ldBaseGetWidgetById(ID_DATE_TIME);
+
         second++;
         if(second>=60)
         {
@@ -148,6 +256,7 @@ void uiWatchLoop(uint8_t page)
         }
 //        if(gPage==1)
         {
+        pClock=ldBaseGetWidgetById(ID_DATE_TIME);
         ldDateTimeSetTime(pClock,hour,min,second);
         }
     }

@@ -838,7 +838,7 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
     {
         ldBaseSetHidden((ldCommon_t*)pWidget,true);
         xEmit(0,SIGNAL_EDITING_FINISHED,0);
-        ldBaseBgMove(0,0);
+        ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,0);
         pWidget->dirtyRegionState=waitChange;
         pWidget->isDirtyRegionAutoIgnore=true;
         break;
@@ -960,7 +960,6 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->isWaitInit=true;
         pNewWidget->isSymbol=false;
         pNewWidget->pFunc=&ldKeyboardCommonFunc;
-        pNewWidget->isIgnoreSysSlider=false;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);

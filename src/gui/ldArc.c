@@ -176,7 +176,6 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         pNewWidget->endAngle_x10[1]=1800;
         pNewWidget->rotationAngle_x10=0;
         pNewWidget->pFunc=&ldArcCommonFunc;
-        pNewWidget->isIgnoreSysSlider=false;
 
         LOG_INFO("[arc] init,id:%d\n",nameId);
     }

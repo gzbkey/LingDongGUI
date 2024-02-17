@@ -160,7 +160,6 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldDateTimeCommonFunc;
-        pNewWidget->isIgnoreSysSlider=false;
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }

@@ -1141,10 +1141,9 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
 
     if(pWidget->parentWidget==NULL)
     {
-        parentRegion.tSize.iWidth=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth;
-        parentRegion.tSize.iHeight=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
-        globalPos.x=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-        globalPos.y=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+        parentRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+        globalPos.x=0;
+        globalPos.y=0;
     }
     else
     {
@@ -1395,19 +1394,24 @@ static void ldGuiUpdateDirtyRegion(xListNode* pLink)
     }
 }
 
-void ldBaseBgMove(int16_t x,int16_t y)
+void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
 {
     ldCommon_t *pWidget=ldBaseGetWidgetById(0);
-    ldBaseMove(pWidget,x,y);
+    ldBaseMove(pWidget,offsetX,offsetY);
 
-    //只考虑左移和上移
-    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
-    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
+    int16_t minX = MIN(0, offsetX);
+    int16_t minY = MIN(0, offsetY);
+    int16_t maxX = MAX(LD_CFG_SCEEN_WIDTH, offsetX + bgWidth);
+    int16_t maxY = MAX(LD_CFG_SCEEN_HEIGHT, offsetX + bgHeight);
+
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=maxX-minX;
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=maxY-minY;
 
     ldGuiUpdateDirtyRegion(&ldWidgetLink);
 
     pWidget->dirtyRegionState=waitChange;
     pWidget->isDirtyRegionAutoIgnore=true;
+
 }
 
 

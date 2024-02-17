@@ -30,11 +30,11 @@
 xQueue_t *emitQueue=NULL;
 NEW_LIST(listConnect);
 
-bool xEmitInit(void)
+bool xEmitInit(uint8_t size)
 {
     if(emitQueue==NULL)
     {
-        emitQueue=xQueueCreate(EMIT_QUEUE_SIZE,sizeof (emitInfo_t));
+        emitQueue=xQueueCreate(size,sizeof (emitInfo_t));
         if(emitQueue)
         {
             return true;
@@ -43,7 +43,7 @@ bool xEmitInit(void)
     return false;
 }
 
-bool xEmit(uint16_t senderId,uint8_t signal,size_t value)
+bool xEmit(uint16_t senderId,uint8_t signal,uint64_t value)
 {
     emitInfo_t emitInfo;
 
@@ -66,8 +66,6 @@ static bool _isConnectSame(xListNode* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-#define IS_CONNECT_SAME(pRelation)   xListInfoPrevTraverse(&listConnect,pRelation,_isConnectSame)
-
 bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t* pRelation;
@@ -82,7 +80,7 @@ bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc f
     pRelation->receiverFunc=func;
 
     //确定是否重复添加链接
-    if(IS_CONNECT_SAME(pRelation))
+    if(xListInfoPrevTraverse(&listConnect,pRelation,_isConnectSame))
     {
         XFREE(pRelation);
         return false;

@@ -41,6 +41,10 @@ extern "C" {
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (16*1024) //BYTE
 
+// <o>LingDongGui signal emit buffer size
+// <i> The size of signal emit buffer to the ldgui
+#define LD_EMIT_SIZE                              8
+
 // <o>Number of project pages
 // <i> Maximum number of pages
 #define LD_PAGE_MAX                               (1)

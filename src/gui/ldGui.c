@@ -51,6 +51,10 @@ bool cursorBlinkFlag=false;
 #define TOUCH_NO_CLICK           0
 #define TOUCH_CLICK              1
 
+#ifndef LD_EMIT_SIZE
+#define LD_EMIT_SIZE             8
+#endif
+
 static volatile ldPoint_t pressPoint;
 static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
@@ -81,59 +85,11 @@ void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
 #endif
 }
 
-#define SYS_SLIDER_NONE   0
-#define SYS_SLIDER_LEFT   1
-#define SYS_SLIDER_RIGHT   2
-#define SYS_SLIDER_UP      3
-#define SYS_SLIDER_DOWN    4
-
-uint8_t ldGuiGetSlideDir(int16_t startX,int16_t startY,int16_t endX,int16_t endY)
-{
-    int16_t delta_x = endX - startX;
-    int16_t delta_y = endY - startY;
-
-    int16_t distance_x = abs(delta_x);
-    int16_t distance_y = abs(delta_y);
-
-    int16_t distance = (distance_x > distance_y) ? distance_x : distance_y;
-
-    if(distance<30)
-    {
-        return SYS_SLIDER_NONE;
-    }
-
-    if (distance_x > distance_y)
-    {
-        if (delta_x > 0)
-        {
-            LOG_DEBUG("sys slide right\n");
-            return SYS_SLIDER_RIGHT;
-        }
-        else
-        {
-            LOG_DEBUG("sys slide left\n");
-            return SYS_SLIDER_LEFT;
-        }
-    }
-    else
-    {
-        if (delta_y > 0)
-        {
-            LOG_DEBUG("sys slide down\n");
-            return SYS_SLIDER_DOWN;
-        }
-        else
-        {
-            LOG_DEBUG("sys slide up\n");
-            return SYS_SLIDER_UP;
-        }
-    }
-}
-
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *pWidget;
     xListNode *pNode;
+    uint64_t u64Temp=0;
 
     switch(touchSignal)
     {
@@ -162,7 +118,10 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 
         if(pWidget!=NULL)
         {
-            xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
+            u64Temp=x;
+            u64Temp<<=16;
+            u64Temp+=y;
+            xEmit(pWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -173,8 +132,15 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             pWidget=prevWidget;//不可以把static变量作为函数变量调用
             if(pWidget!=NULL)
             {
-                xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
-                xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,(((x-pressPoint.x)<<16)&0xFFFF0000)|((y-pressPoint.y)&0xFFFF));
+                u64Temp=x-pressPoint.x;
+                u64Temp<<=16;
+                u64Temp+=y-pressPoint.y;
+                u64Temp<<=16;
+                u64Temp+=x;
+                u64Temp<<=16;
+                u64Temp+=y;
+
+                xEmit(pWidget->nameId,touchSignal,u64Temp);
             }
             prevX=x;
             prevY=y;
@@ -186,42 +152,23 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
         pWidget=prevWidget;
         if(pWidget!=NULL)
         {
-            if(!pWidget->isIgnoreSysSlider)
-            {
-                switch(ldGuiGetSlideDir(pressPoint.x,pressPoint.y,prevX,prevY))
-                {
-                case SYS_SLIDER_LEFT:
-                {
-                    xEmit(0,SIGNAL_SYS_SLIDER_LEFT,0);
-                    break;
-                }
-                case SYS_SLIDER_RIGHT:
-                {
-                    xEmit(0,SIGNAL_SYS_SLIDER_RIGHT,0);
-                    break;
-                }
-                case SYS_SLIDER_UP:
-                {
-                    xEmit(0,SIGNAL_SYS_SLIDER_UP,0);
-                    break;
-                }
-                case SYS_SLIDER_DOWN:
-                {
-                    xEmit(0,SIGNAL_SYS_SLIDER_DOWN,0);
-                    break;
-                }
-                default:
-                    break;
-                }
-            }
             //cal speed
             deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
             pressPoint.x=(prevX-pressPoint.x);
             pressPoint.y=(prevY-pressPoint.y);
             pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
             pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
-            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));//x speed | y speed
-            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
+
+            // x speed,y speed,x,y
+            u64Temp=pressPoint.x;
+            u64Temp<<=16;
+            u64Temp+=pressPoint.y;
+            u64Temp<<=16;
+            u64Temp+=prevX;
+            u64Temp<<=16;
+            u64Temp+=prevY;
+
+            xEmit(pWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -311,7 +258,7 @@ static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
  */
 void ldGuiInit(arm_2d_scene_t *pSence)
 {
-    xEmitInit();
+    xEmitInit(LD_EMIT_SIZE);
 
 #if LD_PAGE_MAX > 1
     if(ldPageInitFunc[pageNumNow])

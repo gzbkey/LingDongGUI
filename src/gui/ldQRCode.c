@@ -167,7 +167,6 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldQRCodeCommonFunc;
-        pNewWidget->isIgnoreSysSlider=false;
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }

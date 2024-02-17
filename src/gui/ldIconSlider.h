@@ -21,6 +21,7 @@ typedef struct {
     bool isWaitMove:1;
     bool isAutoMove:1;
     bool isHoldMove:1;
+    bool isScrollEn:1;
     ldFontDict_t* pFontDict;
     ldIconInfo_t* pIconInfoList;
     uint8_t rowCount:4;

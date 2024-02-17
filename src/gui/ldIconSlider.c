@@ -224,21 +224,48 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
         if(pWidget->isHorizontalScroll)
         {
-            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_X(info.value);
         }
         else
         {
-            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
         }
         pWidget->isHoldMove=true;
         break;
     }
     case SIGNAL_RELEASE:
     {
+        int16_t speed;
+        if(pWidget->isScrollEn)
+        {
+            if(pWidget->isHorizontalScroll)
+            {
+                speed=(int16_t)GET_SIGNAL_SPEED_X(info.value);
+            }
+            else
+            {
+                speed=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
+            }
+
+            if((speed>MOVE_SPEED_THRESHOLD_VALUE)||(speed<-MOVE_SPEED_THRESHOLD_VALUE))
+            {
+                if(isLineScroll(pWidget))
+                {
+                    pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
+                }
+                else
+                {
+                    pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
+                }
+
+                pWidget->isAutoMove=true;
+            }
+        }
+
         if(!pWidget->isAutoMove)
         {
             if(pWidget->isHoldMove)
@@ -304,33 +331,6 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
             }
         }
         pWidget->isWaitMove=true;
-        break;
-    }
-    case SIGNAL_MOVE_SPEED:
-    {
-        int16_t speed;
-        if(pWidget->isHorizontalScroll)
-        {
-            speed=(int16_t)GET_SIGNAL_VALUE_X(info.value);
-        }
-        else
-        {
-            speed=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
-        }
-
-        if((speed>MOVE_SPEED_THRESHOLD_VALUE)||(speed<-MOVE_SPEED_THRESHOLD_VALUE))
-        {
-            if(isLineScroll(pWidget))
-            {
-                pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
-            }
-            else
-            {
-                pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
-            }
-
-            pWidget->isAutoMove=true;
-        }
         break;
     }
     default:
@@ -444,7 +444,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
             }
         }
 
-        bool isScrollEn=true;
+        pNewWidget->isScrollEn=true;
 
         // 单行的情况
         if((pNewWidget->pageMax==1)&&((pNewWidget->rowCount==1)||(pNewWidget->columnCount==1)))
@@ -454,7 +454,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
                 pNewWidget->isHorizontalScroll=true;
                 if(width>=pNewWidget->iconMax*(pNewWidget->iconWidth+pNewWidget->iconSpace))
                 {
-                    isScrollEn=false;
+                    pNewWidget->isScrollEn=false;
                 }
             }
             else
@@ -463,7 +463,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 
                 if(height>=pNewWidget->iconMax*(pNewWidget->iconWidth+pNewWidget->iconSpace+_getStrHeight(pFontDict)+IMG_FONT_SPACE))
                 {
-                    isScrollEn=false;
+                    pNewWidget->isScrollEn=false;
                 }
             }
         }
@@ -475,14 +475,12 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldIconSliderCommonFunc;
-        pNewWidget->isIgnoreSysSlider=true;
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
-        if(isScrollEn)
+        if(pNewWidget->isScrollEn)
         {
-            xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotIconSliderScroll);
-            xConnect(pNewWidget->nameId,SIGNAL_MOVE_SPEED,pNewWidget->nameId,slotIconSliderScroll);
+            xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotIconSliderScroll);
         }
 
         LOG_INFO("[iconSlider] init,id:%d\n",nameId);
