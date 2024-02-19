@@ -39,7 +39,6 @@ SOURCES += \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_map.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_pfb.c \
     ../common/Arm-2D/Helper/Source/arm_2d_helper_scene.c \
-    ../common/Arm-2D/Library/Source/__arm_2d_colour_filling_with_alpha.c \
     ../common/Arm-2D/Library/Source/__arm_2d_conversion_helium.c \
     ../common/Arm-2D/Library/Source/__arm_2d_core.c \
     ../common/Arm-2D/Library/Source/__arm_2d_tile.c \

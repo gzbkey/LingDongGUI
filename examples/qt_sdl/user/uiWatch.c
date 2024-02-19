@@ -66,7 +66,7 @@ static bool slotBgReset(xConnectInfo_t info)
     }
     }
     moveDir=0;
-    return false;
+    return true;
 }
 
 static bool slotBgMove(xConnectInfo_t info)
@@ -134,7 +134,7 @@ static bool slotBgMove(xConnectInfo_t info)
 
 
 
-    return false;
+    return true;
 }
 
 uint8_t contactsName[10][8]={
@@ -206,7 +206,7 @@ void uiWatchInit(uint8_t page)
         obj=ldImageInit(ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,10,1,HARMONYOS_SANS_SC_MEDIUM_12);
+        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,3,1,HARMONYOS_SANS_SC_MEDIUM_12);
         ldIconSliderAddIcon(obj,ICON_BMP,"app1");
         ldIconSliderAddIcon(obj,ICON_BMP,"app2");
         ldIconSliderAddIcon(obj,ICON_BMP,"app3");
@@ -227,6 +227,8 @@ void uiWatchInit(uint8_t page)
         break;
     }
 }
+
+int64_t autoMoveTimer=0;
 int64_t timer1s=0;
 uint8_t hour=12,min=0,second=0;
 void uiWatchLoop(uint8_t page)

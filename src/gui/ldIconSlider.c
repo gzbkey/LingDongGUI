@@ -167,11 +167,13 @@ static uint8_t _ldIconSliderAutoFirstItem(ldIconSlider_t *pWidget,int16_t offset
     {
         d=pWidget->iconSpace+pWidget->iconWidth;
         iconFirstMax=pWidget->iconCount-(pResTile->tRegion.tSize.iWidth/d);
+        iconFirstMax/=pWidget->rowCount;
     }
     else
     {
         d=pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict)+IMG_FONT_SPACE;
         iconFirstMax=pWidget->iconCount-(pResTile->tRegion.tSize.iHeight/d);
+        iconFirstMax/=pWidget->columnCount;
     }
 
     temp1=offset%d;
@@ -189,15 +191,6 @@ static uint8_t _ldIconSliderAutoFirstItem(ldIconSlider_t *pWidget,int16_t offset
     temp2=MIN(temp2,iconFirstMax);
 
     return temp2;
-}
-
-static bool isLineScroll(ldIconSlider_t *pWidget)
-{
-    if((pWidget->pageMax==1)&&((pWidget->rowCount==1)||(pWidget->columnCount==1)))
-    {
-        return true;
-    }
-    return false;
 }
 
 static int16_t _scrollOffset;
@@ -253,7 +246,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
 
             if((speed>MOVE_SPEED_THRESHOLD_VALUE)||(speed<-MOVE_SPEED_THRESHOLD_VALUE))
             {
-                if(isLineScroll(pWidget))
+                if(pWidget->pageMax==1)
                 {
                     pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
                 }
@@ -261,7 +254,6 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 {
                     pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
                 }
-
                 pWidget->isAutoMove=true;
             }
         }
@@ -270,7 +262,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         {
             if(pWidget->isHoldMove)
             {
-                if(isLineScroll(pWidget))
+                if(pWidget->pageMax==1)
                 {
                     pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,pWidget->scrollOffset);
                 }
@@ -299,7 +291,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 itemX=((x-globalPos.x))/itemOffsetWidth;
                 itemY=((y-globalPos.y))/itemOffsetHeight;
 
-                if(isLineScroll(pWidget))
+                if(pWidget->pageMax==1)
                 {
                     uint8_t itemOffsetX=0;
                     uint8_t itemOffsetY=0;
@@ -308,11 +300,21 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
 
                     if(pWidget->isHorizontalScroll)
                     {
-                        (itemY==0)?(selectItem=itemX+itemOffsetX):(selectItem=(-1));
+                        if(pWidget->rowCount==1)
+                        {
+                            (itemY==0)?(selectItem=itemX+itemOffsetX):(selectItem=(-1));
+                        }
                     }
                     else
                     {
-                        (itemX==0)?(selectItem=itemY+itemOffsetY):(selectItem=(-1));
+                        if(pWidget->columnCount==1)
+                        {
+                            (itemX==0)?(selectItem=itemY+itemOffsetY):(selectItem=(-1));
+                        }
+                        else
+                        {
+                            selectItem=(itemY+itemOffsetY)*pWidget->columnCount+itemX;
+                        }
                     }
                 }
                 else
@@ -328,6 +330,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                     selectItem=(-1);
                 }
                 xEmit(pWidget->nameId,SIGNAL_CLICKED_ITEM,selectItem);
+                LOG_DEBUG("icon slider click item %d\n",selectItem);
             }
         }
         pWidget->isWaitMove=true;
@@ -336,7 +339,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     default:
         break;
     }
-    return false;
+    return true;
 }
 
 /**
@@ -532,7 +535,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
     {
         int16_t targetOffset=0;
 
-        if(isLineScroll(pWidget))
+        if(pWidget->pageMax==1)
         {
             if(pWidget->isHorizontalScroll)
             {
