@@ -1,6 +1,18 @@
 #include "virtualNor.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+#define NOR_FILE_PATH  "./image.bin"
+
+#define NOR_PAGE_SIZE      4096
+
+char norImgPath[1024]={0};
+
+void norSetBin(char *path)
+{
+    strcpy(norImgPath,path);
+}
 
 void norInit(uint32_t maxSize)
 {
@@ -15,7 +27,14 @@ void norInit(uint32_t maxSize)
     }
     VIRTUAL_NOR_LOG("virtual nor\nsize:%fMB page:1KB\n",length*sizeof(buf)/1024.0/1024.0);
     memset(buf,0xFF,sizeof(buf));
-    fp=fopen(NOR_FILE_PATH,"wb+");
+    if(norImgPath[0]==0)
+    {
+        fp=fopen(NOR_FILE_PATH,"wb+");
+    }
+    else
+    {
+        fp=fopen(norImgPath,"wb+");
+    }
     if(fp!=NULL)
     {
         for(i=0;i<length;i++)
@@ -30,7 +49,15 @@ void norInit(uint32_t maxSize)
 void norRead(uint8_t *buf, uint32_t addr, uint16_t length)
 {
     FILE *fp;
-    fp=fopen(NOR_FILE_PATH,"rb");
+
+    if(norImgPath[0]==0)
+    {
+        fp=fopen(NOR_FILE_PATH,"rb");
+    }
+    else
+    {
+        fp=fopen(norImgPath,"rb");
+    }
     if(fp!=NULL)
     {
         fseek(fp,addr,SEEK_SET);
@@ -42,7 +69,14 @@ void norRead(uint8_t *buf, uint32_t addr, uint16_t length)
 void norWrite(uint8_t *buf, uint32_t addr, uint16_t length)
 {
     FILE *fp;
-    fp=fopen(NOR_FILE_PATH,"rb+");
+    if(norImgPath[0]==0)
+    {
+        fp=fopen(NOR_FILE_PATH,"rb+");
+    }
+    else
+    {
+        fp=fopen(norImgPath,"rb+");
+    }
     if(fp!=NULL)
     {
         fseek(fp,addr,SEEK_SET);
@@ -54,7 +88,6 @@ void norWrite(uint8_t *buf, uint32_t addr, uint16_t length)
 
 void norWritePage(uint8_t *buf, uint32_t addr, uint16_t length)
 {
-    FILE *fp;
     uint16_t pageNum;
     uint32_t targetPageLength;
     uint8_t readBuf[NOR_PAGE_SIZE]={0},writeBuf[NOR_PAGE_SIZE]={0};

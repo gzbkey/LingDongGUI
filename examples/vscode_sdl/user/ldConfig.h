@@ -41,6 +41,10 @@ extern "C" {
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (16*1024) //BYTE
 
+// <o>LingDongGui signal emit buffer size
+// <i> The size of signal emit buffer to the ldgui
+#define LD_EMIT_SIZE                              8
+
 // <o>Number of project pages
 // <i> Maximum number of pages
 #define LD_PAGE_MAX                               (1)
@@ -51,7 +55,7 @@ extern "C" {
 
 // <q>External NOR support
 // <i> Read external nor, please enable this option
-#define USE_VIRTUAL_RESOURCE                      (0)
+#define USE_VIRTUAL_RESOURCE                      (1)
 
 // widget config
 
@@ -76,7 +80,7 @@ extern "C" {
 //     <4=>    LOG_LEVEL_INFO
 //     <5=>    LOG_LEVEL_DEBUG
 // <i> Do not use log. Please select LOG_LEVEL_NONE
-#define USE_LOG_LEVEL                             (0)
+#define USE_LOG_LEVEL                             (5)
 
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)

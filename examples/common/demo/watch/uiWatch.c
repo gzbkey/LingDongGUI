@@ -1,5 +1,10 @@
 #include "uiWatch.h"
-#include "image.h"
+#include "binWatch.h"
+
+#if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__)
+#include "virtualNor.h"
+bool isWaitNorInit = true;
+#endif
 
 #define ID_BG   0
 #define ID_IMAGE 1
@@ -152,6 +157,13 @@ uint8_t contactsName[10][8]={
 
 void uiWatchInit(uint8_t page)
 {
+#if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__)
+    if(isWaitNorInit)
+    {
+        norSetBin("../common/demo/watch/binWatch.bin");
+        isWaitNorInit=false;
+    }
+#endif
     void *obj;
 
     switch (page) {
@@ -167,14 +179,14 @@ void uiWatchInit(uint8_t page)
         obj=ldImageInit(ID_IMAGE_POS0,ID_BG,70,10,100,30,POS1_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldTableInit(ID_TABLE,ID_BG,20,50,200,180,10,1,2,HARMONYOS_SANS_SC_MEDIUM_28);
+        obj=ldTableInit(ID_TABLE,ID_BG,20,50,200,180,10,1,2,ARIAL_REGULAR_28);
 
         for(int i=0;i<10;i++)
         {
             ldTableSetItemHeight(obj,i,40);
             ldTableSetItemImage(obj,i,0,5,5,30,30,CONTACTS_PNG,false,LD_COLOR_GREEN,true);
-//            ldTableSetItemStaticText(obj,i,0,contactsName[i],HARMONYOS_SANS_SC_MEDIUM_28);
-            ldTableSetItemText(obj,i,0,contactsName[i],HARMONYOS_SANS_SC_MEDIUM_28);
+//            ldTableSetItemStaticText(obj,i,0,contactsName[i],ARIAL_REGULAR_28);
+            ldTableSetItemText(obj,i,0,contactsName[i],ARIAL_REGULAR_28);
             ldTableSetItemAlign(obj,i,0,LD_ALIGN_LEFT);
         }
 
@@ -191,7 +203,7 @@ void uiWatchInit(uint8_t page)
         obj=ldImageInit(ID_IMAGE_POS1,ID_BG,SCEEN_WIDTH+70,10,100,30,POS2_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,SCEEN_WIDTH+20,180,120,60,HARMONYOS_SANS_SC_MEDIUM_28);
+        obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,SCEEN_WIDTH+20,180,120,60,ARIAL_REGULAR_28);
         ldDateTimeSetFormat(obj,"hh:nn:ss");
         ldDateTimeSetTextColor(obj,LD_COLOR_PURPLE);
 
@@ -206,7 +218,7 @@ void uiWatchInit(uint8_t page)
         obj=ldImageInit(ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,3,1,HARMONYOS_SANS_SC_MEDIUM_12);
+        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,3,1,ARIAL_REGULAR_12);
         ldIconSliderAddIcon(obj,ICON_BMP,"app1");
         ldIconSliderAddIcon(obj,ICON_BMP,"app2");
         ldIconSliderAddIcon(obj,ICON_BMP,"app3");

@@ -97,18 +97,18 @@ SOURCES += \
     ../common/Arm-2D/examples/common/controls/progress_wheel.c \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.c \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.c \
+    ../common/demo/watch/binWatch.c \
+    ../common/demo/watch/uiWatch.c \
     ../common/virtual_flash/virtualNor.c \
     ../common/math/arm_common_tables.c \
     ../common/math/arm_cos_f32.c \
     ../common/math/arm_cos_q31.c \
     ../common/math/arm_sin_f32.c \
     ../common/math/arm_sin_q31.c \
-    user/image.c \
     user/ldConfig.c \
     user/main.c \
     user/Virtual_TFT_Port.c \
-    user/arm_2d_disp_adapter_0.c \
-    user/uiWatch.c
+    user/arm_2d_disp_adapter_0.c
 
 HEADERS += \
     ../../src/gui/ldArc.h \
@@ -212,15 +212,14 @@ HEADERS += \
     ../common/Arm-2D/examples/common/controls/progress_wheel.h \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.h \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.h \
+    ../common/demo/watch/binWatch.h \
+    ../common/demo/watch/uiWatch.h \
     ../common/virtual_flash/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
     user/arm_2d_disp_adapter_0.h \
     user/arm_2d_user_arch_port.h \
-    user/image.h \
-    user/ldConfig.h \
-    user/uiWatch.h \
-    user/uiHome.h
+    user/ldConfig.h
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
@@ -230,6 +229,7 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 INCLUDEPATH += $$PWD/user
 INCLUDEPATH += $$PWD/../common/math
 INCLUDEPATH += $$PWD/../common/virtual_flash
+INCLUDEPATH += $$PWD/../common/demo/watch
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc

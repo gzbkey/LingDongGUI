@@ -1,5 +1,5 @@
-﻿#ifndef _IMAGE_H_
-#define _IMAGE_H_
+﻿#ifndef _BIN_WATCH_H_
+#define _BIN_WATCH_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,13 +55,13 @@ extern const uint8_t wallpaper_jpg[];
 #define WALLPAPER_JPG 20268
 #endif
 
-#define HARMONYOS_SANS_SC_MEDIUM_12 (&dict_HarmonyOS_Sans_SC_Medium_12)
-extern ldFontDict_t dict_HarmonyOS_Sans_SC_Medium_12;
+#define ARIAL_REGULAR_28 (&dict_Arial_Regular_28)
+extern ldFontDict_t dict_Arial_Regular_28;
 
-#define HARMONYOS_SANS_SC_MEDIUM_28 (&dict_HarmonyOS_Sans_SC_Medium_28)
-extern ldFontDict_t dict_HarmonyOS_Sans_SC_Medium_28;
+#define ARIAL_REGULAR_12 (&dict_Arial_Regular_12)
+extern ldFontDict_t dict_Arial_Regular_12;
 
 #ifdef __cplusplus
 }
 #endif
-#endif //_IMAGE_H_
+#endif //_BIN_WATCH_H_

@@ -3,11 +3,9 @@
 
 #include "stdint.h"
 
-#define NOR_FILE_PATH  "../qt_sdl/user/image.bin"
-
-#define NOR_PAGE_SIZE      4096
-
 #define VIRTUAL_NOR_LOG     printf
+
+void norSetBin(char *path);
 
 void norRead(uint8_t *buf,uint32_t addr,uint16_t length);
 

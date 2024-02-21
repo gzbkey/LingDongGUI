@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "ldGui.h"
-#include "image.h"
 
 void uiWatchInit(uint8_t page);
 void uiWatchLoop(uint8_t page);

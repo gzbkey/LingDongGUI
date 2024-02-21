@@ -7,7 +7,6 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "ldConfig.h"
 
 //
 // 虚拟屏幕设定参数,即需要一个什么样的屏幕

@@ -12,6 +12,7 @@
                 "${workspaceFolder}/../common/Arm-2D/Library/Include",
                 "${workspaceFolder}/../common/Arm-2D/examples/common/controls",
                 "${workspaceFolder}/../common/virtual_flash",
+                "${workspaceFolder}/../common/demo/watch",
                 "${workspaceFolder}/../../src/gui",
                 "${workspaceFolder}/../../src/misc"
             ],
@@ -42,6 +43,7 @@
                 "${workspaceFolder}/../common/Arm-2D/Library/Include",
                 "${workspaceFolder}/../common/Arm-2D/examples/common/controls",
                 "${workspaceFolder}/../common/virtual_flash",
+                "${workspaceFolder}/../common/demo/watch",
                 "${workspaceFolder}/../../src/gui",
                 "${workspaceFolder}/../../src/misc"
             ],
