@@ -1,7 +1,7 @@
 #include "uiWatch.h"
 #include "binWatch.h"
 
-#if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__)
+#if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
 #include "virtualNor.h"
 bool isWaitNorInit = true;
 #endif
@@ -14,12 +14,15 @@ bool isWaitNorInit = true;
 #define ID_IMAGE_POS2   5
 #define ID_TABLE        6
 #define ID_ICON_SLIDER   7
+#define ID_WIN_TOP       8
 
 #define SCEEN_WIDTH          240
 #define SCEEN_HEIGHT         240
 
 uint8_t gPage=0;
 uint8_t moveDir=0;
+bool isMoveUp=0;
+bool isWinTopFullShow=false;
 
 static bool slotBgReset(xConnectInfo_t info)
 {
@@ -69,6 +72,23 @@ static bool slotBgReset(xConnectInfo_t info)
     default:
         break;
     }
+    }
+    else
+    {
+        if(gPage==1)
+        {
+            if(isMoveUp)
+            {
+                ldWindowMove(ldBaseGetWidgetById(ID_WIN_TOP),SCEEN_WIDTH,-SCEEN_HEIGHT);
+                isWinTopFullShow=false;
+            }
+            else
+            {
+                ldWindowMove(ldBaseGetWidgetById(ID_WIN_TOP),SCEEN_WIDTH,0);
+                isWinTopFullShow=true;
+            }
+
+        }
     }
     moveDir=0;
     return true;
@@ -130,6 +150,31 @@ static bool slotBgMove(xConnectInfo_t info)
         }
         break;
     }
+    case '|':
+    {
+        if((abs(offsetY)>10)&&(abs(offsetX)<abs(offsetY))&&(gPage==1))
+        {
+            if(isWinTopFullShow)
+            {
+                ldWindowMove(ldBaseGetWidgetById(ID_WIN_TOP),SCEEN_WIDTH,offsetY);
+            }
+            else
+            {
+                ldWindowMove(ldBaseGetWidgetById(ID_WIN_TOP),SCEEN_WIDTH,offsetY-SCEEN_HEIGHT);
+            }
+
+            if(offsetY>0)//下拉
+            {
+
+                isMoveUp=false;
+            }
+            else
+            {
+                isMoveUp=true;
+            }
+        }
+        break;
+    }
     default:
         break;
     }
@@ -157,7 +202,7 @@ uint8_t contactsName[10][8]={
 
 void uiWatchInit(uint8_t page)
 {
-#if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__)
+#if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
     if(isWaitNorInit)
     {
         norSetBin("../common/demo/watch/binWatch.bin");
@@ -185,8 +230,8 @@ void uiWatchInit(uint8_t page)
         {
             ldTableSetItemHeight(obj,i,40);
             ldTableSetItemImage(obj,i,0,5,5,30,30,CONTACTS_PNG,false,LD_COLOR_GREEN,true);
-//            ldTableSetItemStaticText(obj,i,0,contactsName[i],ARIAL_REGULAR_28);
-            ldTableSetItemText(obj,i,0,contactsName[i],ARIAL_REGULAR_28);
+            ldTableSetItemStaticText(obj,i,0,contactsName[i],ARIAL_REGULAR_28);
+//            ldTableSetItemText(obj,i,0,contactsName[i],ARIAL_REGULAR_28);
             ldTableSetItemAlign(obj,i,0,LD_ALIGN_LEFT);
         }
 
@@ -213,6 +258,11 @@ void uiWatchInit(uint8_t page)
         xConnect(ID_DATE_TIME,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
         xConnect(ID_DATE_TIME,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
+        obj=ldWindowInit(ID_WIN_TOP,ID_BG,SCEEN_WIDTH,-SCEEN_HEIGHT,SCEEN_WIDTH,SCEEN_HEIGHT);
+        ldWindowSetBgColor(obj,LD_COLOR_GRAY);
+
+        xConnect(ID_WIN_TOP,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
+        xConnect(ID_WIN_TOP,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
         // app page
         obj=ldImageInit(ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);

@@ -1169,7 +1169,14 @@ void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y)
         return;
     }
 
-    pWidget->dirtyRegionState=waitChange;
+    if(pWidget->parentWidget!=NULL)
+    {
+        ((ldCommon_t*)(pWidget->parentWidget))->dirtyRegionState=waitChange;
+    }
+    else
+    {
+        pWidget->dirtyRegionState=waitChange;
+    }
 
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX=x;
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY=y;
@@ -1364,7 +1371,6 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
             pWidget->dirtyRegionListItem.bIgnore=false;
             pWidget->dirtyRegionListItem.bUpdated=true;
             pWidget->dirtyRegionState=none;
-
             if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
             {
                 pWidget->dirtyRegionListItem.bIgnore=true;

@@ -709,6 +709,13 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                     }
                     tItemTile.tRegion.tSize.iWidth+=CURSOR_WIDTH;
                 }
+                else
+                {
+                    if((item->pText!=NULL)&&(item->isStaticText))
+                    {
+                        ldBaseLineText(&tItemTile,pResTile,item->pText,item->pFontDict,item->align,item->textColor,0,255);
+                    }
+                }
 
                 if((item->releaseImgAddr!=LD_ADDR_NONE)||(item->pressImgAddr!=LD_ADDR_NONE))
                 {

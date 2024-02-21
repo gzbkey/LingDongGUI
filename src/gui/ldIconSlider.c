@@ -339,7 +339,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     default:
         break;
     }
-    return true;
+    return false;
 }
 
 /**
