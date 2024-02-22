@@ -97,7 +97,7 @@ SOURCES += \
     ../common/Arm-2D/examples/common/controls/progress_wheel.c \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.c \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.c \
-    ../common/demo/watch/binWatch.c \
+    ../common/demo/watch/srcWatch.c \
     ../common/demo/watch/uiWatch.c \
     ../common/virtual_flash/virtualNor.c \
     ../common/math/arm_common_tables.c \
@@ -212,7 +212,7 @@ HEADERS += \
     ../common/Arm-2D/examples/common/controls/progress_wheel.h \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.h \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.h \
-    ../common/demo/watch/binWatch.h \
+    ../common/demo/watch/srcWatch.h \
     ../common/demo/watch/uiWatch.h \
     ../common/virtual_flash/virtualNor.h \
     user/Virtual_TFT_Port.h \

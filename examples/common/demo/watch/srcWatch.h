@@ -1,5 +1,5 @@
-﻿#ifndef _BIN_WATCH_H_
-#define _BIN_WATCH_H_
+﻿#ifndef _SRC_WATCH_H_
+#define _SRC_WATCH_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,4 +64,4 @@ extern ldFontDict_t dict_Arial_Regular_12;
 #ifdef __cplusplus
 }
 #endif
-#endif //_BIN_WATCH_H_
+#endif //_SRC_WATCH_H_

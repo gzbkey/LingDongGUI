@@ -1,5 +1,5 @@
 #include "uiWatch.h"
-#include "binWatch.h"
+#include "srcWatch.h"
 
 #if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
 #include "virtualNor.h"
@@ -205,7 +205,7 @@ void uiWatchInit(uint8_t page)
 #if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
     if(isWaitNorInit)
     {
-        norSetBin("../common/demo/watch/binWatch.bin");
+        norSetBin("../common/demo/watch/srcWatch.bin");
         isWaitNorInit=false;
     }
 #endif
