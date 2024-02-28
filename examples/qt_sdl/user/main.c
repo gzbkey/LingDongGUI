@@ -9,6 +9,7 @@
 #include "xBtnAction.h"
 #include "stdbool.h"
 #include "uiWatch.h"
+#include "uiWidget.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -107,7 +108,8 @@ int main (void)
     xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
     xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
-    LD_ADD_PAGE(uiWatch);
+//    LD_ADD_PAGE(uiWatch);
+    LD_ADD_PAGE(uiWidget);
 
     arm_irq_safe {
         arm_2d_init();

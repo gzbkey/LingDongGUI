@@ -1,9 +1,8 @@
 #include "uiWatch.h"
-#include "srcWatch.h"
 
 #if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
 #include "virtualNor.h"
-bool isWaitNorInit = true;
+static bool isWaitNorInit = true;
 #endif
 
 #define ID_BG   0

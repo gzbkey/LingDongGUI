@@ -97,8 +97,6 @@ SOURCES += \
     ../common/Arm-2D/examples/common/controls/progress_wheel.c \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.c \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.c \
-    ../common/demo/watch/srcWatch.c \
-    ../common/demo/watch/uiWatch.c \
     ../common/virtual_flash/virtualNor.c \
     ../common/math/arm_common_tables.c \
     ../common/math/arm_cos_f32.c \
@@ -212,14 +210,15 @@ HEADERS += \
     ../common/Arm-2D/examples/common/controls/progress_wheel.h \
     ../common/Arm-2D/examples/common/controls/shape_round_corner_box.h \
     ../common/Arm-2D/examples/common/controls/spinning_wheel.h \
-    ../common/demo/watch/srcWatch.h \
-    ../common/demo/watch/uiWatch.h \
     ../common/virtual_flash/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
     user/arm_2d_disp_adapter_0.h \
     user/arm_2d_user_arch_port.h \
     user/ldConfig.h
+
+HEADERS += $$files(../common/demo/*.h, true)
+SOURCES += $$files(../common/demo/*.c, true)
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
@@ -229,7 +228,8 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 INCLUDEPATH += $$PWD/user
 INCLUDEPATH += $$PWD/../common/math
 INCLUDEPATH += $$PWD/../common/virtual_flash
-INCLUDEPATH += $$PWD/../common/demo/watch
+#INCLUDEPATH += $$PWD/../common/demo/watch
+INCLUDEPATH += $$files(../common/demo/*, true)
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc

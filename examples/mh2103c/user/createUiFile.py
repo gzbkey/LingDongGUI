@@ -18,7 +18,7 @@ pageHFileStr='#ifndef _UI_USER_H_\n\
 extern "C" {\n\
 #endif\n\n\
 #include "ldGui.h"\n\
-#include "image.h"\n\n\
+#include "srcUser.h"\n\n\
 void uiUserInit(uint8_t page);\n\
 void uiUserLoop(uint8_t page);\n\
 void uiUserQuit(uint8_t page);\n\n\
