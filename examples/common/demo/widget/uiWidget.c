@@ -102,24 +102,21 @@ void uiWidgetInit(uint8_t page)
 
         obj=ldQRCodeInit(ID_QR_CODE,ID_WIN,150,250,60,60,(uint8_t*)"ldgui",LD_COLOR_LIGHT_BLUE,LD_COLOR_WHITE,eccHigh,2,2);
 
-//        obj=ldTableInit(ID_TABLE,ID_WIN,320,10,100,100,3,3,1);
-//        ldTableSetItemWidth(obj,1,60);
-//        ldTableSetBgColor(obj,__RGB(230,230,230));
-//        ldTableSetItemColor(obj,0,0,LD_COLOR_BLACK,__RGB(238,238,238));
-//        ldTableSetItemColor(obj,0,1,LD_COLOR_BLACK,__RGB(238,238,238));
-//        ldTableSetItemColor(obj,0,2,LD_COLOR_BLACK,__RGB(238,238,238));
+        obj=ldTableInit(ID_TABLE,ID_WIN,450,200,300,100,5,3,1,SIMSUN_REGULAR_12);
+        ldTableSetExcelType(obj,SIMSUN_REGULAR_12);
+        ldTableSetKeyboard(obj,ID_KB);
 
-//        ldTableSetItemText(obj,0,0,(uint8_t*)"id",SIMSUN_REGULAR_12);
-//        ldTableSetItemText(obj,0,1,(uint8_t*)"name",SIMSUN_REGULAR_12);
-//        ldTableSetItemText(obj,0,2,(uint8_t*)"size",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,0,0,(uint8_t*)"id",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,0,1,(uint8_t*)"name",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,0,2,(uint8_t*)"size",SIMSUN_REGULAR_12);
 
-//        ldTableSetItemText(obj,1,0,(uint8_t*)"1",SIMSUN_REGULAR_12);
-//        ldTableSetItemText(obj,1,1,(uint8_t*)"button",SIMSUN_REGULAR_12);
-//        ldTableSetItemText(obj,1,2,(uint8_t*)"30*20",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,1,0,(uint8_t*)"1",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,1,1,(uint8_t*)"button",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,1,2,(uint8_t*)"30*20",SIMSUN_REGULAR_12);
 
-//        ldTableSetItemText(obj,2,0,(uint8_t*)"2",SIMSUN_REGULAR_12);
-//        ldTableSetItemText(obj,2,1,(uint8_t*)"image",SIMSUN_REGULAR_12);
-//        ldTableSetItemText(obj,2,2,(uint8_t*)"100*100",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,2,0,(uint8_t*)"2",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,2,1,(uint8_t*)"image",SIMSUN_REGULAR_12);
+        ldTableSetItemText(obj,2,2,(uint8_t*)"100*100",SIMSUN_REGULAR_12);
 
         obj=ldLabelInit(ID_LABLE,ID_WIN,320,165,100,30,SIMSUN_REGULAR_12);
         ldLabelSetText(obj,(uint8_t*)"lable demo");
@@ -168,6 +165,7 @@ void uiWidgetInit(uint8_t page)
         obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
         ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
         ldLineEditSetKeyboard(obj,ID_KB);
+
 }
 
 void uiWidgetLoop(uint8_t page)
