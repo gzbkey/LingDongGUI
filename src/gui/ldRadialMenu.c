@@ -124,7 +124,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
         do{
             float preAngle;
             int8_t offsetItem;
-            x=(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            x=(int16_t)GET_SIGNAL_SPEED_X(info.value);
             preAngle=360.0/pWidget->itemCount;
 
             if((x>=preAngle)||(x<=(-preAngle)))
@@ -166,6 +166,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
                 }
             }
         }while(0);
+
         if((pWidget->isMove==false)&&(pWidget->offsetAngle==0))//只允许静止状态下选择
         {
             x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-widgetPos.x;
@@ -177,6 +178,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
                    ((x     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX)&&(x     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth-1))&&(y     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)&&(y     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight-1))))
                 {
                     ldRadialMenuSelectItem(pWidget,pWidget->showList[i]);
+                    LOG_DEBUG("click item %d\n",pWidget->showList[i]);
                     break;
                 }
             }
