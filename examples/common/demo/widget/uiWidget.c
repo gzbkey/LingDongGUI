@@ -31,6 +31,8 @@ static bool isWaitNorInit = true;
 #define ID_Radio1   19
 #define ID_Radio2   20
 
+#define ID_ARC   21
+
 extern size_t xFreeBytesRemaining;
 
 void uiWidgetInit(uint8_t page)
@@ -163,9 +165,14 @@ void uiWidgetInit(uint8_t page)
 
         // 120 280
         obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
-        ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
         ldLineEditSetKeyboard(obj,ID_KB);
 
+
+        obj=ldArcInit(ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
+
+
+
+        ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
 }
 
 void uiWidgetLoop(uint8_t page)
