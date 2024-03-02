@@ -18,8 +18,6 @@
  * @file    ldGauge.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   仪表盘控件
- * @version 0.1
- * @date    2023-11-09
  */
 #include "ldGauge.h"
 #include "ldGui.h"

@@ -18,8 +18,6 @@
  * @file    ldTemplate.c
  * @author  
  * @brief   
- * @version 0.1
- * @date    
  */
 
 #include "ldTemplate.h"

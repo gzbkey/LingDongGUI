@@ -18,8 +18,6 @@
  * @file    xString.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   字符串处理
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xString.h"
 

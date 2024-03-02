@@ -18,8 +18,6 @@
  * @file    ldButton.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   button widget
- * @version 0.1
- * @date    2023-11-03
  * @signal  SIGNAL_PRESS
  *          SIGNAL_RELEASE
  */

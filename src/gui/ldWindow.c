@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   window widget
  *          窗体控件可包含其他的控件，实现复合型控件或者控件组合模块
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldWindow.h"
 #include "ldGui.h"

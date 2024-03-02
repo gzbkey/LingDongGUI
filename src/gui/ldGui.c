@@ -18,8 +18,6 @@
  * @file    ldGui.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   ldgui的主文件
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldGui.h"
 #include "ldImage.h"

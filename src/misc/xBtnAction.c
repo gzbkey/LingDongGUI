@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   轻量级按键状态检测库
  *          支持实体按键、触摸按键
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xBtnAction.h"
 #include "xList.h"

@@ -18,8 +18,6 @@
  * @file    ldLineEdit.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   输入框控件
- * @version 0.2
- * @date    2024-01-15
  */
 
 #include "ldLineEdit.h"

@@ -18,8 +18,6 @@
  * @file    ldGraph.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   曲线图控件
- * @version 0.1
- * @date    2023-12-21
  */
 
 #include "ldGraph.h"

@@ -18,8 +18,6 @@
  * @file    xConnect.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   信号动作连接库，类似qt的信号槽
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xConnect.h"
 #include "xQueue.h"

@@ -169,14 +169,26 @@ void uiWidgetInit(uint8_t page)
 
 
         obj=ldArcInit(ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
-
-
+        ldArcSetBgAngle(obj,0,350);
+        ldArcSetFgAngle(obj,30);
+        ldArcSetColor(obj,LD_COLOR_LIGHT_BLUE,LD_COLOR_LIGHT_GREEN);
 
         ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
 }
 
+int64_t timer=0;
+int16_t angle=0;
 void uiWidgetLoop(uint8_t page)
 {
+    if(ldTimeOut(10,&timer,true))
+    {
+        ldArcSetRotationAngle(ldBaseGetWidgetById(ID_ARC),angle);
+        angle++;
+        if(angle>=360)
+        {
+            angle=0;
+        }
+    }
 }
 
 void uiWidgetQuit(uint8_t page)

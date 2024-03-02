@@ -18,8 +18,6 @@
  * @file    ldScrollSelecter.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   scroll selecter widget
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldScrollSelecter.h"
 #include "ldGui.h"

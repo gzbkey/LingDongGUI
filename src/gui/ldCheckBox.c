@@ -18,8 +18,6 @@
  * @file    ldCheckBox.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   复选框 + 单选功能，支持自定义图片和文字显示
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldCheckBox.h"
 #include "ldGui.h"

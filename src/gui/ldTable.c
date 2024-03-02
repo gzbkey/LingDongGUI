@@ -18,8 +18,6 @@
  * @file    ldTable.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   表格控件
- * @version 0.1
- * @date    2023-11-14
  */
 #include "ldTable.h"
 #include "ldGui.h"

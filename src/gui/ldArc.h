@@ -26,8 +26,7 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isClockwise:1;
-    ldColor bgColor;
-    ldColor fgColor;
+    ldColor color[2];
     ldColor parentColor;
     uint32_t srcAddr;
     uint32_t maskAddr;

@@ -18,8 +18,6 @@
  * @file    ldKeyboard.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   键盘控件，可以切换数字键盘和字母键盘
- * @version 0.2
- * @date    2024-01-15
  * @signal  SIGNAL_INPUT_ASCII
  */
 

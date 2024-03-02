@@ -18,8 +18,6 @@
  * @file    ldText.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   text widget
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldText.h"
 #include "ldGui.h"

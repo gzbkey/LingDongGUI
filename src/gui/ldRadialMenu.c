@@ -18,8 +18,6 @@
  * @file    ldRadialMenu.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   radial menu widget
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldRadialMenu.h"
 #include "ldGui.h"

@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   队列库
  *          支持16位、32位、64位芯片
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xQueue.h"
 #include "string.h"

@@ -18,8 +18,6 @@
  * @file    ldQRCode.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   qr code widget
- * @version 0.1
- * @date    2023-11-14
  */
 #include "ldQRCode.h"
 #include "ldGui.h"

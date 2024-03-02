@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   image widget
  *          background、window、image共用控件
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldImage.h"
 #include "ldGui.h"

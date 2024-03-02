@@ -18,8 +18,6 @@
  * @file    ldComboBox.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   下拉框控件
- * @version 0.2
- * @date    2024-01-15
  * @signal  SIGNAL_CLICKED_ITEM
  */
 
