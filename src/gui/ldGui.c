@@ -214,17 +214,17 @@ void ldGuiTouchProcess(void)
 
 static void _ldGuiLoop(xListNode* pLink,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    xListNode *temp_pos,*safePos;
+    xListNode *tempPos,*safePos;
 
-    list_for_each_safe(temp_pos,safePos, pLink)
+    list_for_each_safe(tempPos,safePos, pLink)
     {
-        if(temp_pos->info!=NULL)
+        if(tempPos->info!=NULL)
         {
-            (((ldCommon_t *)temp_pos->info)->pFunc)->loop(temp_pos->info,ptParent,bIsNewFrame);
+            (((ldCommon_t *)tempPos->info)->pFunc)->loop(tempPos->info,ptParent,bIsNewFrame);
             
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
             {
-                _ldGuiLoop(((ldCommon_t *)temp_pos->info)->childList,ptParent,bIsNewFrame);
+                _ldGuiLoop(((ldCommon_t *)tempPos->info)->childList,ptParent,bIsNewFrame);
             }
         }
     }
@@ -279,17 +279,17 @@ void ldGuiInit(arm_2d_scene_t *pSence)
 
 static void _ldGuiFrameUpdate(xListNode* pLink)
 {
-    xListNode *temp_pos,*safePos;
+    xListNode *tempPos,*safePos;
 
-    list_for_each_safe(temp_pos,safePos, pLink)
+    list_for_each_safe(tempPos,safePos, pLink)
     {
-        if(temp_pos->info!=NULL)
+        if(tempPos->info!=NULL)
         {
-            (((ldCommon_t *)temp_pos->info)->pFunc)->update(temp_pos->info);
+            (((ldCommon_t *)tempPos->info)->pFunc)->update(tempPos->info);
 
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
             {
-                _ldGuiFrameUpdate(((ldCommon_t *)temp_pos->info)->childList);
+                _ldGuiFrameUpdate(((ldCommon_t *)tempPos->info)->childList);
             }
         }
     }

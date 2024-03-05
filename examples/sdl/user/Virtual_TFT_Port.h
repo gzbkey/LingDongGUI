@@ -7,12 +7,13 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "uiDemo.h"
 
 //
 // 虚拟屏幕设定参数,即需要一个什么样的屏幕
 //
-#define VT_WIDTH                 800
-#define VT_HEIGHT                480
+#define VT_WIDTH                 DEMO_SCEEN_WIDTH
+#define VT_HEIGHT                DEMO_SCEEN_HEIGHT
 #define VT_COLOR_DEPTH           16
 #define VT_VIRTUAL_MACHINE       0                   /*Different rendering should be used if running in a Virtual machine*/
 

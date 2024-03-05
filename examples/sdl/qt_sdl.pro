@@ -34,7 +34,7 @@ SOURCES += \
     ../../src/misc/xList.c \
     ../../src/misc/xQueue.c \
     ../../src/misc/xString.c \
-    ../common/virtual_flash/virtualNor.c \
+    virtualNor/virtualNor.c \
     user/ldConfig.c \
     user/main.c \
     user/Virtual_TFT_Port.c \
@@ -72,7 +72,7 @@ HEADERS += \
     ../../src/misc/xLog.h \
     ../../src/misc/xQueue.h \
     ../../src/misc/xString.h \
-    ../common/virtual_flash/virtualNor.h \
+    virtualNor/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
     user/arm_2d_disp_adapter_0.h \
@@ -80,16 +80,16 @@ HEADERS += \
     user/ldConfig.h
 
 HEADERS += $$files(../common/demo/*.h, true) \
-           $$files(../common/Arm-2D/examples/common/controls/*.h, false) \
-           $$files(../common/Arm-2D/Library/Source/*.inc, false) \
-           $$files(../common/Arm-2D/Library/Include/*.h, false) \
-           $$files(../common/Arm-2D/Helper/Include/*.h, false)
+           $$files(../common/Arm-2D/examples/common/controls/*.h) \
+           $$files(../common/Arm-2D/Library/Source/*.inc) \
+           $$files(../common/Arm-2D/Library/Include/*.h) \
+           $$files(../common/Arm-2D/Helper/Include/*.h)
 
 SOURCES += $$files(../common/demo/*.c, true) \
-           $$files(../common/Arm-2D/examples/common/controls/*.c, false) \
-           $$files(../common/Arm-2D/examples/common/asset/*.c, false) \
-           $$files(../common/Arm-2D/Library/Source/*.c, false) \
-           $$files(../common/Arm-2D/Helper/Source/*.c, false) \
+           $$files(../common/Arm-2D/examples/common/controls/*.c) \
+           $$files(../common/Arm-2D/examples/common/asset/*.c) \
+           $$files(../common/Arm-2D/Library/Source/*.c) \
+           $$files(../common/Arm-2D/Helper/Source/*.c) \
            $$files(../common/math/*.c, true)
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
@@ -98,24 +98,24 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/Library/Include
 INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 
 INCLUDEPATH += $$PWD/user
+INCLUDEPATH += $$PWD/virtualNor
 INCLUDEPATH += $$PWD/../common/math
-INCLUDEPATH += $$PWD/../common/virtual_flash
-#INCLUDEPATH += $$PWD/../common/demo/watch
+INCLUDEPATH += $$PWD/../common/demo
 INCLUDEPATH += $$files(../common/demo/*, true)
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc
 
 contains(QT_ARCH, i386){
-INCLUDEPATH += $$PWD/../common/sdl2/32/include/SDL2
-LIBS += -L$$PWD/../common/sdl2/32/lib -lSDL2
-LIBS += -L$$PWD/../common/sdl2/32/lib -lSDL2main
-SDL2_PATH = $$PWD/../common/sdl2/32/bin/SDL2.dll
+INCLUDEPATH += $$PWD/sdl2/32/include/SDL2
+LIBS += -L$$PWD/sdl2/32/lib -lSDL2
+LIBS += -L$$PWD/sdl2/32/lib -lSDL2main
+SDL2_PATH = $$PWD/sdl2/32/bin/SDL2.dll
 }else{
-INCLUDEPATH += $$PWD/../common/sdl2/64/include/SDL2
-LIBS += -L$$PWD/../common/sdl2/64/lib -lSDL2
-LIBS += -L$$PWD/../common/sdl2/64/lib -lSDL2main
-SDL2_PATH = $$PWD/../common/sdl2/64/bin/SDL2.dll
+INCLUDEPATH += $$PWD/sdl2/64/include/SDL2
+LIBS += -L$$PWD/sdl2/64/lib -lSDL2
+LIBS += -L$$PWD/sdl2/64/lib -lSDL2main
+SDL2_PATH = $$PWD/sdl2/64/bin/SDL2.dll
 }
 
 SDL2_PATH = $$replace(SDL2_PATH, /, \\)
