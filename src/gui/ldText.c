@@ -158,7 +158,7 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldTextCommonFunc;
 
         LOG_INFO("[text] init,id:%d\n",nameId);
@@ -205,6 +205,8 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
             {
                 pWidget->isRelease=false;
                 pWidget->scrollOffset=0;
+                pWidget->dirtyRegionState=waitChange;
+                pWidget->isDirtyRegionAutoIgnore=true;
             }
             else
             {
@@ -217,6 +219,8 @@ void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFr
             {
                 pWidget->isRelease=false;
                 pWidget->scrollOffset=pResTile->tRegion.tSize.iHeight-pWidget->strHeight;
+                pWidget->dirtyRegionState=waitChange;
+                pWidget->isDirtyRegionAutoIgnore=true;
             }
             else
             {
@@ -288,6 +292,7 @@ void ldTextSetTransparent(ldText_t* pWidget,bool isTransparent)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -308,6 +313,7 @@ void ldTextSetText(ldText_t* pWidget,uint8_t *pStr)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     ldBaseSetText(&pWidget->pTextInfo,pStr);
     textSize= ldBaseGetStringSize(pWidget->pTextInfo->pStr,pWidget->pTextInfo->pFontDict,&bmpH1Max,((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth);
     pWidget->strHeight=textSize.iHeight;
@@ -328,6 +334,7 @@ void ldTextSetTextColor(ldText_t* pWidget,ldColor charColor)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     ldBaseSetTextColor(&pWidget->pTextInfo,charColor);
 }
 
@@ -350,6 +357,7 @@ void ldTextSetAlign(ldText_t *pWidget,uint8_t align)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     ldBaseSetAlign(&pWidget->pTextInfo,align);
 }
 
@@ -368,6 +376,7 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->scrollOffset=offset;
 }
 
@@ -386,6 +395,7 @@ void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->scrollOffset+=moveValue;
     if((moveValue>0)&&(pWidget->scrollOffset<0))
     {
@@ -399,47 +409,47 @@ void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue)
 
 static bool slotTextVerticalScroll(xConnectInfo_t info)
 {
-    ldText_t *txt;
+    ldText_t *pWidget;
 
-    txt=ldBaseGetWidgetById(info.receiverId);
-
-
+    pWidget=ldBaseGetWidgetById(info.receiverId);
 
     switch (info.signalType)
     {
     case SIGNAL_PRESS:
     {
-        txt->isRelease=false;
-        _scrollOffset=txt->scrollOffset;
+        pWidget->isRelease=false;
+        _scrollOffset=pWidget->scrollOffset;
         _isTopScroll=false;
         _isBottomScroll=false;
+        pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_HOLD_DOWN:
     {
-        txt->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
+        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
     {
-        txt->isRelease=true;
+        pWidget->isRelease=true;
 
-        _scrollOffset=txt->scrollOffset;
+        _scrollOffset=pWidget->scrollOffset;
 
-        if(txt->scrollOffset>0)
+        if(pWidget->scrollOffset>0)
         {
             _isTopScroll=true;
             _isBottomScroll=false;
         }
 
-        if(((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight>(txt->strHeight+txt->scrollOffset))
+        if(((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight>(pWidget->strHeight+pWidget->scrollOffset))
         {
-            _scrollOffset=((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight-(txt->strHeight+txt->scrollOffset);
+            _scrollOffset=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight-(pWidget->strHeight+pWidget->scrollOffset);
             _isTopScroll=false;
             _isBottomScroll=true;
         }
 
-        if(txt->strHeight<=((arm_2d_tile_t*)&txt->resource)->tRegion.tSize.iHeight)
+        if(pWidget->strHeight<=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
         {
             _isTopScroll=true;
             _isBottomScroll=false;
@@ -451,7 +461,7 @@ static bool slotTextVerticalScroll(xConnectInfo_t info)
                 .fIntegration = 0.1f,
                 .nInterval = 10,
             };
-            arm_2d_helper_pi_slider_init(&txt->tPISlider, (arm_2d_helper_pi_slider_cfg_t *)&tCFG, 0);
+            arm_2d_helper_pi_slider_init(&pWidget->tPISlider, (arm_2d_helper_pi_slider_cfg_t *)&tCFG, 0);
         } while(0);
         break;
     }
@@ -493,6 +503,7 @@ void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->bgImgAddr=imageAddr;
     pWidget->isTransparent=false;
 }
@@ -504,6 +515,7 @@ void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->bgColor=bgColor;
     pWidget->isTransparent=false;
     pWidget->bgImgAddr=LD_ADDR_NONE;

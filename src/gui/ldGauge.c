@@ -157,7 +157,7 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldGaugeCommonFunc;
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
@@ -219,8 +219,6 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
         arm_2d_op_wait_async(NULL);
 
         do {
-
-
 #if USE_VIRTUAL_RESOURCE == 0
             arm_2d_tile_t tempRes;
 #else
@@ -244,14 +242,19 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #endif
             pTempRes->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
 
-            arm_2d_location_t targetCentre =
+            arm_2d_location_t pointerRotationCentre =
             {
                 .iX = pWidget->pointerOriginOffsetX,
                 .iY = pWidget->pointerOriginOffsetY,
             };
 
-            tTarget_canvas.tLocation.iX=pWidget->centreOffsetX;
-            tTarget_canvas.tLocation.iY=pWidget->centreOffsetY;
+            arm_2d_location_t bgRotationCentre=
+            {
+                .iX = (tTarget_canvas.tSize.iWidth>>1)+pWidget->centreOffsetX,
+                .iY = (tTarget_canvas.tSize.iHeight>>1)+pWidget->centreOffsetY,
+            };
+//            tTarget_canvas.tLocation.iX=pWidget->centreOffsetX;
+//            tTarget_canvas.tLocation.iY=pWidget->centreOffsetY;
 
             switch (pWidget->pointerImgType) {
             case withMask:
@@ -280,11 +283,11 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                                                                  (arm_2d_tile_t*)&maskTile,
                                                                  &tTarget,
                                                                  &tTarget_canvas,
-                                                                 targetCentre,
+                                                                 pointerRotationCentre,
                                                                  ANGLE_2_RADIAN((pWidget->angle_x10)/10.0+ANGLE_OFFSET),
                                                                  1.0,
-                                                                 255
-                                                                 );
+                                                                 255,
+                                                                 &bgRotationCentre);
                 break;
             }
             case onlyMask:
@@ -295,11 +298,12 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                                                                     pTempRes,
                                                                     &tTarget,
                                                                     &tTarget_canvas,
-                                                                    targetCentre,
+                                                                    pointerRotationCentre,
                                                                     ANGLE_2_RADIAN((pWidget->angle_x10)/10.0+ANGLE_OFFSET),//pWidget->helper.fAngle,
                                                                     1.0,//pWidget->helper.fScale,
                                                                     pWidget->keyingOrMaskColor,
-                                                                    255);
+                                                                    255,
+                                                                    &bgRotationCentre);
                 break;
             }
             case keying:
@@ -308,19 +312,10 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                                                          pTempRes,
                                                          &tTarget,
                                                          &tTarget_canvas,
-                                                         targetCentre,
+                                                         pointerRotationCentre,
                                                          ANGLE_2_RADIAN((pWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                                                         __RGB(255,255,255)
-                                                         );
-                //                arm_2dp_tile_transform_with_colour_keying((arm_2d_op_trans_t *)&pWidget->op,
-                //                                                          pTempRes,
-                //                                                          &tTarget,
-                //                                                          &tTarget_canvas,
-                //                                                          targetCentre,
-                //                                                          ANGLE_2_RADIAN((pWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                //                                                          1.0,
-                //                                                          __RGB(255,255,255)
-                //                                                          );
+                                                         __RGB(255,255,255),
+                                                         &bgRotationCentre);
                 break;
             }
             default:
@@ -329,10 +324,10 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                                             pTempRes,
                                             &tTarget,
                                             &tTarget_canvas,
-                                            targetCentre,
+                                            pointerRotationCentre,
                                             ANGLE_2_RADIAN((pWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                                            1.0
-                                            );
+                                            1.0,
+                                            &bgRotationCentre);
                 break;
             }
             }
@@ -409,6 +404,7 @@ void ldGaugeSetAngle(ldGauge_t *pWidget, float angle)
     pWidget->angle_x10%=3600;
 
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
 }
 
 /**

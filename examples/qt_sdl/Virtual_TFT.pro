@@ -34,75 +34,7 @@ SOURCES += \
     ../../src/misc/xList.c \
     ../../src/misc/xQueue.c \
     ../../src/misc/xString.c \
-    ../common/Arm-2D/Helper/Source/arm_2d_helper.c \
-    ../common/Arm-2D/Helper/Source/arm_2d_helper_list.c \
-    ../common/Arm-2D/Helper/Source/arm_2d_helper_map.c \
-    ../common/Arm-2D/Helper/Source/arm_2d_helper_pfb.c \
-    ../common/Arm-2D/Helper/Source/arm_2d_helper_scene.c \
-    ../common/Arm-2D/Library/Source/__arm_2d_conversion_helium.c \
-    ../common/Arm-2D/Library/Source/__arm_2d_core.c \
-    ../common/Arm-2D/Library/Source/__arm_2d_tile.c \
-    ../common/Arm-2D/Library/Source/__arm_2d_transform_helium.c \
-    ../common/Arm-2D/Library/Source/arm_2d.c \
-    ../common/Arm-2D/Library/Source/arm_2d_alpha_blending.c \
-    ../common/Arm-2D/Library/Source/arm_2d_async.c \
-    ../common/Arm-2D/Library/Source/arm_2d_conversion.c \
-    ../common/Arm-2D/Library/Source/arm_2d_draw.c \
-    ../common/Arm-2D/Library/Source/arm_2d_helium.c \
-    ../common/Arm-2D/Library/Source/arm_2d_transform.c \
-    ../common/Arm-2D/examples/common/asset/DigitsFont.c \
-    ../common/Arm-2D/examples/common/asset/GreenCircle.c \
-    ../common/Arm-2D/examples/common/asset/Lighting.c \
-    ../common/Arm-2D/examples/common/asset/ListCover.c \
-    ../common/Arm-2D/examples/common/asset/MeterPanel.c \
-    ../common/Arm-2D/examples/common/asset/Pointer.c \
-    ../common/Arm-2D/examples/common/asset/QuaterArc.c \
-    ../common/Arm-2D/examples/common/asset/SinWave.c \
-    ../common/Arm-2D/examples/common/asset/SpinWheel.c \
-    ../common/Arm-2D/examples/common/asset/arrow.c \
-    ../common/Arm-2D/examples/common/asset/background.c \
-    ../common/Arm-2D/examples/common/asset/battery_boarder_1.c \
-    ../common/Arm-2D/examples/common/asset/battery_gasgauge_block.c \
-    ../common/Arm-2D/examples/common/asset/battery_gasgauge_grade_boarder.c \
-    ../common/Arm-2D/examples/common/asset/blue_slashes.c \
-    ../common/Arm-2D/examples/common/asset/circle_mask.c \
-    ../common/Arm-2D/examples/common/asset/circle_small.c \
-    ../common/Arm-2D/examples/common/asset/clockface.c \
-    ../common/Arm-2D/examples/common/asset/cmsis_logo.c \
-    ../common/Arm-2D/examples/common/asset/gear_01.c \
-    ../common/Arm-2D/examples/common/asset/gear_02.c \
-    ../common/Arm-2D/examples/common/asset/glass_reflection_narrow.c \
-    ../common/Arm-2D/examples/common/asset/glass_reflection_wide.c \
-    ../common/Arm-2D/examples/common/asset/green28_28.c \
-    ../common/Arm-2D/examples/common/asset/helium.c \
-    ../common/Arm-2D/examples/common/asset/pointer_sec.c \
-    ../common/Arm-2D/examples/common/asset/small_icon_sun.c \
-    ../common/Arm-2D/examples/common/asset/software.c \
-    ../common/Arm-2D/examples/common/asset/star.c \
-    ../common/Arm-2D/examples/common/asset/watch_panel.c \
-    ../common/Arm-2D/examples/common/asset/wave.c \
-    ../common/Arm-2D/examples/common/asset/white_dot.c \
-    ../common/Arm-2D/examples/common/asset/wifi_signal.c \
-    ../common/Arm-2D/examples/common/controls/GLCD_Fonts.c \
-    ../common/Arm-2D/examples/common/controls/battery_gasgauge.c \
-    ../common/Arm-2D/examples/common/controls/busy_wheel.c \
-    ../common/Arm-2D/examples/common/controls/controls.c \
-    ../common/Arm-2D/examples/common/controls/dynamic_nebula.c \
-    ../common/Arm-2D/examples/common/controls/lcd_printf.c \
-    ../common/Arm-2D/examples/common/controls/list_view.c \
-    ../common/Arm-2D/examples/common/controls/number_list.c \
-    ../common/Arm-2D/examples/common/controls/progress_bar_drill.c \
-    ../common/Arm-2D/examples/common/controls/progress_bar_flowing.c \
-    ../common/Arm-2D/examples/common/controls/progress_bar_simple.c \
-    ../common/Arm-2D/examples/common/controls/progress_wheel.c \
-    ../common/Arm-2D/examples/common/controls/shape_round_corner_box.c \
-    ../common/Arm-2D/examples/common/controls/spinning_wheel.c \
     ../common/virtual_flash/virtualNor.c \
-    ../common/math/arm_common_tables.c \
-    ../common/math/arm_cos_f32.c \
-    ../common/math/arm_cos_q31.c \
-    ../common/math/arm_sin_f32.c \
-    ../common/math/arm_sin_q31.c \
     user/ldConfig.c \
     user/main.c \
     user/Virtual_TFT_Port.c \
@@ -140,76 +72,6 @@ HEADERS += \
     ../../src/misc/xLog.h \
     ../../src/misc/xQueue.h \
     ../../src/misc/xString.h \
-    ../common/Arm-2D/Helper/Include/__arm_2d_helper_common.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_disp_adapters.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_helper.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_helper_list.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_helper_map.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_helper_pfb.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_helper_scene.h \
-    ../common/Arm-2D/Helper/Include/arm_2d_scenes.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_direct.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_impl.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_math.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_math_helium.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_paving.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_paving_helium.h \
-    ../common/Arm-2D/Library/Include/__arm_2d_utils_helium.h \
-    ../common/Arm-2D/Library/Include/arm_2d.h \
-    ../common/Arm-2D/Library/Include/arm_2d_alpha_blending.h \
-    ../common/Arm-2D/Library/Include/arm_2d_conversion.h \
-    ../common/Arm-2D/Library/Include/arm_2d_draw.h \
-    ../common/Arm-2D/Library/Include/arm_2d_features.h \
-    ../common/Arm-2D/Library/Include/arm_2d_op.h \
-    ../common/Arm-2D/Library/Include/arm_2d_tile.h \
-    ../common/Arm-2D/Library/Include/arm_2d_transform.h \
-    ../common/Arm-2D/Library/Include/arm_2d_types.h \
-    ../common/Arm-2D/Library/Include/arm_2d_utils.h \
-    ../common/Arm-2D/Library/Source/__arm_2d_alpha_blending_wrapper.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_copy_mirror_wrapper.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_copy_with_colour_keying_and_mirror_wrapper.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_copy_with_mask_and_mirror_wrapper.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_alpha_blending.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_alpha_mask.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_alpha_mask_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_colour_filling_with_alpha.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_copy.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_copy_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_draw_pattern.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_draw_pattern_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_fill_colour.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_fill_colour_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_meta_copy_and_fill.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_meta_copy_with_masks.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_meta_copy_with_masks_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_meta_trans_with_masks.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_meta_trans_with_masks_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_transform.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_ll_transform_helium.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_copy_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_copy_with_colour_keying_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_copy_with_des_mask_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_copy_with_masks_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_copy_with_src_mask_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_fill_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_fill_with_colour_keying_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_fill_with_des_mask_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_fill_with_masks_and_mirror.inc \
-    ../common/Arm-2D/Library/Source/__arm_2d_meta_fill_with_src_mask_and_mirror.inc \
-    ../common/Arm-2D/examples/common/controls/__common.h \
-    ../common/Arm-2D/examples/common/controls/arm_extra_controls.h \
-    ../common/Arm-2D/examples/common/controls/arm_extra_lcd_printf.h \
-    ../common/Arm-2D/examples/common/controls/battery_gasgauge.h \
-    ../common/Arm-2D/examples/common/controls/busy_wheel.h \
-    ../common/Arm-2D/examples/common/controls/dynamic_nebula.h \
-    ../common/Arm-2D/examples/common/controls/list_view.h \
-    ../common/Arm-2D/examples/common/controls/number_list.h \
-    ../common/Arm-2D/examples/common/controls/progress_bar_drill.h \
-    ../common/Arm-2D/examples/common/controls/progress_bar_flowing.h \
-    ../common/Arm-2D/examples/common/controls/progress_bar_simple.h \
-    ../common/Arm-2D/examples/common/controls/progress_wheel.h \
-    ../common/Arm-2D/examples/common/controls/shape_round_corner_box.h \
-    ../common/Arm-2D/examples/common/controls/spinning_wheel.h \
     ../common/virtual_flash/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
@@ -217,8 +79,18 @@ HEADERS += \
     user/arm_2d_user_arch_port.h \
     user/ldConfig.h
 
-HEADERS += $$files(../common/demo/*.h, true)
-SOURCES += $$files(../common/demo/*.c, true)
+HEADERS += $$files(../common/demo/*.h, true) \
+           $$files(../common/Arm-2D/examples/common/controls/*.h, false) \
+           $$files(../common/Arm-2D/Library/Source/*.inc, false) \
+           $$files(../common/Arm-2D/Library/Include/*.h, false) \
+           $$files(../common/Arm-2D/Helper/Include/*.h, false)
+
+SOURCES += $$files(../common/demo/*.c, true) \
+           $$files(../common/Arm-2D/examples/common/controls/*.c, false) \
+           $$files(../common/Arm-2D/examples/common/asset/*.c, false) \
+           $$files(../common/Arm-2D/Library/Source/*.c, false) \
+           $$files(../common/Arm-2D/Helper/Source/*.c, false) \
+           $$files(../common/math/*.c, true)
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include

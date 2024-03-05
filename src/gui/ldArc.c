@@ -160,7 +160,7 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         pNewWidget->dirtyRegionListItem.bUpdated = true;
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
+        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         pNewWidget->color[0]=LD_COLOR_LIGHT_GREY;
         pNewWidget->color[1]=LD_COLOR_LIGHT_BLUE;
@@ -585,6 +585,7 @@ void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->rotationAngle_x10=rotationAngle*10;
 }
 

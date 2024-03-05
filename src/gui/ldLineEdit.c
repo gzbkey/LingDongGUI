@@ -91,6 +91,8 @@ static bool slotEditEnd(xConnectInfo_t info)
 {
     ldLineEdit_t *pWidget=ldBaseGetWidgetById(info.receiverId);
     pWidget->isEditing=false;
+    pWidget->dirtyRegionState=waitChange;
+    pWidget->isDirtyRegionAutoIgnore=true;
     return false;
 }
 
