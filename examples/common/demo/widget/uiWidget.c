@@ -79,7 +79,7 @@ void uiWidgetInit(uint8_t page)
     ldProgressBarSetBgImage(obj,PROGRESSBARBG_BMP,1,false);
     ldProgressBarSetFgImage(obj,PROGRESSBARFG_BMP,20,true);
 
-    obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_WIN,400,10,200,150,170,100,5);
+    obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_WIN,450,10,200,150,170,100,5);
     ldRadialMenuAddItem(obj,NOTE_PNG,48,48,0,true);
     ldRadialMenuAddItem(obj,BOOK_PNG,48,48,0,true);
     ldRadialMenuAddItem(obj,WEATHER_PNG,48,48,0,true);

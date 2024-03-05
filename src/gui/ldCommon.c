@@ -1334,16 +1334,13 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
-void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList,arm_2d_region_list_item_t ** ppRootDirtyRegionList)
+void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t ** ppRootDirtyRegionList)
 {
-    arm_2d_region_list_item_t **ppTempDirty;
-
-    ppTempDirty=ppRootDirtyRegionList;
-    while(*ppTempDirty!=NULL)
+    while(*ppRootDirtyRegionList!=NULL)
     {
-        ppTempDirty=&(*ppTempDirty)->ptNext;
+        ppRootDirtyRegionList=&(*ppRootDirtyRegionList)->ptNext;
     }
-    *ppTempDirty=pItemDirtyRegionList;
+    *ppRootDirtyRegionList=pItemDirtyRegionList;
 }
 
 // pNewRegion和pWidget坐标都是相对父控件来计算

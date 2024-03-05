@@ -232,17 +232,17 @@ static void _ldGuiLoop(xListNode* pLink,arm_2d_tile_t *ptParent,bool bIsNewFrame
 
 static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
 {
-    xListNode *temp_pos,*safePos;
+    xListNode *tempPos,*safePos;
 
-    list_for_each_safe(temp_pos,safePos, pLink)
+    list_for_each_safe(tempPos,safePos, pLink)
     {
-        if(temp_pos->info!=NULL)
+        if(tempPos->info!=NULL)
         {
-            ldBaseAddDirtyRegion(&((ldCommon_t *)temp_pos->info)->dirtyRegionListItem,&pSence->ptDirtyRegion);
+            ldBaseAddDirtyRegion(&((ldCommon_t *)tempPos->info)->dirtyRegionListItem,&pSence->ptDirtyRegion);
 
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
             {
-                ldGuiSetDirtyRegion(((ldCommon_t *)temp_pos->info)->childList,pSence);
+                ldGuiSetDirtyRegion(((ldCommon_t *)tempPos->info)->childList,pSence);
             }
         }
     }
