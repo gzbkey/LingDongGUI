@@ -9,24 +9,24 @@ extern "C" {
 #include "stdbool.h"
 
 #define KNOB_RCC                 RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); \
-                                 RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE); \
                                  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); \
-                                 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE)
+                                 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE); \
+                                 RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
                                  
 
-#define KNOB_B_GPIO              GPIOC
-#define KNOB_B_PIN               GPIO_Pin_13
+#define KNOB_B_GPIO              GPIOA
+#define KNOB_B_PIN               GPIO_Pin_1
 #define KNOB_B_PortSource        GPIO_PortSourceGPIOC   
-#define KNOB_B_PinSource         GPIO_PinSource13
-#define KNOB_B_EXTI_Line         EXTI_Line13
-#define KNOB_B_EXTI_IRQ          EXTI15_10_IRQn
+#define KNOB_B_PinSource         GPIO_PinSource1
+#define KNOB_B_EXTI_Line         EXTI_Line1
+#define KNOB_B_EXTI_IRQ          EXTI1_IRQn
 
 #define KNOB_A_GPIO              GPIOA
-#define KNOB_A_PIN               GPIO_Pin_15
+#define KNOB_A_PIN               GPIO_Pin_0
 #define KNOB_A_PortSource        GPIO_PortSourceGPIOA   
-#define KNOB_A_PinSource         GPIO_PinSource15
-#define KNOB_A_EXTI_Line         EXTI_Line15
-#define KNOB_A_EXTI_IRQ          EXTI15_10_IRQn
+#define KNOB_A_PinSource         GPIO_PinSource0
+#define KNOB_A_EXTI_Line         EXTI_Line0
+#define KNOB_A_EXTI_IRQ          EXTI0_IRQn
 
 #define KNOB_KEY_GPIO            GPIOA
 #define KNOB_KEY_PIN             GPIO_Pin_2
@@ -37,10 +37,10 @@ extern "C" {
 
 void knobInit(void);
 
-
-
 void knobTick(uint8_t cycleMs);
 
+int16_t knobGetEncoder(void);
+int16_t knobGetEncoderDiv4(void);
 uint8_t knobKeyRead(void);
 
 #ifdef __cplusplus

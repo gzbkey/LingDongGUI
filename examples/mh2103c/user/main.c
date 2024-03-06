@@ -96,7 +96,9 @@ bool getBtnState(uint16_t id)
     return 0;
 }
 
+volatile int16_t encoderCount;
 
+int16_t add=0,sub=0;
 int main(void)
 {
 	RCC_ClocksTypeDef clocks;
@@ -128,11 +130,19 @@ int main(void)
     
     arm_2d_scene0_init(&DISP0_ADAPTER);
 
-
-
     while(1)
     {
         disp_adapter0_task();
+
+        encoderCount=knobGetEncoder();
+        if(encoderCount>0)
+        {
+            add+=encoderCount;
+        }
+        else
+        {
+            sub+=encoderCount;
+        }
     }
 }
 

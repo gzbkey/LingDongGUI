@@ -10,35 +10,41 @@ void knobGpioInit(void)
     NVIC_InitTypeDef NVIC_InitStructure;
     EXTI_InitTypeDef  EXTI_InitStructure;
     ADC_InitTypeDef ADC_InitStructure;
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;  
+	TIM_ICInitTypeDef TIM_ICInitStructure; 
     
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-    
-    GPIO_InitStructure.GPIO_Pin = KNOB_KEY_PIN;
-    GPIO_Init(KNOB_KEY_GPIO, &GPIO_InitStructure);
-    
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_InitStructure.GPIO_Pin = KNOB_A_PIN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	
     GPIO_Init(KNOB_A_GPIO, &GPIO_InitStructure);
-    
     GPIO_InitStructure.GPIO_Pin = KNOB_B_PIN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	
     GPIO_Init(KNOB_B_GPIO, &GPIO_InitStructure);
     
-    EXTI_InitStructure.EXTI_Line=KNOB_A_EXTI_Line;
-    EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;
-    EXTI_InitStructure.EXTI_LineCmd=ENABLE;
-    EXTI_Init(&EXTI_InitStructure);
-    GPIO_EXTILineConfig(KNOB_A_PortSource, KNOB_A_PinSource);
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 0;
+	TIM_TimeBaseInitStructure.TIM_Period = 0xffff;
+	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0;
+	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; 
+	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure);
 
-    NVIC_InitStructure.NVIC_IRQChannel = KNOB_A_EXTI_IRQ;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
+	TIM_EncoderInterfaceConfig(TIM2, TIM_EncoderMode_TI12, TIM_ICPolarity_Falling, TIM_ICPolarity_Falling);
+	TIM_ICStructInit(&TIM_ICInitStructure);
+    TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+	TIM_ICInitStructure.TIM_ICFilter = 0x0F;
+	TIM_ICInit(TIM2, &TIM_ICInitStructure);
+	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+	TIM_ICInitStructure.TIM_ICFilter = 0x0F;
+	TIM_ICInit(TIM2, &TIM_ICInitStructure);
+
+	//Reset counter
+	TIM_SetCounter(TIM2,0x7fff);
+    TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+	TIM_Cmd(TIM2, ENABLE);
+    
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_InitStructure.GPIO_Pin = KNOB_KEY_PIN;
+    GPIO_Init(KNOB_KEY_GPIO, &GPIO_InitStructure);
     
 	RCC_ADCCLKConfig(RCC_PCLK2_Div8);   				
 	ADC_DeInit(ADC1); 
@@ -63,6 +69,13 @@ void knobGpioInit(void)
 	while(ADC_GetCalibrationStatus(ADC1));
 }
 
+int16_t knobGetEncoder(void)
+{
+	int16_t temp = TIM_GetCounter(TIM2)-0x7fff;
+	TIM_SetCounter(TIM2, 0x7fff);
+    return temp;
+}
+
 void knobInit(void)
 {
     KNOB_RCC;
@@ -81,31 +94,6 @@ static void knobDelay(void)
 {
     volatile uint8_t i=250;
     while(i--);
-}
-
-void EXTI15_10_IRQHandler(void)
-{
-	if(EXTI_GetITStatus(KNOB_A_EXTI_Line)==SET)
-	{
-        if(knobTickCount==0)
-        {
-            knobDelay();
-            if(KNOB_A_R==RESET)
-            {
-                if(KNOB_B_R)
-                {
-                    knobAdd();
-                }
-                else
-                {
-                    knobSub();
-                }
-            }
-            knobTickCount=5;
-        }
-		EXTI_ClearITPendingBit(KNOB_A_EXTI_Line);
-	}
-	
 }
 
 void knobTick(uint8_t cycleMs)

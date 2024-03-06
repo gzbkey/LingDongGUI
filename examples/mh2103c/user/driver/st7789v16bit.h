@@ -17,16 +17,16 @@ extern "C" {
 #define ST7789V_RST_PIN            GPIO_Pin_15
 
 #define ST7789V_RS_GPIO           GPIOA
-#define ST7789V_RS_PIN            GPIO_Pin_3
+#define ST7789V_RS_PIN            GPIO_Pin_4
 
-#define ST7789V_CS_GPIO           GPIOA
-#define ST7789V_CS_PIN            GPIO_Pin_4
+#define ST7789V_CS_GPIO           GPIOC
+#define ST7789V_CS_PIN            GPIO_Pin_13
 
 #define ST7789V_WR_GPIO           GPIOC
 #define ST7789V_WR_PIN            GPIO_Pin_14
 
 #define ST7789V_RD_GPIO           GPIOA
-#define ST7789V_RD_PIN            GPIO_Pin_1
+#define ST7789V_RD_PIN            GPIO_Pin_3
 
 #define ST7789V_DATA_GPIO         GPIOB
 
