@@ -65,6 +65,7 @@ extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
 extern uint8_t cursorBlinkCount;
 extern bool cursorBlinkFlag;
+
 #define CURSOR_BLINK_TIMEOUT        50 // 500/SYS_TICK_CYCLE_MS
 
 #define LD_ADD_PAGE(pageName)       ldGuiAddPage(pageName##Init,pageName##Loop,pageName##Quit)
@@ -76,8 +77,9 @@ void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame);
 void ldGuiQuit(arm_2d_scene_t *pSence);
 void ldGuiJumpPage(uint8_t pageNum);
 arm_2d_region_list_item_t * ldGuiGetDirtyRegion(void);
-void ldGuiFrameStart(void);
+void ldGuiFrameStart(arm_2d_scene_t *pSence);
 void ldGuiFrameComplete(void);
+void ldGuiUpdateScene(void);
 
 #ifdef __cplusplus
 }

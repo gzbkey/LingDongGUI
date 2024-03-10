@@ -53,6 +53,8 @@ bool cursorBlinkFlag=false;
 #define LD_EMIT_SIZE             8
 #endif
 
+bool isFullWidgetUpdate=false;
+
 static volatile ldPoint_t pressPoint;
 static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
@@ -295,8 +297,19 @@ static void _ldGuiFrameUpdate(xListNode* pLink)
     }
 }
 
-void ldGuiFrameStart(void)
+void ldGuiUpdateScene(void)
 {
+    isFullWidgetUpdate=true;
+}
+
+void ldGuiFrameStart(arm_2d_scene_t *ptScene)
+{
+    if(isFullWidgetUpdate==true)
+    {
+        arm_2d_scene_player_update_scene_background(ptScene->ptPlayer);
+        isFullWidgetUpdate=false;
+    }
+
     _ldGuiFrameUpdate(&ldWidgetLink);
 
     //检查按键

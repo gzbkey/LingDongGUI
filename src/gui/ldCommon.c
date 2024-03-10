@@ -1351,7 +1351,6 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
         case waitChange://扩大到新范围
         {
             arm_2d_region_t tempRegion;
-
             arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
             pWidget->dirtyRegionListItem.bIgnore=false;
@@ -1363,36 +1362,14 @@ void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,b
         case waitUpdate://缩小到新范围
         {
             pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
-            pWidget->dirtyRegionListItem.bIgnore=false;
+            pWidget->dirtyRegionListItem.bIgnore=isAutoIgnore;
             pWidget->dirtyRegionListItem.bUpdated=true;
             pWidget->dirtyRegionState=none;
-            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
-            {
-                pWidget->dirtyRegionListItem.bIgnore=true;
-            }
             break;
         }
         default:
             break;
         }
-}
-
-static void ldGuiUpdateDirtyRegion(xListNode* pLink)
-{
-    xListNode *temp_pos,*safePos;
-
-    list_for_each_safe(temp_pos,safePos, pLink)
-    {
-        if(temp_pos->info!=NULL)
-        {
-            ((ldCommon_t *)temp_pos->info)->dirtyRegionState=waitChange;
-
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
-            {
-                ldGuiUpdateDirtyRegion(((ldCommon_t *)temp_pos->info)->childList);
-            }
-        }
-    }
 }
 
 void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
@@ -1408,11 +1385,7 @@ void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offse
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=maxX-minX;
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=maxY-minY;
 
-    ldGuiUpdateDirtyRegion(&ldWidgetLink);
-
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
-
+    ldGuiUpdateScene();
 }
 
 

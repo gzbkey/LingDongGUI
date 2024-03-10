@@ -80,7 +80,13 @@ extern "C" {
 #define LD_ALIGN_RIGHT                          _BV(3)
 #define LD_ALIGN_LEFT_AUTO                      _BV(4) //GUI内部使用
 
+#if SIZE_MAX == 18446744073709551615ull
+#define LD_ADDR_NONE                            0xffffffffffffffffu
+#elif SIZE_MAX == 4294967295
 #define LD_ADDR_NONE                            0xffffffffu
+#endif
+
+
 
 #define LD_COLOR_LIGHT_PINK __RGB(255, 182, 193)             // 浅粉红
 #define LD_COLOR_PINK __RGB(255, 192, 203)                   // 粉红

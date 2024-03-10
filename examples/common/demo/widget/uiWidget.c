@@ -54,7 +54,8 @@ void uiWidgetInit(uint8_t page)
 
     LOG_DEBUG("win :%zu\n",xFreeBytesRemaining);
 
-    obj=ldWindowInit(ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_WIDTH);
+    obj=ldWindowInit(ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH-10,LD_CFG_SCEEN_HEIGHT-10);
+//    ldWindowSetBgColor(obj,LD_COLOR_LIGHT_SKY_BLUE);
 
     obj=ldButtonInit(ID_BUTTON,ID_WIN,5,5,79,53);
     ldButtonSetFont(obj,SIMSUN_REGULAR_12);

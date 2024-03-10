@@ -28,7 +28,7 @@
 #define __USER_SCENE0_IMPLEMENT__
 #include "ldScene0.h"
 #include "arm_2d_helper.h"
-#include "arm_extra_controls.h"
+#include "arm_2d_example_controls.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +54,7 @@
 #   pragma clang diagnostic ignored "-Wunused-function"
 #   pragma clang diagnostic ignored "-Wmissing-declarations"  
 #elif __IS_COMPILER_ARM_COMPILER_5__
+#   pragma diag_suppress 64,177
 #elif __IS_COMPILER_IAR__
 #   pragma diag_suppress=Pa089,Pe188,Pe177,Pe174
 #elif __IS_COMPILER_GCC__
@@ -114,12 +115,7 @@ static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
 
 static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
-    ARM_2D_UNUSED(ptThis);
-
-
-
-    ldGuiFrameStart();
+    ldGuiFrameStart(ptScene);
     ldGuiLogicLoop();
 }
 
@@ -155,8 +151,11 @@ static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)pTarget;
+    arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
+
     ARM_2D_UNUSED(ptTile);
     ARM_2D_UNUSED(bIsNewFrame);
+    ARM_2D_UNUSED(tScreenSize);
     
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
@@ -222,9 +221,6 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
     return ptThis;
 }
-
-
-
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

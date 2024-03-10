@@ -100,12 +100,14 @@ static bool slotButtonToggle(xConnectInfo_t info)
     {
         pWidget->isPressed=true;
         pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_RELEASE:
     {
         pWidget->isPressed=false;
         pWidget->dirtyRegionState=waitChange;
+        pWidget->isDirtyRegionAutoIgnore=true;
         break;
     }
     default:

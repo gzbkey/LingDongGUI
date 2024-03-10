@@ -113,7 +113,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
         },
         .tSize={
             .iWidth=LD_CFG_SCEEN_WIDTH,
-            .iHeight=LD_CFG_SCEEN_HEIGHT/2,
+            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
         },
     };
 
@@ -123,7 +123,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
     if(pWidget->isNumber)
     {
         btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/4-KB_SPACE;
-        btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+        btnH=((LD_CFG_SCEEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE;
 
         bufferRegion.tLocation.iX=0;
         bufferRegion.tLocation.iY=0;
@@ -257,7 +257,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
     else
     {
         btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/10-KB_SPACE;
-        btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+        btnH=((LD_CFG_SCEEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE;
 
         bufferRegion.tLocation.iX=0;
         bufferRegion.tLocation.iY=0;
@@ -332,7 +332,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
 
 
-                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE+(btnW+KB_SPACE)/2,0,KB_SPACE,0);
+                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW,btnH,KB_SPACE+((btnW+KB_SPACE)>>1),0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     retRegion=item_region;
                     break;
@@ -390,7 +390,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
 
 
-                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     //change shift
                     retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
@@ -441,7 +441,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
                     break;
                 }
 
-                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     retRegion=item_region;
                     break;
@@ -450,7 +450,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
 
 
 
-                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     //change symbol
                     retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
@@ -459,7 +459,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
                     break;
                 }
 
-                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                item_region=ldLayoutHorizontal(&retRegion,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                 if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                     //change 123
                     retRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
@@ -720,7 +720,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             }
         }
     }
-    retRegion.tLocation.iY+=LD_CFG_SCEEN_HEIGHT/2;
+    retRegion.tLocation.iY+=LD_CFG_SCEEN_HEIGHT>>1;
     retRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
 
     return retRegion;
@@ -854,11 +854,11 @@ static bool slotKBProcess(xConnectInfo_t info)
     arm_2d_region_t kbRegion={
         .tLocation={
             .iX=0,
-            .iY=LD_CFG_SCEEN_HEIGHT/2,
+            .iY=LD_CFG_SCEEN_HEIGHT>>1,
         },
         .tSize={
             .iWidth=LD_CFG_SCEEN_WIDTH,
-            .iHeight=LD_CFG_SCEEN_HEIGHT/2,
+            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
         },
     };
 
@@ -875,7 +875,6 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.y);
         pWidget->isClick=false;
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
-        LOG_REGION("=====",pWidget->targetDirtyRegion);
         pWidget->dirtyRegionState=waitChange;
         break;
     }
@@ -928,7 +927,7 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->isHidden = true;
         tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
         tResTile->tRegion.tLocation.iX=0;
-        tResTile->tRegion.tLocation.iY=0;
+        tResTile->tRegion.tLocation.iY=LD_CFG_SCEEN_HEIGHT>>1;
         tResTile->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH;
         tResTile->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT;
         tResTile->tInfo.bIsRoot = true;
@@ -1074,11 +1073,11 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     arm_2d_region_t kbRegion={
         .tLocation={
             .iX=0,
-            .iY=LD_CFG_SCEEN_HEIGHT/2,
+            .iY=LD_CFG_SCEEN_HEIGHT>>1,
         },
         .tSize={
             .iWidth=LD_CFG_SCEEN_WIDTH,
-            .iHeight=LD_CFG_SCEEN_HEIGHT/2,
+            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
         },
     };
     kbRegion.tLocation.iY+=pResTile->tRegion.tLocation.iY;
@@ -1092,7 +1091,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         if(pWidget->isNumber)
         {
             btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/4-KB_SPACE;
-            btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+            btnH=((LD_CFG_SCEEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE;
 
             bufferRegion.tLocation.iX=0;
             bufferRegion.tLocation.iY=0;
@@ -1271,7 +1270,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         else
         {
             btnW=(LD_CFG_SCEEN_WIDTH-KB_SPACE)/10-KB_SPACE;
-            btnH=(LD_CFG_SCEEN_HEIGHT/2-KB_SPACE)/4-KB_SPACE;
+            btnH=((LD_CFG_SCEEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE;
 
             bufferRegion.tLocation.iX=0;
             bufferRegion.tLocation.iY=0;
@@ -1397,7 +1396,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
 
 
-                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE+(btnW+KB_SPACE)/2,0,KB_SPACE,0);
+                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW,btnH,KB_SPACE+((btnW+KB_SPACE)>>1),0,KB_SPACE,0);
                     charBuf[0]='a'-letterOffset;
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_ASCII_PRESS_COLOR;
@@ -1491,7 +1490,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
 
 
-                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
                         pWidget->kbValue=KB_VALUE_SHIFT;
@@ -1570,7 +1569,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }
                     _ldkeyboardNewButton(pWidget,&tTarget,&item_region,charBuf,btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
-                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
                         pWidget->kbValue=0x08;
@@ -1582,7 +1581,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
 
 
-                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
                         pWidget->kbValue=KB_VALUE_SYMBOL_MODE;
@@ -1591,7 +1590,7 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
                     }
                     _ldkeyboardNewButton(pWidget,&tTarget,&item_region,(uint8_t*)"!@",btnColor,LD_COLOR_BLACK,bIsNewFrame);
 
-                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+(btnW+KB_SPACE)/2,btnH,KB_SPACE,0,KB_SPACE,0);
+                    item_region=ldLayoutHorizontal(&tTarget_canvas,&bufferRegion,btnW+((btnW+KB_SPACE)>>1),btnH,KB_SPACE,0,KB_SPACE,0);
                     if(arm_2d_is_point_inside_region(&item_region,&pWidget->clickPoint)){
                         btnColor=KB_OTHER_PRESS_COLOR;
                         pWidget->kbValue=KB_VALUE_NUMBER_MODE;
