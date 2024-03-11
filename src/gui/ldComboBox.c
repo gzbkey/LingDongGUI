@@ -230,7 +230,7 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->itemMax=itemMax;
         pNewWidget->itemCount=0;
         pNewWidget->itemSelect=0;
-        pNewWidget->dropdownImgAddr=(uint32_t)dropDownV_png;
+        pNewWidget->dropdownImgAddr=(uintptr_t)dropDownV_png;
         pNewWidget->dropdownImgWidth=13;
         pNewWidget->dropdownImgHeight=8;
         pNewWidget->pFontDict=pFontDict;
@@ -341,7 +341,7 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 #endif
         ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
 
-        if(pWidget->dropdownImgAddr==(uint32_t)dropDownV_png)
+        if(pWidget->dropdownImgAddr==(uintptr_t)dropDownV_png)
         {
             ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
         }
@@ -459,6 +459,27 @@ void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner)
     }
     pWidget->dirtyRegionState=waitChange;
     pWidget->isCorner=isCorner;
+}
+
+/**
+ * @brief   设置下拉箭头mask图片
+ *
+ * @param   pWidget         目标控件指针
+ * @param   maskAddr        下拉箭头mask图片地址
+ * @param   width           mask图片宽度
+ * @param   height          mask图片高度
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2024-03-11
+ */
+void ldComboBoxSetDropdownMask(ldComboBox_t* pWidget,uintptr_t maskAddr,uint8_t width,uint8_t height)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->dropdownImgAddr=maskAddr;
+    pWidget->dropdownImgWidth=width;
+    pWidget->dropdownImgHeight=height;
 }
 
 #if defined(__clang__)

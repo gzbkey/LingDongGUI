@@ -39,7 +39,7 @@ typedef struct {
     uint16_t xAxisOffset;
     float xScale;
     float yScale;
-    uint32_t pointImgAddr;
+    uintptr_t pointImgAddr;
     int16_t pointImgWidth;
     uint8_t frameSpace;
     uint8_t seriesCount;
@@ -58,7 +58,7 @@ void ldGraphSetAxis(ldGraph_t *pWidget, uint16_t xAxis, uint16_t yAxis, uint16_t
 void ldGraphSetAxisOffset(ldGraph_t *pWidget,uint16_t xAxisOffset);
 void ldGraphSetFrameSpace(ldGraph_t *pWidget, uint8_t frameSpace, bool isCorner);
 void ldGraphSetGridOffset(ldGraph_t *pWidget, uint8_t gridOffset);
-void ldGraphSetPointImageMask(ldGraph_t *pWidget, uint32_t addr, int16_t width);
+void ldGraphSetPointImageMask(ldGraph_t *pWidget, uintptr_t addr, int16_t width);
 int8_t ldGraphAddSeries(ldGraph_t *pWidget, ldColor seriesColor, uint8_t lineSize, uint16_t pointMax);
 void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value);
 void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue);

@@ -665,7 +665,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNameStr)
+void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,uint8_t* pNameStr)
 {
     if(pWidget==NULL)
     {

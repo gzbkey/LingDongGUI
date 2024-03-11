@@ -395,7 +395,7 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask)
+void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,bool isReleaseMask,uintptr_t pressImgAddr,bool isPressMask)
 {
     if(pWidget==NULL)
     {
@@ -417,7 +417,7 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor selectColor)
+void ldButtonSetSelectImage(ldButton_t* pWidget, uintptr_t selectMaskAddr, ldColor selectColor)
 {
     if(pWidget==NULL)
     {

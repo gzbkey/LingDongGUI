@@ -478,25 +478,21 @@ void ldTextSetScroll(ldText_t *pWidget,bool isEnable)
     {
         return;
     }
-    if(pWidget->isScroll!=isEnable)
+    if(isEnable)
     {
-        pWidget->isScroll=isEnable;
-        if(isEnable)
-        {
-            xConnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
-            xConnect(pWidget->nameId,SIGNAL_HOLD_DOWN,pWidget->nameId,slotTextVerticalScroll);
-            xConnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
-        }
-        else
-        {
-            xDisconnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
-            xDisconnect(pWidget->nameId,SIGNAL_HOLD_DOWN,pWidget->nameId,slotTextVerticalScroll);
-            xDisconnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
-        }
+        xConnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
+        xConnect(pWidget->nameId,SIGNAL_HOLD_DOWN,pWidget->nameId,slotTextVerticalScroll);
+        xConnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
+    }
+    else
+    {
+        xDisconnect(pWidget->nameId,SIGNAL_PRESS,pWidget->nameId,slotTextVerticalScroll);
+        xDisconnect(pWidget->nameId,SIGNAL_HOLD_DOWN,pWidget->nameId,slotTextVerticalScroll);
+        xDisconnect(pWidget->nameId,SIGNAL_RELEASE,pWidget->nameId,slotTextVerticalScroll);
     }
 }
 
-void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr)
+void ldTextSetBgImage(ldText_t *pWidget, uintptr_t imageAddr)
 {
     if(pWidget==NULL)
     {

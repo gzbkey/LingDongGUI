@@ -35,11 +35,11 @@ extern "C" {
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
-#define LD_CFG_PFB_HEIGHT                         (24)
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/2)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
-#define LD_MEM_SIZE                               (16*1024) //BYTE
+#define LD_MEM_SIZE                               (1024*1024) //BYTE
 
 // <o>LingDongGui signal emit buffer size
 // <i> The size of signal emit buffer to the ldgui
@@ -55,7 +55,7 @@ extern "C" {
 
 // <q>External NOR support
 // <i> Read external nor, please enable this option
-#define USE_VIRTUAL_RESOURCE                      (0)
+#define USE_VIRTUAL_RESOURCE                      (1)
 
 // widget config
 

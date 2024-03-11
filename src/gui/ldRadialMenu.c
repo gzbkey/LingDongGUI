@@ -494,10 +494,10 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
 
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iWidth=pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tSize.iHeight=pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight;
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)pWidget->pItemList[pWidget->showList[i]].addr;
+                    ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)pWidget->pItemList[pWidget->showList[i]].imgAddr;
 
 #if USE_VIRTUAL_RESOURCE == 1
-                    tempRes.pTarget=pWidget->pItemList[pWidget->showList[i]].addr;
+                    tempRes.pTarget=pWidget->pItemList[pWidget->showList[i]].imgAddr;
 #endif
 #if USE_RADIA_MENU_SCALE == 1
                     if(pWidget->pItemList[i].scalePercent>=100)
@@ -532,7 +532,7 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask)
+void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask)
 {
     if(pWidget==NULL)
     {
@@ -542,7 +542,7 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t wid
 
     if(pWidget->itemCount<pWidget->itemMax)
     {
-        pWidget->pItemList[pWidget->itemCount].addr=imageAddr;
+        pWidget->pItemList[pWidget->itemCount].imgAddr=imageAddr;
         pWidget->pItemList[pWidget->itemCount].itemRegion.tSize.iWidth=width;
         pWidget->pItemList[pWidget->itemCount].itemRegion.tSize.iHeight=height;
         pWidget->pItemList[pWidget->itemCount].count=itemSubCount;

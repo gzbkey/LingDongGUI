@@ -102,7 +102,7 @@ void ldGaugeDel(ldGauge_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uint32_t bgImgAddr,bool isBgMask)
+ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uintptr_t bgImgAddr,bool isBgMask)
 {
     ldGauge_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -354,7 +354,7 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-13
  */
-void ldGaugeSetPointerImage(ldGauge_t *pWidget,uint32_t pointerImgAddr,int16_t pointerWidth,int16_t pointerHeight,int16_t pointerOriginOffsetX,int16_t pointerOriginOffsetY)
+void ldGaugeSetPointerImage(ldGauge_t *pWidget,uintptr_t pointerImgAddr,int16_t pointerWidth,int16_t pointerHeight,int16_t pointerOriginOffsetX,int16_t pointerOriginOffsetY)
 {
     if (pWidget == NULL)
     {

@@ -482,7 +482,7 @@ void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-10
  */
-void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheckedImgAddr,bool isUncheckedMask,uint32_t checkedImgAddr,bool isCheckedMask)
+void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask)
 {
     if(pWidget==NULL)
     {

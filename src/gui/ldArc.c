@@ -116,7 +116,7 @@ void ldArcFrameUpdate(ldArc_t* pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-30
  */
-ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uint32_t srcQuarterAddr,uint32_t maskQuarterAddr,ldColor parentColor)
+ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uintptr_t srcQuarterAddr,uintptr_t maskQuarterAddr,ldColor parentColor)
 {
     ldArc_t *pNewWidget = NULL;
     xListNode *parentInfo;

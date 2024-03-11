@@ -27,7 +27,7 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isExpand:1;
     bool isCorner:1;
-    uint32_t dropdownImgAddr;
+    uintptr_t dropdownImgAddr;
     uint8_t dropdownImgWidth;
     uint8_t dropdownImgHeight;
     uint8_t itemMax;
@@ -48,6 +48,7 @@ void ldComboBoxDel(ldComboBox_t *pWidget);
 
 void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);
 void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);
+void ldComboBoxSetDropdownMask(ldComboBox_t* pWidget, uintptr_t maskAddr, uint8_t width, uint8_t height);
 
 #define ldComboBoxSetHidden          ldBaseSetHidden
 #define ldComboBoxMove               ldBaseMove

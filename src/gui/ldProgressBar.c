@@ -391,7 +391,7 @@ void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove)
+void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uintptr_t bgAddr,uint16_t bgWidth,bool isMove)
 {
     if(pWidget==NULL)
     {
@@ -413,7 +413,7 @@ void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t b
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove)
+void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uintptr_t fgAddr,uint16_t fgWidth,bool isMove)
 {
     if(pWidget==NULL)
     {
@@ -434,7 +434,7 @@ void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t f
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint16_t frameWidth)
+void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget, uintptr_t frameAddr, uint16_t frameWidth)
 {
     if(pWidget==NULL)
     {

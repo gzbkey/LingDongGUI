@@ -10,10 +10,9 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isTransparent:1;
-    bool isScroll:1;
     bool isRelease:1;
     arm_2d_helper_pi_slider_t tPISlider;
-    uint32_t bgImgAddr;
+    uintptr_t bgImgAddr;
     ldChar_t *pTextInfo;
     ldColor bgColor;
     int16_t scrollOffset;
@@ -36,7 +35,7 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset);
 void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue);
 void ldTextSetScroll(ldText_t *pWidget,bool isEnable);
 void ldTextSetOpacity(ldText_t *pWidget, uint8_t opacity);
-void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr);
+void ldTextSetBgImage(ldText_t *pWidget, uintptr_t imageAddr);
 void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor);
 
 #define ldTextSetHidden        ldBaseSetHidden

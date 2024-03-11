@@ -8,7 +8,7 @@ extern "C" {
 #include "ldCommon.h"
 
 typedef struct {
-    uint32_t imgAddr;
+    uintptr_t imgAddr;
     uint8_t* pName;
 }ldIconInfo_t;
 
@@ -41,7 +41,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget);
 void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldIconSliderDel(ldIconSlider_t *pWidget);
-void ldIconSliderAddIcon(ldIconSlider_t *pWidget, uint32_t imageAddr, uint8_t *pNameStr);
+void ldIconSliderAddIcon(ldIconSlider_t *pWidget, uintptr_t imageAddr, uint8_t *pNameStr);
 void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal);
 void ldIconSliderSetSpeed(ldIconSlider_t *pWidget, uint8_t speed);
 

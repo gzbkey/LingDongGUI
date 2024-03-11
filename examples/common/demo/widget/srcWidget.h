@@ -10,7 +10,7 @@ extern "C" {
 //arc_quarter.png w:51 h:51 < A8 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t arc_quarter_png[];
-#define ARC_QUARTER_PNG (uint32_t)&arc_quarter_png[0]
+#define ARC_QUARTER_PNG &arc_quarter_png[0]
 #else
 #define ARC_QUARTER_PNG 0
 #endif
@@ -18,7 +18,7 @@ extern const uint8_t arc_quarter_png[];
 //arc_quarter_mask.png w:51 h:51 < A8 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t arc_quarter_mask_png[];
-#define ARC_QUARTER_MASK_PNG (uint32_t)&arc_quarter_mask_png[0]
+#define ARC_QUARTER_MASK_PNG &arc_quarter_mask_png[0]
 #else
 #define ARC_QUARTER_MASK_PNG 2601
 #endif
@@ -26,7 +26,7 @@ extern const uint8_t arc_quarter_mask_png[];
 //book.png w:48 h:48 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t book_png[];
-#define BOOK_PNG (uint32_t)&book_png[0]
+#define BOOK_PNG &book_png[0]
 #else
 #define BOOK_PNG 5202
 #endif
@@ -34,7 +34,7 @@ extern const uint8_t book_png[];
 //chart.png w:48 h:48 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t chart_png[];
-#define CHART_PNG (uint32_t)&chart_png[0]
+#define CHART_PNG &chart_png[0]
 #else
 #define CHART_PNG 12114
 #endif
@@ -42,7 +42,7 @@ extern const uint8_t chart_png[];
 //Gauge.png w:120 h:98 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t Gauge_png[];
-#define GAUGE_PNG (uint32_t)&Gauge_png[0]
+#define GAUGE_PNG &Gauge_png[0]
 #else
 #define GAUGE_PNG 19026
 #endif
@@ -50,7 +50,7 @@ extern const uint8_t Gauge_png[];
 //keyPress.png w:79 h:53 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t keyPress_png[];
-#define KEYPRESS_PNG (uint32_t)&keyPress_png[0]
+#define KEYPRESS_PNG &keyPress_png[0]
 #else
 #define KEYPRESS_PNG 54306
 #endif
@@ -58,7 +58,7 @@ extern const uint8_t keyPress_png[];
 //keyRelease.png w:79 h:53 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t keyRelease_png[];
-#define KEYRELEASE_PNG (uint32_t)&keyRelease_png[0]
+#define KEYRELEASE_PNG &keyRelease_png[0]
 #else
 #define KEYRELEASE_PNG 66867
 #endif
@@ -66,7 +66,7 @@ extern const uint8_t keyRelease_png[];
 //letter_paper.bmp w:150 h:200 < 565 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t letter_paper_bmp[];
-#define LETTER_PAPER_BMP (uint32_t)&letter_paper_bmp[0]
+#define LETTER_PAPER_BMP &letter_paper_bmp[0]
 #else
 #define LETTER_PAPER_BMP 79428
 #endif
@@ -74,7 +74,7 @@ extern const uint8_t letter_paper_bmp[];
 //nature.bmp w:100 h:100 < 565 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t nature_bmp[];
-#define NATURE_BMP (uint32_t)&nature_bmp[0]
+#define NATURE_BMP &nature_bmp[0]
 #else
 #define NATURE_BMP 139428
 #endif
@@ -82,7 +82,7 @@ extern const uint8_t nature_bmp[];
 //note.png w:48 h:48 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t note_png[];
-#define NOTE_PNG (uint32_t)&note_png[0]
+#define NOTE_PNG &note_png[0]
 #else
 #define NOTE_PNG 159428
 #endif
@@ -90,7 +90,7 @@ extern const uint8_t note_png[];
 //ProgressBarBg.bmp w:1 h:30 < 565 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t ProgressBarBg_bmp[];
-#define PROGRESSBARBG_BMP (uint32_t)&ProgressBarBg_bmp[0]
+#define PROGRESSBARBG_BMP &ProgressBarBg_bmp[0]
 #else
 #define PROGRESSBARBG_BMP 166340
 #endif
@@ -98,7 +98,7 @@ extern const uint8_t ProgressBarBg_bmp[];
 //ProgressBarFg.bmp w:20 h:30 < 565 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t ProgressBarFg_bmp[];
-#define PROGRESSBARFG_BMP (uint32_t)&ProgressBarFg_bmp[0]
+#define PROGRESSBARFG_BMP &ProgressBarFg_bmp[0]
 #else
 #define PROGRESSBARFG_BMP 166400
 #endif
@@ -106,7 +106,7 @@ extern const uint8_t ProgressBarFg_bmp[];
 //weather.png w:48 h:48 < 565+Mask >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t weather_png[];
-#define WEATHER_PNG (uint32_t)&weather_png[0]
+#define WEATHER_PNG &weather_png[0]
 #else
 #define WEATHER_PNG 167600
 #endif
@@ -114,7 +114,7 @@ extern const uint8_t weather_png[];
 //pointer.png w:11 h:60 < A8 >
 #if USE_VIRTUAL_RESOURCE == 0
 extern const uint8_t pointer_png[];
-#define POINTER_PNG (uint32_t)&pointer_png[0]
+#define POINTER_PNG &pointer_png[0]
 #else
 #define POINTER_PNG 174512
 #endif

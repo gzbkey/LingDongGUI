@@ -959,7 +959,7 @@ void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t a
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-21
  */
-void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr,bool isWithMask,ldColor maskColor,bool isMask)
+void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uintptr_t imgAddr,bool isWithMask,ldColor maskColor,bool isMask)
 {
     if(pWidget==NULL)
     {
@@ -1000,7 +1000,7 @@ void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-21
  */
-void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isCheckable)
+void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uintptr_t releaseImgAddr,uintptr_t pressImgAddr,bool isCheckable)
 {
     if(pWidget==NULL)
     {

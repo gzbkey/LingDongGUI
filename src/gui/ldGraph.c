@@ -156,7 +156,7 @@ ldGraph_t *ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        pNewWidget->pointImgAddr=(uint32_t)graphDefalutDot_png;
+        pNewWidget->pointImgAddr=(uintptr_t)graphDefalutDot_png;
         pNewWidget->pointImgWidth=5;
         pNewWidget->isCorner=true;
         pNewWidget->isFrame=true;
@@ -287,7 +287,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 #endif
             ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
             
-            if(pWidget->pointImgAddr==(uint32_t)graphDefalutDot_png)
+            if(pWidget->pointImgAddr==(uintptr_t)graphDefalutDot_png)
             {
                 ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
             }
@@ -341,7 +341,7 @@ void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldGraphSetPointImageMask(ldGraph_t *pWidget,uint32_t addr,int16_t width)
+void ldGraphSetPointImageMask(ldGraph_t *pWidget, uintptr_t addr, int16_t width)
 {
     if (pWidget == NULL)
     {

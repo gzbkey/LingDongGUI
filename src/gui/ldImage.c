@@ -105,7 +105,7 @@ void ldImageDel(ldImage_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t imageAddr, bool isWithMask)
+ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uintptr_t imageAddr, bool isWithMask)
 {
     ldImage_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -294,7 +294,7 @@ void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldImageSetImage(ldImage_t *pWidget, uint32_t imageAddr, bool isWithMask)
+void ldImageSetImage(ldImage_t *pWidget, uintptr_t imageAddr, bool isWithMask)
 {
     if (pWidget == NULL)
     {
