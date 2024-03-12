@@ -63,6 +63,7 @@ void before_scene_switching_handler(void *pTarget,
 
 int app_2d_main_thread (void *argument)
 {
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
     arm_2d_scene_player_register_before_switching_event_handler(
             &DISP0_ADAPTER,
             before_scene_switching_handler);
@@ -72,7 +73,7 @@ int app_2d_main_thread (void *argument)
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
 
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
-
+#endif
     while(1) {
         if (arm_fsm_rt_cpl == disp_adapter0_task()) {
             vtSdlFlush(1);
@@ -109,7 +110,9 @@ int main (void)
     xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
     xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
     LD_ADD_PAGE_DEMO;
+#endif
 
     arm_irq_safe {
         arm_2d_init();
