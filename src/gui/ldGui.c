@@ -240,8 +240,7 @@ static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
     {
         if(tempPos->info!=NULL)
         {
-            ldBaseAddDirtyRegion(&((ldCommon_t *)tempPos->info)->dirtyRegionListItem,&pSence->ptDirtyRegion);
-
+            arm_2d_helper_pfb_append_dirty_regions_to_list(&pSence->ptDirtyRegion,&((ldCommon_t *)tempPos->info)->dirtyRegionListItem,1);
             if(((ldCommon_t *)tempPos->info)->childList!=NULL)
             {
                 ldGuiSetDirtyRegion(((ldCommon_t *)tempPos->info)->childList,pSence);

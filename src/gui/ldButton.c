@@ -189,11 +189,12 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
+        pNewWidget->dirtyRegionListItem.bUpdated = false;
+        pNewWidget->dirtyRegionState=none;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldButtonCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
@@ -211,11 +212,12 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 
 void ldButtonFrameUpdate(ldButton_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+//    if(pWidget->dirtyRegionState==waitChange)
+//    {
+//        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
+        arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+//    }
+//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -338,6 +340,33 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                 }
                 arm_2d_op_wait_async(NULL);
             }
+        }
+
+        switch (arm_2d_user_dynamic_dirty_region_wait_next(&pWidget->dirtyRegionListItem)) {
+            case waitChange:
+                if (pWidget->dirtyRegionState==waitChange) {
+
+
+                        arm_2d_user_dynamic_dirty_region_update(
+                                        &pWidget->dirtyRegionListItem,                     /* the dirty region */
+                                        &tTarget,                           /* the target tile */
+                                        &tTarget_canvas,                         /* the redraw region */
+                                        none);  /* next state */
+
+
+                    pWidget->dirtyRegionState=none;
+                } else {
+                    /* nothing to redraw, update state to DONE */
+                    arm_2d_user_dynamic_dirty_region_change_user_region_index_only(
+                                        &pWidget->dirtyRegionListItem,
+                                        none);
+                }
+
+                break;
+            case none:
+                break;
+            default:    /* 0xFF */
+                break;
         }
     }
 }

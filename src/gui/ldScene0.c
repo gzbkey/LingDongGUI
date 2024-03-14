@@ -52,7 +52,7 @@
 #   pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
 #   pragma clang diagnostic ignored "-Wunused-function"
-#   pragma clang diagnostic ignored "-Wmissing-declarations"  
+#   pragma clang diagnostic ignored "-Wmissing-declarations"
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   pragma diag_suppress 64,177
 #elif __IS_COMPILER_IAR__
@@ -83,9 +83,9 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-    
+
     ptScene->ptPlayer = NULL;
-    
+
     /* reset timestamp */
     arm_foreach(int64_t,this.lTimestamp, ptItem) {
         *ptItem = 0;
@@ -103,7 +103,7 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
 static void __on_scene0_background_start(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
-    ARM_2D_UNUSED(ptThis);    
+    ARM_2D_UNUSED(ptThis);
 }
 
 static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
@@ -123,7 +123,7 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-    
+
     if(pageNumNow!=pageTarget)
     {
         ldGuiQuit(ptScene);
@@ -134,7 +134,7 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     }
     /* switch to next scene after 3s */
 //    if (arm_2d_helper_is_time_out(3000, &this.lTimestamp[0])) {
-//        
+//
 //    }
 }
 
@@ -156,7 +156,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     ARM_2D_UNUSED(ptTile);
     ARM_2D_UNUSED(bIsNewFrame);
     ARM_2D_UNUSED(tScreenSize);
-    
+
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
 
@@ -169,14 +169,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
     return arm_fsm_rt_cpl;
 }
-arm_2d_scene_t *gpScene;
+
 ARM_NONNULL(1)
-user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter, 
+user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
                                         user_scene_0_t *ptThis)
 {
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
-    
+
     if (NULL == ptThis) {
         ptThis = (user_scene_0_t *)
                     __arm_2d_allocate_scratch_memory(   sizeof(user_scene_0_t),
@@ -197,7 +197,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
              */
             .fnScene        = &__pfb_draw_scene0_handler,
             .ptDirtyRegion  = NULL,
-            
+
 
             //.fnOnBGStart    = &__on_scene0_background_start,
             //.fnOnBGComplete = &__on_scene0_background_complete,
@@ -212,11 +212,11 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     /* ------------   initialize members of user_scene_0_t begin ---------------*/
 
         ldGuiInit((arm_2d_scene_t*)ptThis);
-    gpScene=ptThis;
+
     /* ------------   initialize members of user_scene_0_t end   ---------------*/
 
-    arm_2d_scene_player_append_scenes(  ptDispAdapter, 
-                                        &this.use_as__arm_2d_scene_t, 
+    arm_2d_scene_player_append_scenes(  ptDispAdapter,
+                                        &this.use_as__arm_2d_scene_t,
                                         1);
 
     return ptThis;
