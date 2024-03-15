@@ -13,6 +13,7 @@ typedef struct {
     bool isWaitMove:1;
     uint8_t align:4;
     bool isAutoMove:1;
+    bool isWaitInit:1;
     uint8_t itemMax;
     uint8_t itemCount;
     ldFontDict_t* pFontDict;

@@ -158,6 +158,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         if(clickItemNum!=SHOW_ITEM_NUM)
         {
             pWidget->itemPreSelect=clickItemNum-1;
+            pWidget->dirtyRegionState=waitChange;
         }
         break;
     }
@@ -271,7 +272,6 @@ void ldComboBoxFrameUpdate(ldComboBox_t* pWidget)
         ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight*(pWidget->itemCount+1);
         pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
     }
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 
     if(pWidget->isExpand)
     {

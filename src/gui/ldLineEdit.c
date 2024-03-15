@@ -254,7 +254,10 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
     {
         if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            if(!pWidget->isEditing)
+            {
+                pWidget->dirtyRegionState=none;
+            }
         }
 
         if(pWidget->isCorner)

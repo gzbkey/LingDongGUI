@@ -121,58 +121,58 @@ void uiWidgetInit(uint8_t page)
 //     ldTableSetItemText(obj,2,1,(uint8_t*)"image",SIMSUN_REGULAR_12);
 //     ldTableSetItemText(obj,2,2,(uint8_t*)"100*100",SIMSUN_REGULAR_12);
 
-//     obj=ldLabelInit(ID_LABLE,ID_WIN,320,165,100,30,SIMSUN_REGULAR_12);
-//     ldLabelSetText(obj,(uint8_t*)"lable demo");
+     obj=ldLabelInit(ID_LABLE,ID_WIN,320,165,100,30,SIMSUN_REGULAR_12);
+     ldLabelSetText(obj,(uint8_t*)"lable demo");
 
-//     obj=ldCheckBoxInit(ID_CHECK_BOX,ID_WIN,320,200,60,30);
-//     ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"123");
-//     ldCheckBoxSetCorner(obj,true);
+     obj=ldCheckBoxInit(ID_CHECK_BOX,ID_WIN,320,200,60,30);
+     ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"123");
+     ldCheckBoxSetCorner(obj,true);
 
-//     obj=ldCheckBoxInit(ID_Radio1,ID_WIN,320,240,60,30);
-//     ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"abc");
-//     ldCheckBoxSetRadioButtonGroup(obj,0);
+     obj=ldCheckBoxInit(ID_Radio1,ID_WIN,320,240,60,30);
+     ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"abc");
+     ldCheckBoxSetRadioButtonGroup(obj,0);
 
-//     obj=ldCheckBoxInit(ID_Radio2,ID_WIN,380,240,60,30);
-//     ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"xyz");
-//     ldCheckBoxSetRadioButtonGroup(obj,0);
+     obj=ldCheckBoxInit(ID_Radio2,ID_WIN,380,240,60,30);
+     ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"xyz");
+     ldCheckBoxSetRadioButtonGroup(obj,0);
 
-//     obj=ldGraphInit(ID_GRAPH,ID_WIN,320,350,100,100,2);
-//     ldGraphSetAxis(obj,80,80,5);
-//     ldGraphSetGridOffset(obj,4);
-//     ldGraphAddSeries(obj,LD_COLOR_LIGHT_PINK,2,16);
-//     srand(10);
-//     for (int i = 0; i < 16; i++)
-//     {
-//         ldGraphSetValue(obj,0,i,rand() % 81);
-//     }
-//     ldGraphAddSeries(obj,LD_COLOR_LIGHT_BLUE,2,16);
-//     for (int i = 0; i < 16; i++)
-//     {
-//         ldGraphSetValue(obj,1,i,rand() % 81);
-//     }
+     obj=ldGraphInit(ID_GRAPH,ID_WIN,320,350,100,100,2);
+     ldGraphSetAxis(obj,80,80,5);
+     ldGraphSetGridOffset(obj,4);
+     ldGraphAddSeries(obj,LD_COLOR_LIGHT_PINK,2,16);
+     srand(10);
+     for (int i = 0; i < 16; i++)
+     {
+         ldGraphSetValue(obj,0,i,rand() % 81);
+     }
+     ldGraphAddSeries(obj,LD_COLOR_LIGHT_BLUE,2,16);
+     for (int i = 0; i < 16; i++)
+     {
+         ldGraphSetValue(obj,1,i,rand() % 81);
+     }
 
-//     obj=ldComboBoxInit(ID_COMBO_BOX,ID_WIN,200,320,80,30,SIMSUN_REGULAR_12,3);
-//     ldComboBoxAddItem(obj,(uint8_t*)"tool");
-//     ldComboBoxAddItem(obj,(uint8_t*)"setting");
-//     ldComboBoxAddItem(obj,(uint8_t*)"about");
+     obj=ldComboBoxInit(ID_COMBO_BOX,ID_WIN,200,320,80,30,SIMSUN_REGULAR_12,3);
+     ldComboBoxAddItem(obj,(uint8_t*)"tool");
+     ldComboBoxAddItem(obj,(uint8_t*)"setting");
+     ldComboBoxAddItem(obj,(uint8_t*)"about");
 
-//     obj=ldScrollSelecterInit(ID_SCROLL_SELECTER,ID_WIN,320,125,40,40,SIMSUN_REGULAR_12,5);
-//     ldScrollSelecterSetBgColor(obj,LD_COLOR_WHITE);
-//     ldScrollSelecterAddItem(obj,"1");
-//     ldScrollSelecterAddItem(obj,"2");
-//     ldScrollSelecterAddItem(obj,"3");
-//     ldScrollSelecterAddItem(obj,"4");
-//     ldScrollSelecterAddItem(obj,"5");
+     obj=ldScrollSelecterInit(ID_SCROLL_SELECTER,ID_WIN,320,125,40,40,SIMSUN_REGULAR_12,5);
+     ldScrollSelecterSetBgColor(obj,LD_COLOR_WHITE);
+     ldScrollSelecterAddItem(obj,"1");
+     ldScrollSelecterAddItem(obj,"2");
+     ldScrollSelecterAddItem(obj,"3");
+     ldScrollSelecterAddItem(obj,"4");
+     ldScrollSelecterAddItem(obj,"5");
 
-//     // 120 280
-//     obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
+     // 120 280
+     obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
 //     ldLineEditSetKeyboard(obj,ID_KB);
 
 
-//     obj=ldArcInit(ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
-//     ldArcSetBgAngle(obj,0,350);
-//     ldArcSetFgAngle(obj,30);
-//     ldArcSetColor(obj,LD_COLOR_LIGHT_BLUE,LD_COLOR_LIGHT_GREEN);
+     obj=ldArcInit(ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
+     ldArcSetBgAngle(obj,0,350);
+     ldArcSetFgAngle(obj,30);
+     ldArcSetColor(obj,LD_COLOR_LIGHT_BLUE,LD_COLOR_LIGHT_GREEN);
 
 //     ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
 }

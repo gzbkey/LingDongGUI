@@ -242,6 +242,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
+        pNewWidget->isWaitInit=true;
 
         arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
@@ -293,10 +294,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     {
         int16_t targetOffset=-(pWidget->itemSelect*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight);
 
+        pWidget->dirtyRegionState=waitChange;
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=waitChange;
+            pWidget->dirtyRegionState=none;
         }
         else
         {
@@ -325,7 +327,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     {
         if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            if(pWidget->isWaitInit)
+            {
+                pWidget->isWaitInit=false;
+                pWidget->dirtyRegionState=none;
+            }
         }
 
         if(!pWidget->isTransparent)
