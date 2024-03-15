@@ -166,9 +166,7 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
         pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = false;
+        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);;
         pNewWidget->dirtyRegionState=none;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->pFunc=&ldImageCommonFunc;
@@ -210,11 +208,6 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
 void ldImageFrameUpdate(ldImage_t* pWidget)
 {
     arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-//    if(pWidget->dirtyRegionState==waitChange)
-//    {
-//        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-//    }
-//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)
@@ -265,31 +258,9 @@ void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsN
         }
         arm_2d_op_wait_async(NULL);
 
-        switch (arm_2d_user_dynamic_dirty_region_wait_next(&pWidget->dirtyRegionListItem)) {
-            case waitChange:
-                if (pWidget->dirtyRegionState==waitChange) {
-
-
-                        arm_2d_user_dynamic_dirty_region_update(
-                                        &pWidget->dirtyRegionListItem,                     /* the dirty region */
-                                        &tTarget,                           /* the target tile */
-                                        &tTarget_canvas,                         /* the redraw region */
-                                        none);  /* next state */
-
-
-                    pWidget->dirtyRegionState=none;
-                } else {
-                    /* nothing to redraw, update state to DONE */
-                    arm_2d_user_dynamic_dirty_region_change_user_region_index_only(
-                                        &pWidget->dirtyRegionListItem,
-                                        none);
-                }
-
-                break;
-            case none:
-                break;
-            default:    /* 0xFF */
-                break;
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
         }
     }
 }

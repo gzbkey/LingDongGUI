@@ -261,13 +261,8 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = true;
-        pNewWidget->dirtyRegionListItem.bUpdated = false;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldRadialMenuCommonFunc;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
@@ -346,45 +341,6 @@ static void _autoSort(ldRadialMenu_t *pWidget)
         pWidget->showList[i] = i;
     }
     _sortByYAxis(pWidget->pItemList, pWidget->showList, pWidget->itemCount);
-}
-
-void ldRadialMenuDirtyRegionAutoUpdate(ldRadialMenu_t* pWidget,uint8_t itemNum,arm_2d_region_t newRegion,bool isAutoIgnore)
-{
-    switch (pWidget->pItemList[itemNum].dirtyRegionState)
-    {
-    case waitChange://扩张到新范围
-    {
-        arm_2d_region_t tempRegion;
-        ldPoint_t globalPos;
-        globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
-        newRegion.tLocation.iX+=globalPos.x;
-        newRegion.tLocation.iY+=globalPos.y;
-
-        arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->pItemList[itemNum].dirtyRegionTemp,&tempRegion);
-
-        pWidget->pItemList[itemNum].dirtyRegionListItem.tRegion=tempRegion;
-        pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
-        pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
-        pWidget->pItemList[itemNum].dirtyRegionTemp=newRegion;
-        pWidget->pItemList[itemNum].dirtyRegionState=waitUpdate;
-        break;
-    }
-    case waitUpdate://缩小到新范围
-    {
-        pWidget->pItemList[itemNum].dirtyRegionListItem.tRegion=pWidget->pItemList[itemNum].dirtyRegionTemp;
-        pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=false;
-        pWidget->pItemList[itemNum].dirtyRegionListItem.bUpdated=true;
-        pWidget->pItemList[itemNum].dirtyRegionState=none;
-
-        if(isAutoIgnore&&(pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore==false))
-        {
-            pWidget->pItemList[itemNum].dirtyRegionListItem.bIgnore=true;
-        }
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget)
@@ -550,8 +506,6 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t wi
 
         pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.ptNext=NULL;
         pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.tRegion = (arm_2d_region_t){0};
-        pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.bIgnore = false;
-        pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.bUpdated = true;
 
         arm_2d_region_list_item_t * pDirtyRegionListItem=&pWidget->dirtyRegionListItem;
         ldBaseAddDirtyRegion(&pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem,&pDirtyRegionListItem);

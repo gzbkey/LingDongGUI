@@ -838,7 +838,6 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
         xEmit(0,SIGNAL_EDITING_FINISHED,0);
         ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,0);
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=true;
         break;
     }
     default:
@@ -946,17 +945,14 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->clickPoint.iY=-1;
         pNewWidget->isClick=false;
         pNewWidget->upperState=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = (arm_2d_region_t){0};//ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = true;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->isWaitInit=true;
         pNewWidget->isSymbol=false;
         pNewWidget->pFunc=&ldKeyboardCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -1003,7 +999,7 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
     {
         pWidget->dirtyRegionTemp=pWidget->targetDirtyRegion;
     }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -1086,6 +1082,11 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         ldBaseColor(&tTarget,__RGB(208,211,220),255);
 
         if(pWidget->isNumber)

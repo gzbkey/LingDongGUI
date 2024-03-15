@@ -66,19 +66,19 @@ void uiWidgetInit(uint8_t page)
 //     ldButtonSetSelectImage(obj,FRAME_PNG,LD_COLOR_BLUE);
 //     ldButtonSetSelect(obj,true);
 
-//     obj=ldImageInit(ID_IMAGE,ID_WIN,10,70,100,100,NATURE_BMP,false);
+     obj=ldImageInit(ID_IMAGE,ID_WIN,10,70,100,100,NATURE_BMP,false);
 
-//     obj=ldTextInit(ID_TEXT,ID_WIN,10,200,150,200,SIMSUN_REGULAR_12);
-//     ldTextSetBgImage(obj,LETTER_PAPER_BMP);
-//     ldTextSetText(obj,(uint8_t*)"12345679\n123");
-//     ldTextSetTextColor(obj,LD_COLOR_BLACK);
-//     ldTextSetAlign(obj,LD_ALIGN_LEFT|LD_ALIGN_TOP);
-//     ldTextSetScroll(obj,true);
+     obj=ldTextInit(ID_TEXT,ID_WIN,10,200,150,200,SIMSUN_REGULAR_12);
+     ldTextSetBgImage(obj,LETTER_PAPER_BMP);
+     ldTextSetText(obj,(uint8_t*)"12345679\n123");
+     ldTextSetTextColor(obj,LD_COLOR_BLACK);
+     ldTextSetAlign(obj,LD_ALIGN_LEFT|LD_ALIGN_TOP);
+     ldTextSetScroll(obj,true);
 
-//     obj=ldProgressBarInit(ID_PROGRESS_BAR,ID_WIN,10,420,100,30);
-//     ldProgressBarSetPercent(obj,65);
-//     ldProgressBarSetBgImage(obj,PROGRESSBARBG_BMP,1,false);
-//     ldProgressBarSetFgImage(obj,PROGRESSBARFG_BMP,20,true);
+     obj=ldProgressBarInit(ID_PROGRESS_BAR,ID_WIN,10,420,100,30);
+     ldProgressBarSetPercent(obj,65);
+     ldProgressBarSetBgImage(obj,PROGRESSBARBG_BMP,1,false);
+     ldProgressBarSetFgImage(obj,PROGRESSBARFG_BMP,20,true);
 
 //     obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_WIN,450,10,200,150,170,100,5);
 //     ldRadialMenuAddItem(obj,NOTE_PNG,48,48,0,true);
@@ -88,8 +88,8 @@ void uiWidgetInit(uint8_t page)
 
 
 
-//     obj=ldDateTimeInit(ID_DATE_TIME,ID_WIN,150,10,150,30,SIMSUN_REGULAR_12);
-//     ldDateTimeSetBgColor(obj,LD_COLOR_LIGHT_CYAN);
+     obj=ldDateTimeInit(ID_DATE_TIME,ID_WIN,150,10,150,30,SIMSUN_REGULAR_12);
+     ldDateTimeSetBgColor(obj,LD_COLOR_LIGHT_CYAN);
 
 //     obj=ldIconSliderInit(ID_ICON_SLIDER,ID_WIN,150,50,150,50,48,2,5,1,1,SIMSUN_REGULAR_12);
 //     ldIconSliderAddIcon(obj,NOTE_PNG,(uint8_t*)"111");
@@ -103,7 +103,7 @@ void uiWidgetInit(uint8_t page)
 //     ldGaugeSetCenterOffset(obj,0,10);
 //     ldGaugeSetPointerImageType(obj,onlyMask,LD_COLOR_RED);
 
-//     obj=ldQRCodeInit(ID_QR_CODE,ID_WIN,200,250,60,60,(uint8_t*)"ldgui",LD_COLOR_LIGHT_BLUE,LD_COLOR_WHITE,eccHigh,2,2);
+     obj=ldQRCodeInit(ID_QR_CODE,ID_WIN,200,250,60,60,(uint8_t*)"ldgui",LD_COLOR_LIGHT_BLUE,LD_COLOR_WHITE,eccHigh,2,2);
 
 //     obj=ldTableInit(ID_TABLE,ID_WIN,450,200,300,100,5,3,1,SIMSUN_REGULAR_12);
 //     ldTableSetExcelType(obj,SIMSUN_REGULAR_12);

@@ -145,15 +145,12 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
         pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
         pNewWidget->permille=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
         pNewWidget->pFunc=&ldProgressBarCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         LOG_INFO("[progressBar] init,id:%d\n",nameId);
     }
@@ -315,7 +312,8 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
 
 void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget)
 {
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -336,6 +334,11 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         if(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE)//color
         {
             _progressBarColorShow(pWidget,&tTarget);
@@ -343,6 +346,7 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
         else
         {
             _progressBarImageShow(pWidget,&tTarget,bIsNewFrame);
+            pWidget->dirtyRegionState=waitChange;
         }
         arm_2d_op_wait_async(NULL);
     }

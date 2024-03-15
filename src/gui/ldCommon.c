@@ -1334,35 +1334,6 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
-// pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore)
-{
-        switch (pWidget->dirtyRegionState)
-        {
-        case waitChange://扩大到新范围
-        {
-            arm_2d_region_t tempRegion;
-            arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
-            pWidget->dirtyRegionListItem.bIgnore=false;
-            pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionTemp=newRegion;
-            pWidget->dirtyRegionState=waitUpdate;
-            break;
-        }
-        case waitUpdate://缩小到新范围
-        {
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
-            pWidget->dirtyRegionListItem.bIgnore=isAutoIgnore;
-            pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionState=none;
-            break;
-        }
-        default:
-            break;
-        }
-}
-
 void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
 {
     ldCommon_t *pWidget=ldBaseGetWidgetById(0);
@@ -1432,6 +1403,39 @@ arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t 
     pBufferRegion->tLocation.iY+=topSpace+height+bottomSpace;
     return retRegion;
 }
+
+// return true -> update finish
+bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw)
+{
+    switch (arm_2d_user_dynamic_dirty_region_wait_next(pDirtyRegionItem))
+    {
+        case waitChange:
+        if (isRedraw)
+        {
+            arm_2d_user_dynamic_dirty_region_update(
+                        pDirtyRegionItem,                     /* the dirty region */
+                        pTarget,                           /* the target tile */
+                        newRegion,                         /* the redraw region */
+                        none);  /* next state */
+            return true;
+        }
+        else
+        {
+            /* nothing to redraw, update state to DONE */
+            arm_2d_user_dynamic_dirty_region_change_user_region_index_only(
+                        pDirtyRegionItem,
+                        none);
+        }
+        break;
+    case none:
+        break;
+    default:    /* 0xFF */
+        break;
+    }
+    return false;
+}
+
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

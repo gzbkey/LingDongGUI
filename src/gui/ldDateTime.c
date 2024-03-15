@@ -150,14 +150,11 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->second=0;
         strcpy((char*)pNewWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
         pNewWidget->formatStrTemp[0]=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldDateTimeCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }
@@ -173,11 +170,7 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldDateTimeFrameUpdate(ldDateTime_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -270,6 +263,11 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         if(!pWidget->isTransparent)
         {
 #if USE_OPACITY == 1

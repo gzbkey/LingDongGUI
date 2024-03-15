@@ -157,14 +157,11 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         pNewWidget->qrZoom=qrZoom;
         pNewWidget->qrColor=qrColor;
         pNewWidget->bgColor=bgColor;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldQRCodeCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }
@@ -181,11 +178,7 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
 
 void ldQRCodeFrameUpdate(ldQRCode_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -213,6 +206,11 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         uint8_t *qr0;
         uint8_t *tempBuffer;
         uint32_t qrSize;

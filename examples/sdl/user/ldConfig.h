@@ -83,7 +83,7 @@ extern "C" {
 #define USE_LOG_LEVEL                             (5)
 
 #define LD_DEBUG                                  (0)
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (1)
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 
 // <<< end of configuration section >>>
 

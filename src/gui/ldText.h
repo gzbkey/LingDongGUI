@@ -11,6 +11,7 @@ typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isTransparent:1;
     bool isRelease:1;
+    bool isWaitInit:1;
     arm_2d_helper_pi_slider_t tPISlider;
     uintptr_t bgImgAddr;
     ldChar_t *pTextInfo;

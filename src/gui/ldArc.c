@@ -91,11 +91,7 @@ void ldArcDel(ldArc_t *pWidget)
 
 void ldArcFrameUpdate(ldArc_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 /**
@@ -154,13 +150,8 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        pNewWidget->dirtyRegionListItem.ptNext = NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
 
         pNewWidget->color[0]=LD_COLOR_LIGHT_GREY;
         pNewWidget->color[1]=LD_COLOR_LIGHT_BLUE;
@@ -174,6 +165,8 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         pNewWidget->endAngle_x10[1]=1800;
         pNewWidget->rotationAngle_x10=0;
         pNewWidget->pFunc=&ldArcCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         LOG_INFO("[arc] init,id:%d\n",nameId);
     }
@@ -333,6 +326,11 @@ void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFram
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->srcAddr;
 #if USE_VIRTUAL_RESOURCE == 1
         ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->srcAddr;
@@ -585,7 +583,6 @@ void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle)
         return;
     }
     pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
     pWidget->rotationAngle_x10=rotationAngle*10;
 }
 

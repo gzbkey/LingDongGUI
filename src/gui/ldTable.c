@@ -396,7 +396,6 @@ static bool slotTableProcess(xConnectInfo_t info)
                     }
                 }
                 pWidget->dirtyRegionState=waitChange;
-                pWidget->isDirtyRegionAutoIgnore=false;
             }
 
             pWidget->timer=tempTimer;
@@ -587,16 +586,13 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].pFontDict=pFontDict;
             pNewWidget->pItemInfo[i].isEditable=true;
         }
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
         pNewWidget->pFunc=&ldTableCommonFunc;
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
@@ -621,7 +617,8 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 
 void ldTableFrameUpdate(ldTable_t* pWidget)
 {
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -653,6 +650,11 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         if(!pWidget->isBgTransparent)
         {
             ldBaseColor(&tTarget,pWidget->bgColor,255);

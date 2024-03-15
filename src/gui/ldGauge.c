@@ -150,15 +150,12 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pointerOriginOffsetY=0;
         pNewWidget->angle_x10=0;
         memset(&pNewWidget->op, 0, sizeof (pNewWidget->op));
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldGaugeCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -181,7 +178,8 @@ void ldGaugeFrameUpdate(ldGauge_t* pWidget)
         pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
     }
 
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+
 }
 
 void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -215,6 +213,11 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         ldBaseImage(&tTarget,&tempRes,pWidget->isWithBgMask,255);
         arm_2d_op_wait_async(NULL);
 
@@ -404,7 +407,6 @@ void ldGaugeSetAngle(ldGauge_t *pWidget, float angle)
     pWidget->angle_x10%=3600;
 
     pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
 }
 
 /**

@@ -212,7 +212,6 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         pWidget->isHoldMove=false;
         _scrollOffset=pWidget->scrollOffset;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -468,14 +467,11 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
                 }
             }
         }
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldIconSliderCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
@@ -499,11 +495,7 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -561,7 +553,6 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         {
             pWidget->isWaitMove=false;
             pWidget->dirtyRegionState=waitChange;
-            pWidget->isDirtyRegionAutoIgnore=true;
         }
         else
         {
