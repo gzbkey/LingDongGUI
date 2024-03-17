@@ -35,7 +35,7 @@ static bool isWaitNorInit = true;
 
 extern size_t xFreeBytesRemaining;
 
-void uiWidgetInit(uint8_t page)
+void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
 {
 #if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
     if(isWaitNorInit)
@@ -50,14 +50,14 @@ void uiWidgetInit(uint8_t page)
     ldFree(obj);
     LOG_DEBUG("start :%zu\n",xFreeBytesRemaining);
 
-    obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+    obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
 
     LOG_DEBUG("win :%zu\n",xFreeBytesRemaining);
 
-    obj=ldWindowInit(ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH-10,LD_CFG_SCEEN_HEIGHT-10);
+    obj=ldWindowInit(pScene,ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH-10,LD_CFG_SCEEN_HEIGHT-10);
 //    ldWindowSetBgColor(obj,LD_COLOR_LIGHT_SKY_BLUE);
 
-     obj=ldButtonInit(ID_BUTTON,ID_WIN,5,5,79,53);
+     obj=ldButtonInit(pScene,ID_BUTTON,ID_WIN,5,5,79,53);
      ldButtonSetFont(obj,SIMSUN_REGULAR_12);
      ldButtonSetText(obj,(uint8_t*)"123");
      ldButtonSetImage(obj,KEYRELEASE_PNG,true,KEYPRESS_PNG,true);
@@ -66,21 +66,21 @@ void uiWidgetInit(uint8_t page)
 //     ldButtonSetSelectImage(obj,FRAME_PNG,LD_COLOR_BLUE);
 //     ldButtonSetSelect(obj,true);
 
-     obj=ldImageInit(ID_IMAGE,ID_WIN,10,70,100,100,NATURE_BMP,false);
+     obj=ldImageInit(pScene,ID_IMAGE,ID_WIN,10,70,100,100,NATURE_BMP,false);
 
-     obj=ldTextInit(ID_TEXT,ID_WIN,10,200,150,200,SIMSUN_REGULAR_12);
+     obj=ldTextInit(pScene,ID_TEXT,ID_WIN,10,200,150,200,SIMSUN_REGULAR_12);
      ldTextSetBgImage(obj,LETTER_PAPER_BMP);
      ldTextSetText(obj,(uint8_t*)"12345679\n123");
      ldTextSetTextColor(obj,LD_COLOR_BLACK);
      ldTextSetAlign(obj,LD_ALIGN_LEFT|LD_ALIGN_TOP);
      ldTextSetScroll(obj,true);
 
-     obj=ldProgressBarInit(ID_PROGRESS_BAR,ID_WIN,10,420,100,30);
+     obj=ldProgressBarInit(pScene,ID_PROGRESS_BAR,ID_WIN,10,420,100,30);
      ldProgressBarSetPercent(obj,65);
      ldProgressBarSetBgImage(obj,PROGRESSBARBG_BMP,1,false);
      ldProgressBarSetFgImage(obj,PROGRESSBARFG_BMP,20,true);
 
-     obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_WIN,450,10,200,150,170,100,5);
+     obj=ldRadialMenuInit(pScene,ID_RADIAL_MENU,ID_WIN,450,10,200,150,170,100,5);
      ldRadialMenuAddItem(obj,NOTE_PNG,48,48,0,true);
      ldRadialMenuAddItem(obj,BOOK_PNG,48,48,0,true);
      ldRadialMenuAddItem(obj,WEATHER_PNG,48,48,0,true);
@@ -88,24 +88,24 @@ void uiWidgetInit(uint8_t page)
 
 
 
-     obj=ldDateTimeInit(ID_DATE_TIME,ID_WIN,150,10,150,30,SIMSUN_REGULAR_12);
+     obj=ldDateTimeInit(pScene,ID_DATE_TIME,ID_WIN,150,10,150,30,SIMSUN_REGULAR_12);
      ldDateTimeSetBgColor(obj,LD_COLOR_LIGHT_CYAN);
 
-     obj=ldIconSliderInit(ID_ICON_SLIDER,ID_WIN,150,50,150,50,48,2,5,1,1,SIMSUN_REGULAR_12);
+     obj=ldIconSliderInit(pScene,ID_ICON_SLIDER,ID_WIN,150,50,150,50,48,2,5,1,1,SIMSUN_REGULAR_12);
      ldIconSliderAddIcon(obj,NOTE_PNG,(uint8_t*)"111");
      ldIconSliderAddIcon(obj,BOOK_PNG,(uint8_t*)"22");
      ldIconSliderAddIcon(obj,WEATHER_PNG,(uint8_t*)"33");
      ldIconSliderAddIcon(obj,CHART_PNG,(uint8_t*)"44");
      ldIconSliderAddIcon(obj,NOTE_PNG,(uint8_t*)"55");
 
-     obj=ldGaugeInit(ID_GAUGE,ID_WIN,180,120,120,98,GAUGE_PNG,true);
+     obj=ldGaugeInit(pScene,ID_GAUGE,ID_WIN,180,120,120,98,GAUGE_PNG,true);
      ldGaugeSetPointerImage(obj,POINTER_PNG,11,60,5,45);
      ldGaugeSetCenterOffset(obj,0,10);
      ldGaugeSetPointerImageType(obj,onlyMask,LD_COLOR_RED);
 
-     obj=ldQRCodeInit(ID_QR_CODE,ID_WIN,200,250,60,60,(uint8_t*)"ldgui",LD_COLOR_LIGHT_BLUE,LD_COLOR_WHITE,eccHigh,2,2);
+     obj=ldQRCodeInit(pScene,ID_QR_CODE,ID_WIN,200,250,60,60,(uint8_t*)"ldgui",LD_COLOR_LIGHT_BLUE,LD_COLOR_WHITE,eccHigh,2,2);
 
-     obj=ldTableInit(ID_TABLE,ID_WIN,450,200,300,100,6,6,1,SIMSUN_REGULAR_12);
+     obj=ldTableInit(pScene,ID_TABLE,ID_WIN,450,200,300,100,6,6,1,SIMSUN_REGULAR_12);
      ldTableSetExcelType(obj,SIMSUN_REGULAR_12);
      ldTableSetKeyboard(obj,ID_KB);
 
@@ -121,22 +121,22 @@ void uiWidgetInit(uint8_t page)
      ldTableSetItemText(obj,3,2,(uint8_t*)"image",SIMSUN_REGULAR_12);
      ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",SIMSUN_REGULAR_12);
 
-     obj=ldLabelInit(ID_LABLE,ID_WIN,320,165,100,30,SIMSUN_REGULAR_12);
+     obj=ldLabelInit(pScene,ID_LABLE,ID_WIN,320,165,100,30,SIMSUN_REGULAR_12);
      ldLabelSetText(obj,(uint8_t*)"lable demo");
 
-     obj=ldCheckBoxInit(ID_CHECK_BOX,ID_WIN,320,200,60,30);
+     obj=ldCheckBoxInit(pScene,ID_CHECK_BOX,ID_WIN,320,200,60,30);
      ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"123");
      ldCheckBoxSetCorner(obj,true);
 
-     obj=ldCheckBoxInit(ID_Radio1,ID_WIN,320,240,60,30);
+     obj=ldCheckBoxInit(pScene,ID_Radio1,ID_WIN,320,240,60,30);
      ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"abc");
      ldCheckBoxSetRadioButtonGroup(obj,0);
 
-     obj=ldCheckBoxInit(ID_Radio2,ID_WIN,380,240,60,30);
+     obj=ldCheckBoxInit(pScene,ID_Radio2,ID_WIN,380,240,60,30);
      ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"xyz");
      ldCheckBoxSetRadioButtonGroup(obj,0);
 
-     obj=ldGraphInit(ID_GRAPH,ID_WIN,320,350,100,100,2);
+     obj=ldGraphInit(pScene,ID_GRAPH,ID_WIN,320,350,100,100,2);
      ldGraphSetAxis(obj,80,80,5);
      ldGraphSetGridOffset(obj,4);
      ldGraphAddSeries(obj,LD_COLOR_LIGHT_PINK,2,16);
@@ -151,12 +151,12 @@ void uiWidgetInit(uint8_t page)
          ldGraphSetValue(obj,1,i,rand() % 81);
      }
 
-     obj=ldComboBoxInit(ID_COMBO_BOX,ID_WIN,200,320,80,30,SIMSUN_REGULAR_12,3);
+     obj=ldComboBoxInit(pScene,ID_COMBO_BOX,ID_WIN,200,320,80,30,SIMSUN_REGULAR_12,3);
      ldComboBoxAddItem(obj,(uint8_t*)"tool");
      ldComboBoxAddItem(obj,(uint8_t*)"setting");
      ldComboBoxAddItem(obj,(uint8_t*)"about");
 
-     obj=ldScrollSelecterInit(ID_SCROLL_SELECTER,ID_WIN,320,125,40,40,SIMSUN_REGULAR_12,5);
+     obj=ldScrollSelecterInit(pScene,ID_SCROLL_SELECTER,ID_WIN,320,125,40,40,SIMSUN_REGULAR_12,5);
      ldScrollSelecterSetBgColor(obj,LD_COLOR_WHITE);
      ldScrollSelecterAddItem(obj,"1");
      ldScrollSelecterAddItem(obj,"2");
@@ -165,21 +165,21 @@ void uiWidgetInit(uint8_t page)
      ldScrollSelecterAddItem(obj,"5");
 
      // 120 280
-     obj=ldLineEditInit(ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
+     obj=ldLineEditInit(pScene,ID_LINE_EDIT,ID_WIN,320,280,100,40,SIMSUN_REGULAR_12,10);
      ldLineEditSetKeyboard(obj,ID_KB);
 
 
-     obj=ldArcInit(ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
+     obj=ldArcInit(pScene,ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
      ldArcSetBgAngle(obj,0,350);
      ldArcSetFgAngle(obj,30);
      ldArcSetColor(obj,LD_COLOR_LIGHT_BLUE,LD_COLOR_LIGHT_GREEN);
 
-     ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
+     ldKeyboardInit(pScene,ID_KB,SIMSUN_REGULAR_12);
 }
 
 int64_t timer=0;
 int16_t angle=0;
-void uiWidgetLoop(uint8_t page)
+void uiWidgetLoop(arm_2d_scene_t *pScene,uint8_t page)
 {
      if(ldTimeOut(10,&timer,true))
      {
@@ -194,6 +194,6 @@ void uiWidgetLoop(uint8_t page)
      }
 }
 
-void uiWidgetQuit(uint8_t page)
+void uiWidgetQuit(arm_2d_scene_t *pScene,uint8_t page)
 {
 }

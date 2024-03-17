@@ -44,7 +44,7 @@ static bool _isTopScroll=false,_isBottomScroll=false;
 
 void ldTextDel(ldText_t *pWidget);
 void ldTextFrameUpdate(ldText_t* pWidget);
-void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldTextCommonFunc={
     (ldDelFunc_t)ldTextDel,
     (ldLoopFunc_t)ldTextLoop,
@@ -105,7 +105,7 @@ void ldTextDel(ldText_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict)
+ldText_t *ldTextInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict)
 {
     ldText_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -152,11 +152,10 @@ ldText_t *ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t 
 #if USE_OPACITY == 1
         pNewWidget->opacity=255;
 #endif
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->pFunc=&ldTextCommonFunc;
         pNewWidget->isWaitInit=true;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
@@ -175,7 +174,7 @@ void ldTextFrameUpdate(ldText_t* pWidget)
     arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 

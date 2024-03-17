@@ -29,9 +29,9 @@ typedef struct {
 #endif
 }ldDateTime_t;
 
-ldDateTime_t* ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
+ldDateTime_t* ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
 void ldDateTimeFrameUpdate(ldDateTime_t* pWidget);
-void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldDateTimeDel(ldDateTime_t *pWidget);
 
 void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent);

@@ -28,9 +28,9 @@ typedef struct {
 #endif
 }ldScrollSelecter_t;
 
-ldScrollSelecter_t* ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);
+ldScrollSelecter_t* ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
-void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
 //void ldScrollSelecterSetText(ldScrollSelecter_t* pWidget,uint8_t *pStr);
 void ldScrollSelecterSetFont(ldScrollSelecter_t *pWidget,ldFontDict_t *pFontDict);

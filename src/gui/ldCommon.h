@@ -261,7 +261,7 @@ typedef enum{
 }ldDirtyRegionStateType_t;
 
 typedef void (*ldDelFunc_t)(void *);
-typedef void (*ldLoopFunc_t)(void *,void *,bool);
+typedef void (*ldLoopFunc_t)(arm_2d_scene_t*,void *,void *,bool);
 typedef void (*ldUpdateFunc_t)(void *);
 
 typedef struct {

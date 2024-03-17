@@ -12,7 +12,7 @@ extern "C" {
 
 
 
-ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+ldWindow_t* ldWindowInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
 void ldWindowDel(ldWindow_t *pWidget);
 
 void ldWindowSetTransparent(ldWindow_t *pWidget,bool isTransparent);

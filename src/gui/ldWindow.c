@@ -42,7 +42,7 @@
 
 void ldWindowDel(ldWindow_t *pWidget);
 void ldImageFrameUpdate(ldWindow_t* pWidget);
-void ldImageLoop(ldWindow_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldImageLoop(arm_2d_scene_t *pScene,ldWindow_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldWindowCommonFunc={
     (ldDelFunc_t)ldWindowDel,
     (ldLoopFunc_t)ldImageLoop,
@@ -94,10 +94,10 @@ void ldWindowDel(ldWindow_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+ldWindow_t* ldWindowInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldWindow_t * pNewWidget = NULL;
-    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,0,false);
+    pNewWidget = ldImageInit(pScene,nameId,parentNameId,x,y,width,height,0,false);
     if(pNewWidget!=NULL)
     {
         if(xListMallocNode(&pNewWidget->childList)!=NULL)

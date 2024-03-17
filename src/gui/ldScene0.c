@@ -116,7 +116,7 @@ static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
 static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
     ldGuiFrameStart(ptScene);
-    ldGuiLogicLoop();
+    ldGuiLogicLoop(ptScene);
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)

@@ -42,7 +42,7 @@
 
 void ldImageDel(ldImage_t *pWidget);
 void ldImageFrameUpdate(ldImage_t* pWidget);
-void ldImageLoop(ldImage_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldImageLoop(arm_2d_scene_t *pScene,ldImage_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldImageCommonFunc={
     (ldDelFunc_t)ldImageDel,
     (ldLoopFunc_t)ldImageLoop,
@@ -105,7 +105,7 @@ void ldImageDel(ldImage_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uintptr_t imageAddr, bool isWithMask)
+ldImage_t *ldImageInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uintptr_t imageAddr, bool isWithMask)
 {
     ldImage_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -165,12 +165,10 @@ ldImage_t *ldImageInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);;
         pNewWidget->dirtyRegionState=none;
         pNewWidget->pFunc=&ldImageCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }
@@ -209,7 +207,7 @@ void ldImageFrameUpdate(ldImage_t* pWidget)
     arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldImageLoop(ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)
+void ldImageLoop(arm_2d_scene_t *pScene,ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)
 {
 #if USE_OPACITY == 1
 #define IMG_OPACITY        pWidget->opacity

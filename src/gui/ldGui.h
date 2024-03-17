@@ -56,11 +56,11 @@ extern "C" {
 #define GET_SIGNAL_VALUE_X(dat)     ((dat>>16)&0xFFFF)
 #define GET_SIGNAL_VALUE_Y(dat)     (dat&0xFFFF)
 
-typedef void (*pFuncTypedef)(uint8_t);
+typedef void (*pFuncTypedef)(arm_2d_scene_t*,uint8_t);
 
-extern void (*ldPageInitFunc[LD_PAGE_MAX])(uint8_t pageNum);
-extern void (*ldPageLoopFunc[LD_PAGE_MAX])(uint8_t pageNum);
-extern void (*ldPageQuitFunc[LD_PAGE_MAX])(uint8_t pageNum);
+extern void (*ldPageInitFunc[LD_PAGE_MAX])(arm_2d_scene_t *pScene,uint8_t pageNum);
+extern void (*ldPageLoopFunc[LD_PAGE_MAX])(arm_2d_scene_t *pScene,uint8_t pageNum);
+extern void (*ldPageQuitFunc[LD_PAGE_MAX])(arm_2d_scene_t *pScene,uint8_t pageNum);
 extern uint8_t pageNumNow;
 extern uint8_t pageTarget;
 extern uint8_t cursorBlinkCount;
@@ -71,13 +71,13 @@ extern bool cursorBlinkFlag;
 #define LD_ADD_PAGE(pageName)       ldGuiAddPage(pageName##Init,pageName##Loop,pageName##Quit)
 
 void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit);
-void ldGuiInit(arm_2d_scene_t *pSence);
-void ldGuiLogicLoop(void);
-void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame);
-void ldGuiQuit(arm_2d_scene_t *pSence);
+void ldGuiInit(arm_2d_scene_t *pScene);
+void ldGuiLogicLoop(arm_2d_scene_t *pScene);
+void ldGuiLoop(arm_2d_scene_t *pScene,arm_2d_tile_t *ptParent,bool bIsNewFrame);
+void ldGuiQuit(arm_2d_scene_t *pScene);
 void ldGuiJumpPage(uint8_t pageNum);
 arm_2d_region_list_item_t * ldGuiGetDirtyRegion(void);
-void ldGuiFrameStart(arm_2d_scene_t *pSence);
+void ldGuiFrameStart(arm_2d_scene_t *pScene);
 void ldGuiFrameComplete(void);
 void ldGuiUpdateScene(void);
 

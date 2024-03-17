@@ -43,7 +43,7 @@
 
 void ldGaugeDel(ldGauge_t *pWidget);
 void ldGaugeFrameUpdate(ldGauge_t* pWidget);
-void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldGaugeLoop(arm_2d_scene_t *pScene,ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldGaugeCommonFunc={
     (ldDelFunc_t)ldGaugeDel,
     (ldLoopFunc_t)ldGaugeLoop,
@@ -102,7 +102,7 @@ void ldGaugeDel(ldGauge_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uintptr_t bgImgAddr,bool isBgMask)
+ldGauge_t *ldGaugeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,uintptr_t bgImgAddr,bool isBgMask)
 {
     ldGauge_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -150,11 +150,10 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->pointerOriginOffsetY=0;
         pNewWidget->angle_x10=0;
         memset(&pNewWidget->op, 0, sizeof (pNewWidget->op));
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->pFunc=&ldGaugeCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -181,7 +180,7 @@ void ldGaugeFrameUpdate(ldGauge_t* pWidget)
 
 }
 
-void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldGaugeLoop(arm_2d_scene_t *pScene,ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 

@@ -1135,7 +1135,6 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
 {
     arm_2d_region_t parentRegion={{0,0},{0,0}},outRegion;
     ldPoint_t globalPos;
-    bool flag;
 
     if(pWidget->parentWidget==NULL)
     {
@@ -1149,8 +1148,8 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
         parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
         globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
     }
-    flag=arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
-    if(flag==false)
+
+    if(!arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion))
     {
         return (arm_2d_region_t){{0,0},{0,0}};
     }

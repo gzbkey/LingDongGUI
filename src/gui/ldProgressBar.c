@@ -41,7 +41,7 @@
 
 void ldProgressBarDel(ldProgressBar_t *pWidget);
 void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget);
-void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldProgressBarCommonFunc={
     (ldDelFunc_t)ldProgressBarDel,
     (ldLoopFunc_t)ldProgressBarLoop,
@@ -98,7 +98,7 @@ void ldProgressBarDel(ldProgressBar_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldProgressBar_t *ldProgressBarInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldProgressBar_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -145,11 +145,10 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
         pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
         pNewWidget->permille=0;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
         pNewWidget->pFunc=&ldProgressBarCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[progressBar] init,id:%d\n",nameId);
     }
@@ -315,7 +314,7 @@ void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget)
 //    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 

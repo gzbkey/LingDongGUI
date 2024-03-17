@@ -199,7 +199,7 @@ uint8_t contactsName[10][8]={
     {"       \0"},
 };
 
-void uiWatchInit(uint8_t page)
+void uiWatchInit(arm_2d_scene_t *pScene,uint8_t page)
 {
 #if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
     if(isWaitNorInit)
@@ -214,16 +214,16 @@ void uiWatchInit(uint8_t page)
     case 0:
 
         // common
-        obj=ldWindowInit(ID_BG,ID_BG,0,0,SCEEN_WIDTH*3,SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG,ID_BG,0,0,SCEEN_WIDTH*3,SCEEN_HEIGHT);
         xConnect(ID_BG,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
         xConnect(ID_BG,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
 
         // phonebook page
-        obj=ldImageInit(ID_IMAGE_POS0,ID_BG,70,10,100,30,POS1_PNG,true);
+        obj=ldImageInit(pScene,ID_IMAGE_POS0,ID_BG,70,10,100,30,POS1_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldTableInit(ID_TABLE,ID_BG,20,50,200,180,10,1,2,ARIAL_REGULAR_28);
+        obj=ldTableInit(pScene,ID_TABLE,ID_BG,20,50,200,180,10,1,2,ARIAL_REGULAR_28);
 
         for(int i=0;i<10;i++)
         {
@@ -242,12 +242,12 @@ void uiWatchInit(uint8_t page)
 
         // main page
 
-        ldImageInit(ID_IMAGE,ID_BG,SCEEN_WIDTH,0,SCEEN_WIDTH,SCEEN_HEIGHT,WALLPAPER_JPG,false);
+        ldImageInit(pScene,ID_IMAGE,ID_BG,SCEEN_WIDTH,0,SCEEN_WIDTH,SCEEN_HEIGHT,WALLPAPER_JPG,false);
 
-        obj=ldImageInit(ID_IMAGE_POS1,ID_BG,SCEEN_WIDTH+70,10,100,30,POS2_PNG,true);
+        obj=ldImageInit(pScene,ID_IMAGE_POS1,ID_BG,SCEEN_WIDTH+70,10,100,30,POS2_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,SCEEN_WIDTH+20,180,120,60,ARIAL_REGULAR_28);
+        obj=ldDateTimeInit(pScene,ID_DATE_TIME,ID_BG,SCEEN_WIDTH+20,180,120,60,ARIAL_REGULAR_28);
         ldDateTimeSetFormat(obj,"hh:nn:ss");
         ldDateTimeSetTextColor(obj,LD_COLOR_PURPLE);
 
@@ -257,17 +257,17 @@ void uiWatchInit(uint8_t page)
         xConnect(ID_DATE_TIME,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
         xConnect(ID_DATE_TIME,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
-        obj=ldWindowInit(ID_WIN_TOP,ID_BG,SCEEN_WIDTH,-SCEEN_HEIGHT,SCEEN_WIDTH,SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_WIN_TOP,ID_BG,SCEEN_WIDTH,-SCEEN_HEIGHT,SCEEN_WIDTH,SCEEN_HEIGHT);
         ldWindowSetBgColor(obj,LD_COLOR_GRAY);
 
         xConnect(ID_WIN_TOP,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
         xConnect(ID_WIN_TOP,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
         // app page
-        obj=ldImageInit(ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);
+        obj=ldImageInit(pScene,ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
-        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,3,1,ARIAL_REGULAR_12);
+        obj=ldIconSliderInit(pScene,ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,3,1,ARIAL_REGULAR_12);
         ldIconSliderAddIcon(obj,ICON_BMP,"app1");
         ldIconSliderAddIcon(obj,ICON_BMP,"app2");
         ldIconSliderAddIcon(obj,ICON_BMP,"app3");
@@ -292,7 +292,7 @@ void uiWatchInit(uint8_t page)
 int64_t autoMoveTimer=0;
 int64_t timer1s=0;
 uint8_t hour=12,min=0,second=0;
-void uiWatchLoop(uint8_t page)
+void uiWatchLoop(arm_2d_scene_t *pScene,uint8_t page)
 {
 
     ldDateTime_t *pClock;
@@ -325,6 +325,6 @@ void uiWatchLoop(uint8_t page)
     }
 }
 
-void uiWatchQuit(uint8_t page)
+void uiWatchQuit(arm_2d_scene_t *pScene,uint8_t page)
 {
 }
