@@ -151,7 +151,6 @@ ldGauge_t *ldGaugeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
         pNewWidget->angle_x10=0;
         memset(&pNewWidget->op, 0, sizeof (pNewWidget->op));
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->pFunc=&ldGaugeCommonFunc;
 
@@ -213,12 +212,12 @@ void ldGaugeLoop(ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate(&tTarget,(arm_2d_region_t*)pWidget->op.Target.ptRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             pWidget->dirtyRegionState=none;
         }
 
-        ldBaseImage(&tTarget,&tempRes,pWidget->isWithBgMask,255);
+        ldBaseImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->isWithBgMask,255);
         arm_2d_op_wait_async(NULL);
 
         do {

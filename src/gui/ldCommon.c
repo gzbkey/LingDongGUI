@@ -1407,9 +1407,13 @@ arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t 
 // return true -> update finish
 bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw)
 {
+//    ldCommon_t *pWidget= ldBaseGetWidgetById(0);
+//    pDirtyRegionItem->tRegion.tLocation.iX+=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iX;
+//    pDirtyRegionItem->tRegion.tLocation.iY+=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iY;
     switch (arm_2d_user_dynamic_dirty_region_wait_next(pDirtyRegionItem))
     {
-        case waitChange:
+    case waitChange:
+    {
         if (isRedraw)
         {
             arm_2d_user_dynamic_dirty_region_update(
@@ -1417,6 +1421,15 @@ bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,a
                         pTarget,                           /* the target tile */
                         newRegion,                         /* the redraw region */
                         none);  /* next state */
+//            LOG_DIRTY_REGION("target region:%d,%d,%d,%d; redraw area:%d,%d,%d,%d\n",
+//                             pTarget->tRegion.tLocation.iX,
+//                             pTarget->tRegion.tLocation.iY,
+//                             pTarget->tRegion.tSize.iWidth,
+//                             pTarget->tRegion.tSize.iHeight,
+//                             newRegion->tLocation.iX,
+//                             newRegion->tLocation.iY,
+//                             newRegion->tSize.iWidth,
+//                             newRegion->tSize.iHeight);
             return true;
         }
         else
@@ -1427,8 +1440,11 @@ bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,a
                         none);
         }
         break;
+    }
     case none:
+    {
         break;
+    }
     default:    /* 0xFF */
         break;
     }

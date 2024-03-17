@@ -468,7 +468,6 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
             }
         }
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->pFunc=&ldIconSliderCommonFunc;
 
         arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,NULL);
@@ -552,7 +551,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=waitChange;
+            pWidget->dirtyRegionState=none;
         }
         else
         {
@@ -582,6 +581,8 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #if LD_DEBUG == 1
         arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
 #endif
+        ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState);
+
         uint8_t showCount=0;
         for(uint8_t pageCount=0;pageCount<pWidget->pageMax;pageCount++)
         {
@@ -662,7 +663,7 @@ void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,uint8_t* pN
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
+
     if(pWidget->iconCount<pWidget->iconMax)
     {
         pWidget->pIconInfoList[pWidget->iconCount].imgAddr=imageAddr;

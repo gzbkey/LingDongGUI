@@ -151,7 +151,6 @@ ldArc_t *ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y,
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
 
         pNewWidget->color[0]=LD_COLOR_LIGHT_GREY;
         pNewWidget->color[1]=LD_COLOR_LIGHT_BLUE;

@@ -46,30 +46,34 @@ extern "C" {
 #endif
 
 #if (USE_LOG_LEVEL>=LOG_LEVEL_ERROR)
-#define LOG_ERROR(fmt, ...)      LOG_PRINT(ANSI_RED"[E] " fmt ANSI_RESET,##__VA_ARGS__)
+#define LOG_ERROR(fmt, ...)             LOG_PRINT(ANSI_RED"[E] " fmt ANSI_RESET,##__VA_ARGS__)
 #else
-#define LOG_ERROR(...)           {}
+#define LOG_ERROR(...)                  {}
 #endif
 #if (USE_LOG_LEVEL>=LOG_LEVEL_WARNING)
-#define LOG_WARNING(fmt, ...)    LOG_PRINT(ANSI_YELLOW"[W] " fmt ANSI_RESET,##__VA_ARGS__)
+#define LOG_WARNING(fmt, ...)           LOG_PRINT(ANSI_YELLOW"[W] " fmt ANSI_RESET,##__VA_ARGS__)
 #else
-#define LOG_WARNING(...)         {}
+#define LOG_WARNING(...)                {}
 #endif
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
-#define LOG_INFO(fmt, ...)       LOG_PRINT(ANSI_GREEN"[I] " fmt ANSI_RESET,##__VA_ARGS__)
+#define LOG_INFO(fmt, ...)              LOG_PRINT(ANSI_GREEN"[I] " fmt ANSI_RESET,##__VA_ARGS__)
+#define LOG_DIRTY_REGION(fmt, ...)      LOG_PRINT(ANSI_BLUE"[DIRTY REGION] " fmt ANSI_RESET,##__VA_ARGS__)
 #else
-#define LOG_INFO(...)            {}
+#define LOG_INFO(...)                   {}
+#define LOG_DIRTY_REGION(...)           {}
 #endif
 #if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
-#define LOG_DEBUG(fmt, ...)      LOG_PRINT(ANSI_RESET"[D] " fmt ANSI_RESET,##__VA_ARGS__)
-#define LOG_REGION(str,region)   LOG_PRINT("[REGION] %s %d,%d,%d,%d\n",str,(region).tLocation.iX,(region).tLocation.iY,(region).tSize.iWidth,(region).tSize.iHeight);
-#define LOG_POINT(str,point)     LOG_PRINT("[POINT] %s x=%d,y=%d\n",str,(point).x,(point).y);
-#define LOG_XY(str,x,y)          LOG_PRINT("[XY] %s x=%d,y=%d\n",str,(x),(y));
+#define LOG_DEBUG(fmt, ...)             LOG_PRINT(ANSI_RESET"[D] " fmt ANSI_RESET,##__VA_ARGS__)
+#define LOG_REGION(str,region)          LOG_PRINT("[REGION] %s %d,%d,%d,%d\n",str,(region).tLocation.iX,(region).tLocation.iY,(region).tSize.iWidth,(region).tSize.iHeight);
+#define LOG_LOCATION(str,location)      LOG_PRINT("[LOCATION] %s x=%d,y=%d\n",str,(location).iX,(location).iY);
+#define LOG_POINT(str,point)            LOG_PRINT("[POINT] %s x=%d,y=%d\n",str,(point).x,(point).y);
+#define LOG_XY(str,x,y)                 LOG_PRINT("[XY] %s x=%d,y=%d\n",str,(x),(y));
 #else
-#define LOG_DEBUG(...)           {}
-#define LOG_REGION(...)          {}
-#define LOG_POINT(...)           {}
-#define LOG_XY(...)              {}
+#define LOG_DEBUG(...)                  {}
+#define LOG_REGION(...)                 {}
+#define LOG_LOCATION(...)               {}
+#define LOG_POINT(...)                  {}
+#define LOG_XY(...)                     {}
 #endif
 
 

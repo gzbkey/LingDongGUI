@@ -261,8 +261,7 @@ ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
         pNewWidget->isWaitInit=true;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
+//        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
         pNewWidget->pFunc=&ldRadialMenuCommonFunc;
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
@@ -322,7 +321,6 @@ static void _sortByYAxis(ldRadialMenuItem_t* arr, uint8_t* indexArr, int size)
 
 static void _autoSort(ldRadialMenu_t *pWidget)
 {
-    ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
     //计算坐标
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
@@ -347,7 +345,7 @@ void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget)
 {
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
-        ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true);
+        arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem,waitChange);
     }
 }
 
@@ -438,10 +436,16 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
 
             }
 
+            LOG_DEBUG("\nstart\n");
             //刷新item
             for(uint8_t i=0;i<pWidget->itemCount;i++)
             {
-//                ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true,bIsNewFrame);
+                LOG_REGION("==",pWidget->pItemList[pWidget->showList[i]].itemRegion);
+                if(ldBaseDirtyRegionUpdate(&tTarget,&pWidget->pItemList[pWidget->showList[i]].itemRegion,&pWidget->pItemList[i].dirtyRegionListItem,pWidget->dirtyRegionState))
+                {
+//                    pWidget->dirtyRegionState=none;
+                }
+
                 do {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
@@ -469,8 +473,6 @@ void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #endif
                     arm_2d_op_wait_async(NULL);
                 } while (0);
-
-//                ldRadialMenuDirtyRegionAutoUpdate(pWidget,i,pWidget->pItemList[i].itemRegion,true,bIsNewFrame);
             }
         }
     }
@@ -507,8 +509,7 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t wi
         pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.ptNext=NULL;
         pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.tRegion = (arm_2d_region_t){0};
 
-        arm_2d_region_list_item_t * pDirtyRegionListItem=&pWidget->dirtyRegionListItem;
-        ldBaseAddDirtyRegion(&pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem,&pDirtyRegionListItem);
+
 
         pWidget->itemCount++;
 
@@ -525,15 +526,19 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t wi
         ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
         for(uint8_t i=0;i<pWidget->itemCount;i++)
         {
-            pWidget->pItemList[i].dirtyRegionState=waitChange;
+//            pWidget->pItemList[i].dirtyRegionState=waitChange;
 
-            pWidget->pItemList[i].dirtyRegionTemp=pWidget->pItemList[i].itemRegion;
-            pWidget->pItemList[i].dirtyRegionTemp.tLocation.iX+=globalPos.x;
-            pWidget->pItemList[i].dirtyRegionTemp.tLocation.iY+=globalPos.y;
+//            pWidget->pItemList[i].dirtyRegionTemp=pWidget->pItemList[i].itemRegion;
+//            pWidget->pItemList[i].dirtyRegionTemp.tLocation.iX+=globalPos.x;
+//            pWidget->pItemList[i].dirtyRegionTemp.tLocation.iY+=globalPos.y;
 
-            pWidget->pItemList[i].dirtyRegionListItem.tRegion=pWidget->pItemList[i].dirtyRegionTemp;
-
+            pWidget->pItemList[i].dirtyRegionListItem.tRegion=pWidget->pItemList[i].itemRegion;
+            pWidget->pItemList[i].dirtyRegionListItem.tRegion.tLocation.iX+=globalPos.x;
+            pWidget->pItemList[i].dirtyRegionListItem.tRegion.tLocation.iY+=globalPos.y;
         }
+        arm_2d_user_dynamic_dirty_region_init(&pWidget->pItemList[pWidget->itemCount-1].dirtyRegionListItem,NULL);
+        arm_2d_region_list_item_t* pList=&pWidget->dirtyRegionListItem;
+        arm_2d_helper_pfb_append_dirty_regions_to_list(&pList,&pWidget->pItemList[pWidget->itemCount-1].dirtyRegionListItem,1);
     }
 }
 

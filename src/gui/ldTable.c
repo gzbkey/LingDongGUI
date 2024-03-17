@@ -395,11 +395,10 @@ static bool slotTableProcess(xConnectInfo_t info)
                         }
                     }
                 }
-                pWidget->dirtyRegionState=waitChange;
             }
-
             pWidget->timer=tempTimer;
         }
+        pWidget->dirtyRegionState=waitChange;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -455,7 +454,7 @@ static bool slotTableProcess(xConnectInfo_t info)
                 }
             }
         }
-
+        pWidget->dirtyRegionState=waitChange;
         break;
     }
     case SIGNAL_RELEASE:
@@ -465,6 +464,7 @@ static bool slotTableProcess(xConnectInfo_t info)
         if((!currentItem->isCheckable)&&(currentItem->isButton))
         {
             currentItem->isChecked=false;
+            pWidget->dirtyRegionState=waitChange;
         }
 
         break;
@@ -587,7 +587,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
             pNewWidget->pItemInfo[i].isEditable=true;
         }
         pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->pFunc=&ldTableCommonFunc;
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
@@ -618,7 +617,6 @@ ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_
 void ldTableFrameUpdate(ldTable_t* pWidget)
 {
     arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
 void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -698,16 +696,22 @@ void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNew
                         cursorBlinkFlag=!cursorBlinkFlag;
                     }
 
-                    if(cursorBlinkFlag&&item->isEditing)
+                    if(item->isEditing)
                     {
-                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
-                        itemRegion.tLocation.iX+=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
-                        itemRegion.tLocation.iY+=showRegion.tLocation.iY;
-                        itemRegion.tSize.iWidth=CURSOR_WIDTH;
-                        itemRegion.tSize.iHeight=item->pFontDict->lineStrHeight;
-                        arm_2d_draw_box(&tTarget,&itemRegion,1,0,255);
+                        pWidget->dirtyRegionState=waitChange;
+                        if(cursorBlinkFlag)
+                        {
+                            arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
+                            itemRegion.tLocation.iX+=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
+                            itemRegion.tLocation.iY+=showRegion.tLocation.iY;
+                            itemRegion.tSize.iWidth=CURSOR_WIDTH;
+                            itemRegion.tSize.iHeight=item->pFontDict->lineStrHeight;
+                            arm_2d_draw_box(&tTarget,&itemRegion,1,0,255);
+                        }
                     }
+
                     tItemTile.tRegion.tSize.iWidth+=CURSOR_WIDTH;
+
                 }
                 else
                 {

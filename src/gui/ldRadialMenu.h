@@ -16,7 +16,6 @@ typedef struct {
     bool isWithMask:1;
     ldDirtyRegionStateType_t dirtyRegionState:2;
     arm_2d_region_list_item_t dirtyRegionListItem;
-    arm_2d_region_t dirtyRegionTemp;
     arm_2d_region_t itemRegion;
     uint8_t count;
 #if USE_RADIA_MENU_SCALE == 1

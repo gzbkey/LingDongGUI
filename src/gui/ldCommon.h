@@ -278,7 +278,6 @@ typedef struct {
                               xListNode *childList; \
                               uint16_t nameId; \
                               arm_2d_region_list_item_t dirtyRegionListItem; \
-                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
                               ldDirtyRegionStateType_t dirtyRegionState:2
@@ -320,7 +319,6 @@ typedef struct{
                               xListNode *childList; \
                               uint16_t nameId; \
                               arm_2d_region_list_item_t dirtyRegionListItem; \
-                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
                               ldDirtyRegionStateType_t dirtyRegionState:2

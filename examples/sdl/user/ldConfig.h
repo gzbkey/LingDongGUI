@@ -55,7 +55,7 @@ extern "C" {
 
 // <q>External NOR support
 // <i> Read external nor, please enable this option
-#define USE_VIRTUAL_RESOURCE                      (1)
+#define USE_VIRTUAL_RESOURCE                      (0)
 
 // widget config
 
