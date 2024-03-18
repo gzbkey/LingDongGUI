@@ -872,6 +872,7 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.y);
         pWidget->isClick=false;
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
+        pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
         LOG_REGION("kb click region",pWidget->targetDirtyRegion);
         pWidget->dirtyRegionState=waitChange;
         break;
@@ -879,6 +880,7 @@ static bool slotKBProcess(xConnectInfo_t info)
     case SIGNAL_RELEASE:
     {
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
+        pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
         pWidget->isClick=true;
         pWidget->dirtyRegionState=waitChange;
         pWidget->clickPoint.iX=-1;
@@ -1077,7 +1079,7 @@ void ldKeyboardLoop(arm_2d_scene_t *pScene,ldKeyboard_t *pWidget,const arm_2d_ti
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,&pWidget->targetDirtyRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             pWidget->dirtyRegionState=none;
         }

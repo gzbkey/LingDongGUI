@@ -323,7 +323,7 @@ void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,con
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             if(pWidget->isWaitInit)
             {

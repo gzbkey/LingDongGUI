@@ -211,7 +211,7 @@ void ldGaugeLoop(arm_2d_scene_t *pScene,ldGauge_t *pWidget,const arm_2d_tile_t *
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,(arm_2d_region_t*)pWidget->op.Target.ptRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,(arm_2d_region_t*)pWidget->op.Target.ptRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             pWidget->dirtyRegionState=none;
         }

@@ -431,7 +431,7 @@ void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offse
 arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
 arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
 
-bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw);
+bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw);
 
 #ifdef __cplusplus
 }

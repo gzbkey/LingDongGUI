@@ -446,7 +446,7 @@ void ldRadialMenuLoop(arm_2d_scene_t *pScene,ldRadialMenu_t *pWidget,const arm_2
             {
 
                 arm_2d_region_get_minimal_enclosure(&pWidget->pItemList[i].itemRegion,&pWidget->pItemList[i].dirtyRegionTemp,&tempRegion);
-                if(ldBaseDirtyRegionUpdate(&tTarget,&tempRegion,&pWidget->pItemList[i].dirtyRegionListItem,pWidget->dirtyRegionState))
+                if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tempRegion,&pWidget->pItemList[i].dirtyRegionListItem,pWidget->dirtyRegionState))
                 {
                     pWidget->pItemList[i].dirtyRegionTemp=pWidget->pItemList[i].itemRegion;
                     bTempState=true;

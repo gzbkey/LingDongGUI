@@ -647,7 +647,7 @@ void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             pWidget->dirtyRegionState=none;
         }

@@ -330,7 +330,7 @@ void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t
             }
         }
 
-        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             pWidget->dirtyRegionState=none;
         }

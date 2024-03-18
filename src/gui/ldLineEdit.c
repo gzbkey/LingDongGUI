@@ -250,7 +250,7 @@ void ldLineEditLoop(arm_2d_scene_t *pScene,ldLineEdit_t *pWidget,const arm_2d_ti
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
             if(!pWidget->isEditing)
             {

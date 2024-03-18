@@ -580,7 +580,7 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
 #if LD_DEBUG == 1
         arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
 #endif
-        ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState);
+        ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState);
 
         uint8_t showCount=0;
         for(uint8_t pageCount=0;pageCount<pWidget->pageMax;pageCount++)
