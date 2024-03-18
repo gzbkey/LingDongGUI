@@ -1,10 +1,42 @@
-## 如何添加自定义控件
+## 添加UI页面文件
 
-1、运行python脚本，[src/gui/createWidget.py](../../src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h
+1. 复制[tools/createUiFile.py](../../tools/createUiFile.py)到项目中UI页面文件的相同目录中，例如./user
+2. 运行脚本，按提示选择新增页面文件，输入页面名称，例如demo
+3. 按回车后，会自动生成uiDemo.c和uiDemo.h
+4. 将文件导入项目中，main.c中添加头文件uiDemo.h
+5. 在main函数中添加LD_ADD_PAGE(uiDemo);即可设置好页面
+6. 如果有多个页面，请按需要的顺序重复步骤5
+    ~~~c
+    #include "uiHome.h"
+    #include "uiZigbee.h"
+    #include "uiWifi.h"
 
-2、添加刚才新建的.c .h文件到项目中(新文件在./src/gui中)
+    int main(void)
+    {
+        sysInit();
 
-3、修改新控件的.c .h文件
+        LD_ADD_PAGE(uiHome);//Home页面序号为0
+        LD_ADD_PAGE(uiZigbee);//Zigbee页面序号为1
+        LD_ADD_PAGE(uiWifi);//Wifi页面序号为2
+
+        arm_irq_safe {
+            arm_2d_init();
+        }
+
+        ...
+
+        while(1)
+        {
+            ...
+        }
+    }
+    ~~~
+
+## 添加自定义控件
+
+1. 运行python脚本，[src/gui/createWidget.py](../../src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h
+2. 添加刚才新建的.c .h文件到项目中(新文件在./src/gui中)
+3. 修改新控件的.c .h文件
 
 ---
 自动处理：
@@ -20,7 +52,7 @@ ldGui.c中添加新控件的头文件
 ## 功能库
 
 #### btnAction 按键处理
-这是一个独立的多功能按键库，可以对GUI按键和实体按键进行行为检测。ldgui内部已经调用该库，无需用户操作。
+这是一个独立的多功能按键库，可以对GUI按键和实体按键进行行为检测。
 
 ##### 信号
 该库可以检测以下信号
@@ -37,10 +69,10 @@ ldGui.c中添加新控件的头文件
 |BTN_LONG_SHOOT|长按连续触发|
 
 ##### 函数列表
-* void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));
+* void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(uint16_t));
 * void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
 * void xBtnTick(uint8_t cycleMs);
-* uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state);
+* uint16_t xBtnGetState(uint16_t id, uint8_t state);
 * void xBtnClean(void);
 
 ##### 函数说明
@@ -48,7 +80,7 @@ ldGui.c中添加新控件的头文件
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));</code></pre>
+            <pre><code class="language-c">void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t));</code></pre>
         </td>
     </tr>
     <tr>
@@ -56,13 +88,9 @@ ldGui.c中添加新控件的头文件
         <td colspan="2">button初始化函数</td>
     </tr>
     <tr>
-        <td rowspan="3">参数</td>
-        <td>addrOrNum</td>
-        <td>按键自定义序号</td>
-    </tr>
-    <tr>
-        <td>nameId</td>
-        <td>外部按键填0</td>
+        <td rowspan="2">参数</td>
+        <td>id</td>
+        <td>按键id或实体按键自定义序号</td>
     </tr>
     <tr>
         <td>getBtnStateFunc</td>
@@ -75,13 +103,14 @@ ldGui.c中添加新控件的头文件
         <td>ℹ️ Note</td>
     </tr>
     <tr>
-        <td>实体按键，可以使用宏定义X_BTN_KEY_INIT(keyNum,func)进行初始化按键。</td>
+        <td>实体按键和ldgui触摸按键混合使用的时候，id不可冲突，建议将实体按键序号从1000开始命名</td>
     </tr>
     <tr>
         <td>
         getBtnStateFunc参考代码如下
         <pre><code class="language-c">
-bool vtGetKeyState(size_t value)
+// 实体按键
+bool vtGetKeyState(uint16_t value)
 {
     switch (value)
     {
@@ -99,6 +128,13 @@ bool vtGetKeyState(size_t value)
         break;
     }
     return 0;
+}
+
+// ldgui触摸按键
+bool getKeyState(uint16_t value)
+{
+    ldButton_t * pBtn=ldBaseGetWidgetById(value);
+    return pBtn->isPressed;
 }
         </code></pre>
         </td>
@@ -158,7 +194,7 @@ bool vtGetKeyState(size_t value)
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state);</code></pre>
+            <pre><code class="language-c">uint16_t xBtnGetState(uint16_t id, uint8_t state);</code></pre>
         </td>
     </tr>
     <tr>
@@ -167,8 +203,8 @@ bool vtGetKeyState(size_t value)
     </tr>
     <tr>
         <td rowspan="2">参数</td>
-        <td>nameIdOrNum</td>
-        <td>ldgui内部按键填写nameId，外部实体按键填写自定义的按键编号</td>
+        <td>id</td>
+        <td>ldgui触摸按键填写nameId，外部实体按键填写自定义的按键编号</td>
     </tr>
     <tr>
         <td>state</td>
@@ -196,10 +232,10 @@ bool vtGetKeyState(size_t value)
 ##### 使用举例
 ```c
 //自定义实体按键序号
-#define KEY_NUM_UP   0
+#define KEY_NUM_UP   1000
 
 //根据按键序号，获取按键状态
-bool vtGetKeyState(size_t value)
+bool vtGetKeyState(uint16_t value)
 {
     switch (value)
     {
@@ -226,6 +262,10 @@ void loopFunc(void)
     }
 }
 ```
+
+|ℹ️ Note||
+|---|---|
+|注意|获取按键状态的函数，可以每个按键对应一个函数，也可以多个按键共用一个函数，即上述例子中的bool vtGetKeyState(uint16_t value)|
 
 #### queue 队列
 这是一个简单的队列软件库

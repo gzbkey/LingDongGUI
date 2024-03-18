@@ -26,19 +26,18 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isClockwise:1;
-    ldColor bgColor;
-    ldColor fgColor;
+    ldColor color[2];
     ldColor parentColor;
-    uint32_t srcAddr;
-    uint32_t maskAddr;
+    uintptr_t srcAddr;
+    uintptr_t maskAddr;
     uint16_t startAngle_x10[2];
     uint16_t endAngle_x10[2];
     uint16_t rotationAngle_x10;
 }ldArc_t;
 
-ldArc_t* ldArcInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint32_t srcQuarterAddr, uint32_t maskQuarterAddr, uint16_t parentColor);
+ldArc_t* ldArcInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uintptr_t srcQuarterAddr, uintptr_t maskQuarterAddr, uint16_t parentColor);
 void ldArcFrameUpdate(ldArc_t* pWidget);
-void ldArcLoop(ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldArcLoop(arm_2d_scene_t *pScene,ldArc_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldArcDel(ldArc_t *pWidget);
 
 void ldArcSetBgAngle(ldArc_t *pWidget,float bgStart,float bgEnd);
@@ -55,3 +54,4 @@ void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor);
 #endif
 
 #endif //_LD_ARC_H_
+

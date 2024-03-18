@@ -19,9 +19,9 @@ typedef struct {
     bool isWithReleaseMask:1;
     bool isWithPressMask:1;
     bool isCorner:1;
-    uint32_t releaseImgAddr;
-    uint32_t pressImgAddr;
-    uint32_t selectMaskAddr;
+    uintptr_t releaseImgAddr;
+    uintptr_t pressImgAddr;
+    uintptr_t selectMaskAddr;
     uint32_t keyValue;
     ldFontDict_t* pFontDict;
     uint8_t* pStr;
@@ -32,14 +32,14 @@ typedef struct {
     ldColor selectColor;
 }ldButton_t;
 
-ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
 void ldButtonFrameUpdate(ldButton_t* pWidget);
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldButtonDel(ldButton_t *pWidget);
 
 void ldButtonSetColor(ldButton_t* pWidget, ldColor releaseColor, ldColor pressColor);
-void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask);
-void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor selectColor);
+void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,bool isReleaseMask,uintptr_t pressImgAddr,bool isPressMask);
+void ldButtonSetSelectImage(ldButton_t* pWidget,uintptr_t selectMaskAddr,ldColor selectColor);
 
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent);
 void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner);

@@ -18,8 +18,6 @@
  * @file    xString.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   字符串处理
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xString.h"
 
@@ -131,3 +129,57 @@ uint8_t* xFloatToStr(float inFloat,uint8_t afterDecimalPointNum,uint8_t *buf)
 }
 
 
+//在字符串末尾添加一个字符
+void xStringPushBack(uint8_t *pStr,uint16_t strLen,uint8_t ch)
+{
+    if(strLen==0)
+    {
+        strLen=strlen((char*)pStr);
+    }
+    pStr[strLen]=ch;
+    pStr[strLen+1]=0;
+}
+
+//删除字符串末尾的字符。
+void xStringPopBack(uint8_t *pStr,uint16_t strLen)
+{
+    if(strLen==0)
+    {
+        strLen=strlen((char*)pStr);
+    }
+    if(strLen>0)
+    {
+        pStr[strLen-1]=0;
+    }
+}
+
+void xStringInsert(uint8_t *pStr,uint16_t strLen,uint16_t pos,uint8_t *insertStr)
+{
+    uint16_t insertLen;
+    if(strLen==0)
+    {
+        strLen=strlen((char*)pStr);
+    }
+    insertLen=strlen((char*)insertStr);
+    for (uint16_t i = strLen-1; i >= pos; i--)
+    {
+        pStr[i+insertLen] = pStr[i];
+    }
+    memcpy(pStr+pos,insertStr,insertLen);
+    pStr[strLen+insertLen] = 0;
+}
+
+void xStringRemove(uint8_t *pStr,uint16_t strLen,uint16_t pos,uint16_t rmLen)
+{
+    uint16_t newLen;
+    if(strLen==0)
+    {
+        strLen=strlen((char*)pStr);
+    }
+    newLen=strLen-rmLen;
+    for (uint16_t i = pos; i <newLen; i++)
+    {
+        pStr[i] = pStr[rmLen+i];
+    }
+    pStr[newLen]=0;
+}

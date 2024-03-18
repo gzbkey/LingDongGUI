@@ -18,8 +18,6 @@
  * @file    ldTemplate.c
  * @author  
  * @brief   
- * @version 0.1
- * @date    
  */
 
 #include "ldTemplate.h"
@@ -41,6 +39,15 @@
 #pragma clang diagnostic ignored "-Wmissing-declarations"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
+
+void ldTemplateDel(ldTemplate_t *pWidget);
+void ldTemplateFrameUpdate(ldTemplate_t* pWidget);
+void ldTemplateLoop(arm_2d_scene_t *pScene,ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldTemplateCommonFunc={
+    ldTemplateDel,
+    ldTemplateLoop,
+    ldTemplateFrameUpdate,
+};
 
 static bool _templateDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -90,7 +97,7 @@ void ldTemplateFrameUpdate(ldTemplate_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldTemplate_t *ldTemplateInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldTemplate_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -98,7 +105,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldTemplate_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldTemplate_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -135,6 +142,8 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldTemplateCommonFunc;
+        pNewWidget->isIgnoreSysSlider=false;
 
         // add user init
 
@@ -150,7 +159,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldTemplateLoop(arm_2d_scene_t *pScene,ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 

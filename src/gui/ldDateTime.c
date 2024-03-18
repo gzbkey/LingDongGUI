@@ -18,8 +18,6 @@
  * @file    ldDateTime.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   date time widget
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldDateTime.h"
 
@@ -39,6 +37,15 @@
 #pragma clang diagnostic ignored "-Wmissing-declarations"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
+
+void ldDateTimeDel(ldDateTime_t *pWidget);
+void ldDateTimeFrameUpdate(ldDateTime_t* pWidget);
+void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldDateTimeCommonFunc={
+    (ldDelFunc_t)ldDateTimeDel,
+    (ldLoopFunc_t)ldDateTimeLoop,
+    (ldUpdateFunc_t)ldDateTimeFrameUpdate,
+};
 
 static bool _dateTimeDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -93,7 +100,7 @@ void ldDateTimeDel(ldDateTime_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-06
  */
-ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict)
+ldDateTime_t *ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict)
 {
     ldDateTime_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -101,7 +108,7 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldDateTime_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldDateTime_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -143,13 +150,9 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->second=0;
         strcpy((char*)pNewWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
         pNewWidget->formatStrTemp[0]=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldDateTimeCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[dateTime] init,id:%d\n",nameId);
     }
@@ -165,14 +168,10 @@ ldDateTime_t *ldDateTimeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldDateTimeFrameUpdate(ldDateTime_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -262,6 +261,11 @@ void ldDateTimeLoop(ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         if(!pWidget->isTransparent)
         {
 #if USE_OPACITY == 1
@@ -296,6 +300,7 @@ void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -315,6 +320,7 @@ void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     strcpy((char*)pWidget->formatStr,(char*)pStr);
 }
@@ -333,6 +339,7 @@ void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -354,6 +361,7 @@ void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 
@@ -371,6 +379,7 @@ void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     pWidget->isTransparent=false;
 }

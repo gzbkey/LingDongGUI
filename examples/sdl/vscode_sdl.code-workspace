@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../common"
+		},
+		{
+			"path": "../../src"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"ldcheckbox.h": "c",
+			"ldgui.h": "c",
+			"uiwatch.h": "c",
+			"virtual_tft_port.h": "c",
+			"xlog.h": "c",
+			"demo.h": "c",
+			"uidemo.h": "c",
+			"memory_resource": "c"
+		}
+	}
+}

@@ -8,8 +8,9 @@ extern "C" {
 #include "ldCommon.h"
 
 typedef struct {
-    uint32_t imgAddr;
+    uintptr_t imgAddr;
     uint8_t* pName;
+    bool isWithMask:1;
 }ldIconInfo_t;
 
 typedef struct {
@@ -21,6 +22,7 @@ typedef struct {
     bool isWaitMove:1;
     bool isAutoMove:1;
     bool isHoldMove:1;
+    bool isScrollEn:1;
     ldFontDict_t* pFontDict;
     ldIconInfo_t* pIconInfoList;
     uint8_t rowCount:4;
@@ -33,15 +35,14 @@ typedef struct {
     uint8_t pageMax;
     uint8_t selectIconOrPage;
     uint8_t moveOffset;
-ldColor charColor;
-
+    ldColor charColor;
 }ldIconSlider_t;
 
-ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict);
+ldIconSlider_t* ldIconSliderInit(arm_2d_scene_t *pScene, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict);
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget);
-void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldIconSliderDel(ldIconSlider_t *pWidget);
-void ldIconSliderAddIcon(ldIconSlider_t *pWidget, uint32_t imageAddr, uint8_t *pNameStr);
+void ldIconSliderAddIcon(ldIconSlider_t *pWidget, uintptr_t imageAddr, bool isWithMask, uint8_t *pNameStr);
 void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal);
 void ldIconSliderSetSpeed(ldIconSlider_t *pWidget, uint8_t speed);
 

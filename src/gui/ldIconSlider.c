@@ -18,8 +18,6 @@
  * @file    ldIconSlider.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   icon slider widget
- * @version 0.1
- * @date    2023-11-03
  * @signal  SIGNAL_CLICKED_ITEM
  */
 #include "ldIconSlider.h"
@@ -45,6 +43,15 @@
 #define MOVE_SPEED_THRESHOLD_VALUE     (20)          //触摸移动速度超过此值，则产生惯性滑动效果
 #define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
 #define IMG_FONT_SPACE                 (1)           //图片和文字的间隔
+
+void ldIconSliderDel(ldIconSlider_t *pWidget);
+void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget);
+void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldIconSliderCommonFunc={
+    (ldDelFunc_t)ldIconSliderDel,
+    (ldLoopFunc_t)ldIconSliderLoop,
+    (ldUpdateFunc_t)ldIconSliderFrameUpdate,
+};
 
 static bool _iconSliderDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -158,11 +165,13 @@ static uint8_t _ldIconSliderAutoFirstItem(ldIconSlider_t *pWidget,int16_t offset
     {
         d=pWidget->iconSpace+pWidget->iconWidth;
         iconFirstMax=pWidget->iconCount-(pResTile->tRegion.tSize.iWidth/d);
+        iconFirstMax/=pWidget->rowCount;
     }
     else
     {
         d=pWidget->iconSpace+pWidget->iconWidth+_getStrHeight(pWidget->pFontDict)+IMG_FONT_SPACE;
         iconFirstMax=pWidget->iconCount-(pResTile->tRegion.tSize.iHeight/d);
+        iconFirstMax/=pWidget->columnCount;
     }
 
     temp1=offset%d;
@@ -180,15 +189,6 @@ static uint8_t _ldIconSliderAutoFirstItem(ldIconSlider_t *pWidget,int16_t offset
     temp2=MIN(temp2,iconFirstMax);
 
     return temp2;
-}
-
-static bool isLineScroll(ldIconSlider_t *pWidget)
-{
-    if((pWidget->pageMax==1)&&((pWidget->rowCount==1)||(pWidget->columnCount==1)))
-    {
-        return true;
-    }
-    return false;
 }
 
 static int16_t _scrollOffset;
@@ -212,29 +212,54 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         pWidget->isHoldMove=false;
         _scrollOffset=pWidget->scrollOffset;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
         if(pWidget->isHorizontalScroll)
         {
-            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_X(info.value);
+            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_X(info.value);
         }
         else
         {
-            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+            pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
         }
         pWidget->isHoldMove=true;
         break;
     }
     case SIGNAL_RELEASE:
     {
+        int16_t speed;
+        if(pWidget->isScrollEn)
+        {
+            if(pWidget->isHorizontalScroll)
+            {
+                speed=(int16_t)GET_SIGNAL_SPEED_X(info.value);
+            }
+            else
+            {
+                speed=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
+            }
+
+            if((speed>MOVE_SPEED_THRESHOLD_VALUE)||(speed<-MOVE_SPEED_THRESHOLD_VALUE))
+            {
+                if(pWidget->pageMax==1)
+                {
+                    pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
+                }
+                else
+                {
+                    pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
+                }
+                pWidget->isAutoMove=true;
+            }
+        }
+
         if(!pWidget->isAutoMove)
         {
             if(pWidget->isHoldMove)
             {
-                if(isLineScroll(pWidget))
+                if(pWidget->pageMax==1)
                 {
                     pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,pWidget->scrollOffset);
                 }
@@ -263,7 +288,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                 itemX=((x-globalPos.x))/itemOffsetWidth;
                 itemY=((y-globalPos.y))/itemOffsetHeight;
 
-                if(isLineScroll(pWidget))
+                if(pWidget->pageMax==1)
                 {
                     uint8_t itemOffsetX=0;
                     uint8_t itemOffsetY=0;
@@ -272,11 +297,21 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
 
                     if(pWidget->isHorizontalScroll)
                     {
-                        (itemY==0)?(selectItem=itemX+itemOffsetX):(selectItem=(-1));
+                        if(pWidget->rowCount==1)
+                        {
+                            (itemY==0)?(selectItem=itemX+itemOffsetX):(selectItem=(-1));
+                        }
                     }
                     else
                     {
-                        (itemX==0)?(selectItem=itemY+itemOffsetY):(selectItem=(-1));
+                        if(pWidget->columnCount==1)
+                        {
+                            (itemX==0)?(selectItem=itemY+itemOffsetY):(selectItem=(-1));
+                        }
+                        else
+                        {
+                            selectItem=(itemY+itemOffsetY)*pWidget->columnCount+itemX;
+                        }
                     }
                 }
                 else
@@ -292,36 +327,10 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                     selectItem=(-1);
                 }
                 xEmit(pWidget->nameId,SIGNAL_CLICKED_ITEM,selectItem);
+                LOG_DEBUG("icon slider click item %d\n",selectItem);
             }
         }
         pWidget->isWaitMove=true;
-        break;
-    }
-    case SIGNAL_MOVE_SPEED:
-    {
-        int16_t speed;
-        if(pWidget->isHorizontalScroll)
-        {
-            speed=(int16_t)GET_SIGNAL_VALUE_X(info.value);
-        }
-        else
-        {
-            speed=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
-        }
-
-        if((speed>MOVE_SPEED_THRESHOLD_VALUE)||(speed<-MOVE_SPEED_THRESHOLD_VALUE))
-        {
-            if(isLineScroll(pWidget))
-            {
-                pWidget->selectIconOrPage=_ldIconSliderAutoFirstItem(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
-            }
-            else
-            {
-                pWidget->selectIconOrPage=_ldIconSliderAutoSelectPage(pWidget,_scrollOffset+SPEED_2_OFFSET(speed));
-            }
-
-            pWidget->isAutoMove=true;
-        }
         break;
     }
     default:
@@ -349,7 +358,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict)
+ldIconSlider_t* ldIconSliderInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict)
 {
     ldIconSlider_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -358,11 +367,11 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
     ldIconInfo_t* pIconInfoBuf = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldIconSlider_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldIconSlider_t);
     rowCount=MAX(rowCount,1);
     columnCount=MAX(columnCount,1);
     pageMax=MAX(pageMax,1);
-    pIconInfoBuf = ldMalloc(sizeof (ldIconInfo_t)*(rowCount*columnCount*pageMax));
+    pIconInfoBuf = ldCalloc(sizeof (ldIconInfo_t)*(rowCount*columnCount*pageMax));
     if ((pNewWidget != NULL)&&(pIconInfoBuf != NULL))
     {
         pNewWidget->isParentHidden=false;
@@ -435,7 +444,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
             }
         }
 
-        bool isScrollEn=true;
+        pNewWidget->isScrollEn=true;
 
         // 单行的情况
         if((pNewWidget->pageMax==1)&&((pNewWidget->rowCount==1)||(pNewWidget->columnCount==1)))
@@ -445,7 +454,7 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
                 pNewWidget->isHorizontalScroll=true;
                 if(width>=pNewWidget->iconMax*(pNewWidget->iconWidth+pNewWidget->iconSpace))
                 {
-                    isScrollEn=false;
+                    pNewWidget->isScrollEn=false;
                 }
             }
             else
@@ -454,24 +463,19 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 
                 if(height>=pNewWidget->iconMax*(pNewWidget->iconWidth+pNewWidget->iconSpace+_getStrHeight(pFontDict)+IMG_FONT_SPACE))
                 {
-                    isScrollEn=false;
+                    pNewWidget->isScrollEn=false;
                 }
             }
         }
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldIconSliderCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
-        if(isScrollEn)
+        if(pNewWidget->isScrollEn)
         {
-            xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotIconSliderScroll);
-            xConnect(pNewWidget->nameId,SIGNAL_MOVE_SPEED,pNewWidget->nameId,slotIconSliderScroll);
+            xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotIconSliderScroll);
         }
 
         LOG_INFO("[iconSlider] init,id:%d\n",nameId);
@@ -489,14 +493,10 @@ ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
     int16_t x,y,offsetX,offsetY;
@@ -523,7 +523,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
     {
         int16_t targetOffset=0;
 
-        if(isLineScroll(pWidget))
+        if(pWidget->pageMax==1)
         {
             if(pWidget->isHorizontalScroll)
             {
@@ -550,8 +550,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=waitChange;
-            pWidget->isDirtyRegionAutoIgnore=true;
+            pWidget->dirtyRegionState=none;
         }
         else
         {
@@ -581,6 +580,8 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #if LD_DEBUG == 1
         arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
 #endif
+        ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState);
+
         uint8_t showCount=0;
         for(uint8_t pageCount=0;pageCount<pWidget->pageMax;pageCount++)
         {
@@ -624,7 +625,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #if USE_VIRTUAL_RESOURCE == 1
                     tempRes.pTarget=pWidget->pIconInfoList[showCount].imgAddr;
 #endif
-                    ldBaseImage(&imgPosTile,(arm_2d_tile_t*)&tempRes,false,255);
+                    ldBaseImage(&imgPosTile,(arm_2d_tile_t*)&tempRes,pWidget->pIconInfoList[showCount].isWithMask,255);
                     arm_2d_op_wait_async(NULL);
 
                     if((pWidget->pFontDict!=NULL)&&(pWidget->pIconInfoList[showCount].pName!=NULL))
@@ -651,23 +652,26 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
  * 
  * @param   pWidget         目标控件指针
  * @param   imageAddr       图片地址
+ * @param   isWithMask      图片带mask
  * @param   pNameStr        图标名称字符串指针
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNameStr)
+void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,bool isWithMask,uint8_t* pNameStr)
 {
     if(pWidget==NULL)
     {
         return;
     }
+
     if(pWidget->iconCount<pWidget->iconMax)
     {
         pWidget->pIconInfoList[pWidget->iconCount].imgAddr=imageAddr;
+        pWidget->pIconInfoList[pWidget->iconCount].isWithMask=isWithMask;
 
         if((pWidget->pFontDict!=NULL)&&(pNameStr!=NULL))
         {
-            pWidget->pIconInfoList[pWidget->iconCount].pName=LD_MALLOC_STRING(pNameStr);
+            pWidget->pIconInfoList[pWidget->iconCount].pName=LD_CALLOC_STRING(pNameStr);
             if(pWidget->pIconInfoList[pWidget->iconCount].pName!=NULL)
             {
                 strcpy((char*)pWidget->pIconInfoList[pWidget->iconCount].pName,(char*)pNameStr);

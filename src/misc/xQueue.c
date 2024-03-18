@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   队列库
  *          支持16位、32位、64位芯片
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xQueue.h"
 #include "string.h"
@@ -42,7 +40,7 @@ xQueue_t* xQueueCreate(uint32_t length, uint32_t itemSize)
 
     Queue_Data_Buff_Size=length*itemSize;
     //申请队列总空间
-    pNewQueue=( xQueue_t * ) X_QUEUE_MALLOC ( sizeof( xQueue_t ) + Queue_Data_Buff_Size ) ;
+    pNewQueue=( xQueue_t * ) X_QUEUE_CALLOC ( sizeof( xQueue_t ) + Queue_Data_Buff_Size ) ;
 
     if(pNewQueue!=NULL)
     {

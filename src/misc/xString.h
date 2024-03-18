@@ -31,7 +31,11 @@ uint8_t* xI32ToStr(int32_t inInt32,uint8_t *buf);
 float xStrToFloat(uint8_t * str);
 uint8_t* xFloatToStr(float inFloat,uint8_t afterDecimalPointNum,uint8_t *buf);
 
+void xStringPushBack(uint8_t *pStr,uint16_t strLen,uint8_t ch);
+void xStringPopBack(uint8_t *pStr,uint16_t strLen);
 
+void xStringInsert(uint8_t *pStr,uint16_t strLen,uint16_t pos,uint8_t *insertStr);
+void xStringRemove(uint8_t *pStr,uint16_t strLen,uint16_t pos,uint16_t rmLen);
 
 
 #endif //_X_STRING_H_

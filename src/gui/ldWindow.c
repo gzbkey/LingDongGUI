@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   window widget
  *          窗体控件可包含其他的控件，实现复合型控件或者控件组合模块
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldWindow.h"
 #include "ldGui.h"
@@ -42,9 +40,18 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+void ldWindowDel(ldWindow_t *pWidget);
+void ldImageFrameUpdate(ldWindow_t* pWidget);
+void ldImageLoop(arm_2d_scene_t *pScene,ldWindow_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldWindowCommonFunc={
+    (ldDelFunc_t)ldWindowDel,
+    (ldLoopFunc_t)ldImageLoop,
+    (ldUpdateFunc_t)ldImageFrameUpdate,
+};
+
 static bool _windowDel(xListNode* pEachInfo,void* pTarget)
 {
-    ldGuiDelWidget(pEachInfo->info);
+    ((ldCommon_t*)pEachInfo->info)->pFunc->del(pEachInfo->info);
     return false;
 }
 
@@ -87,10 +94,10 @@ void ldWindowDel(ldWindow_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+ldWindow_t* ldWindowInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldWindow_t * pNewWidget = NULL;
-    pNewWidget = ldImageInit(nameId,parentNameId,x,y,width,height,0,false);
+    pNewWidget = ldImageInit(pScene,nameId,parentNameId,x,y,width,height,0,false);
     if(pNewWidget!=NULL)
     {
         if(xListMallocNode(&pNewWidget->childList)!=NULL)
@@ -105,6 +112,7 @@ ldWindow_t* ldWindowInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
                 pNewWidget->isTransparent=true;
                 pNewWidget->widgetType=widgetTypeWindow;
             }
+            pNewWidget->pFunc=&ldWindowCommonFunc;
 
             LOG_INFO("[window] init,id:%d\n",nameId);
         }

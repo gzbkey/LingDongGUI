@@ -18,8 +18,6 @@
  * @file    xList.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   简单的链表库
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xList.h"
 #include "ldCommon.h"
@@ -64,7 +62,7 @@ xListNode *xListInfoAdd(xListNode* pList, void* pInfo)
     {
         return NULL;
     }
-    xListNode * newList = (xListNode *)XMALLOC(sizeof(xListNode));
+    xListNode * newList = (xListNode *)XCALLOC(sizeof(xListNode));
     if(newList!=NULL)
     {
         newList->info=pInfo;
@@ -97,7 +95,7 @@ xListNode* xListMallocNode(xListNode** pListChild)
     xListNode* pNode=NULL;
     if(*pListChild==NULL)
     {
-        pNode=(xListNode *)XMALLOC(sizeof(xListNode));
+        pNode=(xListNode *)XCALLOC(sizeof(xListNode));
         if(pNode!=NULL)
         {
             pNode->next=pNode;

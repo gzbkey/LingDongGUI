@@ -10,10 +10,10 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isTransparent:1;
-    bool isScroll:1;
     bool isRelease:1;
+    bool isWaitInit:1;
     arm_2d_helper_pi_slider_t tPISlider;
-    uint32_t bgImgAddr;
+    uintptr_t bgImgAddr;
     ldChar_t *pTextInfo;
     ldColor bgColor;
     int16_t scrollOffset;
@@ -23,9 +23,9 @@ typedef struct {
 #endif
 }ldText_t;
 
-ldText_t* ldTextInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
+ldText_t* ldTextInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
 void ldTextFrameUpdate(ldText_t* pWidget);
-void ldTextLoop(ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldTextDel(ldText_t *pWidget);
 
 void ldTextSetText(ldText_t* pWidget,uint8_t *pStr);
@@ -36,7 +36,7 @@ void ldTextScrollSeek(ldText_t *pWidget,int16_t offset);
 void ldTextScrollMove(ldText_t *pWidget, int8_t moveValue);
 void ldTextSetScroll(ldText_t *pWidget,bool isEnable);
 void ldTextSetOpacity(ldText_t *pWidget, uint8_t opacity);
-void ldTextSetBgImage(ldText_t *pWidget, uint32_t imageAddr);
+void ldTextSetBgImage(ldText_t *pWidget, uintptr_t imageAddr);
 void ldTextSetBgColor(ldText_t *pWidget, ldColor bgColor);
 
 #define ldTextSetHidden        ldBaseSetHidden

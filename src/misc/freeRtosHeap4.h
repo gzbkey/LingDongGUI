@@ -5,10 +5,11 @@
 extern "C" {
 #endif
 
-#include "stddef.h"
+#include "stdint.h"
 
 void *pvPortMalloc( size_t xWantedSize );
 void vPortFree( void *pv );
+void *pvPortRealloc( uint8_t *srcaddr,size_t xWantedSize );
 
 #ifdef __cplusplus
 }

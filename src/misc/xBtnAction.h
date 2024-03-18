@@ -35,19 +35,18 @@
 #define BTN_LONG_START           7 //检测按键长按触发一次的信号
 #define BTN_LONG_SHOOT           8 //检测按键长按触发一次和连续触发的信号
 
-#define BTN_MALLOC               ldMalloc
+#define BTN_CALLOC               ldCalloc
 #define BTN_FREE                 ldFree
 
 typedef struct {
-    size_t addrOrNum;
     uint8_t FSM_State;
     uint8_t doubleClickCount;
     uint8_t repeatCount;
     uint16_t repeatTimeOutCount;
     uint16_t holdCount;
     uint16_t shootCount;
-    uint16_t nameId;
-    bool (*getBtnStateFunc)(size_t);
+    uint16_t id;
+    bool (*getBtnStateFunc)(uint16_t);
     bool btnNewState:1;
     bool btnOldState:1;
     bool isPressed:1;
@@ -58,20 +57,10 @@ typedef struct {
     bool isShoot:1;
 }xBtnInfo_t;
 
-void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t));
+void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t));
 void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
 void xBtnTick(uint8_t cycleMs);
-uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state);
+uint16_t xBtnGetState(uint16_t id, uint8_t state);
 void xBtnClean(void);
-
-#define X_BTN_WIDGET_INIT(pWidget,nameId,func)   xBtnInit(pWidget,nameId,func)
-#define X_BTN_KEY_INIT(keyNum,func)              xBtnInit(keyNum,0,func)
-
-
-
-
-
-
-
 
 #endif //_X_BTN_ACTION_H_

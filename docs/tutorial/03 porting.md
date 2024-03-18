@@ -2,15 +2,24 @@
 
 本文档以单片机为标准，说明移植过程
 
-## Keil
+## 基于Keil的移植
 
 安装好MDK-ARM，这里使用的版本是5.38。建议使用最新版本
 
-### 移植arm-2d准备
- * 安装arm-2d的pack，最新版本[下载](https://github.com/ARM-software/Arm-2D/releases)
- * 安装perf_counter的pack，最新版本[下载](https://github.com/GorgonMeducer/perf_counter/releases)
- * 准备带屏幕的开发板，可以正常显示图片的keil项目(lcd_project)
- * 屏幕接口
+### 移植前的准备
+* 安装cmsis-dsp
+    * [下载](https://github.com/ARM-software/CMSIS-DSP/releases/)
+* 安装arm-2d的pack
+    * [下载](https://github.com/ARM-software/Arm-2D/releases/)
+* 安装perf_counter的pack
+    * [下载](https://github.com/GorgonMeducer/perf_counter/releases/)
+* 安装ldgui的pack
+    * [github下载](https://github.com/gzbkey/LingDongGUI/releases/)
+    * [gitee下载](https://gitee.com/gzbkey/LingDongGUI/releases/)
+* 安装python,安装时注意勾选添加到系统环境变量的选项
+    * [下载](https://www.python.org/downloads/)
+* 准备带屏幕的开发板，可以正常显示图片的keil项目(lcd_project)
+* 屏幕接口
     ```c 
     void Disp0_DrawBitmap (uint32_t x, 
                            uint32_t y, 
@@ -18,7 +27,7 @@
                            uint32_t height, 
                            const uint8_t *bitmap)
     ```
- * 下载ldgui源码
+* 下载ldgui源码
 
     🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
 
@@ -32,23 +41,26 @@
 
 1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS，keil中选择Project -> Manage -> Run-Time Environment
 
-    ![keilPackSelect](../tutorial/images/03/arm2d%20Manage%20Run-Time%20Environment.png)
+    ![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
 
-2. 选择ac6编译器，并且选择gnu11
+2. 在lcd_project中加入ldgui，keil中选择Project -> Manage -> Run-Time Environment，此步骤必须操作，自动加入retarget文件
 
-    ![ac6Setting](../tutorial/images/03/ac6%20setting.png)
+    ![](./images/03/ldgui%20Manage%20Run-Time%20Environment.png)
 
-3. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
+3. 选择ac6编译器，并且选择gnu11
 
-    ![ac5Setting](../tutorial/images/03/ac5%20setting.png)
+    ![ac6Setting](./images/03/ac6%20setting.png)
 
-4. 确保keil的CMSIS版本不得低于5.7.0，查看方式，Project -> Manage -> Select Software Packs
+4. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
 
-    ![cmsisVersion](../tutorial/images/03/cmsis%20version.png)
+    ![ac5Setting](./images/03/ac5%20setting.png)
 
-5. 树目录中的Acceleration，找到arm_2d_disp_adapter_0.h。
+5. 确保keil的CMSIS版本不得低于5.7.0，查看方式，Project -> Manage -> Select Software Packs
 
-    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，根据实际情况配置
+    ![cmsisVersion](./images/03/cmsis%20version.png)
+
+6. 树目录中的Acceleration，找到arm_2d_disp_adapter_0.h。
+编辑器的左下角选择 Configuration Wizard，进入图形配置界面，根据实际情况配置
 
     颜色位数（Screen Colour Depth）
 
@@ -60,127 +72,11 @@
 
     部分刷新缓冲块的高度（Height of the PFB Block），配置为8
 
-6. 树目录中的Acceleration，找到arm_2d_cfg.h。
+7. 树目录中的Acceleration，找到arm_2d_cfg.h。
     
-    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth、width和height
+    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth
 
-7. 使用microLib需要添加__aeabi_assert
-
-    不使用microLib需要关闭半主机模式，并自定义c库
-    ```c 
-    #include "stdio.h"
-    #include "ctype.h"
-    #include "stdlib.h"
-
-    #if defined(__MICROLIB)
-    void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode) 
-    {
-        ARM_2D_UNUSED(chCond);
-        ARM_2D_UNUSED(chLine);
-        ARM_2D_UNUSED(wErrCode);
-        while(1) {
-            __NOP();
-        }
-    }
-    #else
-
-    #if (__ARMCC_VERSION >= 6010050)
-    __asm(".global __use_no_semihosting\n\t");
-    __asm(".global __ARM_use_no_argv\n\t");
-    #else
-    #pragma import(__use_no_semihosting)
-
-    struct __FILE
-    {
-        int handle;
-        /* Whatever you require here. If the only file you are using is */
-        /* standard output using printf() for debugging, no file handling */
-        /* is required. */
-    };
-    #endif
-
-
-    typedef int FILEHANDLE;
-    FILEHANDLE _sys_open(const char *name,int openmode)
-    {
-     return 0;
-    }
-
-    int _sys_close(FILEHANDLE fh)
-    {
-        return 0;
-    }
-
-    int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
-    {
-        return 0;
-    }
-
-    int _sys_read(FILEHANDLE fh, unsigned char*buf, unsigned len, int mode)
-    {
-        return 0;
-    }
-
-    int _sys_istty(FILEHANDLE fh)
-    {
-        return 0;
-    }
-
-    int _sys_seek(FILEHANDLE fh, long pos)
-    {
-        return 0;
-    }
-
-    int _sys_ensure(FILEHANDLE fh)
-    {
-        return 0;
-    }
-
-    long _sys_flen(FILEHANDLE fh)
-    {
-        return 0;
-    }
-
-    void _sys_exit(int status)
-    {
-        //while(1);
-    }
-
-    int _sys_tmpnam(char *name, int fileno, unsigned maxlength)
-    {
-        return 0;
-    }
-
-    void _ttywrch(int ch)
-    {
-    }
-
-    int remove(const char *filename)
-    {
-        return 0;
-    }
-
-    char *_sys_command_string(char *cmd, int len)
-    {
-        return NULL;
-    }
-
-    void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode) 
-    {
-        (void)chCond;
-        (void)chLine;
-        (void)wErrCode;
-        
-        while(1) 
-        {
-        }
-    }
-
-    #endif
-
-    ```
-
-8. main文件加入如下代码
+9. main文件加入如下代码
     ```c 
     #include "arm_2d.h"
     #include "arm_2d_disp_adapters.h"
@@ -221,139 +117,76 @@
     }
     ```
 
-9. 运行效果
+10. 运行效果
 
-   ![arm2d-demo](../tutorial/images/03/arm2d%20demo.gif)
+    ![arm2d-demo](./images/03/arm2d%20demo.gif)
+
+|ℹ️ 出现Undefined symbol错误|
+|:----|
+|如果硬要勾选microLib，编译后，提示找不到__aeabi_h2f 、__aeabi_f2h，请升级编译器(安装新版本keil)|
+
 
 ### 加入ldgui
 
-1. 将ldgui的c文件添加到项目，添加头文件路径。其中_ldTemplate.c为模板文件，请勿添加到项目中。
+1. keil中选择Project -> Manage -> Run-Time Environment，Acceleration - Arm-2D Helper中，Scene设置为0
 
-2. keil中选择Project -> Manage -> Run-Time Environment，Acceleration - Arm-2D Helper中，Scene设置为0
+2. arm_2d_disp_adapter_0.h修改
+    * 添加ldgui配置头文件
+        ```c
+        #include "ldConfig.h" 
+        ```
 
-3. arm_2d_disp_adapter_0.h中添加ldgui配置头文件
-    ```c
-    #include "ldConfig.h" 
-    ```
+3. ldConfig配置
+    * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
+    * ldConfig.h可以使用keil的图形界面方式进行配置
+    * 如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
 
-4. 新建ldConfig.c
-    ```c
-    #include "ldConfig.h"
+        ![configGui](./images/03/config%20gui.png)
 
-    /**
-     * @brief   获取触摸坐标
-     * 
-     * @param   x 返回的x坐标
-     * @param   y 返回的y坐标
-     * @return  true 有效触摸
-     * @return  false 无效触摸
-     */
-    bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
+    * 补全ldConfig.c中的函数Disp0_DrawBitmap
+
+4. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
+
+    pack文件也带该脚本，在keil安装目录下，参考路径：Keil_v5\Packs\gzbkey\LingDongGUI\版本号\tools
+
+5. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
+6. 将文件导入项目中，main.c中添加页面文件的头文件
+7. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
+    ~~~c
+    #include "uiHome.h"
+    #include "uiZigbee.h"
+    #include "uiWifi.h"
+
+    int main(void)
     {
-        bool touchState=false;
-        int16_t rx;
-        int16_t ry;
-        
-        //添加触摸函数
-    //    touchState=vtMouseGetPoint(&rx,&ry);
+        sysInit();
 
-        if((touchState!=0)&&(((rx!=-1)&&(ry!=-1))||((rx!=0)&&(ry!=0))))
-        {
-            if(rx<0)
-            {
-                rx=0;
-            }
-            if(ry<0)
-            {
-                ry=0;
-            }
-            if(rx>LD_CFG_SCEEN_WIDTH)
-            {
-                rx=LD_CFG_SCEEN_WIDTH;
-            }
-            if(ry>LD_CFG_SCEEN_HEIGHT)
-            {
-                ry=LD_CFG_SCEEN_HEIGHT;
-            }
-            *x=rx;
-            *y=ry;
-            touchState=true;
+        LD_ADD_PAGE(uiHome);//Home页面序号为0
+        LD_ADD_PAGE(uiZigbee);//Zigbee页面序号为1
+        LD_ADD_PAGE(uiWifi);//Wifi页面序号为2
+
+        arm_irq_safe {
+            arm_2d_init();
         }
-        else
+
+        disp_adapter0_init();
+
+        arm_2d_scene0_init(&DISP0_ADAPTER);
+
+        while(1)
         {
-            touchState=false;
-            *x=-1;
-            *y=-1;
+            disp_adapter0_task();
         }
-        return touchState;
     }
-    ```
+    ~~~
 
-5. 新建ldConfig.h
-```c 
-    #ifndef _LD_CONFIG_H_
-    #define _LD_CONFIG_H_
+### 使用外部NOR
+1. ldConfig.h中USE_VIRTUAL_RESOURCE = 1
+2. ldConfig.c中__disp_adapter0_vres_read_memory添加读取nor的函数
+3. arm_2d_disp_adapter_0.c中的__user_scene_player_init函数，+ 3改为+2，.FrameBuffer.u4PoolReserve = 3改为 =2
 
-    #ifdef __cplusplus
-    extern "C" {
-    #endif
+### 关于程序体积
 
-    #include "stdint.h"
-    #include "stdbool.h"
-    #include "arm_2d_cfg.h"
-    #include "lcd.h"
+* 请善用keil的优化等级
 
-    #define LD_CFG_SCEEN_WIDTH                        LCD_WIDTH
-    #define LD_CFG_SCEEN_HEIGHT                       LCD_HEIGHT
-    #define LD_CFG_COLOR_DEPTH                        16   // 8 16 32
-
-    #define USE_VIRTUAL_RESOURCE                      0
-
-    #define USE_DIRTY_REGION                          1
-
-    #define USE_OPACITY                               0
-
-    #define USE_TLSF                                  1
-
-    #define USE_RADIA_MENU_SCALE                      1
-
-    #define LD_MEM_SIZE                               (16*1024) //BYTE
-
-    #define LD_DEBUG                                  0
-
-    // arm-2d config
-
-    // PFB尺寸
-    #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_SCEEN_WIDTH
-    #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            16
-    #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         0
-
-    // 以下不用修改
-    #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
-    #define __DISP0_CFG_SCEEN_WIDTH__                 LD_CFG_SCEEN_WIDTH
-    #define __DISP0_CFG_SCEEN_HEIGHT__                LD_CFG_SCEEN_HEIGHT
-    #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     USE_VIRTUAL_RESOURCE
-
-    #if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
-    #error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
-    #endif
-
-    bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
-
-    #ifdef __cplusplus
-    }
-    #endif
-
-    #endif //_LD_CONFIG_H_
-
-```
-
-6. 新建ldUser.c、ldUser.h
-
-5. xLog.h关闭打印功能
-
-    如果需要使用打印功能，请自定义printf
-
-    ```c
-    #define SET_LOG_LEVEL            LOG_LEVEL_NONE
-    ```
+    ![](./images/03/keil%20optimization.png)

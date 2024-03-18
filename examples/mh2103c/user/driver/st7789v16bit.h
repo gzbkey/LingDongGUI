@@ -13,65 +13,37 @@ extern "C" {
                                  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE); \
                                  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE)
 
-#define ST7789V_RST_PORT           GPIOC
+#define ST7789V_RST_GPIO           GPIOC
 #define ST7789V_RST_PIN            GPIO_Pin_15
 
-#define ST7789V_RS_PORT           GPIOA
-#define ST7789V_RS_PIN            GPIO_Pin_3
+#define ST7789V_RS_GPIO           GPIOA
+#define ST7789V_RS_PIN            GPIO_Pin_4
 
-#define ST7789V_CS_PORT           GPIOA
-#define ST7789V_CS_PIN            GPIO_Pin_4
+#define ST7789V_CS_GPIO           GPIOC
+#define ST7789V_CS_PIN            GPIO_Pin_13
 
-#define ST7789V_WR_PORT           GPIOC
+#define ST7789V_WR_GPIO           GPIOC
 #define ST7789V_WR_PIN            GPIO_Pin_14
 
-#define ST7789V_RD_PORT           GPIOA
-#define ST7789V_RD_PIN            GPIO_Pin_1
+#define ST7789V_RD_GPIO           GPIOA
+#define ST7789V_RD_PIN            GPIO_Pin_3
 
-#define ST7789V_DATA_PORT         GPIOB
+#define ST7789V_DATA_GPIO         GPIOB
 
-#define ST7789V_BG_PORT           GPIOA
-#define ST7789V_BG_PIN            GPIO_Pin_0
+#define ST7789V_CS_L             ST7789V_CS_GPIO->BRR = ST7789V_CS_PIN
+#define ST7789V_RS_L             ST7789V_RS_GPIO->BRR = ST7789V_RS_PIN
+#define ST7789V_RD_L             ST7789V_RD_GPIO->BRR = ST7789V_RD_PIN
+#define ST7789V_WR_L             ST7789V_WR_GPIO->BRR = ST7789V_WR_PIN
+#define ST7789V_RST_L            ST7789V_RST_GPIO->BRR = ST7789V_RST_PIN
 
-#if 1
-#define ST7789V_CS_L             ST7789V_CS_PORT->BRR = ST7789V_CS_PIN
-#define ST7789V_RS_L             ST7789V_RS_PORT->BRR = ST7789V_RS_PIN
-#define ST7789V_RD_L             ST7789V_RD_PORT->BRR = ST7789V_RD_PIN
-#define ST7789V_WR_L             ST7789V_WR_PORT->BRR = ST7789V_WR_PIN
-#define ST7789V_RST_L            ST7789V_RST_PORT->BRR = ST7789V_RST_PIN
+#define ST7789V_CS_H             ST7789V_CS_GPIO->BSRR = ST7789V_CS_PIN
+#define ST7789V_RS_H             ST7789V_RS_GPIO->BSRR = ST7789V_RS_PIN
+#define ST7789V_RD_H             ST7789V_RD_GPIO->BSRR = ST7789V_RD_PIN
+#define ST7789V_WR_H             ST7789V_WR_GPIO->BSRR = ST7789V_WR_PIN
+#define ST7789V_RST_H            ST7789V_RST_GPIO->BSRR = ST7789V_RST_PIN
 
-#define ST7789V_CS_H             ST7789V_CS_PORT->BSRR = ST7789V_CS_PIN
-#define ST7789V_RS_H             ST7789V_RS_PORT->BSRR = ST7789V_RS_PIN
-#define ST7789V_RD_H             ST7789V_RD_PORT->BSRR = ST7789V_RD_PIN
-#define ST7789V_WR_H             ST7789V_WR_PORT->BSRR = ST7789V_WR_PIN
-#define ST7789V_RST_H            ST7789V_RST_PORT->BSRR = ST7789V_RST_PIN
-
-#define ST7789V_DATA_W(dat)      ST7789V_DATA_PORT->ODR=(dat)
-#define ST7789V_DATA_R           ST7789V_DATA_PORT->IDR
-#else
-
-#define ST7789V_CS_L             GPIO_ResetBits(ST7789V_CS_PORT,ST7789V_CS_PIN)
-#define ST7789V_RS_L             GPIO_ResetBits(ST7789V_RS_PORT,ST7789V_RS_PIN)
-#define ST7789V_RD_L             GPIO_ResetBits(ST7789V_RD_PORT,ST7789V_RD_PIN)
-#define ST7789V_WR_L             GPIO_ResetBits(ST7789V_WR_PORT,ST7789V_WR_PIN)
-#define ST7789V_RST_L            GPIO_ResetBits(ST7789V_RST_PORT,ST7789V_RST_PIN)
-
-#define ST7789V_CS_H             GPIO_SetBits(ST7789V_CS_PORT,ST7789V_CS_PIN)
-#define ST7789V_RS_H             GPIO_SetBits(ST7789V_RS_PORT,ST7789V_RS_PIN)
-#define ST7789V_RD_H             GPIO_SetBits(ST7789V_RD_PORT,ST7789V_RD_PIN)
-#define ST7789V_WR_H             GPIO_SetBits(ST7789V_WR_PORT,ST7789V_WR_PIN)
-#define ST7789V_RST_H            GPIO_SetBits(ST7789V_RST_PORT,ST7789V_RST_PIN)
-
-#define ST7789V_DATA_W(dat)      GPIO_Write(ST7789V_DATA_PORT,dat)
-//#define ST7789V_DATA_R           GPIO_ReadInputData(ST7789V_DATA_PORT)
-
-#endif
-
-#define ST7789V_BG_H             GPIO_SetBits(ST7789V_BG_PORT, ST7789V_BG_PIN)
-#define ST7789V_BG_L             GPIO_ResetBits(ST7789V_BG_PORT, ST7789V_BG_PIN)
-
-#define ST7789V_BG_ON            ST7789V_BG_H
-#define ST7789V_BG_OFF           ST7789V_BG_L
+#define ST7789V_DATA_W(dat)      ST7789V_DATA_GPIO->ODR=(dat)
+#define ST7789V_DATA_R           ST7789V_DATA_GPIO->IDR
 
 
 #define ST7789V_ANGLE             90

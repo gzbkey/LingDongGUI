@@ -12,6 +12,8 @@ Objects
 *_sort_by_ram.csv
 !keil5_disp_size_bar.exe
 !*.lib
+*.bat
+*.scvd
 
 #qt
 build*

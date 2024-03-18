@@ -18,8 +18,6 @@
  * @file    ldGui.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   ldgui的主文件
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldGui.h"
 #include "ldImage.h"
@@ -45,24 +43,34 @@
 
 uint8_t pageNumNow=0;
 uint8_t pageTarget=0;
-
 int64_t sysTimer=0;
-
+uint8_t cursorBlinkCount=0;
+bool cursorBlinkFlag=false;
 #define TOUCH_NO_CLICK           0
 #define TOUCH_CLICK              1
+
+#ifndef LD_EMIT_SIZE
+#define LD_EMIT_SIZE             8
+#endif
+
+bool isFullWidgetUpdate=false;
 
 static volatile ldPoint_t pressPoint;
 static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
-void (*ldPageInitFunc[LD_PAGE_MAX])(void)={0};
-void (*ldPageLoopFunc[LD_PAGE_MAX])(void)={0};
-void (*ldPageQuitFunc[LD_PAGE_MAX])(void)={0};
+void (*ldPageInitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
+void (*ldPageLoopFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
+void (*ldPageQuitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
+
+#if LD_PAGE_MAX > 1
 static uint8_t pageCount=0;
+#endif
 
 void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
 {
+#if LD_PAGE_MAX > 1
     if(pageCount<LD_PAGE_MAX)
     {
         ldPageInitFunc[pageCount]=init;
@@ -70,12 +78,18 @@ void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
         ldPageQuitFunc[pageCount]=quit;
         pageCount++;
     }
+#else
+    ldPageInitFunc[0]=init;
+    ldPageLoopFunc[0]=loop;
+    ldPageQuitFunc[0]=quit;
+#endif
 }
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
     ldCommon_t *pWidget;
     xListNode *pNode;
+    uint64_t u64Temp=0;
 
     switch(touchSignal)
     {
@@ -104,7 +118,10 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 
         if(pWidget!=NULL)
         {
-            xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
+            u64Temp=x;
+            u64Temp<<=16;
+            u64Temp+=y;
+            xEmit(pWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -115,8 +132,15 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             pWidget=prevWidget;//不可以把static变量作为函数变量调用
             if(pWidget!=NULL)
             {
-                xEmit(pWidget->nameId,touchSignal,((x<<16)&0xFFFF0000)|(y&0xFFFF));
-                xEmit(pWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,(((x-pressPoint.x)<<16)&0xFFFF0000)|((y-pressPoint.y)&0xFFFF));
+                u64Temp=x-pressPoint.x;
+                u64Temp<<=16;
+                u64Temp+=y-pressPoint.y;
+                u64Temp<<=16;
+                u64Temp+=x;
+                u64Temp<<=16;
+                u64Temp+=y;
+
+                xEmit(pWidget->nameId,touchSignal,u64Temp);
             }
             prevX=x;
             prevY=y;
@@ -134,8 +158,17 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             pressPoint.y=(prevY-pressPoint.y);
             pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
             pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
-            xEmit(pWidget->nameId,SIGNAL_MOVE_SPEED,((pressPoint.x<<16)&0xFFFF0000)|(pressPoint.y&0xFFFF));//x speed | y speed
-            xEmit(pWidget->nameId,touchSignal,((prevX<<16)&0xFFFF0000)|(prevY&0xFFFF));
+
+            // x speed,y speed,x,y
+            u64Temp=pressPoint.x;
+            u64Temp<<=16;
+            u64Temp+=pressPoint.y;
+            u64Temp<<=16;
+            u64Temp+=prevX;
+            u64Temp<<=16;
+            u64Temp+=prevY;
+
+            xEmit(pWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -181,250 +214,40 @@ void ldGuiTouchProcess(void)
     ldGuiClickedAction(touchSignal,x,y);
 }
 
-
-void ldGuiDelWidget(ldCommon_t *pWidget)
+static void _ldGuiLoop(arm_2d_scene_t *pScene,xListNode* pLink,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
-    switch(pWidget->widgetType)
-    {
-    case widgetTypeBackground:
-    case widgetTypeWindow:
-    {
-        ldWindowDel((ldWindow_t*)pWidget);
-        break;
-    }
-    case widgetTypeImage:
-    {
-        ldImageDel((ldImage_t*)pWidget);
-        break;
-    }
-    case widgetTypeButton:
-    {
-        ldButtonDel((ldButton_t*)pWidget);
-        break;
-    }
-    case widgetTypeText:
-    {
-        ldTextDel((ldText_t*)pWidget);
-        break;
-    }
-    case widgetTypeProgressBar:
-    {
-        ldProgressBarDel((ldProgressBar_t*)pWidget);
-        break;
-    }
-    case widgetTypeRadialMenu:
-    {
-        ldRadialMenuDel((ldRadialMenu_t*)pWidget);
-        break;
-    }
-    case widgetTypeCheckBox:
-    {
-        ldCheckBoxDel((ldCheckBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeLabel:
-    {
-        ldLabelDel((ldLabel_t*)pWidget);
-        break;
-    }
-    case widgetTypeScrollSelecter:
-    {
-        ldScrollSelecterDel((ldScrollSelecter_t*)pWidget);
-        break;
-    }
-    case widgetTypeDateTime:
-    {
-        ldDateTimeDel((ldDateTime_t*)pWidget);
-        break;
-    }
-    case widgetTypeIconSlider:
-    {
-        ldIconSliderDel((ldIconSlider_t*)pWidget);
-        break;
-    }
-    case widgetTypeGauge:
-    {
-        ldGaugeDel((ldGauge_t*)pWidget);
-        break;
-    }
-    case widgetTypeQRCode:
-    {
-        ldQRCodeDel((ldQRCode_t*)pWidget);
-        break;
-    }
-    case widgetTypeTable:
-    {
-        ldTableDel((ldTable_t*)pWidget);
-        break;
-    }
-    case widgetTypeKeyboard:
-    {
-        ldKeyboardDel((ldKeyboard_t*)pWidget);
-        break;
-    }
-    case widgetTypeLineEdit:
-    {
-        ldLineEditDel((ldLineEdit_t*)pWidget);
-        break;
-    }
-    case widgetTypeGraph:
-    {
-        ldGraphDel((ldGraph_t*)pWidget);
-        break;
-    }
-    case widgetTypeComboBox:
-    {
-        ldComboBoxDel((ldComboBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeArc:
-    {
-        ldArcDel((ldArc_t*)pWidget);
-        break;
-    }
-/*============================ auto add del ==================================*/
-    default:
-        break;
-    }
-}
+    xListNode *tempPos,*safePos;
 
-static void _widgetLoop(ldCommon_t *pWidget,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
-{
-    switch(pWidget->widgetType)
+    list_for_each_safe(tempPos,safePos, pLink)
     {
-    case widgetTypeBackground:
-    case widgetTypeWindow:
-    case widgetTypeImage:
-    {
-        ldImageLoop((ldImage_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeButton:
-    {
-        ldButtonLoop((ldButton_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeText:
-    {
-        ldTextLoop((ldText_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeProgressBar:
-    {
-        ldProgressBarLoop((ldProgressBar_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeRadialMenu:
-    {
-        ldRadialMenuLoop((ldRadialMenu_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeCheckBox:
-    {
-        ldCheckBoxLoop((ldCheckBox_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeLabel:
-    {
-        ldLabelLoop((ldLabel_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeScrollSelecter:
-    {
-        ldScrollSelecterLoop((ldScrollSelecter_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeDateTime:
-    {
-        ldDateTimeLoop((ldDateTime_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeIconSlider:
-    {
-        ldIconSliderLoop((ldIconSlider_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeGauge:
-    {
-        ldGaugeLoop((ldGauge_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeQRCode:
-    {
-        ldQRCodeLoop((ldQRCode_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeTable:
-    {
-        ldTableLoop((ldTable_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeKeyboard:
-    {
-        ldKeyboardLoop((ldKeyboard_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeLineEdit:
-    {
-        ldLineEditLoop((ldLineEdit_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeGraph:
-    {
-        ldGraphLoop((ldGraph_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeComboBox:
-    {
-        ldComboBoxLoop((ldComboBox_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-    case widgetTypeArc:
-    {
-        ldArcLoop((ldArc_t*)pWidget,ptParent,bIsNewFrame);
-        break;
-    }
-/*============================ auto add loop =================================*/
-    default:
-        break;
-    }
-}
-
-static void _ldGuiLoop(xListNode* pLink,const arm_2d_tile_t *ptParent,bool bIsNewFrame)
-{
-    xListNode *temp_pos,*safePos;
-
-    list_for_each_safe(temp_pos,safePos, pLink)
-    {
-        if(temp_pos->info!=NULL)
+        if(tempPos->info!=NULL)
         {
-            _widgetLoop(temp_pos->info,ptParent,bIsNewFrame);
+            (((ldCommon_t *)tempPos->info)->pFunc)->loop(pScene,tempPos->info,ptParent,bIsNewFrame);
             
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
             {
-                _ldGuiLoop(((ldCommon_t *)temp_pos->info)->childList,ptParent,bIsNewFrame);
+                _ldGuiLoop(pScene,((ldCommon_t *)tempPos->info)->childList,ptParent,bIsNewFrame);
             }
         }
     }
 }
 
-static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
-{
-    xListNode *temp_pos,*safePos;
+//static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pScene)
+//{
+//    xListNode *tempPos,*safePos;
 
-    list_for_each_safe(temp_pos,safePos, pLink)
-    {
-        if(temp_pos->info!=NULL)
-        {
-            ldBaseAddDirtyRegion(&((ldCommon_t *)temp_pos->info)->dirtyRegionListItem,&pSence->ptDirtyRegion);
-
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
-            {
-                ldGuiSetDirtyRegion(((ldCommon_t *)temp_pos->info)->childList,pSence);
-            }
-        }
-    }
-}
+//    list_for_each_safe(tempPos,safePos, pLink)
+//    {
+//        if(tempPos->info!=NULL)
+//        {
+//            arm_2d_helper_pfb_append_dirty_regions_to_list(&pScene->ptDirtyRegion,&((ldCommon_t *)tempPos->info)->dirtyRegionListItem,1);
+//            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
+//            {
+//                ldGuiSetDirtyRegion(((ldCommon_t *)tempPos->info)->childList,pScene);
+//            }
+//        }
+//    }
+//}
 
 /**
  * @brief   ldgui的初始化函数
@@ -432,150 +255,66 @@ static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pSence)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiInit(arm_2d_scene_t *pSence)
+void ldGuiInit(arm_2d_scene_t *pScene)
 {
-    xEmitInit();
+    xEmitInit(LD_EMIT_SIZE);
+#if LD_PAGE_MAX > 1
     if(ldPageInitFunc[pageNumNow])
     {
-        ldPageInitFunc[pageNumNow]();
+        ldPageInitFunc[pageNumNow](pageNumNow);
     }
+#else
+    if(ldPageInitFunc[0])
+    {
+        ldPageInitFunc[0](pScene,pageNumNow);
+    }
+#endif
     LOG_INFO("[sys] page %d init\n",pageNumNow);
 
-#if USE_DIRTY_REGION == 1
-    ldGuiSetDirtyRegion(&ldWidgetLink,pSence);
-    LOG_INFO("[sys] set dirty region\n");
-#endif
-}
-
-
-static void _frameUpdate(ldCommon_t *pWidget)
-{
-    switch(pWidget->widgetType)
-    {
-    case widgetTypeBackground:
-    case widgetTypeWindow:
-    case widgetTypeImage:
-    {
-        ldImageFrameUpdate((ldImage_t*)pWidget);
-        break;
-    }
-    case widgetTypeButton:
-    {
-        ldButtonFrameUpdate((ldButton_t*)pWidget);
-        break;
-    }
-    case widgetTypeText:
-    {
-        ldTextFrameUpdate((ldText_t*)pWidget);
-        break;
-    }
-    case widgetTypeProgressBar:
-    {
-        ldProgressBarFrameUpdate((ldProgressBar_t*)pWidget);
-        break;
-    }
-    case widgetTypeRadialMenu:
-    {
-        ldRadialMenuFrameUpdate((ldRadialMenu_t*)pWidget);
-        break;
-    }
-    case widgetTypeCheckBox:
-    {
-        ldCheckBoxFrameUpdate((ldCheckBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeLabel:
-    {
-        ldLabelFrameUpdate((ldLabel_t*)pWidget);
-        break;
-    }
-    case widgetTypeScrollSelecter:
-    {
-        ldScrollSelecterFrameUpdate((ldScrollSelecter_t*)pWidget);
-        break;
-    }
-    case widgetTypeDateTime:
-    {
-        ldDateTimeFrameUpdate((ldDateTime_t*)pWidget);
-        break;
-    }
-    case widgetTypeIconSlider:
-    {
-        ldIconSliderFrameUpdate((ldIconSlider_t*)pWidget);
-        break;
-    }
-    case widgetTypeGauge:
-    {
-        ldGaugeFrameUpdate((ldGauge_t*)pWidget);
-        break;
-    }
-    case widgetTypeQRCode:
-    {
-        ldQRCodeFrameUpdate((ldQRCode_t*)pWidget);
-        break;
-    }
-    case widgetTypeTable:
-    {
-        ldTableFrameUpdate((ldTable_t*)pWidget);
-        break;
-    }
-    case widgetTypeKeyboard:
-    {
-        ldKeyboardFrameUpdate((ldKeyboard_t*)pWidget);
-        break;
-    }
-    case widgetTypeLineEdit:
-    {
-        ldLineEditFrameUpdate((ldLineEdit_t*)pWidget);
-        break;
-    }
-    case widgetTypeGraph:
-    {
-        ldGraphFrameUpdate((ldGraph_t*)pWidget);
-        break;
-    }
-    case widgetTypeComboBox:
-    {
-        ldComboBoxFrameUpdate((ldComboBox_t*)pWidget);
-        break;
-    }
-    case widgetTypeArc:
-    {
-        ldArcFrameUpdate((ldArc_t*)pWidget);
-        break;
-    }
-/*============================ auto add start =================================*/
-    default:
-        break;
-    }
+//#if USE_DIRTY_REGION == 1
+//    ldGuiSetDirtyRegion(&ldWidgetLink,pScene);
+//    LOG_INFO("[sys] set dirty region\n");
+//#endif
 }
 
 static void _ldGuiFrameUpdate(xListNode* pLink)
 {
-    xListNode *temp_pos,*safePos;
+    xListNode *tempPos,*safePos;
 
-    list_for_each_safe(temp_pos,safePos, pLink)
+    list_for_each_safe(tempPos,safePos, pLink)
     {
-        if(temp_pos->info!=NULL)
+        if(tempPos->info!=NULL)
         {
-            _frameUpdate((ldCommon_t *)temp_pos->info);
+            (((ldCommon_t *)tempPos->info)->pFunc)->update(tempPos->info);
 
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
+            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
             {
-                _ldGuiFrameUpdate(((ldCommon_t *)temp_pos->info)->childList);
+                _ldGuiFrameUpdate(((ldCommon_t *)tempPos->info)->childList);
             }
         }
     }
 }
 
-void ldGuiFrameStart(void)
+void ldGuiUpdateScene(void)
 {
+    isFullWidgetUpdate=true;
+}
+
+void ldGuiFrameStart(arm_2d_scene_t *ptScene)
+{
+    if(isFullWidgetUpdate==true)
+    {
+        arm_2d_scene_player_update_scene_background(ptScene->ptPlayer);
+        isFullWidgetUpdate=false;
+    }
+
     _ldGuiFrameUpdate(&ldWidgetLink);
 
     //检查按键
-    if(ldTimeOut(10,&sysTimer,true))
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,&sysTimer,true))
     {
-        xBtnTick(10);
+        xBtnTick(SYS_TICK_CYCLE_MS);
+        cursorBlinkCount++;
     }
 
     //检查触摸
@@ -590,12 +329,19 @@ void ldGuiFrameStart(void)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiLogicLoop(void)
+void ldGuiLogicLoop(arm_2d_scene_t *pScene)
 {
+#if LD_PAGE_MAX > 1
     if(ldPageLoopFunc[pageNumNow])
     {
-        ldPageLoopFunc[pageNumNow]();
+        ldPageLoopFunc[pageNumNow](pageNumNow);
     }
+#else
+    if(ldPageLoopFunc[0])
+    {
+        ldPageLoopFunc[0](pScene,pageNumNow);
+    }
+#endif
 }
 
 /**
@@ -606,10 +352,11 @@ void ldGuiLogicLoop(void)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldGuiLoop(arm_2d_scene_t *pScene,arm_2d_tile_t *ptParent,bool bIsNewFrame)
 {
+    (void*)pScene;
     //遍历控件
-    _ldGuiLoop(&ldWidgetLink,ptParent,bIsNewFrame);
+    _ldGuiLoop(pScene,&ldWidgetLink,ptParent,bIsNewFrame);
 }
 
 /**
@@ -618,12 +365,21 @@ void ldGuiLoop(arm_2d_scene_t *pSence,arm_2d_tile_t *ptParent,bool bIsNewFrame)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-07
  */
-void ldGuiQuit(void)
+void ldGuiQuit(arm_2d_scene_t *pScene)
 {
+#if LD_PAGE_MAX > 1
     if(ldPageQuitFunc[pageNumNow])
     {
-        ldPageQuitFunc[pageNumNow]();
+        ldPageQuitFunc[pageNumNow](pageNumNow);
     }
+#else
+    if(ldPageQuitFunc[0])
+    {
+        ldPageQuitFunc[0](pScene,pageNumNow);
+    }
+#endif
+    pScene->ptDirtyRegion=NULL;
+    ldWindowDel(ldBaseGetWidgetById(0));
     LOG_INFO("[sys] page %d quit\n",pageNumNow);
 }
 

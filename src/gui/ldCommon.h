@@ -12,6 +12,7 @@ extern "C" {
 #include "xConnect.h"
 #include "xList.h"
 #include "xLog.h"
+#include "xString.h"
 #include "ldConfig.h"
 
 #ifndef SET_BITS
@@ -42,7 +43,7 @@ extern "C" {
 #define CONNECT16(H,L)                          (((H)<<8)+(L))
 #endif
 #ifndef GET32H
-#define   GET32H(data)                          (((data)>>24)&0xFF)
+#define GET32H(data)                            (((data)>>24)&0xFF)
 #endif
 #ifndef GET32MH
 #define GET32MH(data)                           (((data)>>16)&0xFF)
@@ -60,25 +61,32 @@ extern "C" {
 #define SWAP(x,y)                               ((x) = (x)+(y),(y)=(x)-(y),(x)=(x)-(y))
 #endif
 
-#define ANGLE_2_RADIAN(angle)    ((float)(angle)*0.0174533f)
+#define ANGLE_2_RADIAN(angle)                   ((float)(angle)*0.0174533f)
 
 #define ldColor                                 COLOUR_INT
 
-#define XMALLOC                                 ldMalloc
+#define XCALLOC                                 ldCalloc
 #define XFREE                                   ldFree
 
-#define LD_MALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldMalloc(sizeof(widgetTypedef))
-#define LD_MALLOC_STRING(str)                   (uint8_t *)ldMalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
+#define CURSOR_WIDTH                            2
 
-#define LD_ALIGN_CENTER          0
-#define LD_ALIGN_TOP             _BV(0)
-#define LD_ALIGN_BOTTOM          _BV(1)
-#define LD_ALIGN_LEFT            _BV(2)
-#define LD_ALIGN_RIGHT           _BV(3)
+#define LD_CALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldCalloc(sizeof(widgetTypedef))
+#define LD_CALLOC_STRING(str)                   (uint8_t *)ldCalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
-#define LD_ALIGN_LEFT_AUTO       _BV(4) //GUI内部使用
+#define LD_ALIGN_CENTER                         0
+#define LD_ALIGN_TOP                            _BV(0)
+#define LD_ALIGN_BOTTOM                         _BV(1)
+#define LD_ALIGN_LEFT                           _BV(2)
+#define LD_ALIGN_RIGHT                          _BV(3)
+#define LD_ALIGN_LEFT_AUTO                      _BV(4) //GUI内部使用
 
-#define LD_ADDR_NONE             0xffffffffu
+#if SIZE_MAX == 18446744073709551615ull
+#define LD_ADDR_NONE                            0xffffffffffffffffu
+#elif SIZE_MAX == 4294967295
+#define LD_ADDR_NONE                            0xffffffffu
+#endif
+
+
 
 #define LD_COLOR_LIGHT_PINK __RGB(255, 182, 193)             // 浅粉红
 #define LD_COLOR_PINK __RGB(255, 192, 203)                   // 粉红
@@ -222,7 +230,7 @@ extern "C" {
 #define LD_COLOR_BLACK __RGB(0, 0, 0)                        // 纯黑
 
 typedef enum{
-    widgetTypeNone,
+//    widgetTypeNone,
     widgetTypeBackground,
     widgetTypeWindow,
     widgetTypeButton,
@@ -238,7 +246,6 @@ typedef enum{
     widgetTypeDateTime,
     widgetTypeIconSlider,
     widgetTypeComboBox,
-    widgetTypeNumber,
     widgetTypeArc,
     widgetTypeRadialMenu,
     widgetTypeScrollSelecter,
@@ -253,18 +260,27 @@ typedef enum{
     waitUpdate
 }ldDirtyRegionStateType_t;
 
+typedef void (*ldDelFunc_t)(void *);
+typedef void (*ldLoopFunc_t)(arm_2d_scene_t*,void *,void *,bool);
+typedef void (*ldUpdateFunc_t)(void *);
+
+typedef struct {
+    ldDelFunc_t del;
+    ldLoopFunc_t loop;
+    ldUpdateFunc_t update;
+}ldGuiCommonFunc_t;
+
 #if USE_VIRTUAL_RESOURCE == 0
-#define LD_COMMON_ATTRIBUTES  arm_2d_tile_t resource; \
+#define LD_COMMON_ATTRIBUTES  const ldGuiCommonFunc_t *pFunc; \
+                              arm_2d_tile_t resource; \
                               ldWidgetType_t widgetType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
                               arm_2d_region_list_item_t dirtyRegionListItem; \
-                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
-                              ldDirtyRegionStateType_t dirtyRegionState:2; \
-                              bool isDirtyRegionAutoIgnore:1
+                              ldDirtyRegionStateType_t dirtyRegionState:2
 
 typedef struct{
     uint8_t utf8[4];
@@ -296,17 +312,16 @@ typedef struct{
     uint8_t align:4;
 }ldChar_t;
 #else
-#define LD_COMMON_ATTRIBUTES  arm_2d_vres_t resource; \
+#define LD_COMMON_ATTRIBUTES  const ldGuiCommonFunc_t *pFunc; \
+                              arm_2d_vres_t resource; \
                               ldWidgetType_t widgetType; \
                               void * parentWidget; \
                               xListNode *childList; \
                               uint16_t nameId; \
                               arm_2d_region_list_item_t dirtyRegionListItem; \
-                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
-                              ldDirtyRegionStateType_t dirtyRegionState:2; \
-                              bool isDirtyRegionAutoIgnore:1
+                              ldDirtyRegionStateType_t dirtyRegionState:2
 
 typedef struct{
     uint8_t utf8[4];
@@ -348,24 +363,27 @@ typedef struct{
     int16_t y;
 }ldPoint_t;
 
-typedef struct{
-    int16_t width;
-    int16_t height;
-}ldSize_t;
-
 typedef enum{
     typeString,
     typeInt,
     typeFloat
 }ldEditType_t;
 
+#define LD_COMMON_KB_ATTRIBUTES    LD_COMMON_ATTRIBUTES; \
+                                   ldEditType_t editType; \
+                                   uint16_t editorId; \
+                                   uint8_t **ppStr; \
+                                   uint8_t strMax
+
+typedef struct{
+    LD_COMMON_KB_ATTRIBUTES;
+}ldCommonKB_t;
+
 extern xListNode ldWidgetLink;
 
-extern ldEditType_t gActiveEditType;
-
-void *ldMalloc(uint32_t size);
-void ldFree(void *p);
-//void *ldRealloc(void *ptr,uint32_t newSize);
+extern void *ldCalloc(uint32_t size);
+extern void ldFree(void *p);
+extern void *ldRealloc(void *ptr,uint32_t newSize);
 
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
@@ -378,7 +396,7 @@ xListNode* ldBaseGetWidgetInfoByPos(int16_t x,int16_t y);
 
 void ldBaseColor(arm_2d_tile_t* pTile,ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,uint8_t opacity);
-void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t* pResTile, ldColor textColor, uint8_t opacity);
+void ldBaseMaskImage(arm_2d_tile_t* pTile, arm_2d_tile_t* pResTile, ldColor color, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMask,float scale,arm_2d_op_trans_msk_opa_t *pOP,bool bIsNewFrame);
 
 void ldBaseSetFont(ldChar_t **ppCharInfo, ldFontDict_t *pFontDictAddr);
@@ -406,13 +424,14 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 
-void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t **ppRootDirtyRegionList);
 void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore);
 
-void ldBaseBgMove(int16_t x,int16_t y);
+void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
 
 arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
 arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
+
+bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw);
 
 #ifdef __cplusplus
 }

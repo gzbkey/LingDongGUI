@@ -18,8 +18,6 @@
  * @file    ldCommon.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   通用函数文件
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldCommon.h"
 #include "xList.h"
@@ -53,36 +51,32 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-ldEditType_t gActiveEditType;
-
 NEW_LIST(ldWidgetLink);
 
 #if USE_TLSF == 1
 static void * pTlsfMem=NULL;
-__attribute__((aligned (8))) static uint8_t tlsfMemBuf[LD_MEM_SIZE];
 #endif
-extern size_t xFreeBytesRemaining;
-__WEAK void *ldMalloc(uint32_t size)
+
+__attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
+
+__WEAK void *ldCalloc(uint32_t size)
 {
+    void* p=NULL;
 #if USE_TLSF == 1
     if(pTlsfMem==NULL)
     {
-        pTlsfMem = tlsf_create_with_pool((void *)tlsfMemBuf, sizeof (tlsfMemBuf));
+        pTlsfMem = tlsf_create_with_pool((void *)ucHeap, sizeof (ucHeap));
     }
-    void* p=tlsf_malloc(pTlsfMem,size);
+    p=tlsf_malloc(pTlsfMem,size);
+#else
+     p=pvPortMalloc(size);
+//    p=malloc(size);
+#endif
     if(p!=NULL)
     {
         memset(p,0,size);
     }
     return p;
-#else
-//    LOG_DEBUG("malloc:%d\n",size);
-//    LOG_DEBUG("before :%llu\n",xFreeBytesRemaining);
-    return pvPortMalloc(size);
-//    void* p=malloc(size);
-//    memset(p,0,size);
-//    return p;
-#endif
 }
 
 __WEAK void ldFree(void *p)
@@ -95,20 +89,25 @@ __WEAK void ldFree(void *p)
     tlsf_free(pTlsfMem, p);
 #else
     vPortFree(p);
-//    LOG_DEBUG("free\n");
-//    LOG_DEBUG("remaining:%llu\n",xFreeBytesRemaining);
 //    free(p);
 #endif
 }
 
-//__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
-//{
-//#if USE_TLSF == 1
-//    return tlsf_realloc(pTlsfMem, ptr, newSize);
-//#else
+__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
+{
+    void* p=NULL;
+#if USE_TLSF == 1
+    p = tlsf_realloc(pTlsfMem, ptr, newSize);
+#else
+    p = pvPortRealloc(ptr,newSize);
 //    return realloc(ptr,newSize);
-//#endif
-//}
+#endif
+    if(p!=NULL)
+    {
+        memset(p,0,newSize);
+    }
+    return p;
+}
 
 static bool ldBaseGetInfoByName(xListNode *inList,xListNode ** out_info,uint16_t nameId)
 {
@@ -435,7 +434,7 @@ void ldBaseImageScale(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,bool isWithMa
     }
 }
 
-void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textColor,uint8_t opacity)
+void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor color,uint8_t opacity)
 {
 #if USE_VIRTUAL_RESOURCE == 0
     arm_2d_tile_t resource=*pResTile;
@@ -455,14 +454,14 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
                             pTile,
                             &((arm_2d_tile_t*)pRes)->tRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
-                            textColor,
+                            color,
                             LD_COLOR_BLACK);
 #else
         arm_2d_draw_pattern((arm_2d_tile_t*)pRes,
                             pTile,
                             &(((arm_2d_tile_t*)pRes)->tRegion),
                             ARM_2D_DRW_PATN_MODE_COPY,
-                            textColor,
+                            color,
                             LD_COLOR_BLACK);
 #endif
 
@@ -474,13 +473,13 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
         arm_2d_fill_colour_with_a2_mask_and_opacity(pTile,
                                                     &((arm_2d_tile_t*)pRes)->tRegion,
                                                     (arm_2d_tile_t*)pRes,
-                                                    (__arm_2d_color_t){textColor},
+                                                    (__arm_2d_color_t){color},
                                                     opacity);
 #else
         arm_2d_fill_colour_with_a2_mask(pTile,
                                         &(((arm_2d_tile_t*)pRes)->tRegion),
                                         (arm_2d_tile_t*)pRes,
-                                        (__arm_2d_color_t){textColor});
+                                        (__arm_2d_color_t){color});
 #endif
         break;
     }
@@ -490,13 +489,13 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
         arm_2d_fill_colour_with_a4_mask_and_opacity(pTile,
                                                     &((arm_2d_tile_t*)pRes)->tRegion,
                                                     (arm_2d_tile_t*)pRes,
-                                                    (__arm_2d_color_t){textColor},
+                                                    (__arm_2d_color_t){color},
                                                     opacity);
 #else
         arm_2d_fill_colour_with_a4_mask(pTile,
                                         &(((arm_2d_tile_t*)pRes)->tRegion),
                                         (arm_2d_tile_t*)pRes,
-                                        (__arm_2d_color_t){textColor});
+                                        (__arm_2d_color_t){color});
 #endif
         break;
     }
@@ -506,13 +505,13 @@ void ldBaseMaskImage(arm_2d_tile_t* pTile,arm_2d_tile_t* pResTile,ldColor textCo
         arm_2d_fill_colour_with_mask_and_opacity(pTile,
                                                  &((arm_2d_tile_t*)pRes)->tRegion,
                                                  (arm_2d_tile_t*)pRes,
-                                                 (__arm_2d_color_t){textColor},
+                                                 (__arm_2d_color_t){color},
                                                  opacity);
 #else
         arm_2d_fill_colour_with_mask(pTile,
                                      &(((arm_2d_tile_t*)pRes)->tRegion),
                                      (arm_2d_tile_t*)pRes,
-                                     (__arm_2d_color_t){textColor});
+                                     (__arm_2d_color_t){color});
 #endif
         break;
     }
@@ -531,7 +530,7 @@ ldChar_t * ldBaseCheckText(ldChar_t **ppCharInfo)
 {
     if(*ppCharInfo==NULL)
     {
-        *ppCharInfo=ldMalloc(sizeof(ldChar_t));
+        *ppCharInfo=ldCalloc(sizeof(ldChar_t));
         if(*ppCharInfo==NULL)
         {
             return NULL;
@@ -871,7 +870,7 @@ void ldBaseShowText(arm_2d_tile_t target,arm_2d_region_t region,ldChar_t *pTextI
             fontTile = *((arm_2d_vres_t*)&pTextInfo->fontTile);
             fontTile.tTile.tRegion.tSize.iWidth=width;
             fontTile.tTile.tRegion.tSize.iHeight=height;
-            fontTile.tTile.pchBuffer=imgAddr;
+            fontTile.tTile.pchBuffer=(uint8_t*)imgAddr;
             fontTile.pTarget=imgAddr;
 #endif
             int16_t tempHeight;
@@ -997,17 +996,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
     int16_t bmpH1Max;
 
     arm_2d_region_t alignSize={0};
-
-    if(pStr==NULL)
-    {
-        return alignSize;
-    }
-
-    uint8_t strLen=strlen((char*)pStr);
-
-    arm_2d_size_t textSize;
-
-    textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
+    arm_2d_size_t textSize={0};
 
     if(align==LD_ALIGN_LEFT_AUTO)
     {
@@ -1020,6 +1009,17 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
             align=LD_ALIGN_LEFT;
         }
     }
+
+    if(pStr==NULL)
+    {
+        textSize.iHeight=pFontDict->lineStrHeight;
+        alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
+        return alignSize;
+    }
+
+    uint8_t strLen=strlen((char*)pStr);
+
+    textSize= ldBaseGetStringSize(pStr,pFontDict,&bmpH1Max,0xFFFF);
 
     alignSize= ldBaseAutoAlign(&pTile->tRegion,&textSize,align);
 
@@ -1049,7 +1049,7 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 #else
         ((arm_2d_tile_t*)&resTile)->tRegion.tSize.iWidth=width;
         ((arm_2d_tile_t*)&resTile)->tRegion.tSize.iHeight=height;
-        ((arm_2d_tile_t*)&resTile)->pchBuffer=imgAddr;
+        ((arm_2d_tile_t*)&resTile)->pchBuffer=(uint8_t*)imgAddr;
         ((arm_2d_tile_t*)&resTile)->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pFontDict->maskType);
         resTile.pTarget=imgAddr;
 #endif
@@ -1083,8 +1083,8 @@ void ldBaseSetHidden(ldCommon_t* pWidget,bool isHidden)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isHidden=isHidden;
-    pWidget->dirtyRegionListItem.bIgnore=isHidden;
 }
 
 void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
@@ -1103,14 +1103,14 @@ void ldBaseSetText(ldChar_t **ppTextInfo,uint8_t *pStr)
 
         if((*ppTextInfo)->pStr==NULL)
         {
-            (*ppTextInfo)->pStr=ldMalloc(newStrlen);
+            (*ppTextInfo)->pStr=ldCalloc(newStrlen);
             if((*ppTextInfo)->pStr==NULL)
             {
                 return;
             }
             (*ppTextInfo)-> strLen=newStrlen-1;
         }
-        memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
+//        memset((char*)(*ppTextInfo)->pStr,0,newStrlen);
         strcpy((char*)(*ppTextInfo)->pStr,(char*)pStr);
     }
 }
@@ -1135,14 +1135,12 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
 {
     arm_2d_region_t parentRegion={{0,0},{0,0}},outRegion;
     ldPoint_t globalPos;
-    bool flag;
 
     if(pWidget->parentWidget==NULL)
     {
-        parentRegion.tSize.iWidth=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth;
-        parentRegion.tSize.iHeight=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
-        globalPos.x=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-        globalPos.y=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+        parentRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+        globalPos.x=0;
+        globalPos.y=0;
     }
     else
     {
@@ -1150,8 +1148,8 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
         parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
         globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
     }
-    flag=arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
-    if(flag==false)
+
+    if(!arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion))
     {
         return (arm_2d_region_t){{0,0},{0,0}};
     }
@@ -1168,7 +1166,14 @@ void ldBaseMove(ldCommon_t* pWidget,int16_t x,int16_t y)
         return;
     }
 
-    pWidget->dirtyRegionState=waitChange;
+    if(pWidget->parentWidget!=NULL)
+    {
+        ((ldCommon_t*)(pWidget->parentWidget))->dirtyRegionState=waitChange;
+    }
+    else
+    {
+        pWidget->dirtyRegionState=waitChange;
+    }
 
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX=x;
     ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY=y;
@@ -1328,87 +1333,20 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
-void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList,arm_2d_region_list_item_t ** ppRootDirtyRegionList)
+void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
 {
-    arm_2d_region_list_item_t **ppTempDirty;
+    ldCommon_t *pWidget=ldBaseGetWidgetById(0);
+    ldBaseMove(pWidget,offsetX,offsetY);
 
-    ppTempDirty=ppRootDirtyRegionList;
-    while(*ppTempDirty!=NULL)
-    {
-        ppTempDirty=&(*ppTempDirty)->ptNext;
-    }
-    *ppTempDirty=pItemDirtyRegionList;
-}
+    int16_t minX = MIN(0, offsetX);
+    int16_t minY = MIN(0, offsetY);
+    int16_t maxX = MAX(LD_CFG_SCEEN_WIDTH, offsetX + bgWidth);
+    int16_t maxY = MAX(LD_CFG_SCEEN_HEIGHT, offsetX + bgHeight);
 
-// pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore)
-{
-        switch (pWidget->dirtyRegionState)
-        {
-        case waitChange://扩大到新范围
-        {
-            arm_2d_region_t tempRegion;
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=maxX-minX;
+    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=maxY-minY;
 
-            arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
-            pWidget->dirtyRegionListItem.bIgnore=false;
-            pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionTemp=newRegion;
-            pWidget->dirtyRegionState=waitUpdate;
-            break;
-        }
-        case waitUpdate://缩小到新范围
-        {
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
-            pWidget->dirtyRegionListItem.bIgnore=false;
-            pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionState=none;
-
-            if(isAutoIgnore&&(pWidget->dirtyRegionListItem.bIgnore==false))
-            {
-                pWidget->dirtyRegionListItem.bIgnore=true;
-            }
-            break;
-        }
-        default:
-            break;
-        }
-}
-
-static void ldGuiUpdateDirtyRegion(xListNode* pLink)
-{
-    xListNode *temp_pos,*safePos;
-
-    list_for_each_safe(temp_pos,safePos, pLink)
-    {
-        if(temp_pos->info!=NULL)
-        {
-            ((ldCommon_t *)temp_pos->info)->dirtyRegionState=waitChange;
-
-            if(((ldCommon_t *)temp_pos->info)->childList!=NULL)
-            {
-                ldGuiUpdateDirtyRegion(((ldCommon_t *)temp_pos->info)->childList);
-            }
-        }
-    }
-}
-
-void ldBaseBgMove(int16_t x,int16_t y)
-{
-    ldWindow_t *pWidget=ldBaseGetWidgetById(0);
-    ldBaseMove(pWidget,x,y);
-
-    //只考虑左移和上移
-    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH-x;
-    ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT-y;
-
-
-
-    ldGuiUpdateDirtyRegion(&ldWidgetLink);
-
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
-//    isUpdateBackground=true;
+    ldGuiUpdateScene();
 }
 
 
@@ -1464,6 +1402,46 @@ arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t 
     pBufferRegion->tLocation.iY+=topSpace+height+bottomSpace;
     return retRegion;
 }
+
+// return true -> update finish
+bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw)
+{
+    switch (arm_2d_user_dynamic_dirty_region_wait_next(pDirtyRegionItem))
+    {
+    case waitChange:
+    {
+        if (isRedraw)
+        {
+            ldPoint_t pos=ldBaseGetGlobalPos(pWidget);
+            newRegion->tLocation.iX+=pos.x;
+            newRegion->tLocation.iY+=pos.y;
+            arm_2d_user_dynamic_dirty_region_update(
+                        pDirtyRegionItem,                     /* the dirty region */
+                        NULL,                           /* the target tile */
+                        newRegion,                         /* the redraw region */
+                        none);  /* next state */
+            return true;
+        }
+        else
+        {
+            /* nothing to redraw, update state to DONE */
+            arm_2d_user_dynamic_dirty_region_change_user_region_index_only(
+                        pDirtyRegionItem,
+                        none);
+        }
+        break;
+    }
+    case none:
+    {
+        break;
+    }
+    default:    /* 0xFF */
+        break;
+    }
+    return false;
+}
+
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

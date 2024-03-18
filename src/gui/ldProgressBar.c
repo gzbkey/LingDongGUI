@@ -18,8 +18,6 @@
  * @file    ldProgressBar.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   progress bar widget
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldProgressBar.h"
 #include "ldGui.h"
@@ -40,6 +38,15 @@
 #pragma clang diagnostic ignored "-Wmissing-declarations"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
+
+void ldProgressBarDel(ldProgressBar_t *pWidget);
+void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget);
+void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldProgressBarCommonFunc={
+    (ldDelFunc_t)ldProgressBarDel,
+    (ldLoopFunc_t)ldProgressBarLoop,
+    (ldUpdateFunc_t)ldProgressBarFrameUpdate,
+};
 
 static bool _progressBarDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -91,7 +98,7 @@ void ldProgressBarDel(ldProgressBar_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldProgressBar_t *ldProgressBarInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldProgressBar_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -99,7 +106,7 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldProgressBar_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldProgressBar_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -138,15 +145,10 @@ ldProgressBar_t *ldProgressBarInit(uint16_t nameId, uint16_t parentNameId, int16
         pNewWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
         pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
         pNewWidget->permille=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=false;
-
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
+        pNewWidget->pFunc=&ldProgressBarCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[progressBar] init,id:%d\n",nameId);
     }
@@ -308,10 +310,11 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
 
 void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget)
 {
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -324,18 +327,16 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
     {
         return;
     }
-//#if USE_VIRTUAL_RESOURCE == 0
-//    arm_2d_tile_t tempRes=*pResTile;
-//#else
-//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-//#endif
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         if(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE)//color
         {
             _progressBarColorShow(pWidget,&tTarget);
@@ -343,6 +344,7 @@ void ldProgressBarLoop(ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile
         else
         {
             _progressBarImageShow(pWidget,&tTarget,bIsNewFrame);
+            pWidget->dirtyRegionState=waitChange;
         }
         arm_2d_op_wait_async(NULL);
     }
@@ -362,6 +364,7 @@ void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     if(percent>=0)
     {
         if(percent>100)
@@ -390,12 +393,13 @@ void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t bgWidth,bool isMove)
+void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uintptr_t bgAddr,uint16_t bgWidth,bool isMove)
 {
     if(pWidget==NULL)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgAddr=bgAddr;
     pWidget->bgWidth=bgWidth;
     pWidget->isBgMove=isMove;
@@ -411,12 +415,13 @@ void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uint32_t bgAddr,uint16_t b
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t fgWidth,bool isMove)
+void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uintptr_t fgAddr,uint16_t fgWidth,bool isMove)
 {
     if(pWidget==NULL)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->fgAddr=fgAddr;
     pWidget->fgWidth=fgWidth;
     pWidget->isFgMove=isMove;
@@ -431,12 +436,13 @@ void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uint32_t fgAddr,uint16_t f
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget,uint32_t frameAddr,uint16_t frameWidth)
+void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget, uintptr_t frameAddr, uint16_t frameWidth)
 {
     if(pWidget==NULL)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->frameAddr=frameAddr;
     pWidget->frameWidth=frameWidth;
 }
@@ -457,6 +463,7 @@ void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgCo
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgAddr=LD_ADDR_NONE;
     pWidget->fgAddr=LD_ADDR_NONE;
     pWidget->bgColor=bgColor;

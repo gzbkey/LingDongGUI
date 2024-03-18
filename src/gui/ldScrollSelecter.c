@@ -18,8 +18,6 @@
  * @file    ldScrollSelecter.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   scroll selecter widget
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldScrollSelecter.h"
 #include "ldGui.h"
@@ -43,6 +41,15 @@
 
 #define MOVE_SPEED_THRESHOLD_VALUE     (20)          //触摸移动速度超过此值，则产生惯性滑动效果
 #define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
+
+void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
+void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
+void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldScrollSelecterCommonFunc={
+    (ldDelFunc_t)ldScrollSelecterDel,
+    (ldLoopFunc_t)ldScrollSelecterLoop,
+    (ldUpdateFunc_t)ldScrollSelecterFrameUpdate,
+};
 
 static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -129,32 +136,27 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
         pWidget->isAutoMove=false;
         _scrollOffset=pWidget->scrollOffset;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
-    case SIGNAL_TOUCH_HOLD_MOVE:
+    case SIGNAL_HOLD_DOWN:
     {
-        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
         break;
     }
     case SIGNAL_RELEASE:
     {
-        if(!pWidget->isAutoMove)
-        {
-            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,pWidget->scrollOffset);
-        }
-        pWidget->isWaitMove=true;
-        break;
-    }
-    case SIGNAL_MOVE_SPEED:
-    {
-        int16_t ySpeed=(int16_t)GET_SIGNAL_VALUE_Y(info.value);
+        int16_t ySpeed=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
 
         if((ySpeed>MOVE_SPEED_THRESHOLD_VALUE)||(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
             pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,_scrollOffset+SPEED_2_OFFSET(ySpeed));
             pWidget->isAutoMove=true;
         }
+        if(!pWidget->isAutoMove)
+        {
+            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,pWidget->scrollOffset);
+        }
+        pWidget->isWaitMove=true;
         break;
     }
     default:
@@ -179,7 +181,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
+ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
 {
     ldScrollSelecter_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -188,8 +190,8 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
     void **pNewStrGroup = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldScrollSelecter_t);
-    pNewStrGroup=(void**)ldMalloc(sizeof (void*)*itemMax);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldScrollSelecter_t);
+    pNewStrGroup=(void**)ldCalloc(sizeof (void*)*itemMax);
 
     if ((pNewWidget != NULL)&&(pNewStrGroup != NULL))
     {
@@ -237,18 +239,14 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->moveOffset=1;
         pNewWidget->isAutoMove=false;
         pNewWidget->isWaitMove=false;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
+        pNewWidget->isWaitInit=true;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
-        xConnect(pNewWidget->nameId,SIGNAL_TOUCH_HOLD_MOVE,pNewWidget->nameId,slotScrollSelecterScroll);
+        xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotScrollSelecterScroll);
-        xConnect(pNewWidget->nameId,SIGNAL_MOVE_SPEED,pNewWidget->nameId,slotScrollSelecterScroll);
 
         LOG_INFO("[scrollSelecter] init,id:%d\n",nameId);
     }
@@ -265,14 +263,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
 
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -298,11 +292,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     {
         int16_t targetOffset=-(pWidget->itemSelect*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight);
 
+        pWidget->dirtyRegionState=waitChange;
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=waitChange;
-            pWidget->isDirtyRegionAutoIgnore=true;
+            pWidget->dirtyRegionState=none;
         }
         else
         {
@@ -329,6 +323,15 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            if(pWidget->isWaitInit)
+            {
+                pWidget->isWaitInit=false;
+                pWidget->dirtyRegionState=none;
+            }
+        }
+
         if(!pWidget->isTransparent)
         {
             if(pResTile->pchBuffer==(uint8_t*)LD_ADDR_NONE)
@@ -381,12 +384,13 @@ void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
 
     if(pWidget->itemCount<pWidget->itemMax)
     {
         if(pWidget->ppItemStrGroup[pWidget->itemCount]==NULL)
         {
-            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_MALLOC_STRING(pStr);
+            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_CALLOC_STRING(pStr);
             strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],(char*)pStr);
             pWidget->itemCount++;
         }
@@ -407,6 +411,7 @@ void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -424,6 +429,7 @@ void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->bgColor=bgColor;
     ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)LD_ADDR_NONE;
 #if USE_VIRTUAL_RESOURCE == 1
@@ -446,6 +452,7 @@ void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)imgAddr;
 #if USE_VIRTUAL_RESOURCE == 1
     ((arm_2d_vres_t*)&pWidget->resource)->pTarget = imgAddr;
@@ -467,6 +474,7 @@ void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTranspare
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -554,6 +562,7 @@ void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 

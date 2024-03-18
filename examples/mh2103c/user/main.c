@@ -5,6 +5,8 @@
 #include "arm_2d.h"
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
+#include "uiDemo.h"
+#include "knob.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -49,6 +51,8 @@ void rccInit(void)
 	while(RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
 	RCC_HSICmd(ENABLE);
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+    
+    SystemCoreClock=216000000;
 }
 
 void gpioDeInit(void)
@@ -67,6 +71,34 @@ void gpioDeInit(void)
     PWR_BackupAccessCmd(DISABLE);
 }
 
+#define BTN_ID_KNOB 0
+#define BTN_ID_POW  1
+
+bool getBtnState(uint16_t id)
+{
+    uint8_t value=knobKeyRead();
+    
+    switch(id)
+    {
+        case BTN_ID_KNOB:
+        {
+            return GETBIT(value,0);
+            break;
+        }
+        case BTN_ID_POW:
+        {
+            return GETBIT(value,1);
+            break;
+        }
+        default:
+            break;
+    }
+    return 0;
+}
+
+volatile int16_t encoderCount;
+
+int16_t add=0,sub=0;
 int main(void)
 {
 	RCC_ClocksTypeDef clocks;
@@ -74,16 +106,22 @@ int main(void)
 	rccInit();
 	RCC_GetClocksFreq(&clocks);
     
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
 
-    init_cycle_counter(false);
+    SysTick_Config(SystemCoreClock/100);
+    init_cycle_counter(true);
 
     gpioDeInit();
     
     st7789v_init();
-    st7789v_clear(0xff);
-    ST7789V_BG_ON;
     
+    knobInit();
+    
+    xBtnInit(BTN_ID_POW,getBtnState);
+    xBtnInit(BTN_ID_KNOB,getBtnState);
+
+    LD_ADD_PAGE(uiDemo);
+
     arm_irq_safe {
         arm_2d_init();
     }
@@ -91,23 +129,27 @@ int main(void)
     disp_adapter0_init();
     
     arm_2d_scene0_init(&DISP0_ADAPTER);
-    
+
     while(1)
     {
         disp_adapter0_task();
+
+        encoderCount=knobGetEncoder();
+        if(encoderCount>0)
+        {
+            add+=encoderCount;
+        }
+        else
+        {
+            sub+=encoderCount;
+        }
     }
 }
 
 __attribute__((used))    //!< 避免下面的处理程序被编译器优化掉
 void SysTick_Handler(void)
 {
-
-
-}
-
-void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap) 
-{
-    st7789v_colorFill(x,y,x+width-1,y+height-1,(uint16_t *)bitmap);
+    knobTick(10);
 }
 
 

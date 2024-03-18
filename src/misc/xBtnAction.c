@@ -19,8 +19,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   轻量级按键状态检测库
  *          支持实体按键、触摸按键
- * @version 0.1
- * @date    2023-11-03
  */
 #include "xBtnAction.h"
 #include "xList.h"
@@ -29,7 +27,6 @@
 //规定常规电平为高电平，按下电平为低电平，可在getBtnStateFunc匹配
 
 #define PRESS_LEVEL          0
-
 
 NEW_LIST(xBtnLink);
 
@@ -49,15 +46,14 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
     btnClickTimeOut=clickTimeOutMs/btnDebounceMs;
 }
 
-void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(size_t))
+void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t))
 {
-    xBtnInfo_t * link = (xBtnInfo_t *)BTN_MALLOC(sizeof(xBtnInfo_t));
+    xBtnInfo_t * link = (xBtnInfo_t *)BTN_CALLOC(sizeof(xBtnInfo_t));
     if(link!=NULL)
     {
         memset(link,0,sizeof(xBtnInfo_t));
-        
-        link->addrOrNum=addrOrNum;
-        link->nameId=nameId;
+
+        link->id=id;
         link->getBtnStateFunc=getBtnStateFunc;
         xListInfoAdd(&xBtnLink,link);
     }
@@ -67,7 +63,7 @@ void xBtnProcess(xBtnInfo_t *btnInfo)
 {
 
     btnInfo->btnOldState=btnInfo->btnNewState;
-    btnInfo->btnNewState=btnInfo->getBtnStateFunc(btnInfo->addrOrNum);
+    btnInfo->btnNewState=btnInfo->getBtnStateFunc(btnInfo->id);
 
         switch(btnInfo->FSM_State)
         {
@@ -152,6 +148,7 @@ void xBtnProcess(xBtnInfo_t *btnInfo)
 
 static bool _btnLoop(xListNode* pEachInfo,void* pInfo)
 {
+    (void*)pInfo;
     xBtnProcess((xBtnInfo_t *)pEachInfo->info);
      
     return false;
@@ -159,8 +156,6 @@ static bool _btnLoop(xListNode* pEachInfo,void* pInfo)
 
 void xBtnTick(uint8_t cycleMs)
 {
-    uint8_t i;
-
     if(btnCycle==0)
     {
         btnCycle=cycleMs;
@@ -172,27 +167,29 @@ void xBtnTick(uint8_t cycleMs)
 
 
 
-uint16_t xBtnGetState(uint16_t nameIdOrNum,uint8_t state)
+uint16_t xBtnGetState(uint16_t id,uint8_t state)
 {
     uint16_t ret=0;
     xBtnInfo_t *btnInfo=NULL;
     xListNode *temp_pos,*safePos;
 
-
-        list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
+    list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
+    {
+        if(temp_pos->info!=NULL)
         {
-            if(temp_pos->info!=NULL)
+            if(((xBtnInfo_t *)temp_pos->info)->id==id)
             {
-                if((((xBtnInfo_t *)temp_pos->info)->nameId==nameIdOrNum)||
-                    (((xBtnInfo_t *)temp_pos->info)->addrOrNum==nameIdOrNum))
-                {
-                    btnInfo=temp_pos->info;
-                    break;
-                }
+                btnInfo=temp_pos->info;
+                break;
             }
         }
+    }
     
-    
+    if(btnInfo==NULL)
+    {
+        LOG_DEBUG("xBtnAction Error\n");
+        return 0;
+    }
     
     switch(state)
     {
@@ -311,13 +308,3 @@ void xBtnClean(void)
         }
     }
 }
-
-
-
-
-
-
-
-
-
-

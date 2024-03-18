@@ -343,27 +343,60 @@ static bool __on_each_frame_complete(void *ptTarget)
 
     /* calculate real-time FPS */
     if (__DISP0_CFG_ITERATION_CNT__) {
-        if (DISP0_ADAPTER.Benchmark.wIterations) {
+        if (DISP0_ADAPTER.Benchmark.hwIterations) {
+            int32_t nRenderCycle = DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t.Statistics.nTotalCycle;
             DISP0_ADAPTER.Benchmark.wMin = MIN((uint32_t)nElapsed, DISP0_ADAPTER.Benchmark.wMin);
             DISP0_ADAPTER.Benchmark.wMax = MAX(nElapsed, (int32_t)DISP0_ADAPTER.Benchmark.wMax);
             DISP0_ADAPTER.Benchmark.dwTotal += nElapsed;
-            DISP0_ADAPTER.Benchmark.dwRenderTotal += DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t.Statistics.nTotalCycle;
-            DISP0_ADAPTER.Benchmark.wIterations--;
+            DISP0_ADAPTER.Benchmark.dwRenderTotal += nRenderCycle;
+            DISP0_ADAPTER.Benchmark.hwIterations--;
+            DISP0_ADAPTER.Benchmark.hwFrameCounter += (nRenderCycle != 0) ? 1 : 0;
 
-            if (0 == DISP0_ADAPTER.Benchmark.wIterations) {
-                DISP0_ADAPTER.Benchmark.wAverage =
-                    (uint32_t)(DISP0_ADAPTER.Benchmark.dwTotal / (uint64_t)__DISP0_CFG_ITERATION_CNT__);
-                DISP0_ADAPTER.Benchmark.wAverage = MAX(1, DISP0_ADAPTER.Benchmark.wAverage);
- 
+            if (0 == DISP0_ADAPTER.Benchmark.hwIterations) {
+
+                if (0 == DISP0_ADAPTER.Benchmark.hwFrameCounter) {
+                    DISP0_ADAPTER.Benchmark.wAverage = 0;
+                } else {
+                    DISP0_ADAPTER.Benchmark.wAverage =
+                        (uint32_t)(DISP0_ADAPTER.Benchmark.dwTotal / (uint64_t)DISP0_ADAPTER.Benchmark.hwFrameCounter);
+                    DISP0_ADAPTER.Benchmark.wAverage = MAX(1, DISP0_ADAPTER.Benchmark.wAverage);
+                }
+
                 int64_t lElapsed = lTimeStamp - DISP0_ADAPTER.Benchmark.lTimestamp;
-                DISP0_ADAPTER.Benchmark.fCPUUsage = (float)((double)DISP0_ADAPTER.Benchmark.dwRenderTotal / (double)lElapsed) * 100.0f;
+                if (lElapsed) {
+                    DISP0_ADAPTER.Benchmark.fCPUUsage = (float)((double)DISP0_ADAPTER.Benchmark.dwRenderTotal / (double)lElapsed) * 100.0f;
+                }
+
+                /* log statistics */
+                if (DISP0_ADAPTER.Benchmark.wAverage) {
+                    ARM_2D_LOG_INFO(
+                        STATISTICS, 
+                        0, 
+                        "DISP_ADAPTER0", 
+                        "FPS:%3d(%dms)\tCPU:%2.2f%%\tLCD-Latency:%2dms",
+                        MIN(arm_2d_helper_get_reference_clock_frequency() / DISP0_ADAPTER.Benchmark.wAverage, 999),
+                        (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wAverage),
+                        DISP0_ADAPTER.Benchmark.fCPUUsage,
+                        (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency)
+                    );
+                } else {
+                    ARM_2D_LOG_INFO(
+                        STATISTICS, 
+                        0, 
+                        "DISP_ADAPTER0", 
+                        "FPS: SKIPPED\tCPU:%2.2f%%\tLCD-Latency:%2dms",
+                        DISP0_ADAPTER.Benchmark.fCPUUsage,
+                        (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency)
+                    );
+                }
                  
                 DISP0_ADAPTER.Benchmark.wMin = UINT32_MAX;
                 DISP0_ADAPTER.Benchmark.wMax = 0;
                 DISP0_ADAPTER.Benchmark.dwTotal = 0;
                 DISP0_ADAPTER.Benchmark.dwRenderTotal = 0;
-                DISP0_ADAPTER.Benchmark.wIterations = __DISP0_CFG_ITERATION_CNT__;
-                
+                DISP0_ADAPTER.Benchmark.hwIterations = __DISP0_CFG_ITERATION_CNT__;
+                DISP0_ADAPTER.Benchmark.hwFrameCounter = 0;
+
                 DISP0_ADAPTER.Benchmark.lTimestamp = arm_2d_helper_get_system_timestamp();
             }
         }
@@ -387,13 +420,16 @@ static void __user_scene_player_init(void)
         __DISP0_CFG_SCEEN_WIDTH__,                                     //!< screen width
         __DISP0_CFG_SCEEN_HEIGHT__,                                    //!< screen height
         COLOUR_INT,                                                             //!< colour date type
+        __DISP0_COLOUR_FORMAT__,                                       //!< colour format
         __DISP0_CFG_PFB_BLOCK_WIDTH__,                                 //!< PFB block width
         __DISP0_CFG_PFB_BLOCK_HEIGHT__,                                //!< PFB block height
         __DISP0_CFG_PFB_HEAP_SIZE__                                    //!< number of PFB in the PFB pool
 
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
-        + 3
+        + __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
+#else
+        + (__DISP0_CFG_ROTATE_SCREEN__ > 0)
 #endif
         ,{
             .evtOnLowLevelRendering = {
@@ -410,11 +446,13 @@ static void __user_scene_player_init(void)
 #if __DISP0_CFG_DEBUG_DIRTY_REGIONS__
         .FrameBuffer.bDebugDirtyRegions = true,
 #endif
+        .FrameBuffer.u4RotateScreen = __DISP0_CFG_ROTATE_SCREEN__,
         .FrameBuffer.u3PixelWidthAlign = __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__,
         .FrameBuffer.u3PixelHeightAlign = __DISP0_CFG_PFB_PIXEL_ALIGN_HEIGHT__,
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
-        .FrameBuffer.u4PoolReserve = 3,                                         // reserve 3 PFB blocks for the virtual resource service
+        // reserve PFB blocks for the virtual resource service
+        .FrameBuffer.u4PoolReserve = __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__,
 #endif
 #if __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__
         .DirtyRegion.ptRegions = s_tDirtyRegionList,
@@ -468,8 +506,8 @@ static void __user_scene_player_init(void)
                         }}});
 
     DISP0_ADAPTER.Benchmark.wMin = UINT32_MAX;
-    DISP0_ADAPTER.Benchmark.wIterations = __DISP0_CFG_ITERATION_CNT__;
-
+    DISP0_ADAPTER.Benchmark.hwIterations = __DISP0_CFG_ITERATION_CNT__;
+    DISP0_ADAPTER.Benchmark.hwFrameCounter = 0;
 }
 
 #if !__DISP0_CFG_DISABLE_NAVIGATION_LAYER__

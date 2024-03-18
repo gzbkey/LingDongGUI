@@ -39,7 +39,7 @@ typedef struct {
     uint16_t xAxisOffset;
     float xScale;
     float yScale;
-    uint32_t pointImgAddr;
+    uintptr_t pointImgAddr;
     int16_t pointImgWidth;
     uint8_t frameSpace;
     uint8_t seriesCount;
@@ -49,16 +49,16 @@ typedef struct {
 
 }ldGraph_t;
 
-ldGraph_t* ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t seriesMax);
+ldGraph_t* ldGraphInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t seriesMax);
 void ldGraphFrameUpdate(ldGraph_t* pWidget);
-void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldGraphLoop(arm_2d_scene_t *pScene,ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldGraphDel(ldGraph_t *pWidget);
 
 void ldGraphSetAxis(ldGraph_t *pWidget, uint16_t xAxis, uint16_t yAxis, uint16_t xAxisOffset);
 void ldGraphSetAxisOffset(ldGraph_t *pWidget,uint16_t xAxisOffset);
 void ldGraphSetFrameSpace(ldGraph_t *pWidget, uint8_t frameSpace, bool isCorner);
 void ldGraphSetGridOffset(ldGraph_t *pWidget, uint8_t gridOffset);
-void ldGraphSetPointImageMask(ldGraph_t *pWidget, uint32_t addr, int16_t width);
+void ldGraphSetPointImageMask(ldGraph_t *pWidget, uintptr_t addr, int16_t width);
 int8_t ldGraphAddSeries(ldGraph_t *pWidget, ldColor seriesColor, uint8_t lineSize, uint16_t pointMax);
 void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value);
 void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue);

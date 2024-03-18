@@ -18,8 +18,6 @@
  * @file    ldButton.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   button widget
- * @version 0.1
- * @date    2023-11-03
  * @signal  SIGNAL_PRESS
  *          SIGNAL_RELEASE
  */
@@ -42,6 +40,15 @@
 #   pragma clang diagnostic ignored "-Wmissing-declarations"
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
+
+void ldButtonDel(ldButton_t *pWidget);
+void ldButtonFrameUpdate(ldButton_t* pWidget);
+void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldButtonCommonFunc={
+    (ldDelFunc_t)ldButtonDel,
+    (ldLoopFunc_t)ldButtonLoop,
+    (ldUpdateFunc_t)ldButtonFrameUpdate,
+};
 
 static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -121,7 +128,7 @@ static bool slotButtonToggle(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldButton_t * pNewWidget = NULL;
     xListNode *parentInfo;
@@ -129,7 +136,7 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldButton_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldButton_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -177,13 +184,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->dirtyRegionState=none;
+        pNewWidget->pFunc=&ldButtonCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
@@ -201,14 +205,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 
 void ldButtonFrameUpdate(ldButton_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     uint32_t btnColor;
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -329,6 +329,11 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                 arm_2d_op_wait_async(NULL);
             }
         }
+
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
     }
 }
 
@@ -346,8 +351,9 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldFree(pWidget->pStr);
-    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    pWidget->pStr=LD_CALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
 }
 
@@ -362,6 +368,11 @@ void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
  */
 void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
 {
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->releaseColor=releaseColor;
     pWidget->pressColor=pressColor;
     pWidget->releaseImgAddr=LD_ADDR_NONE;
@@ -379,12 +390,13 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isReleaseMask,uint32_t pressImgAddr,bool isPressMask)
+void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,bool isReleaseMask,uintptr_t pressImgAddr,bool isPressMask)
 {
     if(pWidget==NULL)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->releaseImgAddr=releaseImgAddr;
     pWidget->pressImgAddr=pressImgAddr;
     pWidget->isWithReleaseMask=isReleaseMask;
@@ -400,12 +412,13 @@ void ldButtonSetImage(ldButton_t* pWidget,uint32_t releaseImgAddr,bool isRelease
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-void ldButtonSetSelectImage(ldButton_t* pWidget,uint32_t selectMaskAddr,ldColor selectColor)
+void ldButtonSetSelectImage(ldButton_t* pWidget, uintptr_t selectMaskAddr, ldColor selectColor)
 {
     if(pWidget==NULL)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->selectMaskAddr=selectMaskAddr;
     pWidget->selectColor=selectColor;
 }
@@ -424,6 +437,7 @@ void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
@@ -443,6 +457,7 @@ void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isTransparent=isTransparent;
 }
 
@@ -460,6 +475,7 @@ void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isCorner=isCorner;
 }
 
@@ -477,6 +493,7 @@ void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isSelected=isSelected;
 }
 
@@ -498,6 +515,7 @@ void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->align=align;
 }
 
@@ -515,6 +533,7 @@ void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->pFontDict=pFontDict;
 }
 

@@ -4,10 +4,9 @@
   <vendor>gzbkey</vendor>
   <name>LingDongGUI</name>
   <description>A gui based on arm-2d.</description>
-  <url>https://raw.githubusercontent.com/gzbkey/LingDongGUI/cmsis-pack/</url>
-  <supportContact></supportContact>
+  <url>https://github.com/gzbkey/LingDongGUI/</url>
+  <supportContact>https://github.com/gzbkey/LingDongGUI/issues</supportContact>
   <license>LICENSE</license>
-  
   <repository type="git">https://github.com/gzbkey/LingDongGUI.git</repository>
   <releases>
     <release version="9.9.9" tag="v9.9.9">
@@ -21,53 +20,68 @@
     <keyword>LDGUI</keyword>
     <keyword>LingDongGUI</keyword>
   </keywords>
-  
-  <components>
-    <component Cclass="LDGUI" Cversion="0.6.0" Cgroup="ldgui" Csub="Core">
-    <description>A dedicated performance counter for Cortex-M systick.</description>
-    <files>
-      <file category="include"    name="src/gui/" />
-      <file category="sourceC"    name="src/gui/ldArc.c"/>
-      <file category="sourceC"    name="src/gui/ldButton.c"/>
-      <file category="sourceC"    name="src/gui/ldCheckBox.c"/>
-      <file category="sourceC"    name="src/gui/ldComboBox.c"/>
-      <file category="sourceC"    name="src/gui/ldCommon.c"/>
-      <file category="sourceC"    name="src/gui/ldDateTime.c"/>
-      <file category="sourceC"    name="src/gui/ldGauge.c"/>
-      <file category="sourceC"    name="src/gui/ldGraph.c"/>
-      <file category="sourceC"    name="src/gui/ldGui.c"/>
-      <file category="sourceC"    name="src/gui/ldIconSlider.c"/>
-      <file category="sourceC"    name="src/gui/ldImage.c"/>
-      <file category="sourceC"    name="src/gui/ldKeyboard.c"/>
-      <file category="sourceC"    name="src/gui/ldLabel.c"/>
-      <file category="sourceC"    name="src/gui/ldLineEdit.c"/>
-      <file category="sourceC"    name="src/gui/ldProgressBar.c"/>
-      <file category="sourceC"    name="src/gui/ldQRCode.c"/>
-      <file category="sourceC"    name="src/gui/ldRadialMenu.c"/>
-      <file category="sourceC"    name="src/gui/ldScene0.c"/>
-      <file category="sourceC"    name="src/gui/ldScrollSelecter.c"/>
-      <file category="sourceC"    name="src/gui/ldTable.c"/>
-      <file category="sourceC"    name="src/gui/ldText.c"/>
-      <file category="sourceC"    name="src/gui/ldWindow.c"/>
 
-      <file category="include"    name="src/misc/" />
-      <file category="sourceC"    name="src/misc/freeRtosHeap4.c"/>
-      <file category="sourceC"    name="src/misc/qrcodegen.c"/>
-      <file category="sourceC"    name="src/misc/tlsf.c"/>
-      <file category="sourceC"    name="src/misc/xBtnAction.c"/>
-      <file category="sourceC"    name="src/misc/xConnect.c"/>
-      <file category="sourceC"    name="src/misc/xList.c"/>
-      <file category="sourceC"    name="src/misc/xQueue.c"/>
-      <file category="sourceC"    name="src/misc/xString.c"/>
-    </files>
+  <conditions>
+    <condition id="Arm-2D">
+      <description>Require Arm-2D Support</description>
+      <require Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" />
+      <require Cclass="Acceleration" Cgroup="Arm-2D" Csub="Alpha-Blending" />
+      <require Cclass="Acceleration" Cgroup="Arm-2D" Csub="Transform" />
+      <require Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cversion="1.4.16" />
+      <require Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" />
+      <require Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Controls" />
+    </condition>
+  </conditions>
+
+  <components>
+    <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cversion="0.6.2" condition="Arm-2D">
+      <description>ldgui core files</description>
+      <files>
+        <file category="include" name="src/gui/" />
+        <file category="sourceC" name="src/gui/ldArc.c" />
+        <file category="sourceC" name="src/gui/ldButton.c" />
+        <file category="sourceC" name="src/gui/ldCheckBox.c" />
+        <file category="sourceC" name="src/gui/ldComboBox.c" />
+        <file category="sourceC" name="src/gui/ldCommon.c" />
+        <file category="sourceC" name="src/gui/ldDateTime.c" />
+        <file category="sourceC" name="src/gui/ldGauge.c" />
+        <file category="sourceC" name="src/gui/ldGraph.c" />
+        <file category="sourceC" name="src/gui/ldGui.c" />
+        <file category="sourceC" name="src/gui/ldIconSlider.c" />
+        <file category="sourceC" name="src/gui/ldImage.c" />
+        <file category="sourceC" name="src/gui/ldKeyboard.c" />
+        <file category="sourceC" name="src/gui/ldLabel.c" />
+        <file category="sourceC" name="src/gui/ldLineEdit.c" />
+        <file category="sourceC" name="src/gui/ldProgressBar.c" />
+        <file category="sourceC" name="src/gui/ldQRCode.c" />
+        <file category="sourceC" name="src/gui/ldRadialMenu.c" />
+        <file category="sourceC" name="src/gui/ldScene0.c" />
+        <file category="sourceC" name="src/gui/ldScrollSelecter.c" />
+        <file category="sourceC" name="src/gui/ldTable.c" />
+        <file category="sourceC" name="src/gui/ldText.c" />
+        <file category="sourceC" name="src/gui/ldWindow.c" />
+
+        <file category="include" name="src/misc/" />
+        <file category="sourceC" name="src/misc/freeRtosHeap4.c" />
+        <file category="sourceC" name="src/misc/qrcodegen.c" />
+        <file category="sourceC" name="src/misc/tlsf.c" />
+        <file category="sourceC" name="src/misc/xBtnAction.c" />
+        <file category="sourceC" name="src/misc/xConnect.c" />
+        <file category="sourceC" name="src/misc/xList.c" />
+        <file category="sourceC" name="src/misc/xQueue.c" />
+        <file category="sourceC" name="src/misc/xString.c" />
+
+        <file category="sourceC" name="src/template/ldConfig.c" attr="config" version="1.0.1" />
+        <file category="header"  name="src/template/ldConfig.h" attr="config" version="1.1.0" />
+        <file category="sourceC" name="src/template/Retarget.c" attr="config" version="1.0.1" />
+      </files>
     </component>
   </components>
-  
+
   <!-- optional taxonomy section for defining new component Class and Group names -->
 
   <taxonomy>
-    <description Cclass="LDGUI" Cgroup="ldgui">A gui based on arm-2d.</description>
+    <description Cclass="LingDongGui" Cgroup="ldgui">A gui based on arm-2d</description>
   </taxonomy>
 
-  
 </package>

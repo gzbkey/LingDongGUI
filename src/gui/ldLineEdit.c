@@ -18,8 +18,6 @@
  * @file    ldLineEdit.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   输入框控件
- * @version 0.1
- * @date    2023-11-24
  */
 
 #include "ldLineEdit.h"
@@ -41,6 +39,15 @@
 #pragma clang diagnostic ignored "-Wmissing-declarations"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
+
+void ldLineEditDel(ldLineEdit_t *pWidget);
+void ldLineEditFrameUpdate(ldLineEdit_t* pWidget);
+void ldLineEditLoop(arm_2d_scene_t *pScene,ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldLineEditCommonFunc={
+    (ldDelFunc_t)ldLineEditDel,
+    (ldLoopFunc_t)ldLineEditLoop,
+    (ldUpdateFunc_t)ldLineEditFrameUpdate,
+};
 
 static bool _lineEditDel(xListNode *pEachInfo, void *pTarget)
 {
@@ -80,146 +87,50 @@ void ldLineEditDel(ldLineEdit_t *pWidget)
     }
 }
 
-static bool _addAscii(ldLineEdit_t *pWidget,uint8_t ascii)
+static bool slotEditEnd(xConnectInfo_t info)
 {
-    if(pWidget->textLen<pWidget->textMax)
-    {
-        pWidget->pText[pWidget->textLen]=ascii;
-        pWidget->pText[pWidget->textLen+1]=' ';
-        pWidget->pText[pWidget->textLen+2]=0;
-        pWidget->textLen++;
-        return true;
-    }
+    ldLineEdit_t *pWidget=ldBaseGetWidgetById(info.receiverId);
+    pWidget->isEditing=false;
+    pWidget->dirtyRegionState=waitChange;
     return false;
-}
-
-static void _inputAsciiProcess(ldLineEdit_t *pWidget,uint8_t ascii)
-{
-    if((pWidget->editType==typeInt)||(pWidget->editType==typeFloat))
-    {
-        if((ascii>='0')&&(ascii<='9'))
-        {
-            _addAscii(pWidget,ascii);
-        }
-        if((pWidget->editType==typeFloat)&&(ascii=='.')&&(pWidget->hasFloatPoint==false))
-        {
-            if(_addAscii(pWidget,ascii))
-            {
-                pWidget->hasFloatPoint=true;
-            }
-        }
-
-        if(ascii=='-')
-        {
-            if(pWidget->pText[0]=='-')
-            {
-
-                for (uint8_t i = 1; i <pWidget->textLen; i++)
-                {
-                    pWidget->pText[i-1] = pWidget->pText[i];
-                }
-                pWidget->pText[pWidget->textLen-1]=' ';
-                pWidget->pText[pWidget->textLen]=0;
-                pWidget->textLen--;
-
-            }
-            else
-            {
-                if(pWidget->textLen<pWidget->textMax)
-                {
-
-                    for (uint8_t i = pWidget->textLen ; i >0; i--)
-                    {
-                        pWidget->pText[i] = pWidget->pText[i-1];
-                    }
-                    pWidget->pText[pWidget->textLen+1]=' ';
-                    pWidget->pText[pWidget->textLen+2]=0;
-                    pWidget->textLen++;
-
-                    pWidget->pText[0]='-';
-                }
-            }
-        }
-    }
-    else
-    {
-        if((ascii>=0x20)&&(ascii<0x7F))
-        {
-            _addAscii(pWidget,ascii);
-        }
-        else
-        {
-
-        }
-    }
-
-    switch (ascii) {
-    case 0x08://backspace
-    {
-        if(pWidget->textLen>0)
-        {
-            if((pWidget->pText[pWidget->textLen-1]=='.')&&(pWidget->editType==typeFloat))
-            {
-                pWidget->hasFloatPoint=false;
-            }
-            pWidget->pText[pWidget->textLen-1]=' ';
-            pWidget->pText[pWidget->textLen]=0;
-            pWidget->textLen--;
-        }
-        break;
-    }
-    case 0x0d://enter
-    {
-        ldBaseSetHidden(ldBaseGetWidgetById(pWidget->kbNameId),true);
-        pWidget->isEditing=false;
-        ldBaseBgMove(0,0);
-        pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=true;
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 static bool slotLineEditProcess(xConnectInfo_t info)
 {
     ldLineEdit_t *pWidget;
-    ldCommon_t *kb;
+    ldCommonKB_t *kb;
 
     pWidget=ldBaseGetWidgetById(info.receiverId);
 
-    switch (info.signalType)
-    {
-    case SIGNAL_PRESS:
+    if(info.signalType==SIGNAL_PRESS)
     {
         pWidget->isEditing=true;
-        pWidget->pText[pWidget->textLen]=' ';
-        gActiveEditType=pWidget->editType;
         if(pWidget->kbNameId)
         {
             arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
             kb=ldBaseGetWidgetById(pWidget->kbNameId);
-            ldBaseSetHidden(kb,false);
-            if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
+            if(kb!=NULL)
             {
-                ldBaseMove(kb,0,LD_CFG_SCEEN_HEIGHT);
-                ldBaseBgMove(0,-(LD_CFG_SCEEN_HEIGHT/2));
+                kb->editType=pWidget->editType;
+                kb->ppStr=&pWidget->pText;
+                kb->strMax=pWidget->textMax;
+                kb->editorId=pWidget->nameId;
+                cursorBlinkFlag=true;
+                cursorBlinkCount=0;
+                ldBaseSetHidden((ldCommon_t*)kb,false);
+                if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
+                {
+                    ldBaseMove((ldCommon_t*)kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                    ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
+                }
+                else
+                {
+                    ldBaseMove((ldCommon_t*)kb,0,0);
+                }
             }
         }
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
-        break;
-    }
-    case SIGNAL_INPUT_ASCII:
-    {
-        _inputAsciiProcess(pWidget,info.value);
-        break;
-    }
-
-    default:
-        break;
     }
 
     return false;
@@ -240,7 +151,7 @@ static bool slotLineEditProcess(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-24
  */
-ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t *pFontDict,uint8_t textMax)
+ldLineEdit_t *ldLineEditInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t *pFontDict,uint8_t textMax)
 {
     ldLineEdit_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -249,11 +160,11 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     uint8_t *pText = NULL;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldLineEdit_t);
-    pText = (uint8_t *)ldMalloc((textMax+2)*sizeof(uint8_t));//光标位置+结尾
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldLineEdit_t);
+    pText = (uint8_t *)ldCalloc((textMax+1)*sizeof(uint8_t));//+结尾
     if ((pNewWidget != NULL)&&(pText!=NULL))
     {
-        memset((char*)pText,0,textMax+2);
+        memset((char*)pText,0,textMax+1);
         pNewWidget->isParentHidden=false;
         parentList = ((ldCommon_t *)parentInfo->info)->childList;
         if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
@@ -287,21 +198,15 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->isCorner=false;
         pNewWidget->isEditing=false;
         pNewWidget->textColor=LD_COLOR_BLACK;
-        pNewWidget->textLen=0;
-        pNewWidget->timer=0;
-        pNewWidget->blinkFlag=false;
         pNewWidget->editType=typeString;
         pNewWidget->hasFloatPoint=false;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->kbNameId=0;
+        pNewWidget->pFunc=&ldLineEditCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
+        xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
 
         LOG_INFO("[lineEdit] init,id:%d\n",nameId);
     }
@@ -318,14 +223,10 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldLineEditFrameUpdate(ldLineEdit_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldLineEditLoop(arm_2d_scene_t *pScene,ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -339,22 +240,24 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
-    if(ldTimeOut(500,&pWidget->timer,true)&&bIsNewFrame&&pWidget->isEditing)
+    if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&bIsNewFrame&&pWidget->isEditing)
     {
-        pWidget->blinkFlag=!pWidget->blinkFlag;
+        cursorBlinkCount=0;
+        cursorBlinkFlag=!cursorBlinkFlag;
     }
-//#if USE_VIRTUAL_RESOURCE == 0
-//    arm_2d_tile_t tempRes=*pResTile;
-//#else
-//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-//#endif
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            if(!pWidget->isEditing)
+            {
+                pWidget->dirtyRegionState=none;
+            }
+        }
+
         if(pWidget->isCorner)
         {
             draw_round_corner_box(&tTarget,&tTarget_canvas,LD_COLOR_WHITE,255,bIsNewFrame);
@@ -379,13 +282,23 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
             },
         };
 
+        if(pWidget->isEditing)
+        {
+            //预留光标位置
+            tempRegion.tSize.iWidth-=CURSOR_WIDTH;
+        }
+
         arm_2d_tile_generate_child(&tTarget,&tempRegion,&textTile,false);
         arm_2d_region_t showRegion=ldBaseLineText(&textTile,pResTile,pWidget->pText,pWidget->pFontDict,LD_ALIGN_LEFT_AUTO,pWidget->textColor,0,255);
 
-        if((pWidget->blinkFlag)&&(pWidget->isEditing))
+        if((cursorBlinkFlag)&&(pWidget->isEditing))
         {
-            showRegion.tLocation.iX=showRegion.tLocation.iX+showRegion.tSize.iWidth-2;
-            showRegion.tSize.iWidth=2;
+            showRegion.tLocation.iX=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
+            showRegion.tSize.iWidth=CURSOR_WIDTH;
+            if(showRegion.tSize.iHeight==0)
+            {
+                pWidget->pFontDict->lineStrHeight;
+            }
             arm_2d_draw_box(&tTarget,&showRegion,1,0,255);
         }
         arm_2d_op_wait_async(NULL);
@@ -406,18 +319,18 @@ void ldLineEditSetText(ldLineEdit_t* pWidget,uint8_t *pText)
     {
         return;
     }
-
-    int16_t len=strlen((char*)pText);
-    if(len>pWidget->textMax)
+    uint16_t textLen=strlen((char*)pText);
+    if(pWidget->textMax==0)
     {
-        len=pWidget->textMax;
+        pWidget->pText=ldRealloc(pWidget->pText,textLen+1);
     }
-    memcpy((char*)pWidget->pText,(char*)pText,len);
-    pWidget->pText[len]=0;
-    pWidget->pText[len+1]=0;
-    pWidget->textLen=len;
+
+    if((textLen<pWidget->textMax)||(pWidget->textMax==0))
+    {
+        strcpy((char*)pWidget->pText,(char*)pText);
+    }
+
     pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
 }
 
 /**
@@ -435,8 +348,6 @@ void ldLineEditSetKeyboard(ldLineEdit_t* pWidget,uint16_t kbNameId)
         return;
     }
     pWidget->kbNameId=kbNameId;
-    xDisconnect(kbNameId,SIGNAL_INPUT_ASCII,pWidget->nameId,slotLineEditProcess);
-    xConnect(kbNameId,SIGNAL_INPUT_ASCII,pWidget->nameId,slotLineEditProcess);
 }
 
 /**

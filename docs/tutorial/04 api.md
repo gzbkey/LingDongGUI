@@ -750,6 +750,7 @@ button widget
 * void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);
 * void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);
 ### 信号列表
+* SIGNAL_CLICKED_ITEM
 ### 函数说明
 #### ldComboBoxInit
 <table>
@@ -1654,7 +1655,7 @@ date time widget
 ### 简述
 icon slider widget
 ### 函数列表
-* ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict);
+* ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict);
 * void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uint32_t imageAddr,uint8_t* pNameStr);
 * void ldIconSliderSetHorizontalScroll(ldIconSlider_t *pWidget,bool isHorizontal);
 * void ldIconSliderSetSpeed(ldIconSlider_t *pWidget, uint8_t speed);
@@ -1666,7 +1667,7 @@ icon slider widget
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">ldIconSlider_t *ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,int16_t iconWidth,uint8_t iconSpace,uint8_t columnCount,uint8_t rowCount,uint8_t pageMax,ldFontDict_t* pFontDict);</code></pre>
+            <pre><code class="language-c">ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict);</code></pre>
         </td>
     </tr>
     <tr>
@@ -2697,6 +2698,7 @@ radial menu widget
 * ldRadialMenu_t *ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax);
 * void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uint32_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask);
 * void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num);
+* void ldRadialMenuOffsetItem(ldRadialMenu_t *pWidget,int8_t offset);
 ### 信号列表
 ### 函数说明
 #### ldRadialMenuInit
@@ -2819,6 +2821,31 @@ radial menu widget
     <tr>
         <td>num</td>
         <td>项目编号，0开始</td>
+    </tr>
+</table>
+<br>
+
+#### ldRadialMenuOffsetItem
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldRadialMenuOffsetItem(ldRadialMenu_t *pWidget,int8_t offset);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    基于当前选中项目，进行偏移选择        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>offset</td>
+        <td>偏移值</td>
     </tr>
 </table>
 <br>
@@ -3129,7 +3156,7 @@ scroll selecter widget
 * ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget);
 * ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
 * ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
-* ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
+* ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t* pFontDict);
 * void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
 * void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height);
 * void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
@@ -3137,8 +3164,10 @@ scroll selecter widget
 * void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
 * void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
 * void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t align);
-* void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr);
+* void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr,bool isWithMask,ldColor maskColor,bool isMask);
 * void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t releaseImgAddr,uint32_t pressImgAddr,bool isCheckable);
+* void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict);
+* void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId);
 ### 信号列表
 ### 函数说明
 #### ldTableCurrentColumn
@@ -3292,7 +3321,7 @@ scroll selecter widget
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);</code></pre>
+            <pre><code class="language-c">ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t* pFontDict);</code></pre>
         </td>
     </tr>
     <tr>
@@ -3577,7 +3606,7 @@ scroll selecter widget
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr);</code></pre>
+            <pre><code class="language-c">void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uint32_t imgAddr,bool isWithMask,ldColor maskColor,bool isMask);</code></pre>
         </td>
     </tr>
     <tr>
@@ -3674,6 +3703,56 @@ scroll selecter widget
     <tr>
         <td>isCheckable</td>
         <td>是否为开关型按键</td>
+    </tr>
+</table>
+<br>
+
+#### ldTableSetExcelType
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    excel风格        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>pFontDict</td>
+        <td>字体指针</td>
+    </tr>
+</table>
+<br>
+
+#### ldTableSetKeyboard
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">
+    关联键盘        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">参数</td>
+        <td>pWidget</td>
+        <td>目标控件指针</td>
+    </tr>
+    <tr>
+        <td>kbNameId</td>
+        <td>目标键盘id</td>
     </tr>
 </table>
 <br>

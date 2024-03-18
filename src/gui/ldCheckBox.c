@@ -18,8 +18,6 @@
  * @file    ldCheckBox.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   复选框 + 单选功能，支持自定义图片和文字显示
- * @version 0.1
- * @date    2023-11-03
  */
 #include "ldCheckBox.h"
 #include "ldGui.h"
@@ -143,6 +141,15 @@ struct {
     uint8_t group;
 }radioButtonValue;
 
+void ldCheckBoxDel(ldCheckBox_t *pWidget);
+void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget);
+void ldCheckBoxLoop(arm_2d_scene_t *pScene,ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+const ldGuiCommonFunc_t ldCheckBoxCommonFunc={
+    (ldDelFunc_t)ldCheckBoxDel,
+    (ldLoopFunc_t)ldCheckBoxLoop,
+    (ldUpdateFunc_t)ldCheckBoxFrameUpdate,
+};
+
 static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
 {
     if (pEachInfo->info == pTarget)
@@ -218,7 +225,7 @@ static bool slotCheckBoxToggle(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-10
  */
-ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldCheckBox_t *ldCheckBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldCheckBox_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -226,7 +233,7 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     arm_2d_tile_t *tResTile;
 
     parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_MALLOC_WIDGET_INFO(ldCheckBox_t);
+    pNewWidget = LD_CALLOC_WIDGET_INFO(ldCheckBox_t);
     if (pNewWidget != NULL)
     {
         pNewWidget->isParentHidden=false;
@@ -269,13 +276,9 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->boxWidth=CHECK_BOX_SIZE;
         pNewWidget->isRadioButton=false;
         pNewWidget->radioButtonGroup=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion(pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->pFunc=&ldCheckBoxCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 
@@ -293,14 +296,10 @@ ldCheckBox_t *ldCheckBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldCheckBoxLoop(arm_2d_scene_t *pScene,ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -328,6 +327,7 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         if((pWidget->radioButtonGroup==radioButtonValue.group)&&(pWidget->nameId!=radioButtonValue.nameId))
         {
             pWidget->isChecked=false;
+            pWidget->dirtyRegionState=waitChange;
         }
     }
 
@@ -335,6 +335,11 @@ void ldCheckBoxLoop(ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         if ((pWidget->checkedImgAddr==LD_ADDR_NONE)&&(pWidget->uncheckedImgAddr==LD_ADDR_NONE))//color
         {
             do{
@@ -473,12 +478,13 @@ void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-10
  */
-void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uint32_t uncheckedImgAddr,bool isUncheckedMask,uint32_t checkedImgAddr,bool isCheckedMask)
+void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask)
 {
     if(pWidget==NULL)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->uncheckedImgAddr=uncheckedImgAddr;
     pWidget->checkedImgAddr=checkedImgAddr;
     pWidget->isWithUncheckedMask=isUncheckedMask;
@@ -500,8 +506,9 @@ void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pS
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     ldFree(pWidget->pStr);
-    pWidget->pStr=LD_MALLOC_STRING(pStr);
+    pWidget->pStr=LD_CALLOC_STRING(pStr);
     strcpy((char*)pWidget->pStr,(char*)pStr);
     pWidget->pFontDict=pFontDict;
     pWidget->align=LD_ALIGN_LEFT;
@@ -539,6 +546,7 @@ void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->isCorner=isCorner;
 }
 
@@ -556,6 +564,7 @@ void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor)
     {
         return;
     }
+    pWidget->dirtyRegionState=waitChange;
     pWidget->charColor=charColor;
 }
 
