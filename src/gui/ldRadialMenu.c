@@ -260,15 +260,13 @@ ldRadialMenu_t *ldRadialMenuInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
         pNewWidget->selectItem=0;
         pNewWidget->isMove=false;
         pNewWidget->showList=pNewShowList;
-        pNewWidget->isWaitInit=true;
+//        pNewWidget->isWaitInit=true;
         pNewWidget->pFunc=&ldRadialMenuCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-//        while(itemMax--)
-//        {
-//            arm_2d_user_dynamic_dirty_region_init(&pNewWidget->pItemList[itemMax-1].dirtyRegionListItem,NULL);
-//        }
+         for(uint8_t i=0;i<itemMax;i++)
+        {
+            arm_2d_user_dynamic_dirty_region_init(&pNewWidget->pItemList[i].dirtyRegionListItem,pScene);
+        }
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
@@ -336,7 +334,6 @@ static void _autoSort(ldRadialMenu_t *pWidget)
         //计算缩放比例
         pWidget->pItemList[i].scalePercent=(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)*50/pWidget->yAxis+50;
 #endif
-        pWidget->pItemList[i].dirtyRegionState=waitChange;
     }
 
     //计算排序
@@ -349,15 +346,16 @@ static void _autoSort(ldRadialMenu_t *pWidget)
 
 void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-//    for(uint8_t i=0;i<pWidget->itemCount;i++)
-//    {
-//        arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem,waitChange);
-//    }
+    for(uint8_t i=0;i<pWidget->itemCount;i++)
+    {
+        arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->pItemList[i].dirtyRegionListItem,waitChange);
+    }
 }
 
 void ldRadialMenuLoop(arm_2d_scene_t *pScene,ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
+    bool bTempState=false;
+    arm_2d_region_t tempRegion;
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     if (pWidget == NULL)
@@ -380,11 +378,6 @@ void ldRadialMenuLoop(arm_2d_scene_t *pScene,ldRadialMenu_t *pWidget,const arm_2
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
-        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
-        {
-//            pWidget->dirtyRegionState=none;
-        }
-
         if(pWidget->itemCount)
         {
 #if MOVE_CYCLE_MS == 0
@@ -446,18 +439,27 @@ void ldRadialMenuLoop(arm_2d_scene_t *pScene,ldRadialMenu_t *pWidget,const arm_2
                     _autoScalePercent(pWidget);
                 }
 
+                pWidget->dirtyRegionState=waitChange;
             }
 
-//            LOG_DEBUG("\nstart\n");
+            for(uint8_t i=0;i<pWidget->itemCount;i++)
+            {
+
+                arm_2d_region_get_minimal_enclosure(&pWidget->pItemList[i].itemRegion,&pWidget->pItemList[i].dirtyRegionTemp,&tempRegion);
+                if(ldBaseDirtyRegionUpdate(&tTarget,&tempRegion,&pWidget->pItemList[i].dirtyRegionListItem,pWidget->dirtyRegionState))
+                {
+                    pWidget->pItemList[i].dirtyRegionTemp=pWidget->pItemList[i].itemRegion;
+                    bTempState=true;
+                }
+            }
+            if(bTempState)
+            {
+                pWidget->dirtyRegionState=none;
+            }
+
             //刷新item
             for(uint8_t i=0;i<pWidget->itemCount;i++)
             {
-//                LOG_REGION("==",pWidget->pItemList[pWidget->showList[i]].itemRegion);
-//                if(ldBaseDirtyRegionUpdate(&tTarget,&pWidget->pItemList[pWidget->showList[i]].itemRegion,&pWidget->pItemList[i].dirtyRegionListItem,pWidget->dirtyRegionState))
-//                {
-////                    pWidget->dirtyRegionState=none;
-//                }
-
                 do {
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
                     ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
@@ -518,11 +520,6 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t wi
         pWidget->pItemList[pWidget->itemCount].count=itemSubCount;
         pWidget->pItemList[pWidget->itemCount].isWithMask=isWithMask;
 
-        pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.ptNext=NULL;
-        pWidget->pItemList[pWidget->itemCount].dirtyRegionListItem.tRegion = (arm_2d_region_t){0};
-
-
-
         pWidget->itemCount++;
 
         float preAngle=360.0/pWidget->itemCount;
@@ -534,23 +531,6 @@ void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t wi
 
         //初始化数据
         _autoSort(pWidget);
-
-        ldPoint_t globalPos=ldBaseGetGlobalPos((ldCommon_t*)pWidget);
-        for(uint8_t i=0;i<pWidget->itemCount;i++)
-        {
-//            pWidget->pItemList[i].dirtyRegionState=waitChange;
-
-//            pWidget->pItemList[i].dirtyRegionTemp=pWidget->pItemList[i].itemRegion;
-//            pWidget->pItemList[i].dirtyRegionTemp.tLocation.iX+=globalPos.x;
-//            pWidget->pItemList[i].dirtyRegionTemp.tLocation.iY+=globalPos.y;
-
-            pWidget->pItemList[i].dirtyRegionListItem.tRegion=pWidget->pItemList[i].itemRegion;
-            pWidget->pItemList[i].dirtyRegionListItem.tRegion.tLocation.iX+=globalPos.x;
-            pWidget->pItemList[i].dirtyRegionListItem.tRegion.tLocation.iY+=globalPos.y;
-        }
-//        arm_2d_user_dynamic_dirty_region_init(&pWidget->pItemList[pWidget->itemCount-1].dirtyRegionListItem,NULL);
-//        arm_2d_region_list_item_t* pList=&pWidget->dirtyRegionListItem;
-//        arm_2d_helper_pfb_append_dirty_regions_to_list(&pList,&pWidget->pItemList[pWidget->itemCount-1].dirtyRegionListItem,1);
     }
 }
 
@@ -575,11 +555,6 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *pWidget,uint8_t num)
     }
 
     num=num%pWidget->itemCount;
-
-    for(uint8_t i=0;i<pWidget->itemCount;i++)
-    {
-        pWidget->pItemList[i].dirtyRegionState=waitChange;
-    }
 
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 

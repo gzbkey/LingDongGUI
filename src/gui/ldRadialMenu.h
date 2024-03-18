@@ -14,9 +14,9 @@ extern "C" {
 typedef struct {
     uintptr_t imgAddr;
     bool isWithMask:1;
-    ldDirtyRegionStateType_t dirtyRegionState:2;
     arm_2d_region_list_item_t dirtyRegionListItem;
     arm_2d_region_t itemRegion;
+    arm_2d_region_t dirtyRegionTemp;
     uint8_t count;
 #if USE_RADIA_MENU_SCALE == 1
     uint8_t scalePercent;
