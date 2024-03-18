@@ -14,10 +14,9 @@ extern "C" {
 typedef struct {
     uintptr_t imgAddr;
     bool isWithMask:1;
-    ldDirtyRegionStateType_t dirtyRegionState:2;
     arm_2d_region_list_item_t dirtyRegionListItem;
-    arm_2d_region_t dirtyRegionTemp;
     arm_2d_region_t itemRegion;
+    arm_2d_region_t dirtyRegionTemp;
     uint8_t count;
 #if USE_RADIA_MENU_SCALE == 1
     uint8_t scalePercent;
@@ -44,10 +43,10 @@ typedef struct {
     uint8_t *showList;
 }ldRadialMenu_t;
 
-ldRadialMenu_t* ldRadialMenuInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,
+ldRadialMenu_t* ldRadialMenuInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,
                                uint16_t xAxis, uint16_t yAxis, uint8_t itemMax);
 void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget);
-void ldRadialMenuLoop(ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldRadialMenuLoop(arm_2d_scene_t *pScene,ldRadialMenu_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldRadialMenuDel(ldRadialMenu_t *pWidget);
 
 void ldRadialMenuAddItem(ldRadialMenu_t *pWidget,uintptr_t imageAddr,uint16_t width,uint16_t height,uint8_t itemSubCount,bool isWithMask);

@@ -8,9 +8,9 @@ extern "C" {
 #include "ldGui.h"
 #include "srcWidget.h"
 
-void uiWidgetInit(uint8_t page);
-void uiWidgetLoop(uint8_t page);
-void uiWidgetQuit(uint8_t page);
+void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page);
+void uiWidgetLoop(arm_2d_scene_t *pScene,uint8_t page);
+void uiWidgetQuit(arm_2d_scene_t *pScene, uint8_t page);
 
 #ifdef __cplusplus
 }

@@ -57,7 +57,7 @@ const uint8_t dropDownV_png[]={
 
 void ldComboBoxDel(ldComboBox_t *pWidget);
 void ldComboBoxFrameUpdate(ldComboBox_t* pWidget);
-void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldComboBoxLoop(arm_2d_scene_t *pScene,ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldComboBoxCommonFunc={
     (ldDelFunc_t)ldComboBoxDel,
     (ldLoopFunc_t)ldComboBoxLoop,
@@ -136,7 +136,6 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
             pWidget->itemPreSelect=clickItemNum-1;
         }
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_RELEASE:
@@ -152,7 +151,6 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
 
         }
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=true;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -160,6 +158,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
         if(clickItemNum!=SHOW_ITEM_NUM)
         {
             pWidget->itemPreSelect=clickItemNum-1;
+            pWidget->dirtyRegionState=waitChange;
         }
         break;
     }
@@ -184,7 +183,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-05
  */
-ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict,uint8_t itemMax)
+ldComboBox_t *ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict,uint8_t itemMax)
 {
     ldComboBox_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -241,14 +240,9 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         {
             pNewWidget->ppItemStrGroup[0]=NULL;
         }
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldComboBoxCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
@@ -269,12 +263,12 @@ ldComboBox_t *ldComboBoxInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldComboBoxFrameUpdate(ldComboBox_t* pWidget)
 {
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+
     if(pWidget->dirtyRegionState==waitChange)
     {
         ((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight=pWidget->itemHeight*(pWidget->itemCount+1);
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
     }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 
     if(pWidget->isExpand)
     {
@@ -286,7 +280,7 @@ void ldComboBoxFrameUpdate(ldComboBox_t* pWidget)
     }
 }
 
-void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldComboBoxLoop(arm_2d_scene_t *pScene,ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -312,6 +306,11 @@ void ldComboBoxLoop(ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         arm_2d_region_t displayRegion={
             .tSize={
                 .iWidth=tTarget_canvas.tSize.iWidth,

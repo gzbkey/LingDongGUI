@@ -36,9 +36,9 @@ typedef struct {
     uint8_t kbValue;
 }ldKeyboard_t;
 
-ldKeyboard_t* ldKeyboardInit(uint16_t nameId, ldFontDict_t *pFontDict);
+ldKeyboard_t* ldKeyboardInit(arm_2d_scene_t *pScene,uint16_t nameId, ldFontDict_t *pFontDict);
 void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget);
-void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldKeyboardLoop(arm_2d_scene_t *pScene,ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldKeyboardDel(ldKeyboard_t *pWidget);
 
 

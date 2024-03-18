@@ -55,10 +55,11 @@
 #define KB_VALUE_SYMBOL_MODE       4
 
 static ldColor _shiftColor[3]={LD_COLOR_WHITE,LD_COLOR_BLACK,LD_COLOR_BLUE};
+static bool isExit=false;
 
 void ldKeyboardDel(ldKeyboard_t *pWidget);
 void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget);
-void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldKeyboardLoop(arm_2d_scene_t *pScene,ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldKeyboardCommonFunc={
     (ldDelFunc_t)ldKeyboardDel,
     (ldLoopFunc_t)ldKeyboardLoop,
@@ -720,8 +721,8 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *pWidget)
             }
         }
     }
-    retRegion.tLocation.iY+=LD_CFG_SCEEN_HEIGHT>>1;
-    retRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+//    retRegion.tLocation.iY+=LD_CFG_SCEEN_HEIGHT>>1;
+//    retRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
 
     return retRegion;
 }
@@ -834,11 +835,7 @@ static void _inputAsciiProcess(ldKeyboard_t *pWidget,uint8_t ascii)
     }
     case 0x0d://enter
     {
-        ldBaseSetHidden((ldCommon_t*)pWidget,true);
-        xEmit(0,SIGNAL_EDITING_FINISHED,0);
-        ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,0);
-        pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=true;
+        isExit=true;
         break;
     }
     default:
@@ -875,6 +872,7 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.y);
         pWidget->isClick=false;
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
+        LOG_REGION("kb click region",pWidget->targetDirtyRegion);
         pWidget->dirtyRegionState=waitChange;
         break;
     }
@@ -902,7 +900,7 @@ static bool slotKBProcess(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-23
  */
-ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
+ldKeyboard_t *ldKeyboardInit(arm_2d_scene_t *pScene,uint16_t nameId,ldFontDict_t *pFontDict)
 {
     ldKeyboard_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -946,17 +944,13 @@ ldKeyboard_t *ldKeyboardInit(uint16_t nameId,ldFontDict_t *pFontDict)
         pNewWidget->clickPoint.iY=-1;
         pNewWidget->isClick=false;
         pNewWidget->upperState=0;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = (arm_2d_region_t){0};//ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = true;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->targetDirtyRegion.tLocation.iY=0;
         pNewWidget->isWaitInit=true;
         pNewWidget->isSymbol=false;
         pNewWidget->pFunc=&ldKeyboardCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
@@ -989,6 +983,7 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
         {
             //强制脏矩阵覆盖控件
             pWidget->targetDirtyRegion=((arm_2d_tile_t*)&pWidget->resource)->tRegion;
+            pWidget->targetDirtyRegion.tLocation.iY=0;
             pWidget->isWaitInit=false;
         }
         return;
@@ -999,14 +994,10 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
         pWidget->isWaitInit=true;
     }
 
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=pWidget->targetDirtyRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,pWidget->targetDirtyRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldKeyboardLoop(arm_2d_scene_t *pScene,ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
     ldColor btnColor;
@@ -1019,10 +1010,10 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
         return;
     }
 
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
-    {
-        return;
-    }
+//    if((pWidget->isParentHidden)||(pWidget->isHidden))
+//    {
+//        return;
+//    }
 
     if(((pWidget->editType==typeInt)||(pWidget->editType==typeFloat))&&(pWidget->isNumber==false))
     {
@@ -1086,6 +1077,24 @@ void ldKeyboardLoop(ldKeyboard_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&pWidget->targetDirtyRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
+        if((pWidget->isParentHidden)||(pWidget->isHidden))
+        {
+            return;
+        }
+
+        if(isExit)
+        {
+            isExit=false;
+            ldBaseSetHidden((ldCommon_t*)pWidget,true);
+            xEmit(0,SIGNAL_EDITING_FINISHED,0);
+            ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,0);
+        }
+
         ldBaseColor(&tTarget,__RGB(208,211,220),255);
 
         if(pWidget->isNumber)

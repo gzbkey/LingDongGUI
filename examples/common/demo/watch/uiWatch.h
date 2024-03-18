@@ -8,9 +8,9 @@ extern "C" {
 #include "ldGui.h"
 #include "srcWatch.h"
 
-void uiWatchInit(uint8_t page);
-void uiWatchLoop(uint8_t page);
-void uiWatchQuit(uint8_t page);
+void uiWatchInit(arm_2d_scene_t *pScene,uint8_t page);
+void uiWatchLoop(arm_2d_scene_t *pScene,uint8_t page);
+void uiWatchQuit(arm_2d_scene_t *pScene, uint8_t page);
 
 #ifdef __cplusplus
 }

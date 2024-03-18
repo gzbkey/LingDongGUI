@@ -42,7 +42,7 @@
 
 void ldLineEditDel(ldLineEdit_t *pWidget);
 void ldLineEditFrameUpdate(ldLineEdit_t* pWidget);
-void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldLineEditLoop(arm_2d_scene_t *pScene,ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldLineEditCommonFunc={
     (ldDelFunc_t)ldLineEditDel,
     (ldLoopFunc_t)ldLineEditLoop,
@@ -92,7 +92,6 @@ static bool slotEditEnd(xConnectInfo_t info)
     ldLineEdit_t *pWidget=ldBaseGetWidgetById(info.receiverId);
     pWidget->isEditing=false;
     pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
     return false;
 }
 
@@ -132,7 +131,6 @@ static bool slotLineEditProcess(xConnectInfo_t info)
             }
         }
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
     }
 
     return false;
@@ -153,7 +151,7 @@ static bool slotLineEditProcess(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-24
  */
-ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t *pFontDict,uint8_t textMax)
+ldLineEdit_t *ldLineEditInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t *pFontDict,uint8_t textMax)
 {
     ldLineEdit_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -202,15 +200,10 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
         pNewWidget->textColor=LD_COLOR_BLACK;
         pNewWidget->editType=typeString;
         pNewWidget->hasFloatPoint=false;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->kbNameId=0;
         pNewWidget->pFunc=&ldLineEditCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
         xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
@@ -230,14 +223,10 @@ ldLineEdit_t *ldLineEditInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
 
 void ldLineEditFrameUpdate(ldLineEdit_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldLineEditLoop(arm_2d_scene_t *pScene,ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -261,6 +250,14 @@ void ldLineEditLoop(ldLineEdit_t *pWidget,const arm_2d_tile_t *pParentTile,bool 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            if(!pWidget->isEditing)
+            {
+                pWidget->dirtyRegionState=none;
+            }
+        }
+
         if(pWidget->isCorner)
         {
             draw_round_corner_box(&tTarget,&tTarget_canvas,LD_COLOR_WHITE,255,bIsNewFrame);
@@ -334,7 +331,6 @@ void ldLineEditSetText(ldLineEdit_t* pWidget,uint8_t *pText)
     }
 
     pWidget->dirtyRegionState=waitChange;
-    pWidget->isDirtyRegionAutoIgnore=true;
 }
 
 /**

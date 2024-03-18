@@ -46,7 +46,7 @@
 
 void ldIconSliderDel(ldIconSlider_t *pWidget);
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget);
-void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldIconSliderCommonFunc={
     (ldDelFunc_t)ldIconSliderDel,
     (ldLoopFunc_t)ldIconSliderLoop,
@@ -212,7 +212,6 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         pWidget->isHoldMove=false;
         _scrollOffset=pWidget->scrollOffset;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -359,7 +358,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict)
+ldIconSlider_t* ldIconSliderInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, int16_t iconWidth, uint8_t iconSpace, uint8_t columnCount, uint8_t rowCount, uint8_t pageMax, ldFontDict_t* pFontDict)
 {
     ldIconSlider_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -468,14 +467,9 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
                 }
             }
         }
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldIconSliderCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotIconSliderScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotIconSliderScroll);
@@ -499,14 +493,10 @@ ldIconSlider_t* ldIconSliderInit(uint16_t nameId, uint16_t parentNameId, int16_t
 
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
     int16_t x,y,offsetX,offsetY;
@@ -560,8 +550,7 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=waitChange;
-            pWidget->isDirtyRegionAutoIgnore=true;
+            pWidget->dirtyRegionState=none;
         }
         else
         {
@@ -591,6 +580,8 @@ void ldIconSliderLoop(ldIconSlider_t *pWidget,const arm_2d_tile_t *pParentTile,b
 #if LD_DEBUG == 1
         arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
 #endif
+        ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState);
+
         uint8_t showCount=0;
         for(uint8_t pageCount=0;pageCount<pWidget->pageMax;pageCount++)
         {
@@ -671,7 +662,7 @@ void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,uint8_t* pN
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
+
     if(pWidget->iconCount<pWidget->iconMax)
     {
         pWidget->pIconInfoList[pWidget->iconCount].imgAddr=imageAddr;

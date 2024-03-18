@@ -41,7 +41,7 @@
 
 void ldQRCodeDel(ldQRCode_t *pWidget);
 void ldQRCodeFrameUpdate(ldQRCode_t* pWidget);
-void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldQRCodeLoop(arm_2d_scene_t *pScene,ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldQRCodeCommonFunc={
     (ldDelFunc_t)ldQRCodeDel,
     (ldLoopFunc_t)ldQRCodeLoop,
@@ -88,7 +88,7 @@ void ldQRCodeDel(ldQRCode_t *pWidget)
 
 /**
  * @brief   二维码初始化函数
- * 
+ *
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -108,7 +108,7 @@ void ldQRCodeDel(ldQRCode_t *pWidget)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-14
  */
-ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom)
+ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom)
 {
     ldQRCode_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -157,14 +157,9 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
         pNewWidget->qrZoom=qrZoom;
         pNewWidget->qrColor=qrColor;
         pNewWidget->bgColor=bgColor;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldQRCodeCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }
@@ -181,14 +176,10 @@ ldQRCode_t *ldQRCodeInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int1
 
 void ldQRCodeFrameUpdate(ldQRCode_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldQRCodeLoop(arm_2d_scene_t *pScene,ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -213,6 +204,11 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
+        }
+
         uint8_t *qr0;
         uint8_t *tempBuffer;
         uint32_t qrSize;
@@ -275,7 +271,7 @@ void ldQRCodeLoop(ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
 
 /**
  * @brief   设置二维码文本
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   pNewText        文本指针
  * @author  Ou Jianbo(59935554@qq.com)

@@ -1135,7 +1135,6 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
 {
     arm_2d_region_t parentRegion={{0,0},{0,0}},outRegion;
     ldPoint_t globalPos;
-    bool flag;
 
     if(pWidget->parentWidget==NULL)
     {
@@ -1149,8 +1148,8 @@ arm_2d_region_t ldBaseGetGlobalRegion(ldCommon_t *pWidget, arm_2d_region_t *pTar
         parentRegion.tSize.iHeight=((arm_2d_tile_t*)&((ldCommon_t*)pWidget->parentWidget)->resource)->tRegion.tSize.iHeight;
         globalPos=ldBaseGetGlobalPos((ldCommon_t *)pWidget->parentWidget);
     }
-    flag=arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion);
-    if(flag==false)
+
+    if(!arm_2d_region_intersect(&parentRegion,pTargetRegion,&outRegion))
     {
         return (arm_2d_region_t){{0,0},{0,0}};
     }
@@ -1334,44 +1333,6 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
     }
 }
 
-void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t ** ppRootDirtyRegionList)
-{
-    while(*ppRootDirtyRegionList!=NULL)
-    {
-        ppRootDirtyRegionList=&(*ppRootDirtyRegionList)->ptNext;
-    }
-    *ppRootDirtyRegionList=pItemDirtyRegionList;
-}
-
-// pNewRegion和pWidget坐标都是相对父控件来计算
-void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore)
-{
-        switch (pWidget->dirtyRegionState)
-        {
-        case waitChange://扩大到新范围
-        {
-            arm_2d_region_t tempRegion;
-            arm_2d_region_get_minimal_enclosure(&newRegion,&pWidget->dirtyRegionTemp,&tempRegion);
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&tempRegion);
-            pWidget->dirtyRegionListItem.bIgnore=false;
-            pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionTemp=newRegion;
-            pWidget->dirtyRegionState=waitUpdate;
-            break;
-        }
-        case waitUpdate://缩小到新范围
-        {
-            pWidget->dirtyRegionListItem.tRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pWidget->dirtyRegionTemp);
-            pWidget->dirtyRegionListItem.bIgnore=isAutoIgnore;
-            pWidget->dirtyRegionListItem.bUpdated=true;
-            pWidget->dirtyRegionState=none;
-            break;
-        }
-        default:
-            break;
-        }
-}
-
 void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
 {
     ldCommon_t *pWidget=ldBaseGetWidgetById(0);
@@ -1441,6 +1402,55 @@ arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t 
     pBufferRegion->tLocation.iY+=topSpace+height+bottomSpace;
     return retRegion;
 }
+
+// return true -> update finish
+bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw)
+{
+//    ldCommon_t *pWidget= ldBaseGetWidgetById(0);
+//    pDirtyRegionItem->tRegion.tLocation.iX+=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iX;
+//    pDirtyRegionItem->tRegion.tLocation.iY+=(*(arm_2d_tile_t*)(&pWidget->resource)).tRegion.tLocation.iY;
+    switch (arm_2d_user_dynamic_dirty_region_wait_next(pDirtyRegionItem))
+    {
+    case waitChange:
+    {
+        if (isRedraw)
+        {
+            arm_2d_user_dynamic_dirty_region_update(
+                        pDirtyRegionItem,                     /* the dirty region */
+                        pTarget,                           /* the target tile */
+                        newRegion,                         /* the redraw region */
+                        none);  /* next state */
+//            LOG_DIRTY_REGION("target region:%d,%d,%d,%d; redraw area:%d,%d,%d,%d\n",
+//                             pTarget->tRegion.tLocation.iX,
+//                             pTarget->tRegion.tLocation.iY,
+//                             pTarget->tRegion.tSize.iWidth,
+//                             pTarget->tRegion.tSize.iHeight,
+//                             newRegion->tLocation.iX,
+//                             newRegion->tLocation.iY,
+//                             newRegion->tSize.iWidth,
+//                             newRegion->tSize.iHeight);
+            return true;
+        }
+        else
+        {
+            /* nothing to redraw, update state to DONE */
+            arm_2d_user_dynamic_dirty_region_change_user_region_index_only(
+                        pDirtyRegionItem,
+                        none);
+        }
+        break;
+    }
+    case none:
+    {
+        break;
+    }
+    default:    /* 0xFF */
+        break;
+    }
+    return false;
+}
+
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

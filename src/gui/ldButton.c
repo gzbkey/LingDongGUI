@@ -43,7 +43,7 @@
 
 void ldButtonDel(ldButton_t *pWidget);
 void ldButtonFrameUpdate(ldButton_t* pWidget);
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldButtonCommonFunc={
     (ldDelFunc_t)ldButtonDel,
     (ldLoopFunc_t)ldButtonLoop,
@@ -100,14 +100,12 @@ static bool slotButtonToggle(xConnectInfo_t info)
     {
         pWidget->isPressed=true;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_RELEASE:
     {
         pWidget->isPressed=false;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=true;
         break;
     }
     default:
@@ -130,7 +128,7 @@ static bool slotButtonToggle(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
 {
     ldButton_t * pNewWidget = NULL;
     xListNode *parentInfo;
@@ -186,14 +184,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
+        pNewWidget->dirtyRegionState=none;
         pNewWidget->pFunc=&ldButtonCommonFunc;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
@@ -211,14 +205,10 @@ ldButton_t* ldButtonInit(uint16_t nameId, uint16_t parentNameId, int16_t x,int16
 
 void ldButtonFrameUpdate(ldButton_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     uint32_t btnColor;
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
@@ -338,6 +328,11 @@ void ldButtonLoop(ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsN
                 }
                 arm_2d_op_wait_async(NULL);
             }
+        }
+
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=none;
         }
     }
 }

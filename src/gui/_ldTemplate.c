@@ -42,7 +42,7 @@
 
 void ldTemplateDel(ldTemplate_t *pWidget);
 void ldTemplateFrameUpdate(ldTemplate_t* pWidget);
-void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldTemplateLoop(arm_2d_scene_t *pScene,ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldTemplateCommonFunc={
     ldTemplateDel,
     ldTemplateLoop,
@@ -97,7 +97,7 @@ void ldTemplateFrameUpdate(ldTemplate_t* pWidget)
     ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
 }
 
-ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldTemplate_t *ldTemplateInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     ldTemplate_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -159,7 +159,7 @@ ldTemplate_t *ldTemplateInit(uint16_t nameId, uint16_t parentNameId, int16_t x, 
     return pNewWidget;
 }
 
-void ldTemplateLoop(ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldTemplateLoop(arm_2d_scene_t *pScene,ldTemplate_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 

@@ -44,7 +44,7 @@
 
 void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
-void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 const ldGuiCommonFunc_t ldScrollSelecterCommonFunc={
     (ldDelFunc_t)ldScrollSelecterDel,
     (ldLoopFunc_t)ldScrollSelecterLoop,
@@ -136,7 +136,6 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
         pWidget->isAutoMove=false;
         _scrollOffset=pWidget->scrollOffset;
         pWidget->dirtyRegionState=waitChange;
-        pWidget->isDirtyRegionAutoIgnore=false;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -182,7 +181,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
+ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
 {
     ldScrollSelecter_t *pNewWidget = NULL;
     xListNode *parentInfo;
@@ -240,14 +239,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
         pNewWidget->moveOffset=1;
         pNewWidget->isAutoMove=false;
         pNewWidget->isWaitMove=false;
-        pNewWidget->dirtyRegionListItem.ptNext=NULL;
-        pNewWidget->dirtyRegionListItem.tRegion = ldBaseGetGlobalRegion((ldCommon_t *)pNewWidget,&((arm_2d_tile_t*)&pNewWidget->resource)->tRegion);
-        pNewWidget->dirtyRegionListItem.bIgnore = false;
-        pNewWidget->dirtyRegionListItem.bUpdated = true;
-        pNewWidget->dirtyRegionState=waitChange;
-        pNewWidget->dirtyRegionTemp=tResTile->tRegion;
-        pNewWidget->isDirtyRegionAutoIgnore=true;
         pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
+        pNewWidget->isWaitInit=true;
+
+        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotScrollSelecterScroll);
@@ -268,14 +263,10 @@ ldScrollSelecter_t *ldScrollSelecterInit(uint16_t nameId, uint16_t parentNameId,
 
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget)
 {
-    if(pWidget->dirtyRegionState==waitChange)
-    {
-        pWidget->dirtyRegionTemp=((arm_2d_tile_t*)&(pWidget->resource))->tRegion;
-    }
-    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
-void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
 {
     arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
@@ -301,11 +292,11 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
     {
         int16_t targetOffset=-(pWidget->itemSelect*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight);
 
+        pWidget->dirtyRegionState=waitChange;
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=waitChange;
-            pWidget->isDirtyRegionAutoIgnore=true;
+            pWidget->dirtyRegionState=none;
         }
         else
         {
@@ -332,6 +323,15 @@ void ldScrollSelecterLoop(ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pPare
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate(&tTarget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            if(pWidget->isWaitInit)
+            {
+                pWidget->isWaitInit=false;
+                pWidget->dirtyRegionState=none;
+            }
+        }
+
         if(!pWidget->isTransparent)
         {
             if(pResTile->pchBuffer==(uint8_t*)LD_ADDR_NONE)

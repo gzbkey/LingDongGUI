@@ -55,7 +55,7 @@ extern "C" {
 
 // <q>External NOR support
 // <i> Read external nor, please enable this option
-#define USE_VIRTUAL_RESOURCE                      (1)
+#define USE_VIRTUAL_RESOURCE                      (0)
 
 // widget config
 
@@ -90,7 +90,7 @@ extern "C" {
 // do not eidt below
 
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    (1)
-#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (0)
+#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH

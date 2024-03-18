@@ -261,7 +261,7 @@ typedef enum{
 }ldDirtyRegionStateType_t;
 
 typedef void (*ldDelFunc_t)(void *);
-typedef void (*ldLoopFunc_t)(void *,void *,bool);
+typedef void (*ldLoopFunc_t)(arm_2d_scene_t*,void *,void *,bool);
 typedef void (*ldUpdateFunc_t)(void *);
 
 typedef struct {
@@ -278,11 +278,9 @@ typedef struct {
                               xListNode *childList; \
                               uint16_t nameId; \
                               arm_2d_region_list_item_t dirtyRegionListItem; \
-                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
-                              ldDirtyRegionStateType_t dirtyRegionState:2; \
-                              bool isDirtyRegionAutoIgnore:1
+                              ldDirtyRegionStateType_t dirtyRegionState:2
 
 typedef struct{
     uint8_t utf8[4];
@@ -321,11 +319,9 @@ typedef struct{
                               xListNode *childList; \
                               uint16_t nameId; \
                               arm_2d_region_list_item_t dirtyRegionListItem; \
-                              arm_2d_region_t dirtyRegionTemp; \
                               bool isHidden:1; \
                               bool isParentHidden:1; \
-                              ldDirtyRegionStateType_t dirtyRegionState:2; \
-                              bool isDirtyRegionAutoIgnore:1
+                              ldDirtyRegionStateType_t dirtyRegionState:2
 
 typedef struct{
     uint8_t utf8[4];
@@ -428,13 +424,14 @@ arm_2d_region_t ldBaseLineText(arm_2d_tile_t *pTile,arm_2d_tile_t *pResTileTempl
 
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 
-void ldBaseAddDirtyRegion(arm_2d_region_list_item_t *pItemDirtyRegionList, arm_2d_region_list_item_t **ppRootDirtyRegionList);
 void ldBaseDirtyRegionAutoUpdate(ldCommon_t* pWidget,arm_2d_region_t newRegion,bool isAutoIgnore);
 
 void ldBaseBgMove(int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
 
 arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
 arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
+
+bool ldBaseDirtyRegionUpdate(arm_2d_tile_t* pTarget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw);
 
 #ifdef __cplusplus
 }

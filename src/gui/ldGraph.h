@@ -49,9 +49,9 @@ typedef struct {
 
 }ldGraph_t;
 
-ldGraph_t* ldGraphInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t seriesMax);
+ldGraph_t* ldGraphInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t seriesMax);
 void ldGraphFrameUpdate(ldGraph_t* pWidget);
-void ldGraphLoop(ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldGraphLoop(arm_2d_scene_t *pScene,ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldGraphDel(ldGraph_t *pWidget);
 
 void ldGraphSetAxis(ldGraph_t *pWidget, uint16_t xAxis, uint16_t yAxis, uint16_t xAxisOffset);

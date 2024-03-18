@@ -66,9 +66,9 @@ typedef struct {
     uint16_t kbNameId;
 }ldTable_t;
 
-ldTable_t *ldTableInit(uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t *pFontDict);
+ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t *pFontDict);
 void ldTableFrameUpdate(ldTable_t* pWidget);
-void ldTableLoop(ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
+void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldTableDel(ldTable_t *pWidget);
 void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
 void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
