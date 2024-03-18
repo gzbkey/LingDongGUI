@@ -268,11 +268,11 @@ void uiWatchInit(arm_2d_scene_t *pScene,uint8_t page)
         ldImageSetGrayscale(obj,8,LD_COLOR_LIGHT_PINK);
 
         obj=ldIconSliderInit(pScene,ID_ICON_SLIDER,ID_BG,(SCEEN_WIDTH*2)+20,50,200,180,72,10,2,3,1,ARIAL_REGULAR_12);
-        ldIconSliderAddIcon(obj,ICON_BMP,"app1");
-        ldIconSliderAddIcon(obj,ICON_BMP,"app2");
-        ldIconSliderAddIcon(obj,ICON_BMP,"app3");
-        ldIconSliderAddIcon(obj,ICON_BMP,"app4");
-        ldIconSliderAddIcon(obj,ICON_BMP,"app5");
+        ldIconSliderAddIcon(obj,ICON_BMP,true,"app1");
+        ldIconSliderAddIcon(obj,ICON_BMP,true,"app2");
+        ldIconSliderAddIcon(obj,ICON_BMP,true,"app3");
+        ldIconSliderAddIcon(obj,ICON_BMP,true,"app4");
+        ldIconSliderAddIcon(obj,ICON_BMP,true,"app5");
         ldIconSliderSetHorizontalScroll(obj,false);
 
 

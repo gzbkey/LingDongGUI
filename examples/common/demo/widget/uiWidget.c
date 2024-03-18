@@ -92,11 +92,11 @@ void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
      ldDateTimeSetBgColor(obj,LD_COLOR_LIGHT_CYAN);
 
      obj=ldIconSliderInit(pScene,ID_ICON_SLIDER,ID_WIN,150,50,150,50,48,2,5,1,1,SIMSUN_REGULAR_12);
-     ldIconSliderAddIcon(obj,NOTE_PNG,(uint8_t*)"111");
-     ldIconSliderAddIcon(obj,BOOK_PNG,(uint8_t*)"22");
-     ldIconSliderAddIcon(obj,WEATHER_PNG,(uint8_t*)"33");
-     ldIconSliderAddIcon(obj,CHART_PNG,(uint8_t*)"44");
-     ldIconSliderAddIcon(obj,NOTE_PNG,(uint8_t*)"55");
+     ldIconSliderAddIcon(obj,NOTE_PNG,true,(uint8_t*)"111");
+     ldIconSliderAddIcon(obj,BOOK_PNG,true,(uint8_t*)"22");
+     ldIconSliderAddIcon(obj,WEATHER_PNG,true,(uint8_t*)"33");
+     ldIconSliderAddIcon(obj,CHART_PNG,true,(uint8_t*)"44");
+     ldIconSliderAddIcon(obj,NOTE_PNG,true,(uint8_t*)"55");
 
      obj=ldGaugeInit(pScene,ID_GAUGE,ID_WIN,180,120,120,98,GAUGE_PNG,true);
      ldGaugeSetPointerImage(obj,POINTER_PNG,11,60,5,45);
@@ -121,18 +121,18 @@ void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
      ldTableSetItemText(obj,3,2,(uint8_t*)"image",SIMSUN_REGULAR_12);
      ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",SIMSUN_REGULAR_12);
 
-     obj=ldLabelInit(pScene,ID_LABLE,ID_WIN,320,165,100,30,SIMSUN_REGULAR_12);
+     obj=ldLabelInit(pScene,ID_LABLE,ID_WIN,320,100,100,30,SIMSUN_REGULAR_12);
      ldLabelSetText(obj,(uint8_t*)"lable demo");
 
-     obj=ldCheckBoxInit(pScene,ID_CHECK_BOX,ID_WIN,320,200,60,30);
+     obj=ldCheckBoxInit(pScene,ID_CHECK_BOX,ID_WIN,320,160,60,30);
      ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"123");
      ldCheckBoxSetCorner(obj,true);
 
-     obj=ldCheckBoxInit(pScene,ID_Radio1,ID_WIN,320,240,60,30);
+     obj=ldCheckBoxInit(pScene,ID_Radio1,ID_WIN,320,210,60,30);
      ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"abc");
      ldCheckBoxSetRadioButtonGroup(obj,0);
 
-     obj=ldCheckBoxInit(pScene,ID_Radio2,ID_WIN,380,240,60,30);
+     obj=ldCheckBoxInit(pScene,ID_Radio2,ID_WIN,380,210,60,30);
      ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"xyz");
      ldCheckBoxSetRadioButtonGroup(obj,0);
 
@@ -156,7 +156,7 @@ void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
      ldComboBoxAddItem(obj,(uint8_t*)"setting");
      ldComboBoxAddItem(obj,(uint8_t*)"about");
 
-     obj=ldScrollSelecterInit(pScene,ID_SCROLL_SELECTER,ID_WIN,320,125,40,40,SIMSUN_REGULAR_12,5);
+     obj=ldScrollSelecterInit(pScene,ID_SCROLL_SELECTER,ID_WIN,320,10,40,40,SIMSUN_REGULAR_12,5);
      ldScrollSelecterSetBgColor(obj,LD_COLOR_WHITE);
      ldScrollSelecterAddItem(obj,"1");
      ldScrollSelecterAddItem(obj,"2");

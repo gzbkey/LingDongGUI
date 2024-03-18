@@ -625,7 +625,7 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
 #if USE_VIRTUAL_RESOURCE == 1
                     tempRes.pTarget=pWidget->pIconInfoList[showCount].imgAddr;
 #endif
-                    ldBaseImage(&imgPosTile,(arm_2d_tile_t*)&tempRes,false,255);
+                    ldBaseImage(&imgPosTile,(arm_2d_tile_t*)&tempRes,pWidget->pIconInfoList[showCount].isWithMask,255);
                     arm_2d_op_wait_async(NULL);
 
                     if((pWidget->pFontDict!=NULL)&&(pWidget->pIconInfoList[showCount].pName!=NULL))
@@ -652,11 +652,12 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
  * 
  * @param   pWidget         目标控件指针
  * @param   imageAddr       图片地址
+ * @param   isWithMask      图片带mask
  * @param   pNameStr        图标名称字符串指针
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-12-21
  */
-void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,uint8_t* pNameStr)
+void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,bool isWithMask,uint8_t* pNameStr)
 {
     if(pWidget==NULL)
     {
@@ -666,6 +667,7 @@ void ldIconSliderAddIcon(ldIconSlider_t *pWidget,uintptr_t imageAddr,uint8_t* pN
     if(pWidget->iconCount<pWidget->iconMax)
     {
         pWidget->pIconInfoList[pWidget->iconCount].imgAddr=imageAddr;
+        pWidget->pIconInfoList[pWidget->iconCount].isWithMask=isWithMask;
 
         if((pWidget->pFontDict!=NULL)&&(pNameStr!=NULL))
         {
