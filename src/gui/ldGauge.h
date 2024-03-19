@@ -26,7 +26,7 @@ extern "C" {
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isWithBgMask:1;
-    uint8_t pointerImgType:2;
+    ldImageType_t pointerImgType:2;
     uintptr_t bgImgAddr;
     uintptr_t pointerImgAddr;
     int16_t pointerWidth;
@@ -43,13 +43,6 @@ typedef struct {
 //    arm_2d_helper_transform_t helper;
 }ldGauge_t;
 
-typedef enum{
-    nomal,
-    withMask,
-    onlyMask,
-    keying
-} gaugePointerType_t;
-
 ldGauge_t* ldGaugeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uintptr_t bgImgAddr, bool isBgMask);
 void ldGaugeFrameUpdate(ldGauge_t* pWidget);
 void ldGaugeLoop(arm_2d_scene_t *pScene,ldGauge_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
@@ -57,7 +50,7 @@ void ldGaugeDel(ldGauge_t *pWidget);
 void ldGaugeSetPointerImage(ldGauge_t *pWidget,uintptr_t pointerImgAddr,int16_t pointerWidth,int16_t pointerHeight,int16_t pointerOriginOffsetX,int16_t pointerOriginOffsetY);
 void ldGaugeSetCenterOffset(ldGauge_t *pWidget, int16_t centreOffsetX, int16_t centreOffsetY);
 void ldGaugeSetAngle(ldGauge_t *pWidget, float angle);
-void ldGaugeSetPointerImageType(ldGauge_t *pWidget,gaugePointerType_t pointerImgType,ldColor keyingOrMaskColor);
+void ldGaugeSetPointerImageType(ldGauge_t *pWidget,ldImageType_t pointerImgType,ldColor keyingOrMaskColor);
 
 #define ldGaugeSetHidden          ldBaseSetHidden
 #define ldGaugeMove               ldBaseMove

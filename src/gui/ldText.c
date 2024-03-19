@@ -94,6 +94,7 @@ void ldTextDel(ldText_t *pWidget)
 /**
  * @brief   文本控件初始化函数
  * 
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -155,7 +156,7 @@ ldText_t *ldTextInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentName
         pNewWidget->pFunc=&ldTextCommonFunc;
         pNewWidget->isWaitInit=true;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[text] init,id:%d\n",nameId);
     }
@@ -171,7 +172,7 @@ ldText_t *ldTextInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentName
 
 void ldTextFrameUpdate(ldText_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)

@@ -192,6 +192,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
 /**
  * @brief   旋转菜单初始化
  *
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -265,7 +266,7 @@ ldRadialMenu_t *ldRadialMenuInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
 
          for(uint8_t i=0;i<itemMax;i++)
         {
-            arm_2d_user_dynamic_dirty_region_init(&pNewWidget->pItemList[i].dirtyRegionListItem,pScene);
+            arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->pItemList[i].dirtyRegionListItem,pScene);
         }
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotMenuSelect);
@@ -348,7 +349,7 @@ void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget)
 {
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
-        arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->pItemList[i].dirtyRegionListItem,waitChange);
+        arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->pItemList[i].dirtyRegionListItem,waitChange);
     }
 }
 

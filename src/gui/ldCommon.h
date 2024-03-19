@@ -379,6 +379,15 @@ typedef struct{
     LD_COMMON_KB_ATTRIBUTES;
 }ldCommonKB_t;
 
+typedef enum{
+    noMask = 0,
+    withMask = 1,
+    onlyMask,
+    keying
+}ldImageType_t;
+
+
+
 extern xListNode ldWidgetLink;
 
 extern void *ldCalloc(uint32_t size);

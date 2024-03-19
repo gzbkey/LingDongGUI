@@ -55,6 +55,14 @@ extern const uint8_t wallpaper_jpg[];
 #define WALLPAPER_JPG 20268
 #endif
 
+//wifi_icon.png w:48 h:48 < A8 >
+#if USE_VIRTUAL_RESOURCE == 0
+extern const uint8_t wifi_icon_png[];
+#define WIFI_ICON_PNG (uint32_t)&wifi_icon_png[0]
+#else
+#define WIFI_ICON_PNG 135468
+#endif
+
 #define ARIAL_REGULAR_28 (&dict_Arial_Regular_28)
 extern ldFontDict_t dict_Arial_Regular_28;
 

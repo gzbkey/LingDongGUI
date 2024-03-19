@@ -55,7 +55,7 @@ git clone --recursive https://github.com/gzbkey/LingDongGUI.git
 
 4. 打开uiDemo.h文件，修改宏定义TARGET_DEMO为对应demo名称
 
-5. 直接点击左下角三角形，进行编译、运行。
+5. 直接点击左下角三角形，或CTRL+R，进行编译、运行。
 
 # VSCode SDL Demo
 
@@ -152,7 +152,7 @@ D:\mingw64
 
 1. 打开uiDemo.h文件，修改宏定义TARGET_DEMO为对应demo名称
 
-2. 点击左侧按键"运行和调试"，选择对应版本编译即可
+2. 点击左侧按键"运行和调试"，选择对应编译器版本，按F5编译即可
 
 3. 项目编译前，会自动复制SDL2的dll文件到对应的文件内，无需手动操作。
 
