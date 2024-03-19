@@ -34,7 +34,7 @@
   </conditions>
 
   <components>
-    <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cversion="0.6.2" condition="Arm-2D">
+    <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cversion="0.7.0" condition="Arm-2D">
       <description>ldgui core files</description>
       <files>
         <file category="include" name="src/gui/" />
@@ -74,6 +74,30 @@
         <file category="sourceC" name="src/template/ldConfig.c" attr="config" version="1.0.1" />
         <file category="header"  name="src/template/ldConfig.h" attr="config" version="1.1.0" />
         <file category="sourceC" name="src/template/Retarget.c" attr="config" version="1.0.1" />
+      </files>
+    </component>
+    <component Cclass="LingDongGui" Cgroup="examples" Csub="watch" Cversion="1.0.0" condition="Arm-2D">
+      <description>ldgui watch example</description>
+      <files>
+        <file category="include" name="examples/common/demo/" />
+        <file category="include" name="examples/common/demo/watch/" />
+        <file category="sourceC" name="examples/common/demo/watch/srcWatch.c" attr="config" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/watch/uiWatch.c" attr="config" version="1.0.0" />
+        <file category="header"  name="examples/common/demo/watch/srcWatch.h" attr="config" version="1.0.0" />
+        <file category="header"  name="examples/common/demo/watch/uiWatch.h" attr="config" version="1.0.0" />
+        <file category="header"  name="examples/common/demo/uiDemo.h" attr="config" version="1.0.0" />
+      </files>
+    </component>
+    <component Cclass="LingDongGui" Cgroup="examples" Csub="widget" Cversion="1.0.0" condition="Arm-2D">
+      <description>ldgui widget example</description>
+      <files>
+        <file category="include" name="examples/common/demo/" />
+        <file category="include" name="examples/common/demo/widget/" />
+        <file category="sourceC" name="examples/common/demo/widget/srcWidget.c" attr="config" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/widget/uiWidget.c" attr="config" version="1.0.0" />
+        <file category="header"  name="examples/common/demo/widget/srcWidget.h" attr="config" version="1.0.0" />
+        <file category="header"  name="examples/common/demo/widget/uiWidget.h" attr="config" version="1.0.0" />
+        <file category="header"  name="examples/common/demo/uiDemo.h" attr="config" version="1.0.0" />
       </files>
     </component>
   </components>

@@ -37,13 +37,15 @@
 |:----|
 |推荐使用Watt Toolkit加速|
 
-### 先让arm-2d跑起来
+### 配置keil pack
 
 1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS，keil中选择Project -> Manage -> Run-Time Environment
+    
+    Acceleration - Arm-2D Helper中，**Scene设置为0**
 
     ![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
 
-2. 在lcd_project中加入ldgui，keil中选择Project -> Manage -> Run-Time Environment，此步骤必须操作，自动加入retarget文件
+2. 在lcd_project中加入ldgui，keil中选择Project -> Manage -> Run-Time Environment
 
     ![](./images/03/ldgui%20Manage%20Run-Time%20Environment.png)
 
@@ -59,24 +61,31 @@
 
     ![cmsisVersion](./images/03/cmsis%20version.png)
 
-6. 树目录中的Acceleration，找到arm_2d_disp_adapter_0.h。
-编辑器的左下角选择 Configuration Wizard，进入图形配置界面，根据实际情况配置
-
-    颜色位数（Screen Colour Depth）
-
-    横向分辨率（Width of the screen）
-
-    纵向分辨率（Height of the Screen）
-
-    部分刷新缓冲块的宽度（Width of the PFB Block），配置为width/2
-
-    部分刷新缓冲块的高度（Height of the PFB Block），配置为8
-
-7. 树目录中的Acceleration，找到arm_2d_cfg.h。
+6. 树目录中的Acceleration，找到arm_2d_cfg.h
     
-    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth
+    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth(默认为16位色，一般无需修改)
 
-9. main文件加入如下代码
+7. arm_2d_disp_adapter_0.h修改
+    * 添加ldgui配置头文件
+        ```c
+        #include "ldConfig.h" 
+        ```
+
+8. ldConfig配置 (**重要**)
+    * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
+    * ldConfig.h可以使用keil的图形界面方式进行配置
+    * 如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
+
+        ![configGui](./images/03/config%20gui.png)
+
+    * 补全ldConfig.c中的函数Disp0_DrawBitmap
+
+9. 测试arm-2d的demo
+
+    将ldConfig.h中的__DISP0_CFG_DISABLE_DEFAULT_SCENE__设置为0
+
+10. main.c中加入代码
+
     ```c 
     #include "arm_2d.h"
     #include "arm_2d_disp_adapters.h"
@@ -85,17 +94,6 @@
     __attribute__((used))
     void SysTick_Handler(void)
     {
-    }
-
-    void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap) 
-    {
-        //对接屏幕驱动的彩色填充函数
-        //参考1
-        //函数原型 void lcd_colorFill(uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1,uint16_t *color)
-        //填写 lcd_colorFill(x,y,x+width-1,y+height-1,(uint16_t *)bitmap);
-        //参考2
-        //函数原型 void lcd_colorFill(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint16_t *color)
-        //填写 lcd_colorFill(x,y,width,height,(uint16_t *)bitmap);
     }
 
     int main(void) 
@@ -117,7 +115,7 @@
     }
     ```
 
-10. 运行效果
+11. 运行效果
 
     ![arm2d-demo](./images/03/arm2d%20demo.gif)
 
@@ -125,33 +123,13 @@
 |:----|
 |如果硬要勾选microLib，编译后，提示找不到__aeabi_h2f 、__aeabi_f2h，请升级编译器(安装新版本keil)|
 
-
-### 加入ldgui
-
-1. keil中选择Project -> Manage -> Run-Time Environment，Acceleration - Arm-2D Helper中，Scene设置为0
-
-2. arm_2d_disp_adapter_0.h修改
-    * 添加ldgui配置头文件
-        ```c
-        #include "ldConfig.h" 
-        ```
-
-3. ldConfig配置
-    * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
-    * ldConfig.h可以使用keil的图形界面方式进行配置
-    * 如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
-
-        ![configGui](./images/03/config%20gui.png)
-
-    * 补全ldConfig.c中的函数Disp0_DrawBitmap
-
-4. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
+12. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
 
     pack文件也带该脚本，在keil安装目录下，参考路径：Keil_v5\Packs\gzbkey\LingDongGUI\版本号\tools
 
-5. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
-6. 将文件导入项目中，main.c中添加页面文件的头文件
-7. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
+13. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
+14. 将文件导入项目中，main.c中添加页面文件的头文件
+15. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
     ~~~c
     #include "uiHome.h"
     #include "uiZigbee.h"
