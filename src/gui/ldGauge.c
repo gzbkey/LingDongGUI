@@ -92,6 +92,7 @@ void ldGaugeDel(ldGauge_t *pWidget)
 /**
  * @brief   gauge初始化函数
  *
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -153,7 +154,7 @@ ldGauge_t *ldGaugeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         pNewWidget->targetDirtyRegion=tResTile->tRegion;
         pNewWidget->pFunc=&ldGaugeCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[gauge] init,id:%d\n",nameId);
     }
@@ -176,7 +177,7 @@ void ldGaugeFrameUpdate(ldGauge_t* pWidget)
         pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
     }
 
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 
 }
 
@@ -416,7 +417,7 @@ void ldGaugeSetAngle(ldGauge_t *pWidget, float angle)
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-13
  */
-void ldGaugeSetPointerImageType(ldGauge_t *pWidget,gaugePointerType_t pointerImgType,ldColor keyingOrMaskColor)
+void ldGaugeSetPointerImageType(ldGauge_t *pWidget,ldImageType_t pointerImgType,ldColor keyingOrMaskColor)
 {
     if (pWidget == NULL)
     {

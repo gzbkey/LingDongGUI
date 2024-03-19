@@ -14,6 +14,7 @@ static bool isWaitNorInit = true;
 #define ID_TABLE        6
 #define ID_ICON_SLIDER   7
 #define ID_WIN_TOP       8
+#define ID_BTN_WIFI   9
 
 #define SCEEN_WIDTH          240
 #define SCEEN_HEIGHT         240
@@ -29,7 +30,7 @@ static bool slotBgReset(xConnectInfo_t info)
 
 
 
-    if(moveDir=='-')
+    if((moveDir=='-')&&(!isWinTopFullShow))
     {
     x=(int16_t)GET_SIGNAL_SPEED_X(info.value);
     y=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
@@ -118,7 +119,7 @@ static bool slotBgMove(xConnectInfo_t info)
     }
     case '-':
     {
-        if((abs(offsetX)>10)&&(abs(offsetX)>abs(offsetY)))
+        if((abs(offsetX)>10)&&(abs(offsetX)>abs(offsetY))&&(!isWinTopFullShow))
         {
             switch (gPage)
             {
@@ -177,12 +178,6 @@ static bool slotBgMove(xConnectInfo_t info)
     default:
         break;
     }
-
-
-
-
-
-
     return true;
 }
 
@@ -258,10 +253,15 @@ void uiWatchInit(arm_2d_scene_t *pScene,uint8_t page)
         xConnect(ID_DATE_TIME,SIGNAL_RELEASE,ID_BG,slotBgReset);
 
         obj=ldWindowInit(pScene,ID_WIN_TOP,ID_BG,SCEEN_WIDTH,-SCEEN_HEIGHT,SCEEN_WIDTH,SCEEN_HEIGHT);
-        ldWindowSetBgColor(obj,LD_COLOR_GRAY);
+        ldWindowSetBgColor(obj,LD_COLOR_IVORY);
 
         xConnect(ID_WIN_TOP,SIGNAL_HOLD_DOWN,ID_BG,slotBgMove);
         xConnect(ID_WIN_TOP,SIGNAL_RELEASE,ID_BG,slotBgReset);
+
+        obj=ldButtonInit(pScene,ID_BTN_WIFI,ID_WIN_TOP,20,10,48,48);
+        ldButtonSetColor(obj,LD_COLOR_LIGHT_GREY,LD_COLOR_BLUE);
+        ldButtonSetImage(obj,WIFI_ICON_PNG,onlyMask,WIFI_ICON_PNG,onlyMask);
+        ldButtonSetCheckable(obj,true);
 
         // app page
         obj=ldImageInit(pScene,ID_IMAGE_POS2,ID_BG,(SCEEN_WIDTH*2)+70,10,100,30,POS3_PNG,true);

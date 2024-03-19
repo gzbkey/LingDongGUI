@@ -171,6 +171,7 @@ static bool slotComboBoxProcess(xConnectInfo_t info)
 /**
  * @brief   下拉框控件初始化
  * 
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -242,7 +243,7 @@ ldComboBox_t *ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
         }
         pNewWidget->pFunc=&ldComboBoxCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
@@ -263,7 +264,7 @@ ldComboBox_t *ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
 void ldComboBoxFrameUpdate(ldComboBox_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 
     if(pWidget->dirtyRegionState==waitChange)
     {

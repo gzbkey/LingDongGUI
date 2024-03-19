@@ -89,6 +89,7 @@ void ldQRCodeDel(ldQRCode_t *pWidget)
 /**
  * @brief   二维码初始化函数
  *
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -159,7 +160,7 @@ ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
         pNewWidget->bgColor=bgColor;
         pNewWidget->pFunc=&ldQRCodeCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[qRCode] init,id:%d\n",nameId);
     }
@@ -176,7 +177,7 @@ ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
 
 void ldQRCodeFrameUpdate(ldQRCode_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldQRCodeLoop(arm_2d_scene_t *pScene,ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)

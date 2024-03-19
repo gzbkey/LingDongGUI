@@ -487,6 +487,7 @@ static bool slotEditEnd(xConnectInfo_t info)
 /**
  * @brief   表格初始化
  * 
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -590,7 +591,7 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
@@ -615,7 +616,7 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
 void ldTableFrameUpdate(ldTable_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -1046,6 +1047,8 @@ void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
     }
     pWidget->dirtyRegionState=waitChange;
 
+    ldTableSetEditable(pWidget,0,0,false);
+
     ldTableSetBgColor(pWidget,__RGB(219,219,219));
     strBuf[0]='1';
     for(i=0;i<pWidget->rowCount;i++)
@@ -1060,6 +1063,7 @@ void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
             if(pFontDict!=NULL)
             {
                 ldTableSetItemText(pWidget,i,0,strBuf,pFontDict);
+                ldTableSetEditable(pWidget,i,0,false);
                 strBuf[0]++;
             }
         }
@@ -1078,6 +1082,7 @@ void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
             if(pFontDict!=NULL)
             {
                 ldTableSetItemText(pWidget,0,i,strBuf,pFontDict);
+                ldTableSetEditable(pWidget,0,i,false);
                 strBuf[0]++;
             }
         }
@@ -1100,6 +1105,25 @@ void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId)
         return;
     }
     pWidget->kbNameId=kbNameId;
+}
+
+/**
+ * @brief   关联键盘
+ *
+ * @param   pWidget         目标控件指针
+ * @param   row             行
+ * @param   column          列
+ * @param   isEditable      true=可编辑 false=不可编辑
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2024-03-19
+ */
+void ldTableSetEditable(ldTable_t* pWidget,uint8_t row,uint8_t column,bool isEditable)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->pItemInfo[row*pWidget->columnCount+column].isEditable=isEditable;
 }
 
 #if defined(__clang__)

@@ -1406,7 +1406,7 @@ arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t 
 // return true -> update finish
 bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw)
 {
-    switch (arm_2d_user_dynamic_dirty_region_wait_next(pDirtyRegionItem))
+    switch (arm_2d_dynamic_dirty_region_wait_next(pDirtyRegionItem))
     {
     case waitChange:
     {
@@ -1415,7 +1415,7 @@ bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_
             ldPoint_t pos=ldBaseGetGlobalPos(pWidget);
             newRegion->tLocation.iX+=pos.x;
             newRegion->tLocation.iY+=pos.y;
-            arm_2d_user_dynamic_dirty_region_update(
+            arm_2d_dynamic_dirty_region_update(
                         pDirtyRegionItem,                     /* the dirty region */
                         NULL,                           /* the target tile */
                         newRegion,                         /* the redraw region */
@@ -1425,7 +1425,7 @@ bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_
         else
         {
             /* nothing to redraw, update state to DONE */
-            arm_2d_user_dynamic_dirty_region_change_user_region_index_only(
+            arm_2d_dynamic_dirty_region_change_user_region_index_only(
                         pDirtyRegionItem,
                         none);
         }

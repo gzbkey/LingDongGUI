@@ -93,6 +93,7 @@ void ldImageDel(ldImage_t *pWidget)
 /**
  * @brief   图片初始化
  * 
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -168,7 +169,7 @@ ldImage_t *ldImageInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         pNewWidget->dirtyRegionState=none;
         pNewWidget->pFunc=&ldImageCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[image] init,id:%d\n",nameId);
     }
@@ -204,7 +205,7 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
 
 void ldImageFrameUpdate(ldImage_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldImageLoop(arm_2d_scene_t *pScene,ldImage_t *pWidget, const arm_2d_tile_t *pParentTile, bool bIsNewFrame)

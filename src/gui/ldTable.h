@@ -88,6 +88,7 @@ ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
 ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
 void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict);
 void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId);
+void ldTableSetEditable(ldTable_t* pWidget,uint8_t row,uint8_t column,bool isEditable);
 
 #define ldTableSetHidden          ldBaseSetHidden
 #define ldTableMove               ldBaseMove

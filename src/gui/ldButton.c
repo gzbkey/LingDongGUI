@@ -98,13 +98,23 @@ static bool slotButtonToggle(xConnectInfo_t info)
     {
     case SIGNAL_PRESS:
     {
-        pWidget->isPressed=true;
+        if(pWidget->isCheckable)
+        {
+            pWidget->isPressed=!pWidget->isPressed;
+        }
+        else
+        {
+            pWidget->isPressed=true;
+        }
         pWidget->dirtyRegionState=waitChange;
         break;
     }
     case SIGNAL_RELEASE:
     {
-        pWidget->isPressed=false;
+        if(!pWidget->isCheckable)
+        {
+            pWidget->isPressed=false;
+        }
         pWidget->dirtyRegionState=waitChange;
         break;
     }
@@ -118,6 +128,7 @@ static bool slotButtonToggle(xConnectInfo_t info)
 /**
  * @brief   button初始化函数
  * 
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -187,7 +198,7 @@ ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
         pNewWidget->dirtyRegionState=none;
         pNewWidget->pFunc=&ldButtonCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
@@ -205,7 +216,7 @@ ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
 
 void ldButtonFrameUpdate(ldButton_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -270,7 +281,15 @@ void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,&tempRes,pWidget->isWithPressMask,255);
+                        if(pWidget->isPressMaskOnly)
+                        {
+                            ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                            ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->pressColor,255);
+                        }
+                        else
+                        {
+                            ldBaseImage(&tTarget,&tempRes,pWidget->isWithPressMask,255);
+                        }
                     }
                 }
                 else
@@ -281,7 +300,15 @@ void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t
 #endif
                     if(!pWidget->isCorner)
                     {
-                        ldBaseImage(&tTarget,&tempRes,pWidget->isWithReleaseMask,255);
+                        if(pWidget->isReleaseMaskOnly)
+                        {
+                            ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
+                            ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->releaseColor,255);
+                        }
+                        else
+                        {
+                            ldBaseImage(&tTarget,&tempRes,pWidget->isWithReleaseMask,255);
+                        }
                     }
                 }
                 if(pWidget->isCorner)
@@ -375,8 +402,6 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
     pWidget->dirtyRegionState=waitChange;
     pWidget->releaseColor=releaseColor;
     pWidget->pressColor=pressColor;
-    pWidget->releaseImgAddr=LD_ADDR_NONE;
-    pWidget->pressImgAddr=LD_ADDR_NONE;
 }
 
 /**
@@ -384,13 +409,13 @@ void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColo
  * 
  * @param   pWidget         目标控件指针
  * @param   releaseImgAddr  松开显示的图片
- * @param   isReleaseMask   松开显示的图片是否带透明度(蒙版)
+ * @param   releaseMaskType 松开显示的图片蒙版类型
  * @param   pressImgAddr    按下显示的图片
- * @param   isPressMask     按下显示的图片是否带透明度(蒙版)
+ * @param   pressMaskType   按下显示的图片蒙版类型
  * @author  Ou Jianbo(59935554@qq.com)
  * @date    2023-11-09
  */
-void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,bool isReleaseMask,uintptr_t pressImgAddr,bool isPressMask)
+void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,ldImageType_t releaseMaskType,uintptr_t pressImgAddr,ldImageType_t pressMaskType)
 {
     if(pWidget==NULL)
     {
@@ -399,8 +424,40 @@ void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,bool isReleas
     pWidget->dirtyRegionState=waitChange;
     pWidget->releaseImgAddr=releaseImgAddr;
     pWidget->pressImgAddr=pressImgAddr;
-    pWidget->isWithReleaseMask=isReleaseMask;
-    pWidget->isWithPressMask=isPressMask;
+
+    switch (releaseMaskType)
+    {
+    case noMask:
+    case withMask:
+    {
+        pWidget->isWithReleaseMask=releaseMaskType;
+        break;
+    }
+    case onlyMask:
+    {
+        pWidget->isReleaseMaskOnly=true;
+        break;
+    }
+    default:
+        break;
+    }
+
+    switch (pressMaskType)
+    {
+    case noMask:
+    case withMask:
+    {
+        pWidget->isWithPressMask=releaseMaskType;
+        break;
+    }
+    case onlyMask:
+    {
+        pWidget->isPressMaskOnly=true;
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 /**
@@ -535,6 +592,23 @@ void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
     }
     pWidget->dirtyRegionState=waitChange;
     pWidget->pFontDict=pFontDict;
+}
+
+/**
+ * @brief   实现自锁按键效果
+ *
+ * @param   pWidget         目标控件指针
+ * @param   isCheckable     true=自锁按键 false=普通按键
+ * @author  Ou Jianbo(59935554@qq.com)
+ * @date    2024-03-19
+ */
+void ldButtonSetCheckable(ldButton_t *pWidget,bool isCheckable)
+{
+    if(pWidget==NULL)
+    {
+        return;
+    }
+    pWidget->isCheckable=isCheckable;
 }
 
 #if defined(__clang__)

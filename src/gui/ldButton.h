@@ -18,6 +18,8 @@ typedef struct {
     bool isSelected:1;
     bool isWithReleaseMask:1;
     bool isWithPressMask:1;
+    bool isReleaseMaskOnly:1;
+    bool isPressMaskOnly:1;
     bool isCorner:1;
     uintptr_t releaseImgAddr;
     uintptr_t pressImgAddr;
@@ -38,7 +40,7 @@ void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t
 void ldButtonDel(ldButton_t *pWidget);
 
 void ldButtonSetColor(ldButton_t* pWidget, ldColor releaseColor, ldColor pressColor);
-void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,bool isReleaseMask,uintptr_t pressImgAddr,bool isPressMask);
+void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,ldImageType_t releaseMaskType,uintptr_t pressImgAddr,ldImageType_t pressMaskType);
 void ldButtonSetSelectImage(ldButton_t* pWidget,uintptr_t selectMaskAddr,ldColor selectColor);
 
 void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent);
@@ -49,6 +51,8 @@ void ldButtonSetFont(ldButton_t *pWidget, ldFontDict_t *pFontDict);
 void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr);
 void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor);
 void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align);
+
+void ldButtonSetCheckable(ldButton_t *pWidget,bool isCheckable);
 
 #define ldButtonSetHidden          ldBaseSetHidden
 #define ldButtonMove               ldBaseMove

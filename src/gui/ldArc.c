@@ -91,7 +91,7 @@ void ldArcDel(ldArc_t *pWidget)
 
 void ldArcFrameUpdate(ldArc_t* pWidget)
 {
-    arm_2d_user_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
 /**
@@ -99,6 +99,7 @@ void ldArcFrameUpdate(ldArc_t* pWidget)
  *          圆环素材尺寸建议为单数的像素点，
  *          例如101x101的圆环，裁剪51x51的左上角图片作为素材
  *
+ * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
  * @param   x               相对坐标x轴
@@ -163,7 +164,7 @@ ldArc_t *ldArcInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId
         pNewWidget->rotationAngle_x10=0;
         pNewWidget->pFunc=&ldArcCommonFunc;
 
-        arm_2d_user_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
         LOG_INFO("[arc] init,id:%d\n",nameId);
     }

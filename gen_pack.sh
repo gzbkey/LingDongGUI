@@ -30,6 +30,7 @@ DEFAULT_ARGS=(-c "v")
 #
  PACK_DIRS="
    src
+   examples/common/demo
  "
 
 # Specify file names to be added to pack base directory
