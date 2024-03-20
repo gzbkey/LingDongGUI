@@ -8,9 +8,9 @@ extern "C" {
 #include "ldGui.h"
 #include "image.h"
 
-void uiDemoInit(uint8_t page);
-void uiDemoLoop(uint8_t page);
-void uiDemoQuit(uint8_t page);
+void uiDemoInit(arm_2d_scene_t *pScene,uint8_t page);
+void uiDemoLoop(arm_2d_scene_t *pScene,uint8_t page);
+void uiDemoQuit(arm_2d_scene_t *pScene,uint8_t page);
 
 #ifdef __cplusplus
 }

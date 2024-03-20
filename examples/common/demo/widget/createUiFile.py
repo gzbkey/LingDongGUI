@@ -2,13 +2,13 @@ import os
 import sys
 
 pageCFileStr='#include "uiUser.h"\n\n\
-void uiUserInit(uint8_t page)\n\
+void uiUserInit(arm_2d_scene_t *pScene,uint8_t page)\n\
 {\n\
 }\n\n\
-void uiUserLoop(uint8_t page)\n\
+void uiUserLoop(arm_2d_scene_t *pScene,uint8_t page)\n\
 {\n\
 }\n\n\
-void uiUserQuit(uint8_t page)\n\
+void uiUserQuit(arm_2d_scene_t *pScene,uint8_t page)\n\
 {\n\
 }'
 
@@ -19,9 +19,9 @@ extern "C" {\n\
 #endif\n\n\
 #include "ldGui.h"\n\
 #include "srcUser.h"\n\n\
-void uiUserInit(uint8_t page);\n\
-void uiUserLoop(uint8_t page);\n\
-void uiUserQuit(uint8_t page);\n\n\
+void uiUserInit(arm_2d_scene_t *pScene,uint8_t page);\n\
+void uiUserLoop(arm_2d_scene_t *pScene,uint8_t page);\n\
+void uiUserQuit(arm_2d_scene_t *pScene,uint8_t page);\n\n\
 #ifdef __cplusplus\n\
 }\n\
 #endif\n\n\

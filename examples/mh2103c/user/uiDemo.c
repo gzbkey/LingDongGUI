@@ -66,7 +66,7 @@ bool slotChangeItem(xConnectInfo_t info)
     return false;
 }
 
-void uiDemoInit(uint8_t page)
+void uiDemoInit(arm_2d_scene_t *pScene,uint8_t page)
 {
     void* obj;
 
@@ -77,82 +77,82 @@ void uiDemoInit(uint8_t page)
     {
     case 0:
     {
-        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
 
-        obj=ldLabelInit(ID_LABEL,ID_BG,0,0,LD_CFG_SCEEN_WIDTH,30,SIMSUN_REGULAR_12);
+        obj=ldLabelInit(pScene,ID_LABEL,ID_BG,0,0,LD_CFG_SCEEN_WIDTH,30,SIMSUN_REGULAR_12);
         ldLabelSetText(obj,(uint8_t*)"ldgui demo");
         ldLabelSetBgColor(obj,LD_COLOR_BEIGE);
 
-        obj=ldTextInit(ID_TEXT,ID_BG,30,70,150,90,SIMSUN_REGULAR_12);
+        obj=ldTextInit(pScene,ID_TEXT,ID_BG,30,70,150,90,SIMSUN_REGULAR_12);
         ldTextSetAlign(obj,LD_ALIGN_LEFT|LD_ALIGN_TOP);
         ldTextSetScroll(obj,true);
         ldTextSetText(obj,(uint8_t*)"LDGUI is developed based on ARM-2D,greatly reducing the difficulty of using ARM-2D.\nSlide or click on the icon below.");
 
-        obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,0,40,LD_CFG_SCEEN_WIDTH,20,SIMSUN_REGULAR_12);
+        obj=ldDateTimeInit(pScene,ID_DATE_TIME,ID_BG,0,40,LD_CFG_SCEEN_WIDTH,20,SIMSUN_REGULAR_12);
         ldDateTimeSetDate(obj,2024,1,15);
         ldDateTimeSetTextColor(obj,LD_COLOR_DARK_BLUE);
 
-        ldQRCodeInit(ID_QR_CODE,ID_BG,205,70,100,100,(uint8_t*)"https://gitee.com/gzbkey/LingDongGUI",LD_COLOR_LIGHT_BLUE,LD_COLOR_DARK_MAGENTA,eccLow,7,2);
+        ldQRCodeInit(pScene,ID_QR_CODE,ID_BG,205,70,100,100,(uint8_t*)"https://gitee.com/gzbkey/LingDongGUI",LD_COLOR_LIGHT_BLUE,LD_COLOR_DARK_MAGENTA,eccLow,7,2);
 
 
-        obj=ldLabelInit(ID_LABEL_INFO,ID_BG,200,160,100,20,SIMSUN_REGULAR_12);
+        obj=ldLabelInit(pScene,ID_LABEL_INFO,ID_BG,200,160,100,20,SIMSUN_REGULAR_12);
         ldLabelSetAlign(obj,LD_ALIGN_LEFT);
         ldLabelSetText(obj,(uint8_t*)"Get more information");
 
-        obj=ldIconSliderInit(ID_ICON_SLIDER,ID_BG,0,(LD_CFG_SCEEN_HEIGHT-60),LD_CFG_SCEEN_WIDTH,60,48,25,4,1,2,SIMSUN_REGULAR_12);
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 1");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 2");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 3");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 4");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 5");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 6");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 7");
-        ldIconSliderAddIcon(obj,BBG_BMP,(uint8_t*)"icon 8");
+        obj=ldIconSliderInit(pScene,ID_ICON_SLIDER,ID_BG,0,(LD_CFG_SCEEN_HEIGHT-60),LD_CFG_SCEEN_WIDTH,60,48,25,4,1,2,SIMSUN_REGULAR_12);
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 1");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 2");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 3");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 4");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 5");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 6");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 7");
+        ldIconSliderAddIcon(obj,BBG_BMP,false,(uint8_t*)"icon 8");
 
         xConnect(ID_ICON_SLIDER,SIGNAL_CLICKED_ITEM,ID_BG,slotJumpProess);
         break;
     }
     case 1:
     {
-        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
 
-        obj=ldButtonInit(ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
+        obj=ldButtonInit(pScene,ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
         ldButtonSetRoundCorner(obj,true);
         ldButtonSetFont(obj,SIMSUN_REGULAR_12);
         ldButtonSetText(obj,(uint8_t*)"return");
         xConnect(ID_BUTTON,SIGNAL_RELEASE,ID_BG,slotJumpPage0);
 
-        obj=ldCheckBoxInit(ID_CHECK_BOX,ID_BG,10,50,80,20);
+        obj=ldCheckBoxInit(pScene,ID_CHECK_BOX,ID_BG,10,50,80,20);
         ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"check1");
 
-        obj=ldCheckBoxInit(ID_CHECK_BOX_2,ID_BG,10,80,80,20);
+        obj=ldCheckBoxInit(pScene,ID_CHECK_BOX_2,ID_BG,10,80,80,20);
         ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"check2");
 
-        obj=ldCheckBoxInit(ID_CHECK_BOX_3,ID_BG,10,110,80,20);
+        obj=ldCheckBoxInit(pScene,ID_CHECK_BOX_3,ID_BG,10,110,80,20);
         ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"check3");
 
-        obj=ldCheckBoxInit(ID_CHECK_BOX_4,ID_BG,100,50,80,20);
+        obj=ldCheckBoxInit(pScene,ID_CHECK_BOX_4,ID_BG,100,50,80,20);
         ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"radio1");
         ldCheckBoxSetCorner(obj,true);
         ldCheckBoxSetRadioButtonGroup(obj,0);
 
-        obj=ldCheckBoxInit(ID_CHECK_BOX_5,ID_BG,100,80,80,20);
+        obj=ldCheckBoxInit(pScene,ID_CHECK_BOX_5,ID_BG,100,80,80,20);
         ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"radio2");
         ldCheckBoxSetCorner(obj,true);
         ldCheckBoxSetRadioButtonGroup(obj,0);
 
-        obj=ldCheckBoxInit(ID_CHECK_BOX_6,ID_BG,100,110,80,20);
+        obj=ldCheckBoxInit(pScene,ID_CHECK_BOX_6,ID_BG,100,110,80,20);
         ldCheckBoxSetText(obj,SIMSUN_REGULAR_12,(uint8_t*)"radio3");
         ldCheckBoxSetCorner(obj,true);
         ldCheckBoxSetRadioButtonGroup(obj,0);
 
-        ldComboBox_t* pCB=ldComboBoxInit(ID_COMBO_BOX,ID_BG,180,80,120,30,SIMSUN_REGULAR_12,4);
+        ldComboBox_t* pCB=ldComboBoxInit(pScene,ID_COMBO_BOX,ID_BG,180,80,120,30,SIMSUN_REGULAR_12,4);
         ldComboBoxAddItem(pCB,(uint8_t*)"item 1");
         ldComboBoxAddItem(pCB,(uint8_t*)"item 2");
         ldComboBoxAddItem(pCB,(uint8_t*)"item 3");
         ldComboBoxAddItem(pCB,(uint8_t*)"item 4");
 
-        obj=ldLabelInit(ID_LABEL,ID_BG,180,50,50,30,SIMSUN_REGULAR_12);
+        obj=ldLabelInit(pScene,ID_LABEL,ID_BG,180,50,50,30,SIMSUN_REGULAR_12);
         ldLabelSetText(obj,pCB->ppItemStrGroup[pCB->itemSelect]);
 
         xConnect(ID_COMBO_BOX,SIGNAL_CLICKED_ITEM,ID_LABEL,slotChangeItem);
@@ -160,19 +160,19 @@ void uiDemoInit(uint8_t page)
     }
     case 2:
     {
-        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
 
-        obj=ldButtonInit(ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
+        obj=ldButtonInit(pScene,ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
         ldButtonSetRoundCorner(obj,true);
         ldButtonSetFont(obj,SIMSUN_REGULAR_12);
         ldButtonSetText(obj,(uint8_t*)"return");
         xConnect(ID_BUTTON,SIGNAL_RELEASE,ID_BG,slotJumpPage0);
 
-        ldLineEditInit(ID_LINE_EDIT,ID_BG,10,50,100,30,SIMSUN_REGULAR_12,20);
+        ldLineEditInit(pScene,ID_LINE_EDIT,ID_BG,10,50,100,30,SIMSUN_REGULAR_12,20);
 
-        ldLineEditInit(ID_LINE_EDIT_2,ID_BG,10,150,100,30,SIMSUN_REGULAR_12,20);
+        ldLineEditInit(pScene,ID_LINE_EDIT_2,ID_BG,10,150,100,30,SIMSUN_REGULAR_12,20);
 
-        ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
+        ldKeyboardInit(pScene,ID_KB,SIMSUN_REGULAR_12);
 
         ldLineEditSetKeyboard(ldBaseGetWidgetById(ID_LINE_EDIT),ID_KB);
 
@@ -182,19 +182,19 @@ void uiDemoInit(uint8_t page)
     }
     case 3:
     {
-        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
 
-        obj=ldButtonInit(ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
+        obj=ldButtonInit(pScene,ID_BUTTON,ID_BG,(LD_CFG_SCEEN_WIDTH-70),10,60,30);
         ldButtonSetRoundCorner(obj,true);
         ldButtonSetFont(obj,SIMSUN_REGULAR_12);
         ldButtonSetText(obj,(uint8_t*)"return");
         xConnect(ID_BUTTON,SIGNAL_RELEASE,ID_BG,slotJumpPage0);
 
-        ldTable_t *pTable=ldTableInit(ID_TABLE,ID_BG,10,50,LD_CFG_SCEEN_WIDTH-20,LD_CFG_SCEEN_HEIGHT-60,10,10,1,SIMSUN_REGULAR_12);
+        ldTable_t *pTable=ldTableInit(pScene,ID_TABLE,ID_BG,10,50,LD_CFG_SCEEN_WIDTH-20,LD_CFG_SCEEN_HEIGHT-60,10,10,1,SIMSUN_REGULAR_12);
 
         ldTableSetExcelType(pTable,SIMSUN_REGULAR_12);
 
-        ldKeyboardInit(ID_KB,SIMSUN_REGULAR_12);
+        ldKeyboardInit(pScene,ID_KB,SIMSUN_REGULAR_12);
 
         ldTableSetKeyboard(pTable,ID_KB);
 
@@ -203,9 +203,9 @@ void uiDemoInit(uint8_t page)
     }
     case 4:
     {
-        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
         
-        obj=ldRadialMenuInit(ID_RADIAL_MENU,ID_BG,10,40,300,200,220,100,5);
+        obj=ldRadialMenuInit(pScene,ID_RADIAL_MENU,ID_BG,10,40,300,200,220,100,5);
         
         ldRadialMenuAddItem(obj,ICON_BMP,52,52,0,false);
         ldRadialMenuAddItem(obj,BBG_BMP,52,52,0,false);
@@ -218,10 +218,10 @@ void uiDemoInit(uint8_t page)
     }
     case 5:
     {
-        obj=ldWindowInit(ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
+        obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
         ldWindowSetBgColor(obj,LD_COLOR_LAVENDER_BLUSH);
         
-        obj=ldGraphInit(ID_GRAPH,ID_BG,10,20,120,120,2);
+        obj=ldGraphInit(pScene,ID_GRAPH,ID_BG,10,20,120,120,2);
         ldGraphSetAxis(obj,100,100,10);
         ldGraphAddSeries(obj,LD_COLOR_DARK_BLUE,1,10);
         ldGraphSetValue(obj,0,0,10);
@@ -260,7 +260,7 @@ void uiDemoInit(uint8_t page)
 
 int8_t page=0;
 uint8_t counter=0;
-void uiDemoLoop(uint8_t page)
+void uiDemoLoop(arm_2d_scene_t *pScene,uint8_t page)
 {
     if(ldTimeOut(10000,&timer,true))
 //    if(xBtnGetState(BTN_ID_POW,BTN_PRESS))
@@ -306,6 +306,6 @@ void uiDemoLoop(uint8_t page)
 //    }
 }
 
-void uiDemoQuit(uint8_t page)
+void uiDemoQuit(arm_2d_scene_t *pScene,uint8_t page)
 {
 }

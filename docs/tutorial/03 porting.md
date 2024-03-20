@@ -7,6 +7,14 @@
 安装好MDK-ARM，这里使用的版本是5.38。建议使用最新版本
 
 ### 移植前的准备
+
+cmsis-5 和 cmsis-6 二选一，推荐cmsis-5
+
+* 安装cmsis-5
+    * [下载](https://github.com/ARM-software/CMSIS_5/releases/)
+* 安装cmsis-6 + Cortex DFP
+    * [下载](https://github.com/ARM-software/CMSIS_6/releases/)
+    * [下载](https://github.com/ARM-software/Cortex_DFP/releases/)
 * 安装cmsis-dsp
     * [下载](https://github.com/ARM-software/CMSIS-DSP/releases/)
 * 安装arm-2d的pack
@@ -27,7 +35,7 @@
                            uint32_t height, 
                            const uint8_t *bitmap)
     ```
-* 下载ldgui源码
+* ldgui源码地址
 
     🏠️主仓库: https://gitee.com/gzbkey/LingDongGUI
 
@@ -39,52 +47,46 @@
 
 ### 配置keil pack
 
-1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS，keil中选择Project -> Manage -> Run-Time Environment
-    
-    Acceleration - Arm-2D Helper中，**Scene设置为0**
+1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS、ldgui
+    keil中选择Project -> Manage -> Run-Time Environment
 
     ![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
 
-2. 在lcd_project中加入ldgui，keil中选择Project -> Manage -> Run-Time Environment
-
-    ![](./images/03/ldgui%20Manage%20Run-Time%20Environment.png)
-
-3. 选择ac6编译器，并且选择gnu11
+2. 选择ac6编译器，并且选择gnu11
 
     ![ac6Setting](./images/03/ac6%20setting.png)
 
-4. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
+3. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
 
     ![ac5Setting](./images/03/ac5%20setting.png)
 
-5. 确保keil的CMSIS版本不得低于5.7.0，查看方式，Project -> Manage -> Select Software Packs
+4. 确保keil的CMSIS版本不得低于5.7.0，查看方式，Project -> Manage -> Select Software Packs
 
     ![cmsisVersion](./images/03/cmsis%20version.png)
 
-6. 树目录中的Acceleration，找到arm_2d_cfg.h
+5. 树目录中的Acceleration，找到arm_2d_cfg.h
     
     编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth(默认为16位色，一般无需修改)
 
-7. arm_2d_disp_adapter_0.h修改
+6. arm_2d_disp_adapter_0.h修改
     * 添加ldgui配置头文件
         ```c
         #include "ldConfig.h" 
         ```
 
-8. ldConfig配置 (**重要**)
+7. ldConfig配置 (**重要**)
     * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
     * ldConfig.h可以使用keil的图形界面方式进行配置
     * 如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
+    * 补全ldConfig.c中的函数Disp0_DrawBitmap
 
         ![configGui](./images/03/config%20gui.png)
 
-    * 补全ldConfig.c中的函数Disp0_DrawBitmap
+8. 测试arm-2d的demo
 
-9. 测试arm-2d的demo
+    将ldConfig.h中的 DISP0_CFG_DISABLE_DEFAULT_SCENE 设置为0
 
-    将ldConfig.h中的__DISP0_CFG_DISABLE_DEFAULT_SCENE__设置为0
-
-10. main.c中加入代码
+    main.c中加入代码
 
     ```c 
     #include "arm_2d.h"
@@ -115,21 +117,21 @@
     }
     ```
 
-11. 运行效果
+9. 运行效果
 
     ![arm2d-demo](./images/03/arm2d%20demo.gif)
 
-|ℹ️ 出现Undefined symbol错误|
+|ℹ️ 出现Undefined symbol错误，请勿勾选microLib|
 |:----|
 |如果硬要勾选microLib，编译后，提示找不到__aeabi_h2f 、__aeabi_f2h，请升级编译器(安装新版本keil)|
 
-12. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
+10. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
 
     pack文件也带该脚本，在keil安装目录下，参考路径：Keil_v5\Packs\gzbkey\LingDongGUI\版本号\tools
 
-13. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
-14. 将文件导入项目中，main.c中添加页面文件的头文件
-15. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
+11. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
+12. 将文件导入项目中，main.c中添加页面文件的头文件
+13. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
     ~~~c
     #include "uiHome.h"
     #include "uiZigbee.h"
@@ -161,7 +163,6 @@
 ### 使用外部NOR
 1. ldConfig.h中USE_VIRTUAL_RESOURCE = 1
 2. ldConfig.c中__disp_adapter0_vres_read_memory添加读取nor的函数
-3. arm_2d_disp_adapter_0.c中的__user_scene_player_init函数，+ 3改为+2，.FrameBuffer.u4PoolReserve = 3改为 =2
 
 ### 关于程序体积
 
