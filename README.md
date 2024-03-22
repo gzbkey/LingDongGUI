@@ -85,6 +85,7 @@
 * ⚙️[移植](./docs/tutorial/03%20porting.md)
 * 🔗[函数接口](./docs/tutorial/04%20api.md)
 * 🛠️[开发](./docs/tutorial/05%20development.md)
+* 🔨[贡献代码](./docs/tutorial/06%20git.md)
 
 ## 技术交流
 
