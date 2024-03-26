@@ -71,10 +71,10 @@ extern "C" {
 
 // <o> Log output level
 //     <0=>    LOG_LEVEL_NONE
-//     <2=>    LOG_LEVEL_ERROR
-//     <3=>    LOG_LEVEL_WARNING
-//     <4=>    LOG_LEVEL_INFO
-//     <5=>    LOG_LEVEL_DEBUG
+//     <1=>    LOG_LEVEL_ERROR
+//     <2=>    LOG_LEVEL_WARNING
+//     <3=>    LOG_LEVEL_INFO
+//     <4=>    LOG_LEVEL_DEBUG
 // <i> Do not use log. Please select LOG_LEVEL_NONE
 #define USE_LOG_LEVEL                             (0)
 
