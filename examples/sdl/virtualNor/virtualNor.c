@@ -1,7 +1,4 @@
 #include "virtualNor.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
 #define NOR_FILE_PATH  "./image.bin"
 
@@ -122,3 +119,33 @@ void norErasePage(uint16_t pageNum)
     VIRTUAL_NOR_LOG("erase addr %d\n",addr);
     norWrite(buf,addr,NOR_PAGE_SIZE);
 }
+
+void norReadWrite_fast(FILE *fp_fast,uint8_t *path,bool isWrite,uint8_t *buf, uint32_t addr, uint16_t length)
+{
+    if(fp_fast==NULL)
+    {
+        fp_fast = fopen((char*)path, "r+");
+        if(fp_fast==NULL)
+        {
+            fp_fast = fopen((char*)path, "w");
+        }
+        fclose(fp_fast);
+
+        fp_fast=fopen((char*)path,"rb+");
+    }
+
+    if(fp_fast!=NULL)
+    {
+        fseek(fp_fast,addr,SEEK_SET);
+        if(isWrite)
+        {
+            fwrite(buf,length,1,fp_fast);
+        }
+        else
+        {
+            fread(buf,length,1,fp_fast);
+        }
+        fflush(fp_fast);
+    }
+}
+
