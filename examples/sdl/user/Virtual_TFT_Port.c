@@ -6,6 +6,7 @@
 #include "arm_2d.h"
 #include <time.h>
 #include "arm_2d_disp_adapters.h"
+#include "ldConfig.h"
 #include <stdio.h>
 #undef main
 

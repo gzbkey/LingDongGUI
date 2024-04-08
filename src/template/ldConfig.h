@@ -7,7 +7,6 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
-#include "arm_2d_cfg.h"
 #include "lcd.h"
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
@@ -91,6 +90,7 @@ extern "C" {
 
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    (1)
 #define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
+#define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
@@ -102,9 +102,7 @@ extern "C" {
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (2)
 #endif
 
-#if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
-#error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
-#endif
+#include "arm_2d_cfg.h"
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

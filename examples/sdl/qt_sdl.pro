@@ -123,7 +123,10 @@ OutLibFile = $$OUT_PWD/SDL2.dll
 OutLibFile = $$replace(OutLibFile, /, \\)
 QMAKE_PRE_LINK +=  copy $$SDL2_PATH $$OutLibFile /y
 
-DEFINES += ARM_SECTION(x)=  \
+LD_CFG = "ldConfig.h"
+
+DEFINES += ___ARM_2D_CFG_HEADER___=\"\\\"$${LD_CFG}\\\"\" \
+           ARM_SECTION(x)=  \
            __va_list=va_list \
            RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
 

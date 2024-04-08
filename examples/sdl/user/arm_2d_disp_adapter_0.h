@@ -25,7 +25,6 @@
 
 #include "arm_2d_helper_scene.h"
 #include "__common.h"
-#include "ldConfig.h"
 
 #ifdef   __cplusplus
 extern "C" {
