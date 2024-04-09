@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2022 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2024 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -22,6 +22,10 @@
  * @brief   arm2d的场景文件，是arm2d的关键用户文件
  */
 /*============================ INCLUDES ======================================*/
+
+#if defined(_RTE_)
+#   include "RTE_Components.h"
+#endif
 
 #include "arm_2d.h"
 
@@ -150,11 +154,13 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(ptTile);
+    ARM_2D_PARAM(bIsNewFrame);
+
     user_scene_0_t *ptThis = (user_scene_0_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
 
-    ARM_2D_UNUSED(ptTile);
-    ARM_2D_UNUSED(bIsNewFrame);
     ARM_2D_UNUSED(tScreenSize);
 
     arm_2d_canvas(ptTile, __top_canvas) {
@@ -193,6 +199,10 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
     *ptThis = (user_scene_0_t){
         .use_as__arm_2d_scene_t = {
+
+            /* the canvas colour */
+            .tCanvas = {GLCD_COLOR_WHITE}, 
+
             /* Please uncommon the callbacks if you need them
              */
             .fnScene        = &__pfb_draw_scene0_handler,
