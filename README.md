@@ -40,6 +40,12 @@
 
 🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
 
+## 演示效果
+
+widget demo sdl
+<p>
+	<img src="./docs/images/widget%20demo.gif" width="400" />
+</p>
 
 ## 控件列表
 
