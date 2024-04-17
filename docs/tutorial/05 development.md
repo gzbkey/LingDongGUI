@@ -234,6 +234,12 @@ bool getKeyState(uint16_t value)
 //自定义实体按键序号
 #define KEY_NUM_UP   1000
 
+//ldgui内部已经集成
+//void SysTick_Handler(void)
+//{
+//    xBtnTick(10);//10ms
+//}
+
 //根据按键序号，获取按键状态
 bool vtGetKeyState(uint16_t value)
 {
@@ -250,7 +256,7 @@ bool vtGetKeyState(uint16_t value)
 }
 
 //初始化按键
-X_BTN_KEY_INIT(KEY_NUM_UP,vtGetKeyState);
+xBtnInit(KEY_NUM_UP,vtGetKeyState);
 
 //循环处理函数
 void loopFunc(void)

@@ -35,8 +35,12 @@
 #define BTN_LONG_START           7 //检测按键长按触发一次的信号
 #define BTN_LONG_SHOOT           8 //检测按键长按触发一次和连续触发的信号
 
-#define BTN_CALLOC               ldCalloc
-#define BTN_FREE                 ldFree
+#ifndef XCALLOC
+#define XCALLOC                  malloc
+#endif
+#ifndef XFREE
+#define XFREE                    free
+#endif
 
 typedef struct {
     uint8_t FSM_State;

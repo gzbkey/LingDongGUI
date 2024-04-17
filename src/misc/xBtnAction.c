@@ -22,7 +22,7 @@
  */
 #include "xBtnAction.h"
 #include "xList.h"
-#include "stddef.h"
+#include "string.h"
 
 //规定常规电平为高电平，按下电平为低电平，可在getBtnStateFunc匹配
 
@@ -48,7 +48,7 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
 
 void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t))
 {
-    xBtnInfo_t * link = (xBtnInfo_t *)BTN_CALLOC(sizeof(xBtnInfo_t));
+    xBtnInfo_t * link = (xBtnInfo_t *)XCALLOC(sizeof(xBtnInfo_t));
     if(link!=NULL)
     {
         memset(link,0,sizeof(xBtnInfo_t));
@@ -142,8 +142,6 @@ void xBtnProcess(xBtnInfo_t *btnInfo)
                 btnInfo->isRepeatEnd=true;
             }
         }
-
-    
 }
 
 static bool _btnLoop(xListNode* pEachInfo,void* pInfo)
@@ -187,7 +185,6 @@ uint16_t xBtnGetState(uint16_t id,uint8_t state)
     
     if(btnInfo==NULL)
     {
-        LOG_DEBUG("xBtnAction Error\n");
         return 0;
     }
     
@@ -304,7 +301,7 @@ void xBtnClean(void)
     {
         if(temp_pos->info!=NULL)
         {
-            BTN_FREE(xListInfoDel(temp_pos));
+            XFREE(xListInfoDel(temp_pos));
         }
     }
 }

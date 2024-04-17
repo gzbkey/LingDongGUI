@@ -11,6 +11,13 @@ extern "C" {
 #include "stdlib.h"
 #include <stdio.h>
 
+#ifndef XCALLOC
+#define XCALLOC                     malloc
+#endif
+#ifndef XFREE
+#define XFREE                       free
+#endif
+
 struct listNode {
     struct listNode *next, *prev;
     void *info;//ldCommon*

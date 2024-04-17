@@ -113,7 +113,7 @@ void xListFreeNode(xListNode* pListChild)
     {
         return ;
     }
-    ldFree(pListChild);
+    XFREE(pListChild);
 }
 
 //bool xListInfoTraverse(xListNode *pList,bool (traverseFunc)(xListInfo*))
