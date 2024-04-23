@@ -48,9 +48,13 @@ void rccInit(void)
 	RCC_PCLK2Config(RCC_HCLK_Div1);
 	
 	RCC_LSICmd(ENABLE);
-	while(RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
+	while(RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET)
+    {
+    }
 	RCC_HSICmd(ENABLE);
-	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET)
+    {
+    }
     
     SystemCoreClock=216000000;
 }

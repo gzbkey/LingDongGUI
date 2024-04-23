@@ -76,6 +76,7 @@
         <file category="sourceC" name="src/template/Retarget.c" attr="config" version="1.0.1" />
       </files>
       <Pre_Include_Global_h>
+#undef ___ARM_2D_CFG_SKIP_HEADER___
 #define ___ARM_2D_CFG_HEADER___                   "ldConfig.h"
       </Pre_Include_Global_h>
     </component>

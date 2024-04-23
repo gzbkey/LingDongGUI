@@ -12,10 +12,10 @@ extern "C" {
 #include <stdio.h>
 
 #ifndef XCALLOC
-#define XCALLOC                     malloc
+#define XCALLOC                     ldCalloc
 #endif
 #ifndef XFREE
-#define XFREE                       free
+#define XFREE                       ldFree
 #endif
 
 struct listNode {

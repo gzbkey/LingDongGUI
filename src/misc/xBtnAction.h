@@ -36,10 +36,10 @@
 #define BTN_LONG_SHOOT           8 //检测按键长按触发一次和连续触发的信号
 
 #ifndef XCALLOC
-#define XCALLOC                  malloc
+#define XCALLOC                  ldCalloc
 #endif
 #ifndef XFREE
-#define XFREE                    free
+#define XFREE                    ldFree
 #endif
 
 typedef struct {

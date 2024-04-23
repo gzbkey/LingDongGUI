@@ -7,7 +7,6 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
-#include "arm_2d_cfg.h"
 #include "st7789v16bit.h"
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
@@ -35,11 +34,15 @@ extern "C" {
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
-#define LD_CFG_PFB_HEIGHT                         (48)
+#define LD_CFG_PFB_HEIGHT                         (24)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (16*1024) //BYTE
+
+// <o>LingDongGui signal emit buffer size
+// <i> The size of signal emit buffer to the ldgui
+#define LD_EMIT_SIZE                              (8)
 
 // <o>Number of project pages
 // <i> Maximum number of pages
@@ -87,6 +90,7 @@ extern "C" {
 
 #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    (1)
 #define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
+#define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
@@ -98,9 +102,7 @@ extern "C" {
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (2)
 #endif
 
-#if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
-#error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
-#endif
+#include "arm_2d_cfg.h"
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

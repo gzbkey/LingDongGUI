@@ -65,9 +65,6 @@ extern "C" {
 
 #define ldColor                                 COLOUR_INT
 
-#define XCALLOC                                 ldCalloc
-#define XFREE                                   ldFree
-
 #define CURSOR_WIDTH                            2
 
 #define LD_CALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldCalloc(sizeof(widgetTypedef))
