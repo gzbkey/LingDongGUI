@@ -45,6 +45,15 @@ cmsis-5 和 cmsis-6 二选一，推荐cmsis-5
 |:----|
 |推荐使用Watt Toolkit加速|
 
+### 如何使用源码安装pack
+1. 没有最新pack的情况下，git方式下载源码
+
+2. pack install配置界面中，选择manage local repositories
+    ![packInstall](./images/03/pack%20install.png)
+
+3. 加入源码中的.pdsc文件
+    ![localRepositories](./images/03/local%20repositories.png)
+
 ### 配置keil pack
 
 1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS、ldgui
@@ -67,12 +76,6 @@ cmsis-5 和 cmsis-6 二选一，推荐cmsis-5
 5. 树目录中的Acceleration，找到arm_2d_cfg.h
     
     编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth(默认为16位色，一般无需修改)
-
-6. arm_2d_disp_adapter_0.h修改
-    * 添加ldgui配置头文件
-        ```c
-        #include "ldConfig.h" 
-        ```
 
 7. ldConfig配置 (**重要**)
     * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
