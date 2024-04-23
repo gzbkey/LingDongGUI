@@ -49,9 +49,11 @@ cmsis-5 和 cmsis-6 二选一，推荐cmsis-5
 1. 没有最新pack的情况下，git方式下载源码
 
 2. pack install配置界面中，选择manage local repositories
+
     ![packInstall](./images/03/pack%20install.png)
 
 3. 加入源码中的.pdsc文件
+
     ![localRepositories](./images/03/local%20repositories.png)
 
 ### 配置keil pack
