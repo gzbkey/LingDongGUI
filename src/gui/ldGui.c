@@ -60,6 +60,7 @@ static volatile int16_t deltaMoveTime;
 static volatile int16_t prevX,prevY;
 static void *prevWidget;
 
+#if LD_PAGE_STATIC == 1
 void (*ldPageInitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
 void (*ldPageLoopFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
 void (*ldPageQuitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
@@ -68,7 +69,7 @@ void (*ldPageQuitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
 static uint8_t pageCount=0;
 #endif
 
-void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
+void ldGuiAddPage(ldGuiFunc_t init,ldGuiFunc_t loop,ldGuiFunc_t quit)
 {
 #if LD_PAGE_MAX > 1
     if(pageCount<LD_PAGE_MAX)
@@ -84,6 +85,33 @@ void ldGuiAddPage(pFuncTypedef init,pFuncTypedef loop,pFuncTypedef quit)
     ldPageQuitFunc[0]=quit;
 #endif
 }
+#else
+ldGuiFunc_t *ldPageInitFunc = NULL;
+ldGuiFunc_t *ldPageLoopFunc = NULL;
+ldGuiFunc_t *ldPageQuitFunc = NULL;
+
+static uint8_t pageCount=0;
+static uint8_t pageMax=0;
+
+void ldGuiSetPageMax(uint8_t pageMaxValue)
+{
+    pageMax=pageMaxValue;
+    ldPageInitFunc=(ldGuiFunc_t *)ldCalloc(sizeof (ldGuiFunc_t)*pageMaxValue);
+    ldPageLoopFunc=(ldGuiFunc_t *)ldCalloc(sizeof (ldGuiFunc_t)*pageMaxValue);
+    ldPageQuitFunc=(ldGuiFunc_t *)ldCalloc(sizeof (ldGuiFunc_t)*pageMaxValue);
+}
+
+void ldGuiAddPage(ldGuiFunc_t init,ldGuiFunc_t loop,ldGuiFunc_t quit)
+{
+    if(pageCount<pageMax)
+    {
+        ldPageInitFunc[pageCount]=init;
+        ldPageLoopFunc[pageCount]=loop;
+        ldPageQuitFunc[pageCount]=quit;
+        pageCount++;
+    }
+}
+#endif
 
 void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
 {
@@ -253,7 +281,7 @@ static void _ldGuiLoop(arm_2d_scene_t *pScene,xListNode* pLink,arm_2d_tile_t *pt
  * @brief   ldgui的初始化函数
  * 
  * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-07
+ * @date    2024-05-16
  */
 void ldGuiInit(arm_2d_scene_t *pScene)
 {
@@ -261,7 +289,7 @@ void ldGuiInit(arm_2d_scene_t *pScene)
 #if LD_PAGE_MAX > 1
     if(ldPageInitFunc[pageNumNow])
     {
-        ldPageInitFunc[pageNumNow](pageNumNow);
+        ldPageInitFunc[pageNumNow](pScene,pageNumNow);
     }
 #else
     if(ldPageInitFunc[0])
@@ -327,14 +355,14 @@ void ldGuiFrameStart(arm_2d_scene_t *ptScene)
  * @brief   ldgui的逻辑处理函数
  * 
  * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-07
+ * @date    2024-05-16
  */
 void ldGuiLogicLoop(arm_2d_scene_t *pScene)
 {
 #if LD_PAGE_MAX > 1
     if(ldPageLoopFunc[pageNumNow])
     {
-        ldPageLoopFunc[pageNumNow](pageNumNow);
+        ldPageLoopFunc[pageNumNow](pScene,pageNumNow);
     }
 #else
     if(ldPageLoopFunc[0])
@@ -363,14 +391,14 @@ void ldGuiLoop(arm_2d_scene_t *pScene,arm_2d_tile_t *ptParent,bool bIsNewFrame)
  * @brief   ldgui的页面退出函数
  * 
  * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-07
+ * @date    2024-05-16
  */
 void ldGuiQuit(arm_2d_scene_t *pScene)
 {
 #if LD_PAGE_MAX > 1
     if(ldPageQuitFunc[pageNumNow])
     {
-        ldPageQuitFunc[pageNumNow](pageNumNow);
+        ldPageQuitFunc[pageNumNow](pScene,pageNumNow);
     }
 #else
     if(ldPageQuitFunc[0])

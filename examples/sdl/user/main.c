@@ -111,6 +111,9 @@ int main (void)
     xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
 #if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
+#if LD_PAGE_STATIC == 0
+    ldGuiSetPageMax(1);
+#endif
     LD_ADD_PAGE_DEMO;
 #endif
 
