@@ -26,10 +26,6 @@ extern "C" {
 #include "ldComboBox.h"
 #include "ldArc.h"
 
-#ifndef LD_PAGE_STATIC
-#define LD_PAGE_STATIC             1
-#endif
-
 #define SYS_TICK_CYCLE_MS          10
 
 //btn占用0-9

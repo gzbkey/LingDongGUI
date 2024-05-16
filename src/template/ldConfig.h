@@ -84,6 +84,9 @@ extern "C" {
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 
+// default = 1
+#define LD_PAGE_STATIC                            (1)
+
 // <<< end of configuration section >>>
 
 // do not eidt below
