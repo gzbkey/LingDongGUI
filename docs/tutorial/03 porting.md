@@ -8,7 +8,7 @@
 
 ### 移植前的准备
 
-cmsis-5 和 cmsis-6 二选一，推荐cmsis-5
+cmsis-5 和 cmsis-6 二选一
 
 * 安装cmsis-5
     * [下载](https://github.com/ARM-software/CMSIS_5/releases/)
@@ -44,6 +44,11 @@ cmsis-5 和 cmsis-6 二选一，推荐cmsis-5
 |ℹ️ 关于github下载慢的问题|
 |:----|
 |推荐使用Watt Toolkit加速|
+
+### 注意事项
+1. 使用cmsis-6，出现error: no member named 'IP' in 'NVIC_Type'
+
+在keil的option选项，C/C++页面，Define项，加入宏定义IP=IPR(如有其他定义，注意使用英文逗号隔开)
 
 ### 如何使用源码安装pack
 1. 没有最新pack的情况下，git方式下载源码
