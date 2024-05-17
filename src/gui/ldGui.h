@@ -7,6 +7,7 @@ extern "C" {
 
 #include "arm_2d.h"
 #include "ldCommon.h"
+#include "ldScene0.h"
 #include "ldButton.h"
 #include "ldWindow.h"
 #include "ldText.h"
