@@ -84,6 +84,9 @@ extern "C" {
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 
+// default = 1
+#define LD_PAGE_STATIC                            (1)
+
 // <<< end of configuration section >>>
 
 // do not eidt below
@@ -101,11 +104,11 @@ extern "C" {
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (2)
 #endif
 
+#include "arm_2d_cfg.h"
+
 #if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
 #error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
 #endif
-
-#include "arm_2d_cfg.h"
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 

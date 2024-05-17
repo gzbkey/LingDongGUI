@@ -8,12 +8,12 @@ extern "C" {
 #include "stdbool.h"
 #include "stdint.h"
 #include "arm_extra_controls.h"
+#include "ldConfig.h"
 #include "xBtnAction.h"
 #include "xConnect.h"
 #include "xList.h"
 #include "xLog.h"
 #include "xString.h"
-#include "ldConfig.h"
 
 #ifndef SET_BITS
 #define SET_BITS(data,value)                    ((data)|=(value))

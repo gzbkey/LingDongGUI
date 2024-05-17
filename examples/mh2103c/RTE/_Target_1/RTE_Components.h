@@ -16,15 +16,15 @@
  */
 #define CMSIS_device_header "air32f10x.h"
 
-/* ARM::Acceleration:Arm-2D Extras:Controls:1.7.1 */
+/* ARM::Acceleration:Arm-2D Extras:Controls:1.7.6 */
 #define RTE_Acceleration_Arm_2D_Extra_Controls
-/* ARM::Acceleration:Arm-2D Extras:LCD ASCII Printf:2.2.5 */
+/* ARM::Acceleration:Arm-2D Extras:LCD ASCII Printf:2.3.0 */
 #define RTE_Acceleration_Arm_2D_Extra_LCD_printf__
 /* ARM::Acceleration:Arm-2D Helper:Display Adapter:2.3.4 */
 #define RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
     #define __RTE_ACCELERATION_ARM_2D_HELPER_DISP_ADAPTER0__  /* this macro is deprecated, please use the macro above in your code */
 
-/* ARM::Acceleration:Arm-2D Helper:PFB:1.11.1 */
+/* ARM::Acceleration:Arm-2D Helper:PFB:1.12.0 */
 #define RTE_Acceleration_Arm_2D_Helper_PFB
 /* ARM::Acceleration:Arm-2D:Alpha-Blending:1.1.6 */
 #define RTE_Acceleration_Arm_2D_Alpha_Blending
