@@ -57,6 +57,7 @@
 #   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
 #   pragma clang diagnostic ignored "-Wunused-function"
 #   pragma clang diagnostic ignored "-Wmissing-declarations"
+#   pragma clang diagnostic ignored "-Wimplicit-int-conversion" 
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   pragma diag_suppress 64,177
 #elif __IS_COMPILER_IAR__
@@ -82,6 +83,12 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static void __on_scene0_load(arm_2d_scene_t *ptScene)
+{
+    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ARM_2D_UNUSED(ptThis);
+
+}
 
 static void __on_scene0_depose(arm_2d_scene_t *ptScene)
 {
@@ -154,10 +161,6 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
-    ARM_2D_PARAM(pTarget);
-    ARM_2D_PARAM(ptTile);
-    ARM_2D_PARAM(bIsNewFrame);
-
     user_scene_0_t *ptThis = (user_scene_0_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
 
@@ -205,6 +208,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
             /* Please uncommon the callbacks if you need them
              */
+            .fnOnLoad       = &__on_scene0_load,
             .fnScene        = &__pfb_draw_scene0_handler,
             .ptDirtyRegion  = NULL,
 
@@ -215,6 +219,8 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
             //.fnBeforeSwitchOut = &__before_scene0_switching_out,
             .fnOnFrameCPL   = &__on_scene0_frame_complete,
             .fnDepose       = &__on_scene0_depose,
+
+            .bUseDirtyRegionHelper = false,
         },
         .bUserAllocated = bUserAllocated,
     };
