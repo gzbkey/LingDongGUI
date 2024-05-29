@@ -24,7 +24,7 @@ extern "C" {
 #include "ldCommon.h"
 
 typedef struct {
-        LD_COMMON_KB_ATTRIBUTES;
+    LD_COMMON_KB_ATTRIBUTES;
     bool isNumber:1;
     bool isSymbol:1;
     bool isClick:1;

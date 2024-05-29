@@ -32,8 +32,6 @@ ldScrollSelecter_t* ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId,
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
 void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
 void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
-//void ldScrollSelecterSetText(ldScrollSelecter_t* pWidget,uint8_t *pStr);
-void ldScrollSelecterSetFont(ldScrollSelecter_t *pWidget,ldFontDict_t *pFontDict);
 void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr);
 void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
 void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr);
