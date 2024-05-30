@@ -32,6 +32,12 @@
     }
     ~~~
 
+## 生成图片字模数据
+
+tools文件夹中有工具生成数据
+
+📖 [使用说明](../../tools/README.md)
+
 ## 添加自定义控件
 
 1. 运行python脚本，[src/gui/createWidget.py](../../src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h

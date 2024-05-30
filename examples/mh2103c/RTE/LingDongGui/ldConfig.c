@@ -1,5 +1,6 @@
 #include "ldConfig.h"
 #include "arm_2d.h"
+#include "st7789v16bit.h"
 
 /**
  * @brief   获取触摸坐标

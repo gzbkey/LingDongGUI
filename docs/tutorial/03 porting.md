@@ -4,7 +4,7 @@
 
 ## 基于Keil的移植
 
-安装好MDK-ARM，这里使用的版本是5.38。建议使用最新版本
+安装好MDK-ARM，这里使用的版本是5.39。建议使用最新版本
 
 ### 移植前的准备
 
@@ -47,13 +47,12 @@ cmsis-5 和 cmsis-6 二选一
 
 ### 注意事项
 1. 使用cmsis-6，出现error: no member named 'IP' in 'NVIC_Type'
+    在keil的option选项，C/C++页面，Define项，加入宏定义IP=IPR(如有其他定义，注意使用英文逗号隔开)
 
-在keil的option选项，C/C++页面，Define项，加入宏定义IP=IPR(如有其他定义，注意使用英文逗号隔开)
-
-### 如何使用源码安装pack
+### 使用源码安装pack
 1. 没有最新pack的情况下，git方式下载源码
 
-2. pack install配置界面中，选择manage local repositories
+2. pack install配置界面中，选择manage local repositories(建议使用MDK-ARM最新版本，部分版本用此方法安装无效)
 
     ![packInstall](./images/03/pack%20install.png)
 

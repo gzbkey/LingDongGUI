@@ -90,11 +90,11 @@ widget demo sdl
 📖 [详细教程(目录)](./docs/tutorial)
 
 * 🏷️[介绍](./docs/tutorial/01%20introduction.md)
-* 🚀[体验](./docs/tutorial/02%20get%20started.md)
-* ⚙️[移植](./docs/tutorial/03%20porting.md)
-* 🔗[函数接口](./docs/tutorial/04%20api.md)
+* 🚀[快速开始](./docs/tutorial/02%20get%20started.md)
+* ⚙️[移植指南](./docs/tutorial/03%20porting.md)
+* 🔗[API说明](./docs/tutorial/04%20api.md)
 * 🛠️[开发指引](./docs/tutorial/05%20development.md)
-* 🔨[贡献代码](./docs/tutorial/06%20git.md)
+* 🔨[参与贡献](./docs/tutorial/06%20git.md)
 
 ## 技术交流
 

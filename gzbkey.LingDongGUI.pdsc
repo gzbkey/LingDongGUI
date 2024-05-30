@@ -72,13 +72,12 @@
         <file category="sourceC" name="src/misc/xString.c" />
 
         <file category="sourceC" name="src/template/ldConfig.c" attr="config" version="1.0.1" />
-        <file category="header"  name="src/template/ldConfig.h" attr="config" version="1.2.2" />
+        <file category="header"  name="src/template/ldConfig.h" attr="config" version="1.3.0" />
         <file category="sourceC" name="src/template/Retarget.c" attr="config" version="1.0.1" />
       </files>
-      <Pre_Include_Global_h>
-#undef ___ARM_2D_CFG_SKIP_HEADER___
-#define ___ARM_2D_CFG_HEADER___                   "ldConfig.h"
-      </Pre_Include_Global_h>
+      <RTE_Components_h>
+#include "ldConfig.h"
+      </RTE_Components_h>
     </component>
     <component Cclass="LingDongGui" Cgroup="examples" Csub="demo" Cversion="1.0.0" condition="Arm-2D">
       <description>ldgui demo example</description>

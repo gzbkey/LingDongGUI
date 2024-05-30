@@ -7,7 +7,6 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
-#include "lcd.h"
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 
@@ -22,15 +21,15 @@ extern "C" {
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
-#define LD_CFG_SCEEN_WIDTH                        (LCD_WIDTH)
+#define LD_CFG_SCEEN_WIDTH                        (320)
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
-#define LD_CFG_SCEEN_HEIGHT                       (LCD_HEIGHT)
+#define LD_CFG_SCEEN_HEIGHT                       (240)
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size
-#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#define LD_CFG_PFB_WIDTH                          (320)
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
@@ -91,7 +90,7 @@ extern "C" {
 
 // do not eidt below
 
-#define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__    (1)
+#define __DISP0_CFG_NAVIGATION_LAYER_MODE__       (0)
 #define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
@@ -103,11 +102,10 @@ extern "C" {
 #else
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (2)
 #endif
+#define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
 
+#if !defined(_RTE_)
 #include "arm_2d_cfg.h"
-
-#if __GLCD_CFG_COLOUR_DEPTH__ != LD_CFG_COLOR_DEPTH
-#error parameter configuration error. (arm_2d_cfg.h) __GLCD_CFG_COLOUR_DEPTH__ not equal to LD_CFG_COLOR_DEPTH
 #endif
 
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);

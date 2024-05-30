@@ -592,8 +592,8 @@
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.3.4" condition="Arm-2D-Helper" maxInstances="8">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev406+g811ab76"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.4.0" condition="Arm-2D-Helper" maxInstances="8">
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -610,8 +610,8 @@
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.7" condition="CMSIS-DSP">
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -641,7 +641,7 @@
         </targetInfos>
       </component>
       <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.7.0" condition="Arm-2D">
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.7.1-dev18+g83db2b2"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="9.9.9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -649,73 +649,63 @@
     </components>
     <files>
       <file attr="config" category="sourceC" name="examples\common\asset\DigitsFont.c" version="1.2.0">
-        <instance index="0">RTE\Acceleration\DigitsFont.c</instance>
+        <instance index="0" removed="1">RTE\Acceleration\DigitsFont.c</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cvendor="ARM" Cversion="2.3.0" condition="Arm-2D-CORE"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="examples\common\controls\GLCD_Fonts.c" version="1.0.0">
-        <instance index="0">RTE\Acceleration\GLCD_Fonts.c</instance>
+        <instance index="0" removed="1">RTE\Acceleration\GLCD_Fonts.c</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cvendor="ARM" Cversion="2.3.0" condition="Arm-2D-CORE"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="other" name="tools\README.md" version="1.2.2">
-        <instance index="0">RTE\Acceleration\README.md</instance>
+        <instance index="0" removed="1">RTE\Acceleration\README.md</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="examples\common\asset\alarm_clock_font32.c" version="1.1.0">
-        <instance index="0">RTE\Acceleration\alarm_clock_font32.c</instance>
+        <instance index="0" removed="1">RTE\Acceleration\alarm_clock_font32.c</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cvendor="ARM" Cversion="2.3.0" condition="Arm-2D-CORE"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="examples\common\asset\alarm_clock_font64.c" version="1.1.0">
-        <instance index="0">RTE\Acceleration\alarm_clock_font64.c</instance>
+        <instance index="0" removed="1">RTE\Acceleration\alarm_clock_font64.c</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cvendor="ARM" Cversion="2.3.0" condition="Arm-2D-CORE"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
-      <file attr="config" category="sourceC" name="Library\Source\arm_2d.c" version="1.3.4">
+      <file attr="config" category="sourceC" name="Library\Source\arm_2d.c" version="1.4.0">
         <instance index="0">RTE\Acceleration\arm_2d.c</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.7" condition="CMSIS-DSP"/>
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
       <file attr="config" category="preIncludeGlobal" name="Library\Include\template\arm_2d_cfg.h" version="1.3.5">
         <instance index="0">RTE\Acceleration\arm_2d_cfg.h</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.7" condition="CMSIS-DSP"/>
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="sourceC" name="Helper\template\arm_2d_disp_adapter.c" version="2.3.4">
+      <file attr="config" category="sourceC" name="Helper\template\arm_2d_disp_adapter.c" version="2.4.0">
         <instance index="0">RTE\Acceleration\arm_2d_disp_adapter_0.c</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.3.4" condition="Arm-2D-Helper" maxInstances="8"/>
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.4.0" condition="Arm-2D-Helper" maxInstances="8"/>
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="Helper\template\arm_2d_disp_adapter.h" version="2.3.4">
+      <file attr="config" category="header" name="Helper\template\arm_2d_disp_adapter.h" version="2.4.0">
         <instance index="0">RTE\Acceleration\arm_2d_disp_adapter_0.h</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.3.4" condition="Arm-2D-Helper" maxInstances="8"/>
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.4.0" condition="Arm-2D-Helper" maxInstances="8"/>
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -734,16 +724,16 @@
       </file>
       <file attr="config" category="utility" name="tools\img2c.py" version="1.2.2">
         <instance index="0">RTE\Acceleration\img2c.py</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.7" condition="CMSIS-DSP"/>
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
       <file attr="config" category="utility" name="tools\ttf2c.py" version="1.2.0">
         <instance index="0">RTE\Acceleration\ttf2c.py</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.6-dev521+g9171fd0"/>
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.7" condition="CMSIS-DSP"/>
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -775,7 +765,7 @@
       <file attr="config" category="sourceC" name="src\template\Retarget.c" version="1.0.1">
         <instance index="0">RTE\LingDongGui\Retarget.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.7.0" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.7.1-dev18+g83db2b2"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="9.9.9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -789,15 +779,15 @@
       <file attr="config" category="sourceC" name="src\template\ldConfig.c" version="1.0.1">
         <instance index="0">RTE\LingDongGui\ldConfig.c</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.7.0" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.7.1-dev18+g83db2b2"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="9.9.9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.2.2">
+      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.3.0">
         <instance index="0">RTE\LingDongGui\ldConfig.h</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.7.0" condition="Arm-2D"/>
-        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="0.7.1-dev18+g83db2b2"/>
+        <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="9.9.9"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
