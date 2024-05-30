@@ -104,10 +104,6 @@ extern "C" {
 #endif
 #define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
 
-#if !defined(_RTE_)
-#include "arm_2d_cfg.h"
-#endif
-
 bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 
 #ifdef __cplusplus

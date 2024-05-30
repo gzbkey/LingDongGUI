@@ -76,7 +76,7 @@
         <file category="sourceC" name="src/template/Retarget.c" attr="config" version="1.0.1" />
       </files>
       <RTE_Components_h>
-#include "ldConfig.h"
+#define __ARM_2D_USER_APP_CFG_H__ "ldConfig.h"
       </RTE_Components_h>
     </component>
     <component Cclass="LingDongGui" Cgroup="examples" Csub="demo" Cversion="1.0.0" condition="Arm-2D">

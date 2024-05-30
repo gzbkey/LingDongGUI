@@ -31,7 +31,6 @@
 NEW_LIST(xBtnLink);
 
 static uint8_t btnCycle=10;
-static uint8_t btnCount=0;
 
 static uint8_t btnDebounceMs    = 10;   //按键滤波时间
 static uint16_t btnLongPress    = 200;  //长按触发时间

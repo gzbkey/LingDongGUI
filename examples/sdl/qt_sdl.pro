@@ -125,7 +125,7 @@ QMAKE_PRE_LINK +=  copy $$SDL2_PATH $$OutLibFile /y
 
 LD_CFG = "ldConfig.h"
 
-DEFINES += ___ARM_2D_CFG_HEADER___=\"\\\"$${LD_CFG}\\\"\" \
+DEFINES += __ARM_2D_USER_APP_CFG_H__=\"\\\"$${LD_CFG}\\\"\" \
            ARM_SECTION(x)=  \
            __va_list=va_list \
            RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0

@@ -12,7 +12,7 @@
 
 /* ARM::Acceleration:Arm-2D:Core@1.1.7 */
 #define ___ARM_2D_CFG_SKIP_HEADER___
-/* GorgonMeducer::Utilities:perf_counter:Core&Source@2.2.3 */
+/* GorgonMeducer::Utilities:perf_counter:Core&Source@2.3.1 */
 #define __PERF_COUNTER_CFG_USE_SYSTICK_WRAPPER__ 1
 
 

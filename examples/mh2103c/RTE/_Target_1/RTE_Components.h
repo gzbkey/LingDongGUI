@@ -33,10 +33,10 @@
 #define __RTE_ACCELERATION_ARM_2D__     /* this macro is deprecated, please use the macro above in your code */
 /* ARM::Acceleration:Arm-2D:Transform@1.1.7 */
 #define RTE_Acceleration_Arm_2D_Transform
-/* GorgonMeducer::Utilities:perf_counter:Core&Source@2.2.3 */
+/* GorgonMeducer::Utilities:perf_counter:Core&Source@2.3.1 */
 #define __PERF_COUNTER__ 1
 /* gzbkey::LingDongGui:ldgui:Core@0.7.0 */
-#include "ldConfig.h"
+#define __ARM_2D_USER_APP_CFG_H__ "ldConfig.h"
 
 
 #endif /* RTE_COMPONENTS_H */
