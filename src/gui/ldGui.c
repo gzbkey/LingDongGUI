@@ -260,23 +260,6 @@ static void _ldGuiLoop(arm_2d_scene_t *pScene,xListNode* pLink,arm_2d_tile_t *pt
     }
 }
 
-//static void ldGuiSetDirtyRegion(xListNode* pLink,arm_2d_scene_t *pScene)
-//{
-//    xListNode *tempPos,*safePos;
-
-//    list_for_each_safe(tempPos,safePos, pLink)
-//    {
-//        if(tempPos->info!=NULL)
-//        {
-//            arm_2d_helper_pfb_append_dirty_regions_to_list(&pScene->ptDirtyRegion,&((ldCommon_t *)tempPos->info)->dirtyRegionListItem,1);
-//            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
-//            {
-//                ldGuiSetDirtyRegion(((ldCommon_t *)tempPos->info)->childList,pScene);
-//            }
-//        }
-//    }
-//}
-
 /**
  * @brief   ldgui的初始化函数
  * 
@@ -286,6 +269,7 @@ static void _ldGuiLoop(arm_2d_scene_t *pScene,xListNode* pLink,arm_2d_tile_t *pt
 void ldGuiInit(arm_2d_scene_t *pScene)
 {
     xEmitInit(LD_EMIT_SIZE);
+#if LD_PAGE_STATIC == 1
 #if LD_PAGE_MAX > 1
     if(ldPageInitFunc[pageNumNow])
     {
@@ -297,12 +281,16 @@ void ldGuiInit(arm_2d_scene_t *pScene)
         ldPageInitFunc[0](pScene,pageNumNow);
     }
 #endif
+#else
+    if(ldPageInitFunc!=NULL)
+    {
+        if(ldPageInitFunc[pageNumNow])
+        {
+            ldPageInitFunc[pageNumNow](pScene,pageNumNow);
+        }
+    }
+#endif
     LOG_INFO("[sys] page %d init\n",pageNumNow);
-
-//#if USE_DIRTY_REGION == 1
-//    ldGuiSetDirtyRegion(&ldWidgetLink,pScene);
-//    LOG_INFO("[sys] set dirty region\n");
-//#endif
 }
 
 static void _ldGuiFrameUpdate(xListNode* pLink)
@@ -359,6 +347,7 @@ void ldGuiFrameStart(arm_2d_scene_t *ptScene)
  */
 void ldGuiLogicLoop(arm_2d_scene_t *pScene)
 {
+#if LD_PAGE_STATIC == 1
 #if LD_PAGE_MAX > 1
     if(ldPageLoopFunc[pageNumNow])
     {
@@ -368,6 +357,15 @@ void ldGuiLogicLoop(arm_2d_scene_t *pScene)
     if(ldPageLoopFunc[0])
     {
         ldPageLoopFunc[0](pScene,pageNumNow);
+    }
+#endif
+#else
+    if(ldPageLoopFunc!=NULL)
+    {
+        if(ldPageLoopFunc[pageNumNow])
+        {
+            ldPageLoopFunc[pageNumNow](pScene,pageNumNow);
+        }
     }
 #endif
 }
@@ -395,6 +393,7 @@ void ldGuiLoop(arm_2d_scene_t *pScene,arm_2d_tile_t *ptParent,bool bIsNewFrame)
  */
 void ldGuiQuit(arm_2d_scene_t *pScene)
 {
+    #if LD_PAGE_STATIC == 1
 #if LD_PAGE_MAX > 1
     if(ldPageQuitFunc[pageNumNow])
     {
@@ -404,6 +403,15 @@ void ldGuiQuit(arm_2d_scene_t *pScene)
     if(ldPageQuitFunc[0])
     {
         ldPageQuitFunc[0](pScene,pageNumNow);
+    }
+#endif
+#else
+    if(ldPageQuitFunc!=NULL)
+    {
+        if(ldPageQuitFunc[pageNumNow])
+        {
+            ldPageQuitFunc[pageNumNow](pScene,pageNumNow);
+        }
     }
 #endif
     pScene->ptDirtyRegion=NULL;

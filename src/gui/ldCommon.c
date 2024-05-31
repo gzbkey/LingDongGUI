@@ -28,10 +28,12 @@
 #include "ldButton.h"
 #include "ldText.h"
 #include "ldGui.h"
-#if USE_TLSF == 1
+#if LD_MEM_MODE == MEM_MODE_TLFS
 #include "tlsf.h"
-#else
+#elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
 #include "freeRtosHeap4.h"
+#elif LD_MEM_MODE == MEM_MODE_STDLIB
+#include "stdlib.h"
 #endif
 
 #if defined(__clang__)
@@ -53,24 +55,26 @@
 
 NEW_LIST(ldWidgetLink);
 
-#if USE_TLSF == 1
+#if LD_MEM_MODE == MEM_MODE_TLFS
 static void * pTlsfMem=NULL;
-#endif
-
 __attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
+#elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
+__attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
+#endif
 
 __WEAK void *ldCalloc(uint32_t size)
 {
     void* p=NULL;
-#if USE_TLSF == 1
+#if LD_MEM_MODE == MEM_MODE_TLFS
     if(pTlsfMem==NULL)
     {
         pTlsfMem = tlsf_create_with_pool((void *)ucHeap, sizeof (ucHeap));
     }
     p=tlsf_malloc(pTlsfMem,size);
-#else
-     p=pvPortMalloc(size);
-//    p=malloc(size);
+#elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
+    p=pvPortMalloc(size);
+#elif LD_MEM_MODE == MEM_MODE_STDLIB
+    p=malloc(size);
 #endif
     if(p!=NULL)
     {
@@ -85,22 +89,24 @@ __WEAK void ldFree(void *p)
     {
         return;
     }
-#if USE_TLSF == 1
+#if LD_MEM_MODE == MEM_MODE_TLFS
     tlsf_free(pTlsfMem, p);
-#else
+#elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
     vPortFree(p);
-//    free(p);
+#elif LD_MEM_MODE == MEM_MODE_STDLIB
+    free(p);
 #endif
 }
 
 __WEAK void *ldRealloc(void *ptr,uint32_t newSize)
 {
     void* p=NULL;
-#if USE_TLSF == 1
+#if LD_MEM_MODE == MEM_MODE_TLFS
     p = tlsf_realloc(pTlsfMem, ptr, newSize);
-#else
+#elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
     p = pvPortRealloc(ptr,newSize);
-//    return realloc(ptr,newSize);
+#elif LD_MEM_MODE == MEM_MODE_STDLIB
+    return realloc(ptr,newSize);
 #endif
     if(p!=NULL)
     {

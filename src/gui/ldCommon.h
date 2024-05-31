@@ -67,6 +67,11 @@ extern "C" {
 
 #define CURSOR_WIDTH                            2
 
+#define MEM_MODE_FREERTOS_HEAP4                   (0)
+#define MEM_MODE_TLFS                             (1)
+#define MEM_MODE_STDLIB                           (2)
+#define MEM_MODE_USER                             (3)
+
 #define LD_CALLOC_WIDGET_INFO(widgetTypedef)    (widgetTypedef*)ldCalloc(sizeof(widgetTypedef))
 #define LD_CALLOC_STRING(str)                   (uint8_t *)ldCalloc((strlen((const char *)str)+1)*sizeof(uint8_t))
 
@@ -82,8 +87,6 @@ extern "C" {
 #elif SIZE_MAX == 4294967295
 #define LD_ADDR_NONE                            0xffffffffu
 #endif
-
-
 
 #define LD_COLOR_LIGHT_PINK __RGB(255, 182, 193)             // 浅粉红
 #define LD_COLOR_PINK __RGB(255, 192, 203)                   // 粉红
