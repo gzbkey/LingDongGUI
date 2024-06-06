@@ -73,7 +73,7 @@ void ldQRCodeDel(ldQRCode_t *pWidget)
         return;
     }
 
-    LOG_INFO("[qRCode] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[qRCode] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -162,14 +162,14 @@ ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
-        LOG_INFO("[qRCode] init,id:%d\n",nameId);
+        LOG_INFO("[qRCode] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget->qrText);
         ldFree(pNewWidget);
 
-        LOG_ERROR("[qRCode] init failed,id:%d\n",nameId);
+        LOG_ERROR("[qRCode] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

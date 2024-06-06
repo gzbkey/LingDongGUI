@@ -69,7 +69,7 @@ void ldWindowDel(ldWindow_t *pWidget)
         return;
     }
 
-    LOG_INFO("[window] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[window] del,id:%d",pWidget->nameId);
 
     listInfo=ldBaseGetWidgetInfoById(pWidget->nameId);
 
@@ -114,7 +114,7 @@ ldWindow_t* ldWindowInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
             }
             pNewWidget->pFunc=&ldWindowCommonFunc;
 
-            LOG_INFO("[window] init,id:%d\n",nameId);
+            LOG_INFO("[window] init,id:%d",nameId);
         }
         else
         {

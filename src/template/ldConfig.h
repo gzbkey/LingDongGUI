@@ -80,6 +80,12 @@ extern "C" {
 // <i> Do not use log. Please select LOG_LEVEL_NONE
 #define USE_LOG_LEVEL                             (0)
 
+#if USE_LOG_LEVEL > 0
+// <q>Use Color Log
+// <i> Use Color Log
+#define USE_LOG_COLOR                             (0)
+#endif
+
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 

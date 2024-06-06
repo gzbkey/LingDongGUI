@@ -74,7 +74,7 @@ void ldLineEditDel(ldLineEdit_t *pWidget)
         return;
     }
 
-    LOG_INFO("[lineEdit] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[lineEdit] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -209,14 +209,14 @@ ldLineEdit_t *ldLineEditInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
         xConnect(nameId,SIGNAL_PRESS,nameId,slotLineEditProcess);
         xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
 
-        LOG_INFO("[lineEdit] init,id:%d\n",nameId);
+        LOG_INFO("[lineEdit] init,id:%d",nameId);
     }
     else
     {
         ldFree(pText);
         ldFree(pNewWidget);
 
-        LOG_ERROR("[lineEdit] init failed,id:%d\n",nameId);
+        LOG_ERROR("[lineEdit] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

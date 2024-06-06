@@ -316,7 +316,7 @@ void ldKeyboardDel(ldKeyboard_t *pWidget)
         return;
     }
 
-    LOG_INFO("[keyboard] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[keyboard] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -703,13 +703,13 @@ ldKeyboard_t *ldKeyboardInit(arm_2d_scene_t *pScene,uint16_t nameId,ldFontDict_t
         xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotKBProcess);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotKBProcess);
 
-        LOG_INFO("[keyboard] init,id:%d\n",nameId);
+        LOG_INFO("[keyboard] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[keyboard] init failed,id:%d\n",nameId);
+        LOG_ERROR("[keyboard] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

@@ -175,7 +175,7 @@ void ldCheckBoxDel(ldCheckBox_t *pWidget)
         return;
     }
 
-    LOG_INFO("[checkBox] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[checkBox] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -283,13 +283,13 @@ ldCheckBox_t *ldCheckBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
         xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
 
-        LOG_INFO("[checkBox] init,id:%d\n",nameId);
+        LOG_INFO("[checkBox] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[checkBox] init failed,id:%d\n",nameId);
+        LOG_ERROR("[checkBox] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

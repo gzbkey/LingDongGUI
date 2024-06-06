@@ -134,7 +134,7 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
             if(pNode!=NULL)
             {
                 pWidget=pNode->info;
-                LOG_DEBUG("click widget id:%d\n",pWidget->nameId);
+                LOG_DEBUG("click widget id:%d",pWidget->nameId);
             }
         }
         prevX=x;
@@ -290,7 +290,7 @@ void ldGuiInit(arm_2d_scene_t *pScene)
         }
     }
 #endif
-    LOG_INFO("[sys] page %d init\n",pageNumNow);
+    LOG_INFO("[sys] page %d init",pageNumNow);
 }
 
 static void _ldGuiFrameUpdate(xListNode* pLink)
@@ -416,7 +416,7 @@ void ldGuiQuit(arm_2d_scene_t *pScene)
 #endif
     pScene->ptDirtyRegion=NULL;
     ldWindowDel(ldBaseGetWidgetById(0));
-    LOG_INFO("[sys] page %d quit\n",pageNumNow);
+    LOG_INFO("[sys] page %d quit",pageNumNow);
 }
 
 /**

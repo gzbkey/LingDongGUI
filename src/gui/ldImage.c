@@ -73,7 +73,7 @@ void ldImageDel(ldImage_t *pWidget)
         return;
     }
 
-    LOG_INFO("[image] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[image] del,id:%d",pWidget->nameId);
 
     if (pWidget->parentWidget == NULL)
     {
@@ -171,13 +171,13 @@ ldImage_t *ldImageInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
-        LOG_INFO("[image] init,id:%d\n",nameId);
+        LOG_INFO("[image] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[image] init failed,id:%d\n",nameId);
+        LOG_ERROR("[image] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

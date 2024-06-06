@@ -76,7 +76,7 @@ void ldGaugeDel(ldGauge_t *pWidget)
         return;
     }
 
-    LOG_INFO("[gauge] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[gauge] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -156,13 +156,13 @@ ldGauge_t *ldGaugeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
-        LOG_INFO("[gauge] init,id:%d\n",nameId);
+        LOG_INFO("[gauge] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[gauge] init failed,id:%d\n",nameId);
+        LOG_ERROR("[gauge] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

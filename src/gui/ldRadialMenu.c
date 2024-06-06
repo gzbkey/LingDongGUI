@@ -79,7 +79,7 @@ void ldRadialMenuDel(ldRadialMenu_t *pWidget)
         return;
     }
 
-    LOG_INFO("[radialMenu] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[radialMenu] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -176,7 +176,7 @@ static bool slotMenuSelect(xConnectInfo_t info)
                    ((x     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX)&&(x     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iX+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iWidth-1))&&(y     >pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY)&&(y     <(pWidget->pItemList[pWidget->showList[i]].itemRegion.tLocation.iY+pWidget->pItemList[pWidget->showList[i]].itemRegion.tSize.iHeight-1))))
                 {
                     ldRadialMenuSelectItem(pWidget,pWidget->showList[i]);
-                    LOG_DEBUG("click item %d\n",pWidget->showList[i]);
+                    LOG_DEBUG("click item %d",pWidget->showList[i]);
                     break;
                 }
             }
@@ -273,7 +273,7 @@ ldRadialMenu_t *ldRadialMenuInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotMenuSelect);
         xConnect(nameId,SIGNAL_HOLD_DOWN,nameId,slotMenuSelect);
 
-        LOG_INFO("[radialMenu] init,id:%d\n",nameId);
+        LOG_INFO("[radialMenu] init,id:%d",nameId);
     }
     else
     {
@@ -281,7 +281,7 @@ ldRadialMenu_t *ldRadialMenuInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
         ldFree(pNewItemList);
         ldFree(pNewShowList);
 
-        LOG_ERROR("[radialMenu] init failed,id:%d\n",nameId);
+        LOG_ERROR("[radialMenu] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

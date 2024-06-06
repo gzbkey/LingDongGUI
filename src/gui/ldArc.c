@@ -76,7 +76,7 @@ void ldArcDel(ldArc_t *pWidget)
         return;
     }
 
-    LOG_INFO("[arc] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[arc] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -166,13 +166,13 @@ ldArc_t *ldArcInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
-        LOG_INFO("[arc] init,id:%d\n",nameId);
+        LOG_INFO("[arc] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[arc] init failed,id:%d\n",nameId);
+        LOG_ERROR("[arc] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

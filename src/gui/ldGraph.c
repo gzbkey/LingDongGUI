@@ -89,7 +89,7 @@ void ldGraphDel(ldGraph_t *pWidget)
         return;
     }
 
-    LOG_INFO("[graph] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[graph] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -172,14 +172,14 @@ ldGraph_t *ldGraphInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
         ldGraphSetGridOffset(pNewWidget,5);
 
-        LOG_INFO("[graph] init,id:%d\n",nameId);
+        LOG_INFO("[graph] init,id:%d",nameId);
     }
     else
     {
         ldFree(pSeries);
         ldFree(pNewWidget);
 
-        LOG_ERROR("[graph] init failed,id:%d\n",nameId);
+        LOG_ERROR("[graph] init failed,id:%d",nameId);
     }
     return pNewWidget;
 }

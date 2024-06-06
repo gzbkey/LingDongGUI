@@ -75,7 +75,7 @@ void ldButtonDel(ldButton_t *pWidget)
         return;
     }
 
-    LOG_INFO("[button] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[button] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -203,13 +203,13 @@ ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
         xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
 
-        LOG_INFO("[button] init,id:%d\n",nameId);
+        LOG_INFO("[button] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[button] init failed,id:%d\n",nameId);
+        LOG_ERROR("[button] init failed,id:%d",nameId);
     }
     return pNewWidget;
 }

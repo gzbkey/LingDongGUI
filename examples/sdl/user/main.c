@@ -87,20 +87,21 @@ int main (void)
 {
     setbuf(stdout,NULL);
 
-    printf("  _       _____    _____  _    _  _____ \n"
-           " | |     |  __ \\  / ____|| |  | ||_   _|\n"
-           " | |     | |  | || |  __ | |  | |  | |  \n"
-           " | |     | |  | || | |_ || |  | |  | |  \n"
-           " | |____ | |__| || |__| || |__| | _| |_ \n"
-           " |______||_____/  \\_____| \\____/ |_____|\n\n"
-           );
+    LOG_NORMAL(
+                "  _       _____    _____  _    _  _____ \n"
+                " | |     |  __ \\  / ____|| |  | ||_   _|\n"
+                " | |     | |  | || |  __ | |  | |  | |  \n"
+                " | |     | |  | || | |_ || |  | |  | |  \n"
+                " | |____ | |__| || |__| || |__| | _| |_ \n"
+                " |______||_____/  \\_____| \\____/ |_____|\n"
+               );
 
-    printf("====================\n");
-    LOG_ERROR("Error\n");
-    LOG_WARNING("Warning\n");
-    LOG_INFO("Info\n");
-    LOG_DEBUG("Debug\n");
-    printf("====================\n\n");
+    LOG_NORMAL("====================");
+    LOG_ERROR("Error");
+    LOG_WARNING("Warning");
+    LOG_INFO("Info");
+    LOG_DEBUG("Debug");
+    LOG_NORMAL("====================\n");
     vtInit();
 
     xBtnInit(KEY_NUM_UP,vtGetKeyState);

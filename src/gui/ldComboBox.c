@@ -93,7 +93,7 @@ void ldComboBoxDel(ldComboBox_t *pWidget)
         return;
     }
 
-    LOG_INFO("[comboBox] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[comboBox] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -249,14 +249,14 @@ ldComboBox_t *ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
         xConnect(nameId,SIGNAL_RELEASE,nameId,slotComboBoxProcess);
         xConnect(nameId,SIGNAL_HOLD_DOWN,nameId,slotComboBoxProcess);
 
-        LOG_INFO("[comboBox] init,id:%d\n",nameId);
+        LOG_INFO("[comboBox] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewStrGroup);
         ldFree(pNewWidget);
 
-        LOG_ERROR("[comboBox] init failed,id:%d\n",nameId);
+        LOG_ERROR("[comboBox] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

@@ -80,7 +80,7 @@ void ldScrollSelecterDel(ldScrollSelecter_t *pWidget)
         return;
     }
 
-    LOG_INFO("[scrollSelecter] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[scrollSelecter] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -249,14 +249,14 @@ ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId,
         xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotScrollSelecterScroll);
         xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotScrollSelecterScroll);
 
-        LOG_INFO("[scrollSelecter] init,id:%d\n",nameId);
+        LOG_INFO("[scrollSelecter] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
         ldFree(pNewStrGroup);
 
-        LOG_ERROR("[scrollSelecter] init failed,id:%d\n",nameId);
+        LOG_ERROR("[scrollSelecter] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

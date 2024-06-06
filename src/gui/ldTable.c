@@ -85,7 +85,7 @@ void ldTableDel(ldTable_t *pWidget)
         return;
     }
 
-    LOG_INFO("[table] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[table] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -598,7 +598,7 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotTableProcess);
         xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
 
-        LOG_INFO("[table] init,id:%d\n",nameId);
+        LOG_INFO("[table] init,id:%d",nameId);
 
     }
     else
@@ -608,7 +608,7 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         ldFree(heightBuf);
         ldFree(pNewWidget);
 
-        LOG_ERROR("[table] init failed,id:%d\n",nameId);
+        LOG_ERROR("[table] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

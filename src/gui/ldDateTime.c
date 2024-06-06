@@ -73,7 +73,7 @@ void ldDateTimeDel(ldDateTime_t *pWidget)
         return;
     }
 
-    LOG_INFO("[dateTime] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[dateTime] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -155,13 +155,13 @@ ldDateTime_t *ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
-        LOG_INFO("[dateTime] init,id:%d\n",nameId);
+        LOG_INFO("[dateTime] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[dateTime] init failed,id:%d\n",nameId);
+        LOG_ERROR("[dateTime] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

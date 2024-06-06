@@ -86,7 +86,7 @@ void ldIconSliderDel(ldIconSlider_t *pWidget)
         return;
     }
 
-    LOG_INFO("[iconSlider] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[iconSlider] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -327,7 +327,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
                     selectItem=(-1);
                 }
                 xEmit(pWidget->nameId,SIGNAL_CLICKED_ITEM,selectItem);
-                LOG_DEBUG("icon slider click item %d\n",selectItem);
+                LOG_DEBUG("icon slider click item %d",selectItem);
             }
         }
         pWidget->isWaitMove=true;
@@ -479,14 +479,14 @@ ldIconSlider_t* ldIconSliderInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
             xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotIconSliderScroll);
         }
 
-        LOG_INFO("[iconSlider] init,id:%d\n",nameId);
+        LOG_INFO("[iconSlider] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
         ldFree(pIconInfoBuf);
 
-        LOG_ERROR("[iconSlider] init failed,id:%d\n",nameId);
+        LOG_ERROR("[iconSlider] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

@@ -33,8 +33,6 @@ static bool isWaitNorInit = true;
 
 #define ID_ARC   21
 
-extern size_t xFreeBytesRemaining;
-
 void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
 {
 #if (USE_VIRTUAL_RESOURCE == 1) && ( __x86_64__ || __i386__ || __APPLE__ )
@@ -48,11 +46,8 @@ void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
 
     obj=ldCalloc(1);
     ldFree(obj);
-    LOG_DEBUG("start :%zu\n",xFreeBytesRemaining);
 
     obj=ldWindowInit(pScene,ID_BG, ID_BG, 0,0,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT);
-
-    LOG_DEBUG("win :%zu\n",xFreeBytesRemaining);
 
     obj=ldWindowInit(pScene,ID_WIN,ID_BG,10,10,LD_CFG_SCEEN_WIDTH-10,LD_CFG_SCEEN_HEIGHT-10);
 //    ldWindowSetBgColor(obj,LD_COLOR_LIGHT_SKY_BLUE);

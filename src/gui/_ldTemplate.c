@@ -75,7 +75,7 @@ void ldTemplateDel(ldTemplate_t *pWidget)
         return;
     }
 
-    LOG_INFO("[template] del,id:%d\n",pWidget->nameId);
+    LOG_INFO("[template] del,id:%d",pWidget->nameId);
 
     xDeleteConnect(pWidget->nameId);
 
@@ -147,13 +147,13 @@ ldTemplate_t *ldTemplateInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
         // add user init
 
-        LOG_INFO("[template] init,id:%d\n",nameId);
+        LOG_INFO("[template] init,id:%d",nameId);
     }
     else
     {
         ldFree(pNewWidget);
 
-        LOG_ERROR("[template] init failed,id:%d\n",nameId);
+        LOG_ERROR("[template] init failed,id:%d",nameId);
     }
 
     return pNewWidget;

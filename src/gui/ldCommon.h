@@ -14,6 +14,7 @@ extern "C" {
 #include "xList.h"
 #include "xLog.h"
 #include "xString.h"
+#include "xQueue.h"
 
 #ifndef SET_BITS
 #define SET_BITS(data,value)                    ((data)|=(value))

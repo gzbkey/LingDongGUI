@@ -784,7 +784,7 @@
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.3.0">
+      <file attr="config" category="header" name="src\template\ldConfig.h" version="1.3.1">
         <instance index="0">RTE\LingDongGui\ldConfig.h</instance>
         <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cvendor="gzbkey" Cversion="0.7.0" condition="Arm-2D"/>
         <package name="LingDongGUI" schemaVersion="1.7.28" url="https://github.com/gzbkey/LingDongGUI/" vendor="gzbkey" version="9.9.9"/>
