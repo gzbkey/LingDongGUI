@@ -35,6 +35,14 @@ extern "C" {
 // <i> The height of your PFB block size
 #define LD_CFG_PFB_HEIGHT                         (24)
 
+// <o>Select Memory Manager
+//     <0=>    freertos heap4
+//     <1=>    tlfs
+//     <2=>    stdlib
+//     <3=>    user
+// <i> default = 0
+#define LD_MEM_MODE                               (0)
+
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (16*1024) //BYTE
@@ -47,10 +55,6 @@ extern "C" {
 // <i> Maximum number of pages
 #define LD_PAGE_MAX                               (1)
 
-// <q>Dirty Region Function
-// <i> It is recommended to enable this option for applications that do not refresh full screen
-#define USE_DIRTY_REGION                          (1)
-
 // <q>External NOR support
 // <i> Read external nor, please enable this option
 #define USE_VIRTUAL_RESOURCE                      (0)
@@ -60,10 +64,6 @@ extern "C" {
 // <q>Opacity support
 // <i> There is no need to adjust the opacity of the widget. Please turn off this option
 #define USE_OPACITY                               (0)
-
-// <q>tlsf support
-// <i> Two Level Segregated Fit memory allocator
-#define USE_TLSF                                  (0)
 
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
@@ -80,7 +80,7 @@ extern "C" {
 // <i> Do not use log. Please select LOG_LEVEL_NONE
 #define USE_LOG_LEVEL                             (0)
 
-#if USE_LOG_LEVEL != 0
+#if USE_LOG_LEVEL > 0
 // <q>Use Color Log
 // <i> Use Color Log
 #define USE_LOG_COLOR                             (0)
