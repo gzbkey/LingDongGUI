@@ -34,7 +34,7 @@ extern "C" {
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size
-#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/2)
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
 
 // <o>Select Memory Manager
 //     <0=>    freertos heap4
@@ -46,7 +46,7 @@ extern "C" {
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
-#define LD_MEM_SIZE                               (1024*1024) //BYTE
+#define LD_MEM_SIZE                               (32*1024) //BYTE
 
 // <o>LingDongGui signal emit buffer size
 // <i> The size of signal emit buffer to the ldgui
@@ -89,7 +89,7 @@ extern "C" {
 
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
-
+#define __ARM_2D_CFG_ENABLE_LOG__                 (0)
 // default = 1
 #define LD_PAGE_STATIC                            (1)
 
@@ -104,10 +104,13 @@ extern "C" {
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
 #define __DISP0_CFG_SCEEN_WIDTH__                 LD_CFG_SCEEN_WIDTH
 #define __DISP0_CFG_SCEEN_HEIGHT__                LD_CFG_SCEEN_HEIGHT
+#define __DISP0_CFG_FPS_CACULATION_MODE__         (1)
+#define __GLCD_CFG_SCEEN_WIDTH__                  LD_CFG_SCEEN_WIDTH
+#define __GLCD_CFG_SCEEN_HEIGHT__                 LD_CFG_SCEEN_HEIGHT
 #if USE_VIRTUAL_RESOURCE == 0
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (0)
 #else
-#define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (2)
+#define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (3)
 #endif
 #define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
 

@@ -623,7 +623,7 @@ static void __user_scene_player_init(void)
 
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
-        + __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
+        + __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__ - 1
 #else
         + (__DISP0_CFG_ROTATE_SCREEN__ > 0)
 #endif
@@ -652,7 +652,7 @@ static void __user_scene_player_init(void)
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
         // reserve PFB blocks for the virtual resource service
-        .FrameBuffer.u4PoolReserve = __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__,
+        .FrameBuffer.u4PoolReserve = __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__ - 1,
 #endif
 #if __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__
         .DirtyRegion.ptRegions = s_tDirtyRegionList,
@@ -947,8 +947,7 @@ void __disp_adapter0_free(void *pMem)
 
 
 
-intptr_t __disp_adapter0_vres_asset_loader (
-                                            uintptr_t pObj, 
+intptr_t __disp_adapter0_vres_asset_loader (uintptr_t pObj, 
                                             arm_2d_vres_t *ptVRES, 
                                             arm_2d_region_t *ptRegion)
 {
@@ -972,7 +971,38 @@ intptr_t __disp_adapter0_vres_asset_loader (
             nBytesPerLine = (nBitsPerLine + 7) >> 3;
         }
     }
-    
+
+    /* background load mode */
+    do {
+        if (ptVRES->tTile.tInfo.u3ExtensionID != ARM_2D_TILE_EXTENSION_VRES) {
+            break;
+        }
+
+        assert ((uintptr_t)NULL != ptVRES->tTile.nAddress);
+
+        uintptr_t pSrc = __disp_adapter0_vres_get_asset_address(pObj, ptVRES);
+        uintptr_t pDes = (uintptr_t)ptVRES->tTile.nAddress;
+        int16_t iTargetStride = ptVRES->tTile.tInfo.Extension.VRES.iTargetStride;
+        int16_t iSourceStride = ptVRES->tTile.tRegion.tSize.iWidth;
+        int16_t iSourceWidth = ptRegion->tSize.iWidth;
+
+        /* calculate offset */
+        pSrc += (ptRegion->tLocation.iY * iSourceStride + ptRegion->tLocation.iX) * nPixelSize;
+        
+        for (int_fast16_t y = 0; y < ptRegion->tSize.iHeight; y++) {
+            __disp_adapter0_vres_read_memory( 
+                                            pObj, 
+                                            (void *)pDes, 
+                                            (uintptr_t)pSrc, 
+                                            nPixelSize * iSourceWidth);
+            
+            pDes += iTargetStride * nPixelSize;
+            pSrc += iSourceStride * nPixelSize;
+        }
+
+        return ptVRES->tTile.nAddress;
+    } while(0);
+
     /* default condition */
     tBufferSize = ptRegion->tSize.iHeight * nBytesPerLine;
     
@@ -1022,6 +1052,7 @@ intptr_t __disp_adapter0_vres_asset_loader (
         uintptr_t pDes = (uintptr_t)pBuffer;
         int16_t iTargetStride = ptRegion->tSize.iWidth;
         int16_t iSourceStride = ptVRES->tTile.tRegion.tSize.iWidth;
+        int16_t iSourceWidth = ptRegion->tSize.iWidth;
 
         /* calculate offset */
         pSrc += (ptRegion->tLocation.iY * iSourceStride + ptRegion->tLocation.iX) * nPixelSize;
@@ -1031,7 +1062,7 @@ intptr_t __disp_adapter0_vres_asset_loader (
                                             pObj, 
                                             (void *)pDes, 
                                             (uintptr_t)pSrc, 
-                                            nPixelSize * iTargetStride);
+                                            nPixelSize * iSourceWidth);
             
             pDes += iTargetStride * nPixelSize;
             pSrc += iSourceStride * nPixelSize;
