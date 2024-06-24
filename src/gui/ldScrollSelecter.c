@@ -135,7 +135,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
         pWidget->isWaitMove=false;
         pWidget->isAutoMove=false;
         _scrollOffset=pWidget->scrollOffset;
-        pWidget->dirtyRegionState=waitChange;
+
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -163,6 +163,7 @@ static bool slotScrollSelecterScroll(xConnectInfo_t info)
         break;
     }
 
+    pWidget->dirtyRegionState=waitChange;
     return false;
 }
 
@@ -242,6 +243,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId,
         pNewWidget->isWaitMove=false;
         pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
         pNewWidget->isWaitInit=true;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -264,6 +266,7 @@ ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId,
 
 void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -297,7 +300,7 @@ void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,con
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
         }
         else
         {
@@ -329,8 +332,13 @@ void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,con
             if(pWidget->isWaitInit)
             {
                 pWidget->isWaitInit=false;
-                pWidget->dirtyRegionState=none;
+                pWidget->dirtyRegionState=waitEnd;
             }
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(!pWidget->isTransparent)

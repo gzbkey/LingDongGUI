@@ -148,6 +148,7 @@ ldProgressBar_t *ldProgressBarInit(arm_2d_scene_t *pScene,uint16_t nameId, uint1
         pNewWidget->permille=0;
         pNewWidget->timer = arm_2d_helper_get_system_timestamp();
         pNewWidget->pFunc=&ldProgressBarCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -311,8 +312,13 @@ static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarg
 
 void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
+
+    if(!(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE))
+    {
+        pWidget->dirtyRegionState=waitChange;
+    }
 }
 
 void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
@@ -335,7 +341,12 @@ void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE)//color
@@ -345,7 +356,6 @@ void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm
         else
         {
             _progressBarImageShow(pWidget,&tTarget,bIsNewFrame);
-            pWidget->dirtyRegionState=waitChange;
         }
         arm_2d_op_wait_async(NULL);
     }

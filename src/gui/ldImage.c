@@ -166,7 +166,7 @@ ldImage_t *ldImageInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
         ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
 #endif
-        pNewWidget->dirtyRegionState=none;
+        pNewWidget->dirtyRegionState=waitChange;
         pNewWidget->pFunc=&ldImageCommonFunc;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
@@ -205,6 +205,7 @@ void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor)
 
 void ldImageFrameUpdate(ldImage_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -239,6 +240,16 @@ void ldImageLoop(arm_2d_scene_t *pScene,ldImage_t *pWidget, const arm_2d_tile_t 
 
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
+        }
+
         if (pWidget->isColor)
         {
             ldBaseColor(&tTarget,pWidget->bgColor,IMG_OPACITY);
@@ -256,10 +267,7 @@ void ldImageLoop(arm_2d_scene_t *pScene,ldImage_t *pWidget, const arm_2d_tile_t 
         }
         arm_2d_op_wait_async(NULL);
 
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
-        {
-            pWidget->dirtyRegionState=none;
-        }
+
     }
 }
 

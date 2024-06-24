@@ -211,7 +211,6 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
         pWidget->isAutoMove=false;
         pWidget->isHoldMove=false;
         _scrollOffset=pWidget->scrollOffset;
-        pWidget->dirtyRegionState=waitChange;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -336,6 +335,7 @@ static bool slotIconSliderScroll(xConnectInfo_t info)
     default:
         break;
     }
+    pWidget->dirtyRegionState=waitChange;
     return false;
 }
 
@@ -469,6 +469,7 @@ ldIconSlider_t* ldIconSliderInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
             }
         }
         pNewWidget->pFunc=&ldIconSliderCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -494,6 +495,7 @@ ldIconSlider_t* ldIconSliderInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
 
 void ldIconSliderFrameUpdate(ldIconSlider_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -551,7 +553,7 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
         if(pWidget->scrollOffset==targetOffset)
         {
             pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
         }
         else
         {
@@ -571,6 +573,7 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
                     pWidget->scrollOffset=targetOffset;
                 }
             }
+            pWidget->dirtyRegionState=waitChange;
         }
     }
 
@@ -581,7 +584,15 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
 #if LD_DEBUG == 1
         arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
 #endif
-        ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState);
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
+        }
 
         uint8_t showCount=0;
         for(uint8_t pageCount=0;pageCount<pWidget->pageMax;pageCount++)

@@ -148,6 +148,7 @@ ldLabel_t *ldLabelInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         pNewWidget->opacity=255;
 #endif
         pNewWidget->pFunc=&ldLabelCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -165,6 +166,7 @@ ldLabel_t *ldLabelInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
 void ldLabelFrameUpdate(ldLabel_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -195,7 +197,12 @@ void ldLabelLoop(arm_2d_scene_t *pScene,ldLabel_t *pWidget,const arm_2d_tile_t *
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(!pWidget->isTransparent)

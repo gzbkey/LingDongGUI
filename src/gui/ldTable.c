@@ -120,7 +120,7 @@ void _ldTableSelectItem(ldTable_t *pWidget,ldTableItem_t *item)
 
 /**
  * @brief   获取选中列的编号
- * 
+ *
  * @param   pWidget         目标控件指针
  * @return  uint8_t         列号
  * @author  Ou Jianbo(59935554@qq.com)
@@ -133,7 +133,7 @@ uint8_t ldTableCurrentColumn(ldTable_t *pWidget)
 
 /**
  * @brief   获取选中行的编号
- * 
+ *
  * @param   pWidget         目标控件指针
  * @return  uint8_t         行号
  * @author  Ou Jianbo(59935554@qq.com)
@@ -146,7 +146,7 @@ uint8_t ldTableCurrentRow(ldTable_t *pWidget)
 
 /**
  * @brief   获取选中行的项目
- * 
+ *
  * @param   pWidget         目标控件指针
  * @return  ldTableItem_t*  返回目标item指针
  * @author  Ou Jianbo(59935554@qq.com)
@@ -228,7 +228,7 @@ arm_2d_region_t _ldTableGetItemCellGlobalRegion(ldTable_t *pWidget,uint8_t row, 
 
 /**
  * @brief   获取指定的项目
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行号
  * @param   column          列号
@@ -243,7 +243,7 @@ ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column)
 
 /**
  * @brief   获取指定坐标的项目
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   x               全局坐标x轴
  * @param   y               全局坐标y轴
@@ -369,6 +369,7 @@ static bool slotTableProcess(xConnectInfo_t info)
             if((tempTimer-pWidget->timer)<500)
             {
                 currentItem->isEditing=true;
+                LOG_DEBUG("edit item %d,%d",x,y);
                 if(pWidget->kbNameId)
                 {
                     kb=ldBaseGetWidgetById(pWidget->kbNameId);
@@ -486,7 +487,7 @@ static bool slotEditEnd(xConnectInfo_t info)
 
 /**
  * @brief   表格初始化
- * 
+ *
  * @param   pScene          场景指针
  * @param   nameId          新控件id
  * @param   parentNameId    父控件id
@@ -590,6 +591,7 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         pNewWidget->pFunc=&ldTableCommonFunc;
         pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
         pNewWidget->kbNameId=0;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -616,6 +618,7 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
 void ldTableFrameUpdate(ldTable_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -650,7 +653,12 @@ void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(!pWidget->isBgTransparent)
@@ -783,7 +791,7 @@ void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *
 
 /**
  * @brief   设置指定列的宽度
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   column          列
  * @param   width           宽度
@@ -804,7 +812,7 @@ void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width)
 
 /**
  * @brief   设置指定行的高度
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行
  * @param   height          高度
@@ -825,7 +833,7 @@ void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height)
 
 /**
  * @brief   设置项目的文本
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行
  * @param   column          列
@@ -855,7 +863,7 @@ void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *p
 
 /**
  * @brief   设置项目的静态文本，不可变更的文本内容，不消耗内存
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行
  * @param   column          列
@@ -887,7 +895,7 @@ void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint
 
 /**
  * @brief   设置项目颜色
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行
  * @param   column          列
@@ -912,7 +920,7 @@ void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor t
 
 /**
  * @brief   设置表格底色
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   bgColor         底色
  * @author  Ou Jianbo(59935554@qq.com)
@@ -929,7 +937,7 @@ void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor)
 
 /**
  * @brief   设置指定项目文本对齐方式
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行号
  * @param   column          列号
@@ -953,7 +961,7 @@ void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t a
 
 /**
  * @brief   设置项目图片
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行号
  * @param   column          列号
@@ -992,7 +1000,7 @@ void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x
 
 /**
  * @brief   设置项目按键图片
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   row             行号
  * @param   column          列号

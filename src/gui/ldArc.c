@@ -91,6 +91,7 @@ void ldArcDel(ldArc_t *pWidget)
 
 void ldArcFrameUpdate(ldArc_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -163,6 +164,7 @@ ldArc_t *ldArcInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId
         pNewWidget->endAngle_x10[1]=1800;
         pNewWidget->rotationAngle_x10=0;
         pNewWidget->pFunc=&ldArcCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -326,7 +328,12 @@ void ldArcLoop(arm_2d_scene_t *pScene,ldArc_t *pWidget,const arm_2d_tile_t *pPar
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->srcAddr;

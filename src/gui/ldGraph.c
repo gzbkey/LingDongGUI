@@ -166,6 +166,7 @@ ldGraph_t *ldGraphInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
         pNewWidget->seriesCount=0;
         pNewWidget->pSeries=pSeries;
         pNewWidget->pFunc=&ldGraphCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -186,6 +187,7 @@ ldGraph_t *ldGraphInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
 void ldGraphFrameUpdate(ldGraph_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -217,7 +219,12 @@ void ldGraphLoop(arm_2d_scene_t *pScene,ldGraph_t *pWidget,const arm_2d_tile_t *
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         // draw frame

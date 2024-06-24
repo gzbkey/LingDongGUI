@@ -159,6 +159,7 @@ ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
         pNewWidget->qrColor=qrColor;
         pNewWidget->bgColor=bgColor;
         pNewWidget->pFunc=&ldQRCodeCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -177,6 +178,7 @@ ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parent
 
 void ldQRCodeFrameUpdate(ldQRCode_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -207,7 +209,12 @@ void ldQRCodeLoop(arm_2d_scene_t *pScene,ldQRCode_t *pWidget,const arm_2d_tile_t
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         uint8_t *qr0;

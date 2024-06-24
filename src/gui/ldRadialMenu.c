@@ -263,6 +263,7 @@ ldRadialMenu_t *ldRadialMenuInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_
         pNewWidget->showList=pNewShowList;
 //        pNewWidget->isWaitInit=true;
         pNewWidget->pFunc=&ldRadialMenuCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
          for(uint8_t i=0;i<itemMax;i++)
         {
@@ -347,6 +348,7 @@ static void _autoSort(ldRadialMenu_t *pWidget)
 
 void ldRadialMenuFrameUpdate(ldRadialMenu_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     for(uint8_t i=0;i<pWidget->itemCount;i++)
     {
         arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->pItemList[i].dirtyRegionListItem,waitChange);
@@ -455,7 +457,12 @@ void ldRadialMenuLoop(arm_2d_scene_t *pScene,ldRadialMenu_t *pWidget,const arm_2
             }
             if(bTempState)
             {
-                pWidget->dirtyRegionState=none;
+                pWidget->dirtyRegionState=waitEnd;
+            }
+
+            if(pWidget->dirtyRegionState<waitRefresh)
+            {
+                return;
             }
 
             //刷新item

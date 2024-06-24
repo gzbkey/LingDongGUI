@@ -152,6 +152,7 @@ ldDateTime_t *ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
         strcpy((char*)pNewWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
         pNewWidget->formatStrTemp[0]=0;
         pNewWidget->pFunc=&ldDateTimeCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -169,6 +170,7 @@ ldDateTime_t *ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
 void ldDateTimeFrameUpdate(ldDateTime_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -264,7 +266,12 @@ void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_ti
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(!pWidget->isTransparent)

@@ -155,6 +155,7 @@ ldText_t *ldTextInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentName
 #endif
         pNewWidget->pFunc=&ldTextCommonFunc;
         pNewWidget->isWaitInit=true;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -172,6 +173,7 @@ ldText_t *ldTextInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentName
 
 void ldTextFrameUpdate(ldText_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -202,7 +204,7 @@ void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pP
             {
                 pWidget->isRelease=false;
                 pWidget->scrollOffset=0;
-                pWidget->dirtyRegionState=none;
+                pWidget->dirtyRegionState=waitEnd;
             }
             else
             {
@@ -215,7 +217,7 @@ void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pP
             {
                 pWidget->isRelease=false;
                 pWidget->scrollOffset=pResTile->tRegion.tSize.iHeight-pWidget->strHeight;
-                pWidget->dirtyRegionState=none;
+                pWidget->dirtyRegionState=waitEnd;
             }
             else
             {
@@ -241,8 +243,13 @@ void ldTextLoop(arm_2d_scene_t *pScene,ldText_t *pWidget,const arm_2d_tile_t *pP
             if(pWidget->isWaitInit)
             {
                 pWidget->isWaitInit=false;
-                pWidget->dirtyRegionState=none;
+                pWidget->dirtyRegionState=waitEnd;
             }
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(!pWidget->isTransparent)

@@ -258,7 +258,8 @@ typedef enum{
 typedef enum{
     none,
     waitChange,
-    waitUpdate
+    waitRefresh,
+    waitEnd
 }ldDirtyRegionStateType_t;
 
 typedef void (*ldDelFunc_t)(void *);
@@ -442,6 +443,7 @@ arm_2d_region_t ldLayoutHorizontal(arm_2d_region_t *pWidgetRegion,arm_2d_region_
 arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t *pBufferRegion,int16_t width,int16_t height,int16_t leftSpace,int16_t rightSpace,int16_t topSpace,int16_t bottomSpace);
 
 bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw);
+ldDirtyRegionStateType_t ldBaseUpdateDirtyRegionState(ldDirtyRegionStateType_t state);
 
 #ifdef __cplusplus
 }

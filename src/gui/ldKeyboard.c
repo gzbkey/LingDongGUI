@@ -697,6 +697,7 @@ ldKeyboard_t *ldKeyboardInit(arm_2d_scene_t *pScene,uint16_t nameId,ldFontDict_t
         pNewWidget->isWaitInit=true;
         pNewWidget->isSymbol=false;
         pNewWidget->pFunc=&ldKeyboardCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -742,6 +743,7 @@ void ldKeyboardFrameUpdate(ldKeyboard_t* pWidget)
         pWidget->isWaitInit=true;
     }
 
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -785,7 +787,12 @@ void ldKeyboardLoop(arm_2d_scene_t *pScene,ldKeyboard_t *pWidget,const arm_2d_ti
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&pWidget->targetDirtyRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if((pWidget->isParentHidden)||(pWidget->isHidden))

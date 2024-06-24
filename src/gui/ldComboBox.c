@@ -242,6 +242,7 @@ ldComboBox_t *ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
             pNewWidget->ppItemStrGroup[0]=NULL;
         }
         pNewWidget->pFunc=&ldComboBoxCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -264,6 +265,7 @@ ldComboBox_t *ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
 void ldComboBoxFrameUpdate(ldComboBox_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 
     if(pWidget->dirtyRegionState==waitChange)
@@ -309,7 +311,12 @@ void ldComboBoxLoop(arm_2d_scene_t *pScene,ldComboBox_t *pWidget,const arm_2d_ti
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            pWidget->dirtyRegionState=none;
+            pWidget->dirtyRegionState=waitEnd;
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         arm_2d_region_t displayRegion={

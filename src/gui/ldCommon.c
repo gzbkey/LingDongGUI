@@ -1447,7 +1447,25 @@ bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_
     return false;
 }
 
-
+ldDirtyRegionStateType_t ldBaseUpdateDirtyRegionState(ldDirtyRegionStateType_t state)
+{
+    switch (state)
+    {
+    case waitEnd:
+    {
+        state=none;
+        break;
+    }
+    case waitChange:
+    {
+        state=waitRefresh;
+        break;
+    }
+    default:
+        break;
+    }
+    return state;
+}
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

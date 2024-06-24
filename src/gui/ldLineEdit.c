@@ -203,6 +203,7 @@ ldLineEdit_t *ldLineEditInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
         pNewWidget->hasFloatPoint=false;
         pNewWidget->kbNameId=0;
         pNewWidget->pFunc=&ldLineEditCommonFunc;
+        pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
 
@@ -224,6 +225,7 @@ ldLineEdit_t *ldLineEditInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t pa
 
 void ldLineEditFrameUpdate(ldLineEdit_t* pWidget)
 {
+    pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
 
@@ -255,8 +257,13 @@ void ldLineEditLoop(arm_2d_scene_t *pScene,ldLineEdit_t *pWidget,const arm_2d_ti
         {
             if(!pWidget->isEditing)
             {
-                pWidget->dirtyRegionState=none;
+                pWidget->dirtyRegionState=waitEnd;
             }
+        }
+
+        if(pWidget->dirtyRegionState<waitRefresh)
+        {
+            return;
         }
 
         if(pWidget->isCorner)
