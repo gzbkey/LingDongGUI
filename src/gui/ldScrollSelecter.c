@@ -242,7 +242,6 @@ ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId,
         pNewWidget->isAutoMove=false;
         pNewWidget->isWaitMove=false;
         pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
-        pNewWidget->isWaitInit=true;
         pNewWidget->dirtyRegionState=waitChange;
 
         arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
@@ -331,11 +330,7 @@ void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,con
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
         {
-            if(pWidget->isWaitInit)
-            {
-                pWidget->isWaitInit=false;
-                pWidget->dirtyRegionState=waitEnd;
-            }
+            pWidget->dirtyRegionState=waitEnd;
         }
 
         if(pWidget->dirtyRegionState<waitRefresh)

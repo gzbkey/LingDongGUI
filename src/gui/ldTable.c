@@ -368,6 +368,7 @@ static bool slotTableProcess(xConnectInfo_t info)
 
             if((tempTimer-pWidget->timer)<500)
             {
+                pWidget->isEditing=true;
                 currentItem->isEditing=true;
                 LOG_DEBUG("edit item %d,%d",x,y);
                 if(pWidget->kbNameId)
@@ -482,6 +483,7 @@ static bool slotEditEnd(xConnectInfo_t info)
     ldTable_t *pWidget=ldBaseGetWidgetById(info.receiverId);
     ldTableItem_t *currentItem=ldTableCurrentItem(pWidget);
     currentItem->isEditing=false;
+    pWidget->isEditing=false;
     return false;
 }
 
@@ -618,6 +620,10 @@ ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNa
 
 void ldTableFrameUpdate(ldTable_t* pWidget)
 {
+    if(pWidget->isEditing)
+    {
+        pWidget->dirtyRegionState=waitChange;
+    }
     pWidget->dirtyRegionState=ldBaseUpdateDirtyRegionState(pWidget->dirtyRegionState);
     arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
 }
@@ -708,7 +714,6 @@ void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *
 
                     if(item->isEditing)
                     {
-                        pWidget->dirtyRegionState=waitChange;
                         if(cursorBlinkFlag)
                         {
                             arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);

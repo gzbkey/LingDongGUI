@@ -50,6 +50,7 @@ typedef struct{
 typedef struct {
     LD_COMMON_ATTRIBUTES;
     bool isBgTransparent:1;
+    bool isEditing:1;
     uint8_t rowCount;
     uint8_t columnCount;
     uint8_t itemSpace;//item 间隔
