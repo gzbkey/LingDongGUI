@@ -325,6 +325,8 @@ void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,con
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
+    ldBaseProcessOutsideScreen((ldCommon_t*)pWidget,&newRegion);
+
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))

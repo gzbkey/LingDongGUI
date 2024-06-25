@@ -27,37 +27,41 @@ extern "C" {
 #include "ldComboBox.h"
 #include "ldArc.h"
 
-#define SYS_TICK_CYCLE_MS          10
+#define SYS_TICK_CYCLE_MS               10
 
 //btn占用0-9
-#define SIGNAL_NO_OPERATION         BTN_NO_OPERATION
-#define SIGNAL_PRESS                BTN_PRESS           // value = x (2Byte) + y (2Byte)
-#define SIGNAL_HOLD_DOWN            BTN_HOLD_DOWN       // value = x offset(2Byte) + y offset(2Byte) + x (2Byte) + y (2Byte)
-#define SIGNAL_RELEASE              BTN_RELEASE         // value = x speed(2Byte) + y speed(2Byte) + x (2Byte) + y (2Byte)
+#define SIGNAL_NO_OPERATION             BTN_NO_OPERATION
+#define SIGNAL_PRESS                    BTN_PRESS           // value = x (2Byte) + y (2Byte)
+#define SIGNAL_HOLD_DOWN                BTN_HOLD_DOWN       // value = x offset(2Byte) + y offset(2Byte) + x (2Byte) + y (2Byte)
+#define SIGNAL_RELEASE                  BTN_RELEASE         // value = x speed(2Byte) + y speed(2Byte) + x (2Byte) + y (2Byte)
 
-#define SIGNAL_CLICKED_ITEM         12                  // value = item num
+#define SIGNAL_CLICKED_ITEM             12                  // value = item num
 
-#define SIGNAL_EDITING_FINISHED     13
+#define SIGNAL_EDITING_FINISHED         13
 
-//#define SIGNAL_SYS_SLIDER_LEFT      14
-//#define SIGNAL_SYS_SLIDER_RIGHT     15
-//#define SIGNAL_SYS_SLIDER_UP        16
-//#define SIGNAL_SYS_SLIDER_DOWN      17
+//#define SIGNAL_SYS_SLIDER_LEFT        14
+//#define SIGNAL_SYS_SLIDER_RIGHT       15
+//#define SIGNAL_SYS_SLIDER_UP          16
+//#define SIGNAL_SYS_SLIDER_DOWN        17
 
-//#define SIGNAL_VALUE_CHANGED           7 //数据变化
-//#define SIGNAL_WIDGET_ACTIVE           8 //激活控件
-//#define SIGNAL_SYS_TIME_OUT             10//gui软件定时器
+//#define SIGNAL_VALUE_CHANGED          7 //数据变化
+//#define SIGNAL_WIDGET_ACTIVE          8 //激活控件
+//#define SIGNAL_SYS_TIME_OUT           10//gui软件定时器
 
-#define GET_SIGNAL_OFFSET_X(dat)     ((dat>>48)&0xFFFF)
-#define GET_SIGNAL_OFFSET_Y(dat)     ((dat>>32)&0xFFFF)
+#define GET_SIGNAL_OFFSET_X(dat)        ((dat>>48)&0xFFFF)
+#define GET_SIGNAL_OFFSET_Y(dat)        ((dat>>32)&0xFFFF)
 
-#define GET_SIGNAL_SPEED_X(dat)     ((dat>>48)&0xFFFF)
-#define GET_SIGNAL_SPEED_Y(dat)     ((dat>>32)&0xFFFF)
+#define GET_SIGNAL_SPEED_X(dat)         ((dat>>48)&0xFFFF)
+#define GET_SIGNAL_SPEED_Y(dat)         ((dat>>32)&0xFFFF)
 
-#define GET_SIGNAL_VALUE_X(dat)     ((dat>>16)&0xFFFF)
-#define GET_SIGNAL_VALUE_Y(dat)     (dat&0xFFFF)
+#define GET_SIGNAL_VALUE_X(dat)         ((dat>>16)&0xFFFF)
+#define GET_SIGNAL_VALUE_Y(dat)         (dat&0xFFFF)
 
 typedef void (*ldGuiFunc_t)(arm_2d_scene_t*,uint8_t);
+
+#ifndef LD_PAGE_STATIC
+#define LD_PAGE_STATIC                  (1)
+#endif
 
 #if LD_PAGE_STATIC == 1
 extern void (*ldPageInitFunc[LD_PAGE_MAX])(arm_2d_scene_t *pScene,uint8_t pageNum);

@@ -566,7 +566,6 @@ static bool slotKBProcess(xConnectInfo_t info)
         pWidget->isClick=false;
         pWidget->targetDirtyRegion=_keyboardGetClickRegion(pWidget);
         pWidget->targetDirtyRegion.tLocation.iY+=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
-        LOG_REGION("kb click region",pWidget->targetDirtyRegion);
         pWidget->dirtyRegionState=waitChange;
         break;
     }

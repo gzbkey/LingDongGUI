@@ -210,6 +210,8 @@ void ldGaugeLoop(arm_2d_scene_t *pScene,ldGauge_t *pWidget,const arm_2d_tile_t *
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
+    ldBaseProcessOutsideScreen((ldCommon_t*)pWidget,&newRegion);
+
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
         if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,(arm_2d_region_t*)pWidget->op.Target.ptRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
@@ -346,7 +348,7 @@ void ldGaugeLoop(arm_2d_scene_t *pScene,ldGauge_t *pWidget,const arm_2d_tile_t *
 
 /**
  * @brief   设置指针图片
- * 
+ *
  * @param   pWidget              目标控件指针
  * @param   pointerImgAddr       指针图片地址
  * @param   pointerWidth         指针宽度
@@ -371,7 +373,7 @@ void ldGaugeSetPointerImage(ldGauge_t *pWidget,uintptr_t pointerImgAddr,int16_t 
 
 /**
  * @brief   设置仪表盘的旋转中心点
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   centreOffsetX   中心点坐标x轴
  * @param   centreOffsetY   中心点坐标y轴
@@ -390,7 +392,7 @@ void ldGaugeSetCenterOffset(ldGauge_t *pWidget, int16_t centreOffsetX, int16_t c
 
 /**
  * @brief   仪表盘的指针显示角度
- * 
+ *
  * @param   pWidget         目标控件指针
  * @param   angle           旋转角度，小数点后1位有效
  * @author  Ou Jianbo(59935554@qq.com)
@@ -410,7 +412,7 @@ void ldGaugeSetAngle(ldGauge_t *pWidget, float angle)
 
 /**
  * @brief   指针图片的素材类型
- * 
+ *
  * @param   pWidget           目标控件指针
  * @param   pointerImgType    nomal,withMask,onlyMask,keying
  * @param   keyingOrMaskColor 颜色

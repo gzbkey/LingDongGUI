@@ -579,6 +579,8 @@ void ldIconSliderLoop(arm_2d_scene_t *pScene,ldIconSlider_t *pWidget,const arm_2
 
     arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
 
+    ldBaseProcessOutsideScreen((ldCommon_t*)pWidget,&newRegion);
+
     arm_2d_container(pParentTile,tTarget , &newRegion)
     {
 #if LD_DEBUG == 1

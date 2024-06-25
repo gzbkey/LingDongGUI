@@ -301,6 +301,10 @@ static void _ldGuiFrameUpdate(xListNode* pLink)
     {
         if(tempPos->info!=NULL)
         {
+            if(isFullWidgetUpdate)
+            {
+                ((ldCommon_t *)tempPos->info)->dirtyRegionState=waitChange;
+            }
             (((ldCommon_t *)tempPos->info)->pFunc)->update(tempPos->info);
 
             if(((ldCommon_t *)tempPos->info)->childList!=NULL)
@@ -318,13 +322,15 @@ void ldGuiUpdateScene(void)
 
 void ldGuiFrameStart(arm_2d_scene_t *ptScene)
 {
-    if(isFullWidgetUpdate==true)
+    if(isFullWidgetUpdate)
     {
         arm_2d_scene_player_update_scene_background(ptScene->ptPlayer);
-        isFullWidgetUpdate=false;
     }
 
     _ldGuiFrameUpdate(&ldWidgetLink);
+
+    //初始化后马上清空
+    isFullWidgetUpdate=false;
 
     //检查按键
     if(ldTimeOut(SYS_TICK_CYCLE_MS,&sysTimer,true))

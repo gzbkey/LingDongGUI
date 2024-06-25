@@ -85,13 +85,18 @@ extern "C" {
 // <q>Use Color Log
 // <i> Use Color Log
 #define USE_LOG_COLOR                             (1)
+
+// <o> Log new line type
+//     <0=>    LF \n
+//     <1=>    CR \r
+//     <2=>    CRLF \r\n
+// <i> default select \n
+#define LOG_NEW_LINE_TYPE                         (0)
 #endif
 
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
-// default = 1
-#define LD_PAGE_STATIC                            (1)
 
 // <<< end of configuration section >>>
 

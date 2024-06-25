@@ -1467,6 +1467,43 @@ ldDirtyRegionStateType_t ldBaseUpdateDirtyRegionState(ldDirtyRegionStateType_t s
     return state;
 }
 
+static const arm_2d_region_t tScreen = {
+    .tSize = {
+        .iWidth = LD_CFG_SCEEN_WIDTH,
+        .iHeight = LD_CFG_SCEEN_HEIGHT,
+    },
+};
+
+// 函数arm_2d_is_region_outside
+bool ldBaseRegionOutside(arm_2d_region_t* a, arm_2d_region_t* b)
+{
+    // 计算区域a的右下角和区域b的右下角坐标
+    int16_t aRight = a->tLocation.iX + a->tSize.iWidth;
+    int16_t aBottom = a->tLocation.iY + a->tSize.iHeight;
+    int16_t bRight = b->tLocation.iX + b->tSize.iWidth;
+    int16_t bBottom = b->tLocation.iY + b->tSize.iHeight;
+
+    // 检查x轴和y轴是否重叠
+    bool xOverlap = (a->tLocation.iX > bRight) || (b->tLocation.iX > aRight);
+    bool yOverlap = (a->tLocation.iY > bBottom) || (b->tLocation.iY > aBottom);
+
+    // 如果在x轴或y轴上有一个不重叠，那么返回true，表示两个区域不重叠
+    return xOverlap || yOverlap;
+}
+
+bool ldBaseProcessOutsideScreen(ldCommon_t* pWidget,arm_2d_region_t *targetRegion)
+{
+    if(ldBaseRegionOutside(&tScreen,targetRegion)==1)
+    {
+        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,targetRegion,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        {
+            pWidget->dirtyRegionState=waitEnd;
+        }
+        return true;
+    }
+    return false;
+}
+
 #if defined(__clang__)
 #   pragma clang diagnostic pop
 #endif

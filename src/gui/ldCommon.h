@@ -444,6 +444,7 @@ arm_2d_region_t ldLayoutVertical(arm_2d_region_t *pWidgetRegion,arm_2d_region_t 
 
 bool ldBaseDirtyRegionUpdate(ldCommon_t *pWidget,arm_2d_region_t *newRegion,arm_2d_region_list_item_t *pDirtyRegionItem,bool isRedraw);
 ldDirtyRegionStateType_t ldBaseUpdateDirtyRegionState(ldDirtyRegionStateType_t state);
+bool ldBaseProcessOutsideScreen(ldCommon_t* pWidget,arm_2d_region_t *targetRegion);
 
 #ifdef __cplusplus
 }
