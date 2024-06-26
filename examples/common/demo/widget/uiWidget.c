@@ -165,8 +165,8 @@ void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page)
 
 
      obj=ldArcInit(pScene,ID_ARC,ID_WIN,450,350,101,101,ARC_QUARTER_PNG,ARC_QUARTER_MASK_PNG,__RGB(240,240,240));
-     ldArcSetBgAngle(obj,0,350);
-     ldArcSetFgAngle(obj,30);
+     ldArcSetBgAngle(obj,0,320);
+     ldArcSetFgAngle(obj,0);
      ldArcSetColor(obj,LD_COLOR_LIGHT_BLUE,LD_COLOR_LIGHT_GREEN);
 
      ldKeyboardInit(pScene,ID_KB,SIMSUN_REGULAR_12);
@@ -180,6 +180,7 @@ void uiWidgetLoop(arm_2d_scene_t *pScene,uint8_t page)
      {
          ldArcSetRotationAngle(ldBaseGetWidgetById(ID_ARC),angle);
 
+         ldArcSetFgAngle(ldBaseGetWidgetById(ID_ARC),angle);
          ldGaugeSetAngle(ldBaseGetWidgetById(ID_GAUGE),angle/2+90);
          angle++;
          if(angle>=360)

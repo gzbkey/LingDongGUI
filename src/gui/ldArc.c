@@ -572,7 +572,12 @@ void ldArcSetFgAngle(ldArc_t *pWidget,float fgEnd)
     }
     pWidget->dirtyRegionState=waitChange;
     pWidget->startAngle_x10[1]=pWidget->startAngle_x10[0];
-    pWidget->endAngle_x10[1]=fgEnd*10;
+    fgEnd*=10;
+    if(fgEnd>pWidget->endAngle_x10[0])
+    {
+        fgEnd=pWidget->endAngle_x10[0];
+    }
+    pWidget->endAngle_x10[1]=fgEnd;
 }
 
 /**
