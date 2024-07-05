@@ -1,10 +1,10 @@
 #include "ldConfig.h"
-#include "ldWindow.h"
-#include "ldGui.h"
+//#include "ldWindow.h"
+//#include "ldGui.h"
 #include "Virtual_TFT_Port.h"
-#include "ldCommon.h"
-#include "xList.h"
-#include "ldImage.h"
+//#include "ldCommon.h"
+//#include "xList.h"
+//#include "ldImage.h"
 #include "virtualNor.h"
 
 /**

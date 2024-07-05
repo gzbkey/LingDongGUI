@@ -42,7 +42,7 @@ extern "C" {
 //     <2=>    stdlib
 //     <3=>    user
 // <i> default = 0
-#define LD_MEM_MODE                               (0)
+#define LD_MEM_MODE                               (2)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui

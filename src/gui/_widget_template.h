@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#ifndef __LD_IMAGE_H__
-#define __LD_IMAGE_H__
+#ifndef __<CONTROL_NAME>_H__
+#define __<CONTROL_NAME>_H__
 
 /*============================ INCLUDES ======================================*/
 #include "arm_2d.h"
@@ -37,11 +37,11 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 /* OOC header, please DO NOT modify  */
-#ifdef __LD_IMAGE_IMPLEMENT__
-#   undef   __LD_IMAGE_IMPLEMENT__
+#ifdef __<CONTROL_NAME>_IMPLEMENT__
+#   undef   __<CONTROL_NAME>_IMPLEMENT__
 #   define  __ARM_2D_IMPL__
-#elif defined(__LD_IMAGE_INHERIT__)
-#   undef   __LD_IMAGE_INHERIT__
+#elif defined(__<CONTROL_NAME>_INHERIT__)
+#   undef   __<CONTROL_NAME>_INHERIT__
 #   define __ARM_2D_INHERIT__
 #endif
 #include "arm_2d_utils.h"
@@ -55,23 +55,15 @@ extern "C" {
 /*!
  * \brief a user class for user defined control
  */
-typedef struct ldImage_t ldImage_t;
+typedef struct template_t template_t;
 
-struct ldImage_t {
-    implement(arm_2d_control_node_t);
-    ldWidgetType_t widgetType;
-    uint16_t nameId;
-    ARM_PRIVATE(
-            arm_2d_scene_t *ptScene;
-    )
-    ldColor bgColor;
-    ldColor fgColor;
-    arm_2d_tile_t* ptImgTile;
-    arm_2d_tile_t* ptMaskTile;
-    uint8_t opacity;
-    bool isTransparent:1;//window专用
-    bool isColor:1;
-    bool isHidden:1;
+struct template_t {
+
+ARM_PRIVATE(
+    arm_2d_scene_t *ptScene;
+)
+    /* place your public member here */
+    
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -79,28 +71,26 @@ struct ldImage_t {
 
 extern
 ARM_NONNULL(1)
-ldImage_t* ldImage_init(arm_2d_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* pImgTile, arm_2d_tile_t* pMaskTile, bool isWindow);
-
+template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
+                          template_cfg_t *ptCFG);
+extern
+ARM_NONNULL(1)
+void template_depose( template_t *ptWidget);
 
 extern
 ARM_NONNULL(1)
-void ldImage_depose( ldImage_t *ptWidget);
+void template_on_load( template_t *ptWidget);
 
 extern
 ARM_NONNULL(1)
-void ldImage_on_load( ldImage_t *ptWidget);
+void template_on_frame_start( template_t *ptWidget);
 
 extern
 ARM_NONNULL(1)
-void ldImage_on_frame_start( ldImage_t *ptWidget);
-
-extern
-ARM_NONNULL(1)
-void ldImage_show( ldImage_t *ptWidget,
+void template_show( template_t *ptWidget,
                             const arm_2d_tile_t *ptTile, 
                             bool bIsNewFrame);
 
-void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor);
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

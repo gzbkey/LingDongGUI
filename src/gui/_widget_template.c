@@ -17,13 +17,13 @@
  */
 
 /*============================ INCLUDES ======================================*/
-#define __LD_WINDOW_IMPLEMENT__
+#define __<CONTROL_NAME>_IMPLEMENT__
 
 #include "./arm_extra_controls.h"
 #include "./__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
-#include "ldWindow.h"
+#include "template.h"
 #include <assert.h>
 #include <string.h>
 
@@ -45,31 +45,74 @@
 #endif
 
 ARM_NONNULL(1)
-ldWindow_t* ldWindow_init( arm_2d_scene_t *ptScene,ldWindow_t *ptWidget,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
+                          template_cfg_t *ptCFG)
 {
     assert(NULL!= ptScene);
-
-    ldWindow_t * ptNew=ldImage_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height,NULL,NULL);
-
-    if(ptNew!=NULL)
+    if(NULL==ptWidget)
     {
-        if(nameId==0)
+        ptWidget=ldMalloc(sizeof (template_t));
+        if(ptWidget)
         {
-            ptNew->widgetType=widgetTypeBackground;
-            ldImageSetBgColor(ptNew,__RGB(240,240,240));
+            memset(ptWidget, 0, sizeof(template_t));
         }
         else
         {
-            ptNew->isTransparent=true;
-            ptNew->widgetType=widgetTypeWindow;
+            return NULL;
         }
-
-        LOG_INFO("[window] init,id:%d",nameId);
     }
 
-    return ptNew;
+    ptWidget->tRegion.tLocation.iX=x;
+    ptWidget->tRegion.tLocation.iY=y;
+    ptWidget->tRegion.tSize.iWidth=width;
+    ptWidget->tRegion.tSize.iHeight=height;
+    ptWidget->nameId=nameId;
+    ptWidget->widgetType=widgetTypeTemplate;
+
+    return ptWidget;
 }
 
+ARM_NONNULL(1)
+void template_depose( template_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+ARM_NONNULL(1)
+void template_on_load( template_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+ARM_NONNULL(1)
+void template_on_frame_start( template_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+ARM_NONNULL(1)
+void template_show( template_t *ptWidget,
+                            const arm_2d_tile_t *ptTile, 
+                            bool bIsNewFrame)
+{
+    assert(NULL!= ptWidget);
+
+#if 0
+    if (bIsNewFrame) {
+        
+    }
+#endif
+    arm_2d_container(ptTile, tTarget, &ptWidget->tRegion) {
+
+
+
+    }
+
+    arm_2d_op_wait_async(NULL);
+}
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

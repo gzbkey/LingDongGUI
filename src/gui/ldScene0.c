@@ -21,11 +21,6 @@
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   arm2d的场景文件，是arm2d的关键用户文件
  */
-/*============================ INCLUDES ======================================*/
-
-#if defined(_RTE_)
-#   include "RTE_Components.h"
-#endif
 
 #include "arm_2d.h"
 
@@ -38,8 +33,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "ldCommon.h"
+
 #include "ldGui.h"
+
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -126,8 +122,8 @@ static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
 
 static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
-    ldGuiFrameStart(ptScene);
-    ldGuiLogicLoop(ptScene);
+//    ldGuiFrameStart(ptScene);
+//    ldGuiLogicLoop(ptScene);
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
@@ -135,14 +131,14 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
-    if(pageNumNow!=pageTarget)
-    {
-        ldGuiQuit(ptScene);
-        pageNumNow=pageTarget;
-        ldGuiInit(ptScene);
-//        arm_2d_scene1_init(&DISP0_ADAPTER);
-//        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
-    }
+//    if(pageNumNow!=pageTarget)
+//    {
+//        ldGuiQuit(ptScene);
+//        pageNumNow=pageTarget;
+//        ldGuiInit(ptScene);
+////        arm_2d_scene1_init(&DISP0_ADAPTER);
+////        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
+//    }
     /* switch to next scene after 3s */
 //    if (arm_2d_helper_is_time_out(3000, &this.lTimestamp[0])) {
 //
@@ -157,7 +153,7 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 //    ldGuiQuit();
 //    pageNumNow=pageTarget;
 }
-
+void *obj,*pImg,*pWin;
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
@@ -169,7 +165,10 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
 
-        ldGuiLoop((arm_2d_scene_t*)ptThis,(arm_2d_tile_t*)ptTile,bIsNewFrame);
+    ldWindow_show(pWin,ptTile,bIsNewFrame);
+        ldImage_show(pImg,ptTile,bIsNewFrame);
+
+    ldButton_show(obj,ptTile,bIsNewFrame);
 
 
     /*-----------------------draw the foreground end  -----------------------*/
@@ -210,8 +209,6 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
              */
             .fnOnLoad       = &__on_scene0_load,
             .fnScene        = &__pfb_draw_scene0_handler,
-            .ptDirtyRegion  = NULL,
-
 
             //.fnOnBGStart    = &__on_scene0_background_start,
             //.fnOnBGComplete = &__on_scene0_background_complete,
@@ -227,7 +224,24 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
     /* ------------   initialize members of user_scene_0_t begin ---------------*/
 
-        ldGuiInit((arm_2d_scene_t*)ptThis);
+//        ldGuiInit((arm_2d_scene_t*)ptThis);
+
+    pWin=ldWindow_init(&ptThis->use_as__arm_2d_scene_t,NULL,0, 0, 0, 0, 320, 240);
+    pImg= ldImage_init(&ptThis->use_as__arm_2d_scene_t,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
+    ldImageSetBgColor(pImg,__RGB(0xFF,0xFF,0xFF));
+
+    obj=ldButton_init(&ptThis->use_as__arm_2d_scene_t,NULL,2, 0, 10,10,100,50);
+
+    ldWidgetNode=&((ldWindow_t*)pWin)->use_as__arm_2d_control_node_t;
+
+
+ldNodeAdd(&((ldWindow_t*)pWin)->use_as__arm_2d_control_node_t,&((ldImage_t*)pImg)->use_as__arm_2d_control_node_t);
+ldNodeAdd(&((ldWindow_t*)pWin)->use_as__arm_2d_control_node_t,&((ldButton_t*)obj)->use_as__arm_2d_control_node_t);
+
+arm_ctrl_enum(ldWidgetNode, ptItem, PREORDER_TRAVERSAL) {
+        LOG_REGION("", ptItem->tRegion);
+
+    }
 
     /* ------------   initialize members of user_scene_0_t end   ---------------*/
 

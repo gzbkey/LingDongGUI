@@ -5,7 +5,10 @@
 extern "C" {
 #endif
 
-#include "ldCommon.h"
+#include "ldConfig.h"
+#ifndef LOG_PRINT
+#include "stdio.h"
+#endif
 
 #define LOG_LEVEL_NONE                  (0)
 #define LOG_LEVEL_ERROR                 (1)

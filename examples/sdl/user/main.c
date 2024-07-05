@@ -6,11 +6,11 @@
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
 #include "xLog.h"
-#include "xBtnAction.h"
+//#include "xBtnAction.h"
 #include "stdbool.h"
-#include "uiWatch.h"
-#include "uiWidget.h"
-#include "uiDemo.h"
+//#include "uiWatch.h"
+//#include "uiWidget.h"
+//#include "uiDemo.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -104,18 +104,18 @@ int main (void)
     LOG_NORMAL("====================\n");
     vtInit();
 
-    xBtnInit(KEY_NUM_UP,vtGetKeyState);
-    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
-    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
-    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
-    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
-    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
+//    xBtnInit(KEY_NUM_UP,vtGetKeyState);
+//    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
+//    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
+//    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
+//    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
+//    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
 #if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-#if LD_PAGE_STATIC == 0
-    ldGuiSetPageMax(1);
-#endif
-    LD_ADD_PAGE_DEMO;
+//#if LD_PAGE_STATIC == 0
+//    ldGuiSetPageMax(1);
+//#endif
+//    LD_ADD_PAGE_DEMO;
 #endif
 
     arm_irq_safe {
