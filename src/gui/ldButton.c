@@ -44,10 +44,24 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+const ldBaseWidgetFunc_t ldButtonFunc={
+    .depose=(ldDeposeFunc_t)ldButton_depose,
+    .show=(ldShowFunc_t)ldButton_show,
+    .frameStart=(ldFrameStartFunc_t)ldButton_on_frame_start,
+};
+
 ARM_NONNULL(1)
-ldButton_t *ldButton_init(arm_2d_scene_t *ptScene,ldButton_t *ptWidget,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+ldButton_t *ldButton_init(arm_2d_scene_t *ptScene,
+                          ldButton_t *ptWidget,
+                          uint16_t nameId,
+                          uint16_t parentNameId,
+                          int16_t x,
+                          int16_t y,
+                          int16_t width,
+                          int16_t height)
 {
     assert(NULL!= ptScene);
+    ldBase_t* ptParent;
 
     if(NULL==ptWidget)
     {
@@ -59,18 +73,23 @@ ldButton_t *ldButton_init(arm_2d_scene_t *ptScene,ldButton_t *ptWidget,uint16_t 
         }
     }
 
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
-    ptWidget->nameId=nameId;
-    ptWidget->widgetType=widgetTypeButton;
+    ptParent=ldBaseGetWidget(parentNameId);
+    ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
 
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
+    ptWidget->use_as__ldBase_t.nameId=nameId;
+    ptWidget->use_as__ldBase_t.widgetType=widgetTypeButton;
+ptWidget->use_as__ldBase_t.pFunc=&ldButtonFunc;
 
     ptWidget->releaseColor = __RGB(217,225,244);
     ptWidget->pressColor = __RGB(255,243,202);
     ptWidget->selectColor = __RGB(255,0,0);
     ptWidget->opacity = 255;
+
+
 
     LOG_INFO("[button] init,id:%d",nameId);
     return ptWidget;
@@ -98,9 +117,10 @@ void ldButton_on_frame_start( ldButton_t *ptWidget)
 }
 
 ARM_NONNULL(1)
-void ldButton_show( ldButton_t *ptWidget,
-                            const arm_2d_tile_t *ptTile,
-                            bool bIsNewFrame)
+void ldButton_show(arm_2d_scene_t *pScene,
+                   ldButton_t *ptWidget,
+                   const arm_2d_tile_t *ptTile,
+                   bool bIsNewFrame)
 {
     assert(NULL!= ptWidget);
 
@@ -115,9 +135,12 @@ void ldButton_show( ldButton_t *ptWidget,
     }
 #endif
 
-    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__arm_2d_control_node_t.tRegion) {
+    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion) {
 
-        if ((ptWidget->ptReleaseImgTile==NULL)&&(ptWidget->ptReleaseMaskTile==NULL)&&(ptWidget->ptPressImgTile==NULL)&&(ptWidget->ptPressMaskTile==NULL))//color
+        if ((ptWidget->ptReleaseImgTile==NULL)&&
+                (ptWidget->ptReleaseMaskTile==NULL)&&
+                (ptWidget->ptPressImgTile==NULL)&&
+                (ptWidget->ptPressMaskTile==NULL))//color
         {
 
             if(ptWidget->isCorner)

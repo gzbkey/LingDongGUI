@@ -58,9 +58,7 @@ extern "C" {
 typedef struct ldButton_t ldButton_t;
 
 struct ldButton_t {
-    implement(arm_2d_control_node_t);
-    ldWidgetType_t widgetType;
-    uint16_t nameId;
+    implement(ldBase_t);
     ARM_PRIVATE(
             arm_2d_scene_t *ptScene;
     )
@@ -93,7 +91,14 @@ struct ldButton_t {
 
 extern
 ARM_NONNULL(1)
-ldButton_t *ldButton_init(arm_2d_scene_t *ptScene,ldButton_t *ptWidget,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height);
+ldButton_t *ldButton_init( arm_2d_scene_t *ptScene,
+                           ldButton_t *ptWidget,
+                           uint16_t nameId,
+                           uint16_t parentNameId,
+                           int16_t x,
+                           int16_t y,
+                           int16_t width,
+                           int16_t height);
 
 extern
 ARM_NONNULL(1)
@@ -109,9 +114,10 @@ void ldButton_on_frame_start( ldButton_t *ptWidget);
 
 extern
 ARM_NONNULL(1)
-void ldButton_show( ldButton_t *ptWidget,
-                            const arm_2d_tile_t *ptTile,
-                            bool bIsNewFrame);
+void ldButton_show( arm_2d_scene_t *pScene,
+                    ldButton_t *ptWidget,
+                    const arm_2d_tile_t *ptTile,
+                    bool bIsNewFrame);
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

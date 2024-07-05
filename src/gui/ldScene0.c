@@ -153,7 +153,7 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 //    ldGuiQuit();
 //    pageNumNow=pageTarget;
 }
-void *obj,*pImg,*pWin;
+void *pBtn,*pImg,*pWin;
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
@@ -165,10 +165,13 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
 
-    ldWindow_show(pWin,ptTile,bIsNewFrame);
-        ldImage_show(pImg,ptTile,bIsNewFrame);
+        ldGuiDraw(pTarget,
+                       ptTile,
+                       bIsNewFrame);
+//    ldWindow_show(pTarget,pWin,ptTile,bIsNewFrame);
+//        ldImage_show(pTarget,pImg,ptTile,bIsNewFrame);
 
-    ldButton_show(obj,ptTile,bIsNewFrame);
+//    ldButton_show(pTarget,pBtn,ptTile,bIsNewFrame);
 
 
     /*-----------------------draw the foreground end  -----------------------*/
@@ -230,18 +233,9 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     pImg= ldImage_init(&ptThis->use_as__arm_2d_scene_t,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(pImg,__RGB(0xFF,0xFF,0xFF));
 
-    obj=ldButton_init(&ptThis->use_as__arm_2d_scene_t,NULL,2, 0, 10,10,100,50);
-
-    ldWidgetNode=&((ldWindow_t*)pWin)->use_as__arm_2d_control_node_t;
+    pBtn=ldButton_init(&ptThis->use_as__arm_2d_scene_t,NULL,2, 0, 10,10,100,50);
 
 
-ldNodeAdd(&((ldWindow_t*)pWin)->use_as__arm_2d_control_node_t,&((ldImage_t*)pImg)->use_as__arm_2d_control_node_t);
-ldNodeAdd(&((ldWindow_t*)pWin)->use_as__arm_2d_control_node_t,&((ldButton_t*)obj)->use_as__arm_2d_control_node_t);
-
-arm_ctrl_enum(ldWidgetNode, ptItem, PREORDER_TRAVERSAL) {
-        LOG_REGION("", ptItem->tRegion);
-
-    }
 
     /* ------------   initialize members of user_scene_0_t end   ---------------*/
 

@@ -11,7 +11,9 @@ extern "C" {
 #include "ldImage.h"
 #include "ldButton.h"
 
-
+void ldGuiDraw(arm_2d_scene_t *ptScene,
+               const arm_2d_tile_t *ptTile,
+               bool bIsNewFrame);
 
 
 #ifdef __cplusplus

@@ -188,29 +188,16 @@ void ldNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
 //    }
 }
 
-//void* ldFindWidget(arm_2d_control_node_t *targetNode)
-//{
-
-//    arm_ctrl_enum(ldWidgetNode, ptItem, PREORDER_TRAVERSAL) {
-//        LOG_REGION("", ptItem->tRegion);
-//        if(targetNode==ptItem)
-//        {
-//            return
-//        }
-//    }
-
-
-
-////    arm_2d_helper_control_enum_init(&tEnumerator,
-////                                    &ARM_2D_CONTROL_ENUMERATION_POLICY_PREORDER_TRAVERSAL,
-////                                    ldWidgetNode);
-////    while(arm_2d_helper_control_enum_get_next_node(&tEnumerator))
-////    {
-////        tEnumerator.ptCurrent  ;
-////    }
-
-//    return NULL;
-//}
+void* ldBaseGetWidget(uint16_t nameId)
+{
+    arm_ctrl_enum(ldWidgetNode, ptItem, PREORDER_TRAVERSAL) {
+        if(((ldBase_t*)ptItem)->nameId==nameId)
+        {
+            return ptItem;
+        }
+    }
+    return NULL;
+}
 
 void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity)
 {

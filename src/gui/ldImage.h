@@ -58,9 +58,7 @@ extern "C" {
 typedef struct ldImage_t ldImage_t;
 
 struct ldImage_t {
-    implement(arm_2d_control_node_t);
-    ldWidgetType_t widgetType;
-    uint16_t nameId;
+    implement(ldBase_t);
     ARM_PRIVATE(
             arm_2d_scene_t *ptScene;
     )
@@ -96,7 +94,8 @@ void ldImage_on_frame_start( ldImage_t *ptWidget);
 
 extern
 ARM_NONNULL(1)
-void ldImage_show( ldImage_t *ptWidget,
+void ldImage_show( arm_2d_scene_t *pScene,
+                   ldImage_t *ptWidget,
                             const arm_2d_tile_t *ptTile, 
                             bool bIsNewFrame);
 

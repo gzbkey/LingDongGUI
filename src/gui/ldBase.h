@@ -46,21 +46,28 @@ widgetTypeKeyboard,
 #define MEM_MODE_STDLIB                           (2)
 #define MEM_MODE_USER                             (3)
 
+typedef void (*ldDeposeFunc_t)(void *);
+typedef void (*ldShowFunc_t)(arm_2d_scene_t*,void *,void *,bool);
+typedef void (*ldFrameStartFunc_t)(void *);
 
-//#define LD_BASE                         ARM_PROTECTED( \
-//                                            arm_2d_control_node_t *ptNext; \
-//                                            arm_2d_control_node_t *ptParent; \
-//                                            arm_2d_control_node_t *ptChildList; \
-//                                        ) \
-//                                        arm_2d_region_t tRegion; \
-//                                        ldWidgetType_t widgetType; \
-//                                        uint16_t nameId
+typedef struct {
+    ldDeposeFunc_t depose;
+    ldShowFunc_t show;
+    ldFrameStartFunc_t frameStart;
+}ldBaseWidgetFunc_t;
 
+typedef struct  {
+    implement(arm_2d_control_node_t);
+    ldWidgetType_t widgetType;
+    uint16_t nameId;
+    const ldBaseWidgetFunc_t *pFunc;
+}ldBase_t;
 
 #define LD_CHK_PTR_RET(ptr,retValue)             if ((ptr) == NULL) { return retValue; }
 
 
 extern arm_2d_control_node_t *ldWidgetNode;
+
 
 
 extern void *ldMalloc(uint32_t size);
@@ -71,7 +78,7 @@ extern void *ldRealloc(void *ptr,uint32_t newSize);
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
 void ldNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
-
+void* ldBaseGetWidget(uint16_t nameId);
 void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity);
 

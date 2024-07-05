@@ -44,6 +44,12 @@
 #   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+const ldBaseWidgetFunc_t ldImageFunc={
+    .depose=(ldDeposeFunc_t)ldImage_depose,
+    .show=(ldShowFunc_t)ldImage_show,
+    .frameStart=(ldFrameStartFunc_t)ldImage_on_frame_start,
+};
+
 ARM_NONNULL(1)
 ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
                          ldImage_t *ptWidget,
@@ -58,6 +64,8 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
                          bool isWindow)
 {
     assert(NULL!= ptScene);
+    ldBase_t* ptParent;
+
     if(NULL==ptWidget)
     {
         ptWidget=ldCalloc(1,sizeof (ldImage_t));
@@ -68,53 +76,47 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
         }
     }
 
-//    arm_2d_control_node_t* node=ldCalloc(1,(sizeof (arm_2d_control_node_t)));
-//    if(NULL==node)
-//    {
-//        ldFree(ptWidget);
-//        LOG_ERROR("[node] init failed,id:%d",nameId);
-//        return NULL;
-//    }
-//    if(parentNameId==0)
-//    {
-////        ldWidgetNode=ptWidget;
-//    }
-//    else
-//    {
-////        ldNodeAdd()
-////        arm_2d_control_node_t* node=
-//    }
 
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
-    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
-    ptWidget->nameId=nameId;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
+    ptWidget->use_as__ldBase_t.nameId=nameId;
+ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
+
+    ptWidget->opacity = 255;
+    ptWidget->ptImgTile=ptImgTile;
+    ptWidget->ptMaskTile=ptMaskTile;
+
+
 
     if(isWindow)
     {
         if(nameId==0)
         {
-            ptWidget->widgetType=widgetTypeBackground;
+            ldWidgetNode=(arm_2d_control_node_t*)ptWidget;
+            ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
             ldImageSetBgColor(ptWidget,__RGB(240,240,240));
             LOG_INFO("[background] init,id:%d",nameId);
         }
         else
         {
+            ptParent=ldBaseGetWidget(parentNameId);
+            ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
-            ptWidget->widgetType=widgetTypeWindow;
+            ptWidget->use_as__ldBase_t.widgetType=widgetTypeWindow;
             LOG_INFO("[window] init,id:%d",nameId);
         }
     }
     else
     {
-        ptWidget->widgetType=widgetTypeImage;
+        ptParent=ldBaseGetWidget(parentNameId);
+        ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
+        ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;
         LOG_INFO("[image] init,id:%d",nameId);
     }
 
-    ptWidget->opacity = 255;
-    ptWidget->ptImgTile=ptImgTile;
-    ptWidget->ptMaskTile=ptMaskTile;
+
 
 
     return ptWidget;
@@ -142,9 +144,10 @@ void ldImage_on_frame_start( ldImage_t *ptWidget)
 }
 
 ARM_NONNULL(1)
-void ldImage_show( ldImage_t *ptWidget,
-                            const arm_2d_tile_t *ptTile, 
-                            bool bIsNewFrame)
+void ldImage_show( arm_2d_scene_t *pScene,
+                   ldImage_t *ptWidget,
+                   const arm_2d_tile_t *ptTile,
+                   bool bIsNewFrame)
 {
     assert(NULL!= ptWidget);
 
@@ -157,7 +160,7 @@ void ldImage_show( ldImage_t *ptWidget,
         
     }
 #endif
-    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__arm_2d_control_node_t.tRegion) {
+    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion) {
         if (ptWidget->isColor)
         {
             ldBaseColor(&tTarget,
