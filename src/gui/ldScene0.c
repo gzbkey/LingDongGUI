@@ -67,17 +67,14 @@
 #   pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 #endif
 
-/*============================ MACROS ========================================*/
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
 #undef this
 #define this (*ptThis)
 
-/*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ IMPLEMENTATION ================================*/
+enum {
+//    SCENE_DR_START = 0,
+    SCENE_DR_UPDATE=0,
+    SCENE_DR_DONE,
+};
 
 static void __on_scene0_load(arm_2d_scene_t *ptScene)
 {
@@ -92,6 +89,10 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
     ARM_2D_UNUSED(ptThis);
 
     ptScene->ptPlayer = NULL;
+
+    arm_2d_scene_player_dynamic_dirty_region_depose(
+                &ptThis->tDirtyRegionItem,
+                &ptThis->use_as__arm_2d_scene_t);
 
     /* reset timestamp */
     arm_foreach(int64_t,this.lTimestamp, ptItem) {
@@ -122,14 +123,24 @@ static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
 
 static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
+    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+
 //    ldGuiFrameStart(ptScene);
 //    ldGuiLogicLoop(ptScene);
+
+    arm_2d_dynamic_dirty_region_on_frame_start(
+                                                &ptThis->tDirtyRegionItem,
+                                                SCENE_DR_UPDATE);//SCENE_DR_START);
+
+    arm_2d_helper_control_enum_init(&ptThis->tEnum,&ARM_2D_CONTROL_ENUMERATION_POLICY_PREORDER_TRAVERSAL,ptNodeRoot);
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
+
+    arm_2d_helper_control_enum_depose(&ptThis->tEnum);
 
 //    if(pageNumNow!=pageTarget)
 //    {
@@ -153,7 +164,7 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 //    ldGuiQuit();
 //    pageNumNow=pageTarget;
 }
-void *pBtn,*pImg,*pWin;
+
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
@@ -166,14 +177,52 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     /*-----------------------draw the foreground begin-----------------------*/
 
         ldGuiDraw(pTarget,
-                       ptTile,
-                       bIsNewFrame);
-//    ldWindow_show(pTarget,pWin,ptTile,bIsNewFrame);
-//        ldImage_show(pTarget,pImg,ptTile,bIsNewFrame);
+                  ptTile,
+                  bIsNewFrame);
 
-//    ldButton_show(pTarget,pBtn,ptTile,bIsNewFrame);
+        /* update dirty region */
+        switch (arm_2d_dynamic_dirty_region_wait_next(
+            &ptThis->tDirtyRegionItem))
+        {
+//        case SCENE_DR_START:
+//        {
+//            break;
+//        }
+        case SCENE_DR_UPDATE:
+        {
+            do {
+                if (arm_2d_helper_control_enum_get_next_node(&ptThis->tEnum))
+                {
+                    if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isRegionChange)
+                    {
+                        arm_2d_dynamic_dirty_region_update(
+                            &ptThis->tDirtyRegionItem,
+                            (arm_2d_tile_t*)ptTile,
+                            &((ldBase_t *)ptThis->tEnum.ptCurrent)->use_as__arm_2d_control_node_t.tRegion,
+                            SCENE_DR_UPDATE);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    arm_2d_dynamic_dirty_region_change_user_region_index_only(
+                        &ptThis->tDirtyRegionItem,
+                        SCENE_DR_DONE);
+                }
+                break;
+            } while (true);
 
 
+            break;
+        }
+        case SCENE_DR_DONE:
+            break;
+        default:
+            break;
+        }
     /*-----------------------draw the foreground end  -----------------------*/
     }
     ARM_2D_OP_WAIT_ASYNC();
@@ -229,13 +278,18 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
 //        ldGuiInit((arm_2d_scene_t*)ptThis);
 
-    pWin=ldWindow_init(&ptThis->use_as__arm_2d_scene_t,NULL,0, 0, 0, 0, 320, 240);
-    pImg= ldImage_init(&ptThis->use_as__arm_2d_scene_t,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
-    ldImageSetBgColor(pImg,__RGB(0xFF,0xFF,0xFF));
+    void *obj;
+    ldWindow_init(&ptThis->use_as__arm_2d_scene_t,NULL,0, 0, 0, 0, 320, 240);
+    obj= ldImage_init(&ptThis->use_as__arm_2d_scene_t,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
+    ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
-    pBtn=ldButton_init(&ptThis->use_as__arm_2d_scene_t,NULL,2, 0, 10,10,100,50);
+    ldButton_init(&ptThis->use_as__arm_2d_scene_t,NULL,2, 0, 10,10,100,50);
 
 
+
+    arm_2d_scene_player_dynamic_dirty_region_init(
+                                                &ptThis->tDirtyRegionItem,
+                                                &ptThis->use_as__arm_2d_scene_t);
 
     /* ------------   initialize members of user_scene_0_t end   ---------------*/
 

@@ -47,7 +47,7 @@
 
 
 
-arm_2d_control_node_t *ldWidgetNode=NULL;
+arm_2d_control_node_t *ptNodeRoot=NULL;
 
 
 
@@ -190,7 +190,7 @@ void ldNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
 
 void* ldBaseGetWidget(uint16_t nameId)
 {
-    arm_ctrl_enum(ldWidgetNode, ptItem, PREORDER_TRAVERSAL) {
+    arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
         if(((ldBase_t*)ptItem)->nameId==nameId)
         {
             return ptItem;

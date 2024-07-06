@@ -83,6 +83,7 @@ ldButton_t *ldButton_init(arm_2d_scene_t *ptScene,
     ptWidget->use_as__ldBase_t.nameId=nameId;
     ptWidget->use_as__ldBase_t.widgetType=widgetTypeButton;
 ptWidget->use_as__ldBase_t.pFunc=&ldButtonFunc;
+ptWidget->use_as__ldBase_t.isRegionChange=true;
 
     ptWidget->releaseColor = __RGB(217,225,244);
     ptWidget->pressColor = __RGB(255,243,202);

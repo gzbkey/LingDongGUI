@@ -84,6 +84,7 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
     ptWidget->use_as__ldBase_t.nameId=nameId;
 ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
 
+
     ptWidget->opacity = 255;
     ptWidget->ptImgTile=ptImgTile;
     ptWidget->ptMaskTile=ptMaskTile;
@@ -94,13 +95,14 @@ ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
     {
         if(nameId==0)
         {
-            ldWidgetNode=(arm_2d_control_node_t*)ptWidget;
+            ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
             ldImageSetBgColor(ptWidget,__RGB(240,240,240));
             LOG_INFO("[background] init,id:%d",nameId);
         }
         else
         {
+            ptWidget->use_as__ldBase_t.isRegionChange=true;
             ptParent=ldBaseGetWidget(parentNameId);
             ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
@@ -110,6 +112,7 @@ ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
     }
     else
     {
+        ptWidget->use_as__ldBase_t.isRegionChange=true;
         ptParent=ldBaseGetWidget(parentNameId);
         ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;

@@ -6,7 +6,7 @@
 #include "arm_2d.h"
 
 #include "arm_2d_helper_scene.h"
-
+#include "arm_2d_helper_control.h"
 #ifdef   __cplusplus
 extern "C" {
 #endif
@@ -61,6 +61,8 @@ ARM_PRIVATE(
     /* place your private member here, following two are examples */
     int64_t lTimestamp[1];
     bool bUserAllocated;
+    arm_2d_region_list_item_t tDirtyRegionItem;
+    arm_2d_control_enumerator_t tEnum;
 
 )
     /* place your public member here */

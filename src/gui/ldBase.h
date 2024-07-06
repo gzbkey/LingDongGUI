@@ -58,15 +58,16 @@ typedef struct {
 
 typedef struct  {
     implement(arm_2d_control_node_t);
+    const ldBaseWidgetFunc_t *pFunc;
     ldWidgetType_t widgetType;
     uint16_t nameId;
-    const ldBaseWidgetFunc_t *pFunc;
+    bool isRegionChange:1;
 }ldBase_t;
 
 #define LD_CHK_PTR_RET(ptr,retValue)             if ((ptr) == NULL) { return retValue; }
 
 
-extern arm_2d_control_node_t *ldWidgetNode;
+extern arm_2d_control_node_t *ptNodeRoot;
 
 
 
