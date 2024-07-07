@@ -9,6 +9,12 @@ SOURCES += \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldImage.c \
     ../../src/gui/ldScene0.c \
+    ../../src/misc/freeRtosHeap4.c \
+    ../../src/misc/tlsf.c \
+    ../../src/misc/xBtnAction.c \
+    ../../src/misc/xConnect.c \
+    ../../src/misc/xList.c \
+    ../../src/misc/xQueue.c \
     virtualNor/virtualNor.c \
     user/ldConfig.c \
     user/main.c \
@@ -22,6 +28,13 @@ HEADERS += \
     ../../src/gui/ldImage.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldWindow.h \
+    ../../src/misc/freeRtosHeap4.h \
+    ../../src/misc/tlsf.h \
+    ../../src/misc/xBtnAction.h \
+    ../../src/misc/xConnect.h \
+    ../../src/misc/xList.h \
+    ../../src/misc/xLog.h \
+    ../../src/misc/xQueue.h \
     virtualNor/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \

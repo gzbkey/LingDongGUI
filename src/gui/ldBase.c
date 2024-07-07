@@ -3,15 +3,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -29,68 +29,65 @@
 #endif
 
 #if defined(__clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wunknown-warning-option"
-#   pragma clang diagnostic ignored "-Wreserved-identifier"
-#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
-#   pragma clang diagnostic ignored "-Wsign-conversion"
-#   pragma clang diagnostic ignored "-Wpadded"
-#   pragma clang diagnostic ignored "-Wcast-qual"
-#   pragma clang diagnostic ignored "-Wcast-align"
-#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#   pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#   pragma clang diagnostic ignored "-Wmissing-braces"
-#   pragma clang diagnostic ignored "-Wunused-const-variable"
-#   pragma clang diagnostic ignored "-Wmissing-declarations"
-#   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Wunused-const-variable"
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-
-
-arm_2d_control_node_t *ptNodeRoot=NULL;
-
-
+arm_2d_control_node_t *ptNodeRoot = NULL;
+ldPageFuncGroup_t *ptGuiPageFuncGroup = NULL;
 
 #if LD_MEM_MODE == MEM_MODE_TLFS
-static void * pTlsfMem=NULL;
-__attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
+static void *pTlsfMem = NULL;
+__attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
-__attribute__((aligned (8))) uint8_t ucHeap[LD_MEM_SIZE];
+__attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
 #endif
 
 __WEAK void *ldMalloc(uint32_t size)
 {
-    void* p=NULL;
+    void *p = NULL;
 #if LD_MEM_MODE == MEM_MODE_TLFS
-    if(pTlsfMem==NULL)
+    if (pTlsfMem == NULL)
     {
-        pTlsfMem = tlsf_create_with_pool((void *)ucHeap, sizeof (ucHeap));
+        pTlsfMem = tlsf_create_with_pool((void *)ucHeap, sizeof(ucHeap));
     }
-    p=tlsf_malloc(pTlsfMem,size);
+    p = tlsf_malloc(pTlsfMem, size);
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
-    p=pvPortMalloc(size);
+    p = pvPortMalloc(size);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
-    p=malloc(size);
+    p = malloc(size);
 #endif
     return p;
 }
 
-__WEAK void *ldCalloc(uint32_t num,uint32_t size)
+__WEAK void *ldCalloc(uint32_t num, uint32_t size)
 {
-    void* p=NULL;
+    void *p = NULL;
 
-    p=ldMalloc(num*size);
+    p = ldMalloc(num * size);
 
-    if(p!=NULL)
+    if (p != NULL)
     {
-        memset(p,0,num*size);
+        memset(p, 0, num * size);
     }
     return p;
 }
 
 __WEAK void ldFree(void *p)
 {
-    if(p==NULL)
+    if (p == NULL)
     {
         return;
     }
@@ -103,36 +100,36 @@ __WEAK void ldFree(void *p)
 #endif
 }
 
-__WEAK void *ldRealloc(void *ptr,uint32_t newSize)
+__WEAK void *ldRealloc(void *ptr, uint32_t newSize)
 {
-    void* p=NULL;
+    void *p = NULL;
 #if LD_MEM_MODE == MEM_MODE_TLFS
     p = tlsf_realloc(pTlsfMem, ptr, newSize);
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
-    p = pvPortRealloc(ptr,newSize);
+    p = pvPortRealloc(ptr, newSize);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
-    return realloc(ptr,newSize);
+    return realloc(ptr, newSize);
 #endif
-    if(p!=NULL)
+    if (p != NULL)
     {
-        memset(p,0,newSize);
+        memset(p, 0, newSize);
     }
     return p;
 }
 
-
-bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset)
+bool ldTimeOut(uint16_t ms, int64_t *pTimer, bool isReset)
 {
     int64_t lPeriod;
     int64_t lTimestamp = arm_2d_helper_get_system_timestamp();
 
-    if(1==*pTimer)
+    if (1 == *pTimer)
     {
         return false;
     }
 
-    lPeriod=arm_2d_helper_convert_ms_to_ticks(ms);
-    if (0 == *pTimer) {
+    lPeriod = arm_2d_helper_convert_ms_to_ticks(ms);
+    if (0 == *pTimer)
+    {
         *pTimer = lPeriod;
         *pTimer += lTimestamp;
 
@@ -141,20 +138,20 @@ bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset)
 
     if (lTimestamp >= *pTimer)
     {
-        if(isReset)
+        if (isReset)
         {
             *pTimer = lPeriod + lTimestamp;
         }
         else
         {
-            *pTimer =1;
+            *pTimer = 1;
         }
-            return true;
+        return true;
     }
     return false;
 }
 
-void ldNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
+void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
 {
     child->ptParent = parent;
     if (parent->ptChildList == NULL)
@@ -170,28 +167,49 @@ void ldNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
         }
         sibling->ptNext = child;
     }
-//    if (parent->ptChildList == NULL)
-//    {
-//        child->ptParent = parent;
-//        parent->ptChildList = child;
-//    }
-//    else
-//    {
-//        arm_2d_control_node_t *sibling = parent->ptChildList;
-//        child->ptParent = sibling;
-//        while (sibling->ptNext != NULL)
-//        {
-//            child->ptParent = sibling;
-//            sibling = sibling->ptNext;
-//        }
-//        sibling->ptNext = child;
-//    }
+    //    if (parent->ptChildList == NULL)
+    //    {
+    //        child->ptParent = parent;
+    //        parent->ptChildList = child;
+    //    }
+    //    else
+    //    {
+    //        arm_2d_control_node_t *sibling = parent->ptChildList;
+    //        child->ptParent = sibling;
+    //        while (sibling->ptNext != NULL)
+    //        {
+    //            child->ptParent = sibling;
+    //            sibling = sibling->ptNext;
+    //        }
+    //        sibling->ptNext = child;
+    //    }
 }
 
-void* ldBaseGetWidget(uint16_t nameId)
+void ldBaseNodeRemove(arm_2d_control_node_t *ptNode)
 {
-    arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
-        if(((ldBase_t*)ptItem)->nameId==nameId)
+    arm_2d_control_node_t *ptNext=ptNode->ptNext;
+
+    arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+    {
+        if (ptItem->ptNext == ptNode)
+        {
+            ptItem->ptNext = ptNext;
+            return;
+        }
+
+        if(ptItem->ptChildList == ptNode)
+        {
+            ptItem->ptChildList=ptNext;
+            return;
+        }
+    }
+}
+
+void *ldBaseGetWidget(uint16_t nameId)
+{
+    arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+    {
+        if (((ldBase_t *)ptItem)->nameId == nameId)
         {
             return ptItem;
         }
@@ -199,14 +217,14 @@ void* ldBaseGetWidget(uint16_t nameId)
     return NULL;
 }
 
-void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity)
+void ldBaseColor(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, ldColor color, uint8_t opacity)
 {
-    arm_2d_fill_colour_with_opacity(pTile, pRegion,(__arm_2d_color_t)color, opacity);
+    arm_2d_fill_colour_with_opacity(pTile, pRegion, (__arm_2d_color_t)color, opacity);
 }
 
-void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity)
+void ldBaseImage(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, arm_2d_tile_t *pImgTile, arm_2d_tile_t *pMaskTile, ldColor color, uint8_t opacity)
 {
-    if(pImgTile==NULL)
+    if (pImgTile == NULL)
     {
         switch (pMaskTile->tInfo.tColourInfo.chScheme)
         {
@@ -253,7 +271,7 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pI
     }
     else
     {
-        if (pMaskTile==NULL)
+        if (pMaskTile == NULL)
         {
             arm_2d_tile_copy_with_opacity(pImgTile,
                                           pTile,

@@ -3,15 +3,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -50,7 +50,6 @@ const ldBaseWidgetFunc_t ldImageFunc={
     .frameStart=(ldFrameStartFunc_t)ldImage_on_frame_start,
 };
 
-ARM_NONNULL(1)
 ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
                          ldImage_t *ptWidget,
                          uint16_t nameId,
@@ -82,7 +81,7 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
     ptWidget->use_as__ldBase_t.nameId=nameId;
-ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
+    ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
 
 
     ptWidget->opacity = 255;
@@ -102,9 +101,9 @@ ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
         }
         else
         {
-            ptWidget->use_as__ldBase_t.isRegionChange=true;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
             ptParent=ldBaseGetWidget(parentNameId);
-            ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
+            ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeWindow;
             LOG_INFO("[window] init,id:%d",nameId);
@@ -112,9 +111,9 @@ ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
     }
     else
     {
-        ptWidget->use_as__ldBase_t.isRegionChange=true;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
         ptParent=ldBaseGetWidget(parentNameId);
-        ldNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
+        ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;
         LOG_INFO("[image] init,id:%d",nameId);
     }
@@ -125,28 +124,46 @@ ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
     return ptWidget;
 }
 
-ARM_NONNULL(1)
 void ldImage_depose( ldImage_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if((ptWidget->use_as__ldBase_t.widgetType!=widgetTypeImage)&&
+            (ptWidget->use_as__ldBase_t.widgetType!=widgetTypeWindow)&&
+            (ptWidget->use_as__ldBase_t.widgetType!=widgetTypeBackground))
+    {
+        return;
+    }
+
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeImage)
+    {
+        arm_ctrl_enum(&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t, ptItem, BOTTOM_UP_TRAVERSAL)
+        {
+            ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
+        }
+    }
+
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+
+    ldFree(ptWidget);
 }
 
-ARM_NONNULL(1)
 void ldImage_on_load( ldImage_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-ARM_NONNULL(1)
 void ldImage_on_frame_start( ldImage_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-ARM_NONNULL(1)
 void ldImage_show( arm_2d_scene_t *pScene,
                    ldImage_t *ptWidget,
                    const arm_2d_tile_t *ptTile,

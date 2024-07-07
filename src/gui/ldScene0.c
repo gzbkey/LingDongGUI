@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2009-2024 Arm Limited. All rights reserved.
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -78,14 +78,14 @@ enum {
 
 static void __on_scene0_load(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
 }
 
 static void __on_scene0_depose(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
     ptScene->ptPlayer = NULL;
@@ -93,11 +93,6 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
     arm_2d_scene_player_dynamic_dirty_region_depose(
                 &ptThis->tDirtyRegionItem,
                 &ptThis->use_as__arm_2d_scene_t);
-
-    /* reset timestamp */
-    arm_foreach(int64_t,this.lTimestamp, ptItem) {
-        *ptItem = 0;
-    }
 
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
@@ -110,23 +105,25 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
 
 static void __on_scene0_background_start(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 }
 
 static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
 }
 
 static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
 
 //    ldGuiFrameStart(ptScene);
 //    ldGuiLogicLoop(ptScene);
+    ldGuiTouchProcess();
+    xConnectProcess();
 
     arm_2d_dynamic_dirty_region_on_frame_start(
                                                 &ptThis->tDirtyRegionItem,
@@ -137,11 +134,12 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
     arm_2d_helper_control_enum_depose(&ptThis->tEnum);
 
+    ldGuiFrameComplete(ptThis);
 //    if(pageNumNow!=pageTarget)
 //    {
 //        ldGuiQuit(ptScene);
@@ -158,17 +156,17 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
 
 static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
+    ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
-//    ldGuiQuit();
+    ldGuiQuit(ptThis);
 //    pageNumNow=pageTarget;
 }
 
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 {
-    user_scene_0_t *ptThis = (user_scene_0_t *)pTarget;
+    ld_scene_t *ptThis = (ld_scene_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
 
     ARM_2D_UNUSED(tScreenSize);
@@ -193,7 +191,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
             do {
                 if (arm_2d_helper_control_enum_get_next_node(&ptThis->tEnum))
                 {
-                    if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isRegionChange)
+                    if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate)
                     {
                         arm_2d_dynamic_dirty_region_update(
                             &ptThis->tDirtyRegionItem,
@@ -231,16 +229,17 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 }
 
 ARM_NONNULL(1)
-user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
-                                        user_scene_0_t *ptThis)
+ld_scene_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
+                                        ld_scene_t *ptThis,
+                                    const ldPageFuncGroup_t *ptFunc)
 {
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
 
     if (NULL == ptThis) {
-        ptThis = (user_scene_0_t *)
-                    __arm_2d_allocate_scratch_memory(   sizeof(user_scene_0_t),
-                                                        __alignof__(user_scene_0_t),
+        ptThis = (ld_scene_t *)
+                    __arm_2d_allocate_scratch_memory(   sizeof(ld_scene_t),
+                                                        __alignof__(ld_scene_t),
                                                         ARM_2D_MEM_TYPE_UNSPECIFIED);
         assert(NULL != ptThis);
         if (NULL == ptThis) {
@@ -249,9 +248,9 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     } else {
         bUserAllocated = true;
     }
-    memset(ptThis, 0, sizeof(user_scene_0_t));
+    memset(ptThis, 0, sizeof(ld_scene_t));
 
-    *ptThis = (user_scene_0_t){
+    *ptThis = (ld_scene_t){
         .use_as__arm_2d_scene_t = {
 
             /* the canvas colour */
@@ -272,19 +271,12 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
             .bUseDirtyRegionHelper = false,
         },
         .bUserAllocated = bUserAllocated,
+        .ldGuiFuncGroup=ptFunc,
     };
 
     /* ------------   initialize members of user_scene_0_t begin ---------------*/
 
-//        ldGuiInit((arm_2d_scene_t*)ptThis);
-
-    void *obj;
-    ldWindow_init(&ptThis->use_as__arm_2d_scene_t,NULL,0, 0, 0, 0, 320, 240);
-    obj= ldImage_init(&ptThis->use_as__arm_2d_scene_t,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
-    ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
-
-    ldButton_init(&ptThis->use_as__arm_2d_scene_t,NULL,2, 0, 10,10,100,50);
-
+    ldGuiInit(ptThis);
 
 
     arm_2d_scene_player_dynamic_dirty_region_init(

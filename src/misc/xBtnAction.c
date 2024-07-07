@@ -1,5 +1,7 @@
 /*
- * Copyright 2021-2024 Ou Jianbo 59935554@qq.com
+ * Copyright (c) 2021-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +14,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
+
 
 /**
  * @file    xBtnAction.c
@@ -47,7 +50,7 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
 
 void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t))
 {
-    xBtnInfo_t * link = (xBtnInfo_t *)XCALLOC(sizeof(xBtnInfo_t));
+    xBtnInfo_t * link = (xBtnInfo_t *)XMALLOC(sizeof(xBtnInfo_t));
     if(link!=NULL)
     {
         memset(link,0,sizeof(xBtnInfo_t));

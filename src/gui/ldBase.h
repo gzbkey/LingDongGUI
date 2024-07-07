@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef __LD_BASE_H__
 #define __LD_BASE_H__
 
@@ -9,6 +27,8 @@ extern "C" {
 #include "arm_extra_controls.h"
 #include "arm_2d_helper_control.h"
 #include "xLog.h"
+#include "xBtnAction.h"
+#include "xConnect.h"
 
 #include "ldConfig.h"
 
@@ -36,6 +56,12 @@ widgetTypeTable,
 widgetTypeKeyboard,
 }ldWidgetType_t;
 
+//btn占用0-9
+#define SIGNAL_NO_OPERATION         BTN_NO_OPERATION
+#define SIGNAL_PRESS                BTN_PRESS           // value = x (2Byte) + y (2Byte)
+#define SIGNAL_HOLD_DOWN            BTN_HOLD_DOWN       // value = x offset(2Byte) + y offset(2Byte) + x (2Byte) + y (2Byte)
+#define SIGNAL_RELEASE              BTN_RELEASE         // value = x speed(2Byte) + y speed(2Byte) + x (2Byte) + y (2Byte)
+
 
 #define ldColor                                 COLOUR_INT
 
@@ -56,19 +82,49 @@ typedef struct {
     ldFrameStartFunc_t frameStart;
 }ldBaseWidgetFunc_t;
 
+typedef void (*ldPageFunc_t)(arm_2d_scene_t*);
+
+typedef struct ld_scene_t ld_scene_t;
+
+typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
+
+typedef struct ld_scene_t* (*sceneInit_t)(arm_2d_scene_player_t *,ld_scene_t *ptThis,const ldPageFuncGroup_t *);
+
+struct ldPageFuncGroup_t{
+    sceneInit_t pSceneInit;
+    ldPageFunc_t init;
+    ldPageFunc_t loop;
+    ldPageFunc_t quit;
+#if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
+    uint8_t pageName[16];
+#endif
+};
+
+
+
+struct ld_scene_t {
+    implement(arm_2d_scene_t);
+//ARM_PRIVATE(
+    bool bUserAllocated;
+    arm_2d_region_list_item_t tDirtyRegionItem;
+    arm_2d_control_enumerator_t tEnum;
+//)
+    const ldPageFuncGroup_t *ldGuiFuncGroup;
+};
+
 typedef struct  {
     implement(arm_2d_control_node_t);
     const ldBaseWidgetFunc_t *pFunc;
     ldWidgetType_t widgetType;
     uint16_t nameId;
-    bool isRegionChange:1;
+    bool isDirtyRegionUpdate:1;
 }ldBase_t;
 
 #define LD_CHK_PTR_RET(ptr,retValue)             if ((ptr) == NULL) { return retValue; }
 
 
 extern arm_2d_control_node_t *ptNodeRoot;
-
+extern ldPageFuncGroup_t *ptGuiPageFuncGroup;
 
 
 extern void *ldMalloc(uint32_t size);
@@ -78,7 +134,8 @@ extern void *ldRealloc(void *ptr,uint32_t newSize);
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
-void ldNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
+void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
+void ldBaseNodeRemove(arm_2d_control_node_t *ptNode);
 void* ldBaseGetWidget(uint16_t nameId);
 void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity);

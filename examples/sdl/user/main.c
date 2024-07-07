@@ -12,6 +12,8 @@
 //#include "uiWidget.h"
 //#include "uiDemo.h"
 
+#include "ldGui.h"
+
 #if defined(__clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -32,33 +34,63 @@
 #   pragma GCC diagnostic ignored "-Wformat="
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
+void demoInit(arm_2d_scene_t* ptScene);
 
-void scene0_loader(void)
+const ldPageFuncGroup_t ldGuiFuncGroup={
+    .pSceneInit=__arm_2d_scene0_init,
+    .init=demoInit,
+#if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
+    .pageName="demo",
+#endif
+};
+
+static bool slotPageJump(xConnectInfo_t info)
 {
-    arm_2d_scene0_init(&DISP0_ADAPTER);
+    ldGuiJumpPage(&ldGuiFuncGroup,ARM_2D_SCENE_SWITCH_MODE_SLIDE_RIGHT,3000);
+    return false;
 }
 
-typedef void scene_loader_t(void);
+void demoInit(arm_2d_scene_t* ptScene)
+{
+    void *obj;
+    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
+    obj= ldImage_init(ptScene,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
+    ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
-static scene_loader_t * const c_SceneLoaders[] = {
-    scene0_loader,
-//    scene1_loader,
-};
+    ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
+
+    xConnect(2,SIGNAL_RELEASE,0,slotPageJump);
+}
+
+
+
+
+//void scene0_loader(void)
+//{
+//    __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,&ldGuiFuncGroup);
+//}
+
+//typedef void scene_loader_t(void);
+
+//static scene_loader_t * const c_SceneLoaders[] = {
+//    scene0_loader,
+//};
 
 /* load scene one by one */
 void before_scene_switching_handler(void *pTarget,
                                     arm_2d_scene_player_t *ptPlayer,
                                     arm_2d_scene_t *ptScene)
 {
-    static uint_fast8_t s_chIndex = 0;
+    ptGuiPageFuncGroup->pSceneInit(&DISP0_ADAPTER,NULL,&ldGuiFuncGroup);
+//    static uint_fast8_t s_chIndex = 0;
 
-    if (s_chIndex >= dimof(c_SceneLoaders)) {
-        s_chIndex = 0;
-    }
+//    if (s_chIndex >= dimof(c_SceneLoaders)) {
+//        s_chIndex = 0;
+//    }
 
-    /* call loader */
-    c_SceneLoaders[s_chIndex]();
-    s_chIndex++;
+//    /* call loader */
+//    c_SceneLoaders[s_chIndex]();
+//    s_chIndex++;
 }
 
 int app_2d_main_thread (void *argument)
@@ -69,7 +101,7 @@ int app_2d_main_thread (void *argument)
             before_scene_switching_handler);
 
     arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
+                                            ARM_2D_SCENE_SWITCH_MODE_SLIDE_RIGHT);
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
 
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
@@ -117,6 +149,8 @@ int main (void)
 //#endif
 //    LD_ADD_PAGE_DEMO;
 #endif
+
+    ptGuiPageFuncGroup=(ldPageFuncGroup_t*)&ldGuiFuncGroup;
 
     arm_irq_safe {
         arm_2d_init();

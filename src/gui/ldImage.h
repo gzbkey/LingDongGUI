@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2009-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -75,25 +75,14 @@ struct ldImage_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern
-ARM_NONNULL(1)
 ldImage_t* ldImage_init(arm_2d_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* pImgTile, arm_2d_tile_t* pMaskTile, bool isWindow);
 
-
-extern
-ARM_NONNULL(1)
 void ldImage_depose( ldImage_t *ptWidget);
 
-extern
-ARM_NONNULL(1)
 void ldImage_on_load( ldImage_t *ptWidget);
 
-extern
-ARM_NONNULL(1)
 void ldImage_on_frame_start( ldImage_t *ptWidget);
 
-extern
-ARM_NONNULL(1)
 void ldImage_show( arm_2d_scene_t *pScene,
                    ldImage_t *ptWidget,
                             const arm_2d_tile_t *ptTile, 

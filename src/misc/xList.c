@@ -1,5 +1,7 @@
 /*
- * Copyright 2021-2024 Ou Jianbo 59935554@qq.com
+ * Copyright (c) 2021-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 /**
  * @file    xList.c
@@ -20,7 +22,7 @@
  * @brief   简单的链表库
  */
 #include "xList.h"
-#include "ldCommon.h"
+#include "string.h"
 
 static void _xListAddTail(xListNode *pList,xListNode *newNode)
 {
@@ -62,9 +64,10 @@ xListNode *xListInfoAdd(xListNode* pList, void* pInfo)
     {
         return NULL;
     }
-    xListNode * newList = (xListNode *)XCALLOC(sizeof(xListNode));
+    xListNode * newList = (xListNode *)XMALLOC(sizeof(xListNode));
     if(newList!=NULL)
     {
+        memset(newList,0,sizeof(xListNode));
         newList->info=pInfo;
         _xListAddTail(pList,newList);
         return newList;
@@ -95,9 +98,10 @@ xListNode* xListMallocNode(xListNode** pListChild)
     xListNode* pNode=NULL;
     if(*pListChild==NULL)
     {
-        pNode=(xListNode *)XCALLOC(sizeof(xListNode));
+        pNode=(xListNode *)XMALLOC(sizeof(xListNode));
         if(pNode!=NULL)
         {
+            memset(pNode,0,sizeof(xListNode));
             pNode->next=pNode;
             pNode->prev=pNode;
             pNode->info=NULL;

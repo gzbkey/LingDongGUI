@@ -1,5 +1,7 @@
 /*
- * Copyright 2021-2024 Ou Jianbo 59935554@qq.com
+ * Copyright (c) 2021-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 /**
  * @file    xConnect.c
@@ -22,7 +24,7 @@
 #include "xConnect.h"
 #include "xQueue.h"
 #include "xList.h"
-#include "ldCommon.h"
+#include "ldBase.h"
 
 
 xQueue_t *emitQueue=NULL;
@@ -68,10 +70,11 @@ bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc f
 {
     relationInfo_t* pRelation;
 
-    pRelation=XCALLOC(sizeof(relationInfo_t));
+    pRelation=XMALLOC(sizeof(relationInfo_t));
 
     if(pRelation!=NULL)
     {
+        memset(pRelation,0,sizeof(relationInfo_t));
     pRelation->senderId=senderId;
     pRelation->receiverId=receiverId;
     pRelation->signalType=signal;

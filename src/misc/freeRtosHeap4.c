@@ -47,7 +47,7 @@
 #include "stdio.h"
 #include "ldConfig.h"
 #include "string.h"
-#include "ldCommon.h"
+#include "ldBase.h"
 
 #if LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
 
