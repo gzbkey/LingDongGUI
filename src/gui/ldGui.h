@@ -35,7 +35,7 @@ extern "C" {
 
 
 
-
+void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup);
 
 void ldGuiDraw(ld_scene_t *ptScene,
                const arm_2d_tile_t *ptTile,
@@ -43,10 +43,10 @@ void ldGuiDraw(ld_scene_t *ptScene,
 
 void ldGuiTouchProcess(void);
 
-void ldGuiInit(ld_scene_t *ptScene);
+void ldGuiSceneInit(ld_scene_t *ptScene);
 void ldGuiQuit(ld_scene_t *ptScene);
 void ldGuiFrameComplete(ld_scene_t *ptScene);
-void ldGuiJumpPage(ldPageFuncGroup_t *cmdGroup, arm_2d_scene_switch_mode_t mode, uint16_t switchTimeMs);
+void ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs);
 #ifdef __cplusplus
 }
 #endif

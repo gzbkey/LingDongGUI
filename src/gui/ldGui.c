@@ -17,6 +17,8 @@
  */
 
 #include "ldGui.h"
+#include "ldScene0.h"
+#include "ldScene1.h"
 
 static volatile arm_2d_location_t pressLocation;
 static volatile int16_t deltaMoveTime;
@@ -24,7 +26,7 @@ static volatile arm_2d_location_t prevLocation;
 static void *prevWidget;
 static uint8_t pageNumNow=0;
 
-static bool isGuiSwthcnScene=false;
+bool isGuiSwthcnScene=false;
 
 #ifndef LD_EMIT_SIZE
 #define LD_EMIT_SIZE             8
@@ -168,7 +170,7 @@ void ldGuiTouchProcess(void)
     ldGuiClickedAction(touchSignal,clickLocation);
 }
 
-void ldGuiInit(ld_scene_t *ptScene)
+void ldGuiSceneInit(ld_scene_t *ptScene)
 {
     xEmitInit(LD_EMIT_SIZE);
 
@@ -198,10 +200,56 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
 
 }
 
-void ldGuiJumpPage(ldPageFuncGroup_t *cmdGroup,arm_2d_scene_switch_mode_t mode,uint16_t switchTimeMs)
+ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
+static uint8_t sysSceneNum=0;
+void ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs)
 {
-    ptGuiPageFuncGroup=cmdGroup;
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,mode);
+    sysSceneNum++;
+    if (sysSceneNum >= dimof(ptSysGuiFuncGroup)) {
+        sysSceneNum = 0;
+    }
+
+    ptSysGuiFuncGroup[sysSceneNum]=ptFuncGroup;
+
+    __arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,ptMode,0);
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, switchTimeMs);
     isGuiSwthcnScene=true;
+
+}
+
+
+void scene0_loader(void)
+{
+    __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
+}
+
+void scene1_loader(void)
+{
+    __arm_2d_scene1_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[1]);
+}
+
+typedef void scene_loader_t(void);
+
+static scene_loader_t * const c_SceneLoaders[] = {
+    scene0_loader,
+    scene1_loader,
+};
+
+void before_scene_switching_handler(void *pTarget,arm_2d_scene_player_t *ptPlayer,arm_2d_scene_t *ptScene)
+{
+    c_SceneLoaders[sysSceneNum]();
+}
+
+void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
+{
+    arm_2d_scene_player_register_before_switching_event_handler(
+            &DISP0_ADAPTER,
+            before_scene_switching_handler);
+
+    ptSysGuiFuncGroup[sysSceneNum]=ptFuncGroup;
+
+    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,ARM_2D_SCENE_SWITCH_MODE_NONE);
+    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 0);
+
+    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 }

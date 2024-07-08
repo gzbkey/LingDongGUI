@@ -46,7 +46,6 @@
 #endif
 
 arm_2d_control_node_t *ptNodeRoot = NULL;
-ldPageFuncGroup_t *ptGuiPageFuncGroup = NULL;
 
 #if LD_MEM_MODE == MEM_MODE_TLFS
 static void *pTlsfMem = NULL;

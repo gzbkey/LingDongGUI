@@ -88,10 +88,10 @@ typedef struct ld_scene_t ld_scene_t;
 
 typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
 
-typedef struct ld_scene_t* (*sceneInit_t)(arm_2d_scene_player_t *,ld_scene_t *ptThis,const ldPageFuncGroup_t *);
+//typedef struct ld_scene_t* (*sceneInit_t)(arm_2d_scene_player_t *,ld_scene_t *ptThis,const ldPageFuncGroup_t *);
 
 struct ldPageFuncGroup_t{
-    sceneInit_t pSceneInit;
+//    sceneInit_t pSceneInit;
     ldPageFunc_t init;
     ldPageFunc_t loop;
     ldPageFunc_t quit;
@@ -124,7 +124,6 @@ typedef struct  {
 
 
 extern arm_2d_control_node_t *ptNodeRoot;
-extern ldPageFuncGroup_t *ptGuiPageFuncGroup;
 
 
 extern void *ldMalloc(uint32_t size);

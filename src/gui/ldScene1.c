@@ -17,15 +17,15 @@
  */
 
 /**
- * @file    ldScene0.c
+ * @file    ldscene1.c
  * @author  Ou Jianbo(59935554@qq.com)
  * @brief   arm2d的场景文件，是arm2d的关键用户文件
  */
 
 #include "arm_2d.h"
 
-#define __USER_SCENE0_IMPLEMENT__
-#include "ldScene0.h"
+#define __USER_SCENE1_IMPLEMENT__
+#include "ldScene1.h"
 #include "arm_2d_helper.h"
 #include "arm_2d_example_controls.h"
 
@@ -76,14 +76,14 @@ enum {
     SCENE_DR_DONE,
 };
 
-static void __on_scene0_load(arm_2d_scene_t *ptScene)
+static void __on_scene1_load(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
 }
 
-static void __on_scene0_depose(arm_2d_scene_t *ptScene)
+static void __on_scene1_depose(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
@@ -103,20 +103,20 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
  * Scene 0                                                                    *
  *----------------------------------------------------------------------------*/
 
-static void __on_scene0_background_start(arm_2d_scene_t *ptScene)
+static void __on_scene1_background_start(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 }
 
-static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
+static void __on_scene1_background_complete(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
 }
 
-static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
+static void __on_scene1_frame_start(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
 
@@ -132,7 +132,7 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
     arm_2d_helper_control_enum_init(&ptThis->tEnum,&ARM_2D_CONTROL_ENUMERATION_POLICY_PREORDER_TRAVERSAL,ptNodeRoot);
 }
 
-static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
+static void __on_scene1_frame_complete(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
@@ -154,7 +154,7 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
 //    }
 }
 
-static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
+static void __before_scene1_switching_out(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
@@ -164,7 +164,7 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
 }
 
 static
-IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
+IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
 {
     ld_scene_t *ptThis = (ld_scene_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
@@ -229,7 +229,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 }
 
 ARM_NONNULL(1)
-ld_scene_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
+ld_scene_t *__arm_2d_scene1_init(   arm_2d_scene_player_t *ptDispAdapter,
                                         ld_scene_t *ptThis,
                                     const ldPageFuncGroup_t *ptFunc)
 {
@@ -258,15 +258,15 @@ ld_scene_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
             /* Please uncommon the callbacks if you need them
              */
-            .fnOnLoad       = &__on_scene0_load,
-            .fnScene        = &__pfb_draw_scene0_handler,
+            .fnOnLoad       = &__on_scene1_load,
+            .fnScene        = &__pfb_draw_scene1_handler,
 
-            //.fnOnBGStart    = &__on_scene0_background_start,
-            //.fnOnBGComplete = &__on_scene0_background_complete,
-            .fnOnFrameStart = &__on_scene0_frame_start,
-            //.fnBeforeSwitchOut = &__before_scene0_switching_out,
-            .fnOnFrameCPL   = &__on_scene0_frame_complete,
-            .fnDepose       = &__on_scene0_depose,
+            //.fnOnBGStart    = &__on_scene1_background_start,
+            //.fnOnBGComplete = &__on_scene1_background_complete,
+            .fnOnFrameStart = &__on_scene1_frame_start,
+            //.fnBeforeSwitchOut = &__before_scene1_switching_out,
+            .fnOnFrameCPL   = &__on_scene1_frame_complete,
+            .fnDepose       = &__on_scene1_depose,
 
             .bUseDirtyRegionHelper = false,
         },
