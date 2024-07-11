@@ -18,7 +18,9 @@
 
 /*============================ INCLUDES ======================================*/
 #define __LD_IMAGE_IMPLEMENT__
-
+#define __ARM_2D_HELPER_INHERIT__
+#define __ARM_2D_HELPER_IMPLEMENT__
+#define __ARM_2D_HELPER_CONTROL_INHERIT__
 #include "./arm_extra_controls.h"
 #include "./__common.h"
 #include "arm_2d.h"
@@ -50,7 +52,7 @@ const ldBaseWidgetFunc_t ldImageFunc={
     .frameStart=(ldFrameStartFunc_t)ldImage_on_frame_start,
 };
 
-ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
+ldImage_t* ldImage_init( ld_scene_t *ptScene,
                          ldImage_t *ptWidget,
                          uint16_t nameId,
                          uint16_t parentNameId,
@@ -76,6 +78,8 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
     }
 
 
+    ptWidget->ptScene=ptScene;
+
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
@@ -92,9 +96,9 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
 
     if(isWindow)
     {
-        if(nameId==0)
+        if((nameId&NAME_ID_MASK)==0)
         {
-            ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
+            ptScene->ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
             ldImageSetBgColor(ptWidget,__RGB(240,240,240));
             LOG_INFO("[background] init,id:%d",nameId);
@@ -102,7 +106,7 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
         else
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
-            ptParent=ldBaseGetWidget(parentNameId);
+            ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
             ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeWindow;
@@ -112,7 +116,7 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
     else
     {
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
-        ptParent=ldBaseGetWidget(parentNameId);
+        ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
         ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;
         LOG_INFO("[image] init,id:%d",nameId);
@@ -126,6 +130,7 @@ ldImage_t* ldImage_init( arm_2d_scene_t *ptScene,
 
 void ldImage_depose( ldImage_t *ptWidget)
 {
+    LOG_DEBUG("ptWidget = %p",ptWidget);
     assert(NULL != ptWidget);
 
     if (ptWidget == NULL)
@@ -139,15 +144,22 @@ void ldImage_depose( ldImage_t *ptWidget)
         return;
     }
 
+    LOG_DEBUG("img depose");
     if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeImage)
     {
-        arm_ctrl_enum(&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t, ptItem, BOTTOM_UP_TRAVERSAL)
+        if(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.ptChildList!=NULL)
         {
-            ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
+            arm_ctrl_enum(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.ptChildList, ptItem, PREORDER_TRAVERSAL)
+            {
+                ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
+            }
+
         }
+
     }
 
-    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+    xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
+    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
 
     ldFree(ptWidget);
 }
@@ -164,7 +176,7 @@ void ldImage_on_frame_start( ldImage_t *ptWidget)
     
 }
 
-void ldImage_show( arm_2d_scene_t *pScene,
+void ldImage_show( ld_scene_t *ptScene,
                    ldImage_t *ptWidget,
                    const arm_2d_tile_t *ptTile,
                    bool bIsNewFrame)

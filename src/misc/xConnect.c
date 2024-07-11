@@ -23,12 +23,12 @@
  */
 #include "xConnect.h"
 #include "xQueue.h"
-#include "xList.h"
+
 #include "ldBase.h"
 
 
 xQueue_t *emitQueue=NULL;
-NEW_LIST(listConnect);
+//NEW_LIST(listConnect);
 
 bool xEmitInit(uint8_t size)
 {
@@ -53,7 +53,7 @@ bool xEmit(uint16_t senderId,uint8_t signal,uint64_t value)
     return xQueueEnqueue(emitQueue,&emitInfo,sizeof (emitInfo_t));
 }
 
-static bool _isConnectSame(xListNode* pEachInfo,void* pRelationInfo)
+static bool _isConnectSame(xListNode_t* pEachInfo,void* pRelationInfo)
 {
     if(((((relationInfo_t*)(pEachInfo->info))->senderId) ==((relationInfo_t*)pRelationInfo)->senderId)&&
        (((relationInfo_t*)(pEachInfo->info))->signalType ==((relationInfo_t*)pRelationInfo)->signalType)&&
@@ -66,7 +66,7 @@ static bool _isConnectSame(xListNode* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
+bool xConnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t* pRelation;
 
@@ -75,25 +75,24 @@ bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc f
     if(pRelation!=NULL)
     {
         memset(pRelation,0,sizeof(relationInfo_t));
-    pRelation->senderId=senderId;
-    pRelation->receiverId=receiverId;
-    pRelation->signalType=signal;
-    pRelation->receiverFunc=func;
+        pRelation->senderId=senderId;
+        pRelation->receiverId=receiverId;
+        pRelation->signalType=signal;
+        pRelation->receiverFunc=func;
 
-    //确定是否重复添加链接
-    if(xListInfoPrevTraverse(&listConnect,pRelation,_isConnectSame))
-    {
-        XFREE(pRelation);
-        return false;
-    }
+        //确定是否重复添加链接
+        if(xListInfoPrevTraverse(ptList,pRelation,_isConnectSame))
+        {
+            XFREE(pRelation);
+            return false;
+        }
 
-    //添加链表
-    if(xListInfoAdd(&listConnect,pRelation)==NULL)
-    {
-        XFREE(pRelation);
-        return false;
-    }
-
+        //添加链表
+        if(xListInfoAdd(ptList,pRelation)==NULL)
+        {
+            XFREE(pRelation);
+            return false;
+        }
         return true;
     }
 
@@ -101,7 +100,7 @@ bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc f
 
 }
 
-static bool _disconnect(xListNode* pEachInfo,void* pRelationInfo)
+static bool _disconnect(xListNode_t* pEachInfo,void* pRelationInfo)
 {
     if(((((relationInfo_t*)(pEachInfo->info))->senderId) ==((relationInfo_t*)pRelationInfo)->senderId)&&
        (((relationInfo_t*)(pEachInfo->info))->signalType ==((relationInfo_t*)pRelationInfo)->signalType)&&
@@ -116,7 +115,7 @@ static bool _disconnect(xListNode* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-bool xDisconnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
+bool xDisconnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t info;
 
@@ -125,10 +124,10 @@ bool xDisconnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFun
     info.receiverId=receiverId;
     info.receiverFunc=func;
 
-    return xListInfoPrevTraverse(&listConnect,&info,_disconnect);
+    return xListInfoPrevTraverse(ptList,&info,_disconnect);
 }
 
-static bool _delConnect(xListNode* pEachInfo,void* pRelationInfo)
+static bool _delConnect(xListNode_t* pEachInfo,void* pRelationInfo)
 {
     if(((((relationInfo_t*)(pEachInfo->info))->senderId) ==((relationInfo_t*)pRelationInfo)->senderId)||
        ((((relationInfo_t*)(pEachInfo->info))->receiverId) ==((relationInfo_t*)pRelationInfo)->receiverId))
@@ -140,7 +139,7 @@ static bool _delConnect(xListNode* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-void xDeleteConnect(uint16_t nameId)
+void xDeleteConnect(xListNode_t* ptList,uint16_t nameId)
 {
     relationInfo_t info;
 
@@ -149,13 +148,13 @@ void xDeleteConnect(uint16_t nameId)
     info.receiverId=nameId;
     info.receiverFunc=0;
 
-    xListInfoPrevTraverse(&listConnect,&info,_delConnect);
+    xListInfoPrevTraverse(ptList,&info,_delConnect);
 }
 
-void xConnectProcess(void)
+void xConnectProcess(xListNode_t* ptList,void *dat)
 {
     emitInfo_t emitInfo;
-    xListNode *temp_pos,*safePos;
+    xListNode_t *temp_pos,*safePos;
     relationInfo_t *pRelationInfo;
     xConnectInfo_t connectInfo;
     bool ignoreSignal=false;//忽略相同信号的其他操作
@@ -165,7 +164,7 @@ void xConnectProcess(void)
         {
             //此处轮训 连接表 所有数据
             //正向开始遍历list_for_each_safe(temp_pos,safePos, pList)
-            list_for_each_safe(temp_pos,safePos, &listConnect)
+            list_for_each_safe(temp_pos,safePos, ptList)
             {
                     pRelationInfo=(relationInfo_t*)temp_pos->info;
 
@@ -175,7 +174,7 @@ void xConnectProcess(void)
                         connectInfo.signalType=pRelationInfo->signalType;
                         connectInfo.receiverId=pRelationInfo->receiverId;
                         connectInfo.value=emitInfo.value;
-                        ignoreSignal=pRelationInfo->receiverFunc(connectInfo);
+                        ignoreSignal=pRelationInfo->receiverFunc(connectInfo,dat);
 
                         if(ignoreSignal==true)
                         {

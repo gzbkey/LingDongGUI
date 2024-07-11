@@ -60,7 +60,7 @@ typedef struct ldImage_t ldImage_t;
 struct ldImage_t {
     implement(ldBase_t);
     ARM_PRIVATE(
-            arm_2d_scene_t *ptScene;
+            ld_scene_t *ptScene;
     )
     ldColor bgColor;
     ldColor fgColor;
@@ -75,7 +75,7 @@ struct ldImage_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-ldImage_t* ldImage_init(arm_2d_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* pImgTile, arm_2d_tile_t* pMaskTile, bool isWindow);
+ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* pImgTile, arm_2d_tile_t* pMaskTile, bool isWindow);
 
 void ldImage_depose( ldImage_t *ptWidget);
 
@@ -83,7 +83,7 @@ void ldImage_on_load( ldImage_t *ptWidget);
 
 void ldImage_on_frame_start( ldImage_t *ptWidget);
 
-void ldImage_show( arm_2d_scene_t *pScene,
+void ldImage_show( ld_scene_t *ptScene,
                    ldImage_t *ptWidget,
                             const arm_2d_tile_t *ptTile, 
                             bool bIsNewFrame);

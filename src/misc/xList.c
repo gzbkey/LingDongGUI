@@ -24,10 +24,13 @@
 #include "xList.h"
 #include "string.h"
 
-static void _xListAddTail(xListNode *pList,xListNode *newNode)
+#define XMALLOC ldMalloc
+#define XFREE ldFree
+
+static void _xListAddTail(xListNode_t *pList,xListNode_t *newNode)
 {
-    xListNode * prevObj;
-    xListNode * nextObj;
+    xListNode_t * prevObj;
+    xListNode_t * nextObj;
 
     //找出前后对象,中间插入,自身为下一个对象
     prevObj=pList->prev;
@@ -40,10 +43,10 @@ static void _xListAddTail(xListNode *pList,xListNode *newNode)
     prevObj->next= newNode;
 }
 
-static void _xListDelete(xListNode *target)
+static void _xListDelete(xListNode_t *target)
 {
-    xListNode * prevObj;
-    xListNode * nextObj;
+    xListNode_t * prevObj;
+    xListNode_t * nextObj;
 
     //找出前后对象
     prevObj=target->prev;
@@ -58,16 +61,16 @@ static void _xListDelete(xListNode *target)
 
 
 //返回新节点地址
-xListNode *xListInfoAdd(xListNode* pList, void* pInfo)
+xListNode_t *xListInfoAdd(xListNode_t* pList, void* pInfo)
 {
     if(pList==NULL)
     {
         return NULL;
     }
-    xListNode * newList = (xListNode *)XMALLOC(sizeof(xListNode));
+    xListNode_t * newList = (xListNode_t *)XMALLOC(sizeof(xListNode_t));
     if(newList!=NULL)
     {
-        memset(newList,0,sizeof(xListNode));
+        memset(newList,0,sizeof(xListNode_t));
         newList->info=pInfo;
         _xListAddTail(pList,newList);
         return newList;
@@ -80,7 +83,7 @@ xListNode *xListInfoAdd(xListNode* pList, void* pInfo)
 }
 
 //返回还没释放的info的指针
-void *xListInfoDel(xListNode* pList)
+void *xListInfoDel(xListNode_t* pList)
 {
     void* pInfo;
     if(pList==NULL)
@@ -93,15 +96,15 @@ void *xListInfoDel(xListNode* pList)
     return pInfo;
 }
 
-xListNode* xListMallocNode(xListNode** pListChild)
+xListNode_t* xListMallocNode(xListNode_t** pListChild)
 {
-    xListNode* pNode=NULL;
+    xListNode_t* pNode=NULL;
     if(*pListChild==NULL)
     {
-        pNode=(xListNode *)XMALLOC(sizeof(xListNode));
+        pNode=(xListNode_t *)XMALLOC(sizeof(xListNode_t));
         if(pNode!=NULL)
         {
-            memset(pNode,0,sizeof(xListNode));
+            memset(pNode,0,sizeof(xListNode_t));
             pNode->next=pNode;
             pNode->prev=pNode;
             pNode->info=NULL;
@@ -111,7 +114,7 @@ xListNode* xListMallocNode(xListNode** pListChild)
     return pNode;
 }
 
-void xListFreeNode(xListNode* pListChild)
+void xListFreeNode(xListNode_t* pListChild)
 {
     if(pListChild==NULL)
     {
@@ -120,9 +123,9 @@ void xListFreeNode(xListNode* pListChild)
     XFREE(pListChild);
 }
 
-//bool xListInfoTraverse(xListNode *pList,bool (traverseFunc)(xListInfo*))
+//bool xListInfoTraverse(xListNode_t *pList,bool (traverseFunc)(xListInfo*))
 //{
-//    xListNode *temp_pos,*safePos;
+//    xListNode_t *temp_pos,*safePos;
 //    xListInfo *link_info;
 
 //    //判断链表是否为空
@@ -143,9 +146,9 @@ void xListFreeNode(xListNode* pListChild)
 //    return false;
 //}
 
-//bool xListInfoPrevTraverse(xListNode *pList,void *pTarget,bool (traverseFunc)(xListInfo*,void*))
+//bool xListInfoPrevTraverse(xListNode_t *pList,void *pTarget,bool (traverseFunc)(xListInfo*,void*))
 //{
-//    xListNode *temp_pos,*safePos;
+//    xListNode_t *temp_pos,*safePos;
 //    xListInfo *link_info;
 
 //    //判断链表是否为空
@@ -166,9 +169,9 @@ void xListFreeNode(xListNode* pListChild)
 //    return false;
 //}
 
-bool xListInfoPrevTraverse(xListNode *pList,void *pTarget,bool (traverseFunc)(xListNode*,void*))
+bool xListInfoPrevTraverse(xListNode_t *pList,void *pTarget,bool (traverseFunc)(xListNode_t*,void*))
 {
-    xListNode *temp_pos,*safePos;
+    xListNode_t *temp_pos,*safePos;
 
     //判断链表是否为空
     if((pList->next!=pList)&&(pList->prev!=pList))

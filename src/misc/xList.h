@@ -28,23 +28,18 @@ extern "C" {
 #include "stddef.h"
 #include "stdlib.h"
 #include <stdio.h>
-#include "ldBase.h"
 
-#ifndef XMALLOC
-#define XMALLOC                     ldMalloc
-#endif
-#ifndef XFREE
-#define XFREE                       ldFree
-#endif
+extern void *ldMalloc(uint32_t size);
+extern void ldFree(void *p);
 
-struct listNode {
+typedef struct listNode {
     struct listNode *next, *prev;
-    void *info;//ldCommon*
-};
+    void *info;
+}xListNode_t;
 
-typedef struct listNode xListNode;
+// struct listNode ;
 
-#define NEW_LIST(newLink)  xListNode newLink={ &(newLink), &(newLink), NULL }
+//#define NEW_LIST(newLink)  xListNode newLink={ &(newLink), &(newLink), NULL }
 
 #define list_entry(ptr, type, member)    (type *)((char*)(ptr) - offsetof(type, member))
 
@@ -57,13 +52,13 @@ typedef struct listNode xListNode;
          pos != (head); \
          pos = n, n = pos->prev)
 
-xListNode* xListMallocNode(xListNode** pListChild);
-void xListFreeNode(xListNode* pListChild);
-xListNode* xListInfoAdd(xListNode* pList, void* pInfo);
-void     * xListInfoDel(xListNode* pList);
+xListNode_t* xListMallocNode(xListNode_t** pListChild);
+void xListFreeNode(xListNode_t* pListChild);
+xListNode_t* xListInfoAdd(xListNode_t* pList, void* pInfo);
+void     * xListInfoDel(xListNode_t* pList);
 
 //bool xListInfoTraverse(xListNode *pList,bool (traverseFunc)(xListInfo*));//bool (traverseFunc)(xListInfo* pEachInfo)
-bool xListInfoPrevTraverse(xListNode *pList,void *pTarget,bool (traverseFunc)(xListNode *,void*));//bool (traverseFunc)(xListInfo* pEachInfo,void* pTarget);
+bool xListInfoPrevTraverse(xListNode_t *pList,void *pTarget,bool (traverseFunc)(xListNode_t *,void*));//bool (traverseFunc)(xListInfo* pEachInfo,void* pTarget);
 
 #ifdef __cplusplus
 }

@@ -80,7 +80,6 @@ static void __on_scene0_load(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-
 }
 
 static void __on_scene0_depose(arm_2d_scene_t *ptScene)
@@ -97,6 +96,9 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
+
+LOG_DEBUG("__on_scene0_depose");
+    ldGuiQuit(ptThis);
 }
 
 /*----------------------------------------------------------------------------*
@@ -113,7 +115,6 @@ static void __on_scene0_background_complete(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-
 }
 
 static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
@@ -122,14 +123,14 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 
 //    ldGuiFrameStart(ptScene);
 //    ldGuiLogicLoop(ptScene);
-    ldGuiTouchProcess();
-    xConnectProcess();
+    ldGuiTouchProcess(ptScene);
+    xConnectProcess(&((ld_scene_t*)ptScene)->tLink,ptScene);
 
     arm_2d_dynamic_dirty_region_on_frame_start(
                                                 &ptThis->tDirtyRegionItem,
                                                 SCENE_DR_UPDATE);//SCENE_DR_START);
 
-    arm_2d_helper_control_enum_init(&ptThis->tEnum,&ARM_2D_CONTROL_ENUMERATION_POLICY_PREORDER_TRAVERSAL,ptNodeRoot);
+    arm_2d_helper_control_enum_init(&ptThis->tEnum,&ARM_2D_CONTROL_ENUMERATION_POLICY_PREORDER_TRAVERSAL,ptThis->ptNodeRoot);
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
@@ -159,7 +160,6 @@ static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
-    ldGuiQuit(ptThis);
 //    pageNumNow=pageTarget;
 }
 
@@ -273,6 +273,9 @@ ld_scene_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .bUserAllocated = bUserAllocated,
         .ldGuiFuncGroup=ptFunc,
     };
+
+    ptThis->tLink.next=&ptThis->tLink;
+    ptThis->tLink.prev=&ptThis->tLink;
 
     /* ------------   initialize members of user_scene_0_t begin ---------------*/
 

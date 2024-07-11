@@ -49,11 +49,11 @@ const ldBaseWidgetFunc_t ldButtonFunc = {
     .frameStart = (ldFrameStartFunc_t)ldButton_on_frame_start,
 };
 
-static bool slotButtonToggle(xConnectInfo_t info)
+static bool slotButtonToggle(xConnectInfo_t info,ld_scene_t *ptScene)
 {
     ldButton_t *ptWidget;
 
-    ptWidget = ldBaseGetWidget(info.receiverId);
+    ptWidget = ldBaseGetWidget(ptScene->ptNodeRoot,info.receiverId);
 
     switch (info.signalType)
     {
@@ -86,7 +86,7 @@ static bool slotButtonToggle(xConnectInfo_t info)
     return false;
 }
 
-ldButton_t *ldButton_init(arm_2d_scene_t *ptScene, ldButton_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
@@ -101,9 +101,10 @@ ldButton_t *ldButton_init(arm_2d_scene_t *ptScene, ldButton_t *ptWidget, uint16_
         }
     }
 
-    ptParent = ldBaseGetWidget(parentNameId);
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
+    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
@@ -118,8 +119,8 @@ ldButton_t *ldButton_init(arm_2d_scene_t *ptScene, ldButton_t *ptWidget, uint16_
     ptWidget->selectColor = __RGB(255, 0, 0);
     ptWidget->opacity = 255;
 
-    xConnect(nameId, SIGNAL_PRESS, nameId, slotButtonToggle);
-    xConnect(nameId, SIGNAL_RELEASE, nameId, slotButtonToggle);
+    xConnect(&ptWidget->ptScene->tLink,nameId, SIGNAL_PRESS, nameId, slotButtonToggle);
+    xConnect(&ptWidget->ptScene->tLink,nameId, SIGNAL_RELEASE, nameId, slotButtonToggle);
 
     LOG_INFO("[button] init,id:%d", nameId);
     return ptWidget;
@@ -136,9 +137,10 @@ void ldButton_depose(ldButton_t *ptWidget)
     {
         return;
     }
+LOG_DEBUG("btn depose");
+    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
 
-    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
-
+    xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
     ldFree(ptWidget->pStr);
     ldFree(ptWidget);
 }
@@ -153,7 +155,7 @@ void ldButton_on_frame_start(ldButton_t *ptWidget)
     assert(NULL != ptWidget);
 }
 
-void ldButton_show(arm_2d_scene_t *pScene, ldButton_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
 

@@ -42,7 +42,7 @@ extern "C" {
 //     <2=>    stdlib
 //     <3=>    user
 // <i> default = 0
-#define LD_MEM_MODE                               (2)
+#define LD_MEM_MODE                               (0)
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
@@ -66,6 +66,7 @@ extern "C" {
 // <i> Radia menu's scale function support
 #define USE_RADIA_MENU_SCALE                      (0)
 
+#define USE_SCENE_SWITCHING                       (1)
 // debug config
 
 // <o> Log output level

@@ -54,7 +54,7 @@ struct ldButton_t
 {
     implement(ldBase_t);
     ARM_PRIVATE(
-            arm_2d_scene_t *ptScene;)
+            ld_scene_t *ptScene;)
     arm_2d_tile_t *ptReleaseImgTile;
     arm_2d_tile_t *ptReleaseMaskTile;
     arm_2d_tile_t *ptPressImgTile;
@@ -78,7 +78,7 @@ struct ldButton_t
     bool isHidden : 1;
 };
 
-ldButton_t *ldButton_init(arm_2d_scene_t *ptScene, ldButton_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
+ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
 
 void ldButton_depose(ldButton_t *ptWidget);
 
@@ -86,7 +86,7 @@ void ldButton_on_load(ldButton_t *ptWidget);
 
 void ldButton_on_frame_start(ldButton_t *ptWidget);
 
-void ldButton_show(arm_2d_scene_t *pScene, ldButton_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

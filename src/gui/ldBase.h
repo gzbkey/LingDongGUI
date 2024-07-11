@@ -29,7 +29,7 @@ extern "C" {
 #include "xLog.h"
 #include "xBtnAction.h"
 #include "xConnect.h"
-
+#include "xList.h"
 #include "ldConfig.h"
 
 typedef enum{
@@ -72,6 +72,9 @@ widgetTypeKeyboard,
 #define MEM_MODE_STDLIB                           (2)
 #define MEM_MODE_USER                             (3)
 
+#define NAME_ID_MASK                    0x3FF
+#define PAGE_NUM_MASK                   0xFC00
+
 typedef void (*ldDeposeFunc_t)(void *);
 typedef void (*ldShowFunc_t)(arm_2d_scene_t*,void *,void *,bool);
 typedef void (*ldFrameStartFunc_t)(void *);
@@ -110,6 +113,8 @@ struct ld_scene_t {
     arm_2d_control_enumerator_t tEnum;
 //)
     const ldPageFuncGroup_t *ldGuiFuncGroup;
+    arm_2d_control_node_t *ptNodeRoot;
+    xListNode_t tLink;
 };
 
 typedef struct  {
@@ -123,8 +128,6 @@ typedef struct  {
 #define LD_CHK_PTR_RET(ptr,retValue)             if ((ptr) == NULL) { return retValue; }
 
 
-extern arm_2d_control_node_t *ptNodeRoot;
-
 
 extern void *ldMalloc(uint32_t size);
 extern void *ldCalloc(uint32_t num,uint32_t size);
@@ -134,8 +137,9 @@ extern void *ldRealloc(void *ptr,uint32_t newSize);
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
-void ldBaseNodeRemove(arm_2d_control_node_t *ptNode);
-void* ldBaseGetWidget(uint16_t nameId);
+void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot, arm_2d_control_node_t *ptNode);
+void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth);
+void* ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot, uint16_t nameId);
 void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity);
 

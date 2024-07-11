@@ -45,8 +45,6 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-arm_2d_control_node_t *ptNodeRoot = NULL;
-
 #if LD_MEM_MODE == MEM_MODE_TLFS
 static void *pTlsfMem = NULL;
 __attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
@@ -97,6 +95,7 @@ __WEAK void ldFree(void *p)
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
     free(p);
 #endif
+    p=NULL;
 }
 
 __WEAK void *ldRealloc(void *ptr, uint32_t newSize)
@@ -184,7 +183,7 @@ void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
     //    }
 }
 
-void ldBaseNodeRemove(arm_2d_control_node_t *ptNode)
+void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot,arm_2d_control_node_t *ptNode)
 {
     arm_2d_control_node_t *ptNext=ptNode->ptNext;
 
@@ -204,7 +203,24 @@ void ldBaseNodeRemove(arm_2d_control_node_t *ptNode)
     }
 }
 
-void *ldBaseGetWidget(uint16_t nameId)
+void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth)
+{
+    for (int i = 0; i < depth; ++i)
+    {
+        LOG_NORMAL("  "); // 打印缩进
+    }
+
+    LOG_NORMAL("type:%02d,id:%02d",((ldBase_t*)ptNodeRoot)->widgetType,((ldBase_t*)ptNodeRoot)->nameId);
+
+    arm_2d_control_node_t *child = ptNodeRoot->ptChildList;
+    while (child != NULL)
+    {
+        ldBaseNodeTreePrint(child, depth + 1);
+        child = child->ptNext;
+    }
+}
+
+void *ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot,uint16_t nameId)
 {
     arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {

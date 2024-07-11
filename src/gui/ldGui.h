@@ -41,7 +41,7 @@ void ldGuiDraw(ld_scene_t *ptScene,
                const arm_2d_tile_t *ptTile,
                bool bIsNewFrame);
 
-void ldGuiTouchProcess(void);
+void ldGuiTouchProcess(ld_scene_t *ptScene);
 
 void ldGuiSceneInit(ld_scene_t *ptScene);
 void ldGuiQuit(ld_scene_t *ptScene);

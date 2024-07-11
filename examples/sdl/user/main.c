@@ -12,6 +12,7 @@
 //#include "uiWatch.h"
 //#include "uiWidget.h"
 //#include "uiDemo.h"
+#include "freeRtosHeap4.h"
 
 #include "ldGui.h"
 
@@ -36,7 +37,8 @@
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-void demoInit(arm_2d_scene_t* ptScene);
+void demoInit(ld_scene_t* ptScene);
+void demoInit2(ld_scene_t* ptScene);
 
 const ldPageFuncGroup_t ldGuiFuncGroup0={
     .init=demoInit,
@@ -48,7 +50,7 @@ const ldPageFuncGroup_t ldGuiFuncGroup0={
 };
 
 const ldPageFuncGroup_t ldGuiFuncGroup1={
-    .init=demoInit,
+    .init=demoInit2,
     .loop=NULL,
     .quit=NULL,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
@@ -57,25 +59,47 @@ const ldPageFuncGroup_t ldGuiFuncGroup1={
 };
 
 
-static bool slotPageJump(xConnectInfo_t info)
+static bool slotPageJump(xConnectInfo_t info,ld_scene_t *ptScene)
 {
     ldGuiJumpPage(&ldGuiFuncGroup1,&ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP,1000);
 
     return false;
 }
 
-void demoInit(arm_2d_scene_t* ptScene)
+static bool slotPageJump2(xConnectInfo_t info,ld_scene_t *ptScene)
 {
-    void *obj;
-    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
-    obj= ldImage_init(ptScene,NULL,3, 0, 100, 100, 50, 50, NULL, NULL,false);
+    ldGuiJumpPage(&ldGuiFuncGroup0,&ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP,1000);
+
+    return false;
+}
+
+
+void demoInit(ld_scene_t* ptScene)
+{
+    void *obj,*win;
+
+    win=ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
+
+    obj= ldImage_init(ptScene,NULL,1, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
     ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
 
-    xConnect(2,SIGNAL_RELEASE,0,slotPageJump);
+    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
+
 }
 
+void demoInit2(ld_scene_t* ptScene)
+{
+    void *obj;
+    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
+    obj= ldImage_init(ptScene,NULL,1, 0, 200, 100, 50, 50, NULL, NULL,false);
+    ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
+
+    ldButton_init(ptScene,NULL,2, 0, 10,100,100,50);
+
+    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump2);
+}
 
 int app_2d_main_thread (void *argument)
 {

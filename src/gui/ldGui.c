@@ -26,7 +26,11 @@ static volatile arm_2d_location_t prevLocation;
 static void *prevWidget;
 static uint8_t pageNumNow=0;
 
+#if USE_SCENE_SWITCHING == 1
 bool isGuiSwthcnScene=false;
+static uint8_t sysSceneNum=0;
+#endif
+static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 #ifndef LD_EMIT_SIZE
 #define LD_EMIT_SIZE             8
@@ -36,13 +40,13 @@ void ldGuiDraw(ld_scene_t *ptScene,
                const arm_2d_tile_t *ptTile,
                bool bIsNewFrame)
 {
-    arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
         ((ldBase_t*)ptItem)->pFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
     }
 }
 
 
-void ldGuiClickedAction(uint8_t touchSignal,arm_2d_location_t tLocation)
+void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
     ldBase_t *ptWidget;
     uint64_t u64Temp=0;
@@ -58,7 +62,7 @@ void ldGuiClickedAction(uint8_t touchSignal,arm_2d_location_t tLocation)
         ptWidget=NULL;
         if(ptWidget==NULL)
         {
-            ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptNodeRoot,tLocation);
+            ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
 #if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
             if(ptWidget!=NULL)
             {
@@ -134,7 +138,7 @@ void ldGuiClickedAction(uint8_t touchSignal,arm_2d_location_t tLocation)
 #define TOUCH_NO_CLICK           0
 #define TOUCH_CLICK              1
 
-void ldGuiTouchProcess(void)
+void ldGuiTouchProcess(ld_scene_t *ptScene)
 {
     arm_2d_location_t clickLocation;
     bool nowState;
@@ -167,7 +171,7 @@ void ldGuiTouchProcess(void)
     }
     prevState=nowState;
 
-    ldGuiClickedAction(touchSignal,clickLocation);
+    ldGuiClickedAction(ptScene,touchSignal,clickLocation);
 }
 
 void ldGuiSceneInit(ld_scene_t *ptScene)
@@ -178,46 +182,72 @@ void ldGuiSceneInit(ld_scene_t *ptScene)
     {
         ptScene->ldGuiFuncGroup->init((arm_2d_scene_t*)ptScene);
     }
-
+#if USE_SCENE_SWITCHING == 1
     isGuiSwthcnScene=false;
-
+#endif
     LOG_INFO("[sys] page %s init",ptScene->ldGuiFuncGroup->pageName);
 }
 
 void ldGuiQuit(ld_scene_t *ptScene)
 {
-    ldImage_depose(ldBaseGetWidget(0));
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
+    {
+        if(((ldBase_t *)ptItem))
+        {
+//            LOG_DEBUG("id:%d type:%d",((ldBase_t *)ptItem)->nameId,((ldBase_t *)ptItem)->widgetType);
+            if(((ldBase_t *)ptItem)->widgetType>0)
+            {
+                ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
+            }
+        }
+    }
+
     LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
 }
 
 void ldGuiFrameComplete(ld_scene_t *ptScene)
 {
+#if USE_SCENE_SWITCHING == 1
     if(isGuiSwthcnScene)
     {
         isGuiSwthcnScene=false;
         arm_2d_scene_player_switch_to_next_scene(ptScene->use_as__arm_2d_scene_t.ptPlayer);
     }
-
+#else
+    if(ptSysGuiFuncGroup[0]!=ptSysGuiFuncGroup[1])
+    {
+        ldGuiQuit(ptScene);
+        ptSysGuiFuncGroup[0]==ptSysGuiFuncGroup[1];
+        ldGuiSceneInit(ptScene);
+    }
+#endif
 }
 
-ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
-static uint8_t sysSceneNum=0;
+
 void ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs)
 {
-    sysSceneNum++;
-    if (sysSceneNum >= dimof(ptSysGuiFuncGroup)) {
+#if USE_SCENE_SWITCHING == 1
+
+    if (sysSceneNum ==0)
+    {
+        sysSceneNum = 1;
+    }
+    else
+    {
         sysSceneNum = 0;
     }
-
+LOG_DEBUG("jump = %d",sysSceneNum);
     ptSysGuiFuncGroup[sysSceneNum]=ptFuncGroup;
 
     __arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,ptMode,0);
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, switchTimeMs);
     isGuiSwthcnScene=true;
-
+#else
+    ptSysGuiFuncGroup[1]=ptFuncGroup;
+#endif
 }
 
-
+#if USE_SCENE_SWITCHING == 1
 void scene0_loader(void)
 {
     __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
@@ -239,17 +269,18 @@ void before_scene_switching_handler(void *pTarget,arm_2d_scene_player_t *ptPlaye
 {
     c_SceneLoaders[sysSceneNum]();
 }
+#endif
 
 void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
 {
-    arm_2d_scene_player_register_before_switching_event_handler(
-            &DISP0_ADAPTER,
-            before_scene_switching_handler);
-
-    ptSysGuiFuncGroup[sysSceneNum]=ptFuncGroup;
-
+    ptSysGuiFuncGroup[0]=ptFuncGroup;
+    ptSysGuiFuncGroup[1]=ptFuncGroup;
+#if USE_SCENE_SWITCHING == 1
+    arm_2d_scene_player_register_before_switching_event_handler(&DISP0_ADAPTER,before_scene_switching_handler);
     arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,ARM_2D_SCENE_SWITCH_MODE_NONE);
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 0);
-
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
+#else
+    __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
+#endif
 }

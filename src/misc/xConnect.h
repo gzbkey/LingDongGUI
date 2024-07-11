@@ -26,6 +26,7 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 #include "stddef.h"
+#include "xList.h"
 
 typedef struct{
     uint16_t senderId;
@@ -40,7 +41,7 @@ typedef struct{
     uint64_t value;
 }xConnectInfo_t;
 
-typedef bool (*connectFunc)(xConnectInfo_t);
+typedef bool (*connectFunc)(xConnectInfo_t,void*);
 
 typedef struct{
     uint16_t senderId;
@@ -51,11 +52,11 @@ typedef struct{
 
 bool xEmitInit(uint8_t size);
 bool xEmit(uint16_t senderId,uint8_t signal,uint64_t value);
-bool xConnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
-bool xDisconnect(uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
-void xDeleteConnect(uint16_t nameId);
+bool xConnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
+bool xDisconnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
+void xDeleteConnect(xListNode_t* ptList,uint16_t nameId);
 
-void xConnectProcess(void);
+void xConnectProcess(xListNode_t* ptList,void *dat);
 
 #ifdef __cplusplus
 }

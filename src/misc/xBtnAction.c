@@ -31,6 +31,8 @@
 
 #define PRESS_LEVEL          0
 
+#define NEW_LIST(newLink)  xListNode_t newLink={ &(newLink), &(newLink), NULL }
+
 NEW_LIST(xBtnLink);
 
 static uint8_t btnCycle=10;
@@ -146,7 +148,7 @@ void xBtnProcess(xBtnInfo_t *btnInfo)
         }
 }
 
-static bool _btnLoop(xListNode* pEachInfo,void* pInfo)
+static bool _btnLoop(xListNode_t* pEachInfo,void* pInfo)
 {
     (void*)pInfo;
     xBtnProcess((xBtnInfo_t *)pEachInfo->info);
@@ -171,7 +173,7 @@ uint16_t xBtnGetState(uint16_t id,uint8_t state)
 {
     uint16_t ret=0;
     xBtnInfo_t *btnInfo=NULL;
-    xListNode *temp_pos,*safePos;
+    xListNode_t *temp_pos,*safePos;
 
     list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
     {
@@ -297,7 +299,7 @@ uint16_t xBtnGetState(uint16_t id,uint8_t state)
 
 void xBtnClean(void)
 {
-    xListNode *temp_pos,*safePos;
+    xListNode_t *temp_pos,*safePos;
 
     list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
     {
