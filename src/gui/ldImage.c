@@ -72,7 +72,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
         ptWidget=ldCalloc(1,sizeof (ldImage_t));
         if(NULL==ptWidget)
         {
-            LOG_ERROR("[image] init failed,id:%d",nameId);
+            LOG_ERROR("[init failed][image] id:%d",nameId);
             return NULL;
         }
     }
@@ -101,7 +101,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
             ptScene->ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
             ldImageSetBgColor(ptWidget,__RGB(240,240,240));
-            LOG_INFO("[background] init,id:%d",nameId);
+            LOG_INFO("[init][background] id:%d",nameId);
         }
         else
         {
@@ -110,7 +110,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
             ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeWindow;
-            LOG_INFO("[window] init,id:%d",nameId);
+            LOG_INFO("[init][window] id:%d",nameId);
         }
     }
     else
@@ -119,20 +119,14 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
         ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
         ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;
-        LOG_INFO("[image] init,id:%d",nameId);
+        LOG_INFO("[init][image] id:%d",nameId);
     }
-
-
-
-
     return ptWidget;
 }
 
 void ldImage_depose( ldImage_t *ptWidget)
 {
-    LOG_DEBUG("ptWidget = %p",ptWidget);
     assert(NULL != ptWidget);
-
     if (ptWidget == NULL)
     {
         return;
@@ -144,7 +138,30 @@ void ldImage_depose( ldImage_t *ptWidget)
         return;
     }
 
-    LOG_DEBUG("img depose");
+#if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
+    switch (ptWidget->use_as__ldBase_t.widgetType)
+    {
+    case widgetTypeImage:
+    {
+        LOG_INFO("[depose][image] id:%d", ptWidget->use_as__ldBase_t.nameId);
+        break;
+    }
+    case widgetTypeWindow:
+    {
+        LOG_INFO("[depose][window] id:%d", ptWidget->use_as__ldBase_t.nameId);
+        break;
+    }
+    case widgetTypeBackground:
+    {
+        LOG_INFO("[depose][background] id:%d", ptWidget->use_as__ldBase_t.nameId);
+        break;
+    }
+    default:
+        break;
+    }
+
+#endif
+
     if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeImage)
     {
         if(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.ptChildList!=NULL)
@@ -153,15 +170,14 @@ void ldImage_depose( ldImage_t *ptWidget)
             {
                 ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
             }
-
         }
-
     }
 
     xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
-
     ldFree(ptWidget);
+
+
 }
 
 void ldImage_on_load( ldImage_t *ptWidget)

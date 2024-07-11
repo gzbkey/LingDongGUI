@@ -97,7 +97,6 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
 
-LOG_DEBUG("__on_scene0_depose");
     ldGuiQuit(ptThis);
 }
 

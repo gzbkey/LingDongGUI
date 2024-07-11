@@ -194,11 +194,7 @@ void ldGuiQuit(ld_scene_t *ptScene)
     {
         if(((ldBase_t *)ptItem))
         {
-//            LOG_DEBUG("id:%d type:%d",((ldBase_t *)ptItem)->nameId,((ldBase_t *)ptItem)->widgetType);
-            if(((ldBase_t *)ptItem)->widgetType>0)
-            {
-                ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
-            }
+            ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
         }
     }
 
@@ -236,7 +232,7 @@ void ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *pt
     {
         sysSceneNum = 0;
     }
-LOG_DEBUG("jump = %d",sysSceneNum);
+
     ptSysGuiFuncGroup[sysSceneNum]=ptFuncGroup;
 
     __arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,ptMode,0);

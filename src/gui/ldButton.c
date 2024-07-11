@@ -96,7 +96,7 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
         ptWidget = ldCalloc(1, sizeof(ldButton_t));
         if (NULL == ptWidget)
         {
-            LOG_ERROR("[button] init failed,id:%d", nameId);
+            LOG_ERROR("[init failed][button] id:%d", nameId);
             return NULL;
         }
     }
@@ -122,7 +122,7 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     xConnect(&ptWidget->ptScene->tLink,nameId, SIGNAL_PRESS, nameId, slotButtonToggle);
     xConnect(&ptWidget->ptScene->tLink,nameId, SIGNAL_RELEASE, nameId, slotButtonToggle);
 
-    LOG_INFO("[button] init,id:%d", nameId);
+    LOG_INFO("[init][button] id:%d", nameId);
     return ptWidget;
 }
 
@@ -137,10 +137,11 @@ void ldButton_depose(ldButton_t *ptWidget)
     {
         return;
     }
-LOG_DEBUG("btn depose");
-    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
+
+    LOG_INFO("[depose][button] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
+    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
     ldFree(ptWidget->pStr);
     ldFree(ptWidget);
 }
