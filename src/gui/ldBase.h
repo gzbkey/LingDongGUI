@@ -73,11 +73,8 @@ widgetTypeKeyboard,
 #define MEM_MODE_STDLIB                           (2)
 #define MEM_MODE_USER                             (3)
 
-#define NAME_ID_MASK                    0x3FF
-#define PAGE_NUM_MASK                   0xFC00
-
-typedef void (*ldPageFunc_t)(arm_2d_scene_t*);
 typedef struct ld_scene_t ld_scene_t;
+typedef void (*ldPageFunc_t)(ld_scene_t*);
 typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
 
 typedef void (*ldDeposeFunc_t)(void *);

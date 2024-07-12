@@ -94,7 +94,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
 
     if(isWindow)
     {
-        if((nameId&NAME_ID_MASK)==0)
+        if(nameId==0)
         {
             ptScene->ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;

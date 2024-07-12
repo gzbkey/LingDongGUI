@@ -86,12 +86,12 @@ void demoInit(ld_scene_t* ptScene)
     ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
 
     xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
-
 }
 
 void demoInit2(ld_scene_t* ptScene)
 {
     void *obj;
+
     ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
     obj= ldImage_init(ptScene,NULL,1, 0, 200, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));

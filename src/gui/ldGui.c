@@ -178,7 +178,7 @@ void ldGuiSceneInit(ld_scene_t *ptScene)
 
     if(ptScene->ldGuiFuncGroup!=NULL)
     {
-        ptScene->ldGuiFuncGroup->init((arm_2d_scene_t*)ptScene);
+        ptScene->ldGuiFuncGroup->init(ptScene);
     }
 #if USE_SCENE_SWITCHING == 1
     isGuiSwthcnScene=false;
@@ -186,8 +186,27 @@ void ldGuiSceneInit(ld_scene_t *ptScene)
     LOG_INFO("[sys] page %s init",ptScene->ldGuiFuncGroup->pageName);
 }
 
+void ldGuiLogicLoop(ld_scene_t *ptScene)
+{
+    if(ptScene->ldGuiFuncGroup!=NULL)
+    {
+        if(ptScene->ldGuiFuncGroup->loop)
+        {
+            ptScene->ldGuiFuncGroup->loop(ptScene);
+        }
+    }
+}
+
 void ldGuiQuit(ld_scene_t *ptScene)
 {
+    if(ptScene->ldGuiFuncGroup!=NULL)
+    {
+        if(ptScene->ldGuiFuncGroup->quit)
+        {
+            ptScene->ldGuiFuncGroup->quit(ptScene);
+        }
+    }
+
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
     {
         if(((ldBase_t *)ptItem))
@@ -211,7 +230,8 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
     if(ptSysGuiFuncGroup[0]!=ptSysGuiFuncGroup[1])
     {
         ldGuiQuit(ptScene);
-        ptSysGuiFuncGroup[0]==ptSysGuiFuncGroup[1];
+        ptSysGuiFuncGroup[0]=ptSysGuiFuncGroup[1];
+        ptScene->ldGuiFuncGroup=ptSysGuiFuncGroup[0];
         ldGuiSceneInit(ptScene);
     }
 #endif
