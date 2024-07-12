@@ -18,8 +18,6 @@
 
 /*============================ INCLUDES ======================================*/
 #define __LD_IMAGE_IMPLEMENT__
-#define __ARM_2D_HELPER_INHERIT__
-#define __ARM_2D_HELPER_IMPLEMENT__
 #define __ARM_2D_HELPER_CONTROL_INHERIT__
 #include "./arm_extra_controls.h"
 #include "./__common.h"
@@ -30,20 +28,20 @@
 #include <string.h>
 
 #if defined(__clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wunknown-warning-option"
-#   pragma clang diagnostic ignored "-Wreserved-identifier"
-#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
-#   pragma clang diagnostic ignored "-Wsign-conversion"
-#   pragma clang diagnostic ignored "-Wpadded"
-#   pragma clang diagnostic ignored "-Wcast-qual"
-#   pragma clang diagnostic ignored "-Wcast-align"
-#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#   pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#   pragma clang diagnostic ignored "-Wmissing-braces"
-#   pragma clang diagnostic ignored "-Wunused-const-variable"
-#   pragma clang diagnostic ignored "-Wmissing-declarations"
-#   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Wunused-const-variable"
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
 const ldBaseWidgetFunc_t ldImageFunc={
@@ -241,5 +239,5 @@ void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor)
 }
 
 #if defined(__clang__)
-#   pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif

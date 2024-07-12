@@ -37,9 +37,7 @@ extern "C" {
 
 void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup);
 
-void ldGuiDraw(ld_scene_t *ptScene,
-               const arm_2d_tile_t *ptTile,
-               bool bIsNewFrame);
+void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 void ldGuiTouchProcess(ld_scene_t *ptScene);
 

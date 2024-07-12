@@ -22,10 +22,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "ldBase.h"
+#include "ldMem.h"
 
 #ifndef XMALLOC
-#define XMALLOC                     ldMalloc
+#define XMALLOC                         ldMalloc
+#endif
+#ifndef XFREE
+#define XFREE                           ldFree
 #endif
 
 typedef struct

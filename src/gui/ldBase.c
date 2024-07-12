@@ -165,22 +165,6 @@ void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
         }
         sibling->ptNext = child;
     }
-    //    if (parent->ptChildList == NULL)
-    //    {
-    //        child->ptParent = parent;
-    //        parent->ptChildList = child;
-    //    }
-    //    else
-    //    {
-    //        arm_2d_control_node_t *sibling = parent->ptChildList;
-    //        child->ptParent = sibling;
-    //        while (sibling->ptNext != NULL)
-    //        {
-    //            child->ptParent = sibling;
-    //            sibling = sibling->ptNext;
-    //        }
-    //        sibling->ptNext = child;
-    //    }
 }
 
 void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot,arm_2d_control_node_t *ptNode)
@@ -203,6 +187,7 @@ void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot,arm_2d_control_node_t *p
     }
 }
 
+#if (USE_LOG_LEVEL>=LOG_LEVEL_NONE)
 void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth)
 {
     for (int i = 0; i < depth; ++i)
@@ -219,6 +204,7 @@ void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth)
         child = child->ptNext;
     }
 }
+#endif
 
 void *ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot,uint16_t nameId)
 {

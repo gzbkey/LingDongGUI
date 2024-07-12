@@ -24,11 +24,7 @@
 #include "xConnect.h"
 #include "xQueue.h"
 
-#include "ldBase.h"
-
-
 xQueue_t *emitQueue=NULL;
-//NEW_LIST(listConnect);
 
 bool xEmitInit(uint8_t size)
 {
@@ -66,7 +62,7 @@ static bool _isConnectSame(xListNode_t* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-bool xConnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
+bool xConnect(xListNode_t* ptRootList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t* pRelation;
 
@@ -81,14 +77,14 @@ bool xConnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t rece
         pRelation->receiverFunc=func;
 
         //确定是否重复添加链接
-        if(xListInfoPrevTraverse(ptList,pRelation,_isConnectSame))
+        if(xListInfoPrevTraverse(ptRootList,pRelation,_isConnectSame))
         {
             XFREE(pRelation);
             return false;
         }
 
         //添加链表
-        if(xListInfoAdd(ptList,pRelation)==NULL)
+        if(xListInfoAdd(ptRootList,pRelation)==NULL)
         {
             XFREE(pRelation);
             return false;
@@ -115,7 +111,7 @@ static bool _disconnect(xListNode_t* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-bool xDisconnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
+bool xDisconnect(xListNode_t* ptRootList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func)
 {
     relationInfo_t info;
 
@@ -124,7 +120,7 @@ bool xDisconnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t r
     info.receiverId=receiverId;
     info.receiverFunc=func;
 
-    return xListInfoPrevTraverse(ptList,&info,_disconnect);
+    return xListInfoPrevTraverse(ptRootList,&info,_disconnect);
 }
 
 static bool _delConnect(xListNode_t* pEachInfo,void* pRelationInfo)
@@ -139,7 +135,7 @@ static bool _delConnect(xListNode_t* pEachInfo,void* pRelationInfo)
     return false;
 }
 
-void xDeleteConnect(xListNode_t* ptList,uint16_t nameId)
+void xDeleteConnect(xListNode_t* ptRootList,uint16_t nameId)
 {
     relationInfo_t info;
 
@@ -148,10 +144,10 @@ void xDeleteConnect(xListNode_t* ptList,uint16_t nameId)
     info.receiverId=nameId;
     info.receiverFunc=0;
 
-    xListInfoPrevTraverse(ptList,&info,_delConnect);
+    xListInfoPrevTraverse(ptRootList,&info,_delConnect);
 }
 
-void xConnectProcess(xListNode_t* ptList,void *dat)
+void xConnectProcess(xListNode_t* ptRootList,void *dat)
 {
     emitInfo_t emitInfo;
     xListNode_t *temp_pos,*safePos;
@@ -164,23 +160,23 @@ void xConnectProcess(xListNode_t* ptList,void *dat)
         {
             //此处轮训 连接表 所有数据
             //正向开始遍历list_for_each_safe(temp_pos,safePos, pList)
-            list_for_each_safe(temp_pos,safePos, ptList)
+            list_for_each_safe(temp_pos,safePos, ptRootList)
             {
-                    pRelationInfo=(relationInfo_t*)temp_pos->info;
+                pRelationInfo=(relationInfo_t*)temp_pos->info;
 
-                    if((pRelationInfo->senderId==emitInfo.senderId)&&(pRelationInfo->signalType==emitInfo.signalType))
+                if((pRelationInfo->senderId==emitInfo.senderId)&&(pRelationInfo->signalType==emitInfo.signalType))
+                {
+                    connectInfo.senderId=pRelationInfo->senderId;
+                    connectInfo.signalType=pRelationInfo->signalType;
+                    connectInfo.receiverId=pRelationInfo->receiverId;
+                    connectInfo.value=emitInfo.value;
+                    ignoreSignal=pRelationInfo->receiverFunc(connectInfo,dat);
+
+                    if(ignoreSignal==true)
                     {
-                        connectInfo.senderId=pRelationInfo->senderId;
-                        connectInfo.signalType=pRelationInfo->signalType;
-                        connectInfo.receiverId=pRelationInfo->receiverId;
-                        connectInfo.value=emitInfo.value;
-                        ignoreSignal=pRelationInfo->receiverFunc(connectInfo,dat);
-
-                        if(ignoreSignal==true)
-                        {
-                            break;
-                        }
+                        break;
                     }
+                }
             }
         }
     }

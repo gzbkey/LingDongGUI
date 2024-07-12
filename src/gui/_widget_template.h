@@ -52,7 +52,7 @@ typedef struct template_t template_t;
 
 struct template_t
 {
-
+    implement(ldBase_t);
 ARM_PRIVATE(
     arm_2d_scene_t *ptScene;
 )
@@ -60,8 +60,6 @@ ARM_PRIVATE(
     
 };
 
-extern
-ARM_NONNULL(1)
 template_t* template_init(arm_2d_scene_t *ptScene, template_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
 
 void template_depose( template_t *ptWidget);

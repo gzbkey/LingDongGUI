@@ -30,6 +30,7 @@ extern "C" {
 #include "xBtnAction.h"
 #include "xConnect.h"
 #include "xList.h"
+#include "ldMem.h"
 #include "ldConfig.h"
 
 typedef enum{
@@ -75,8 +76,12 @@ widgetTypeKeyboard,
 #define NAME_ID_MASK                    0x3FF
 #define PAGE_NUM_MASK                   0xFC00
 
+typedef void (*ldPageFunc_t)(arm_2d_scene_t*);
+typedef struct ld_scene_t ld_scene_t;
+typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
+
 typedef void (*ldDeposeFunc_t)(void *);
-typedef void (*ldShowFunc_t)(arm_2d_scene_t*,void *,void *,bool);
+typedef void (*ldShowFunc_t)(ld_scene_t*,void *,void *,bool);
 typedef void (*ldFrameStartFunc_t)(void *);
 
 typedef struct {
@@ -85,16 +90,8 @@ typedef struct {
     ldFrameStartFunc_t frameStart;
 }ldBaseWidgetFunc_t;
 
-typedef void (*ldPageFunc_t)(arm_2d_scene_t*);
-
-typedef struct ld_scene_t ld_scene_t;
-
-typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
-
-//typedef struct ld_scene_t* (*sceneInit_t)(arm_2d_scene_player_t *,ld_scene_t *ptThis,const ldPageFuncGroup_t *);
 
 struct ldPageFuncGroup_t{
-//    sceneInit_t pSceneInit;
     ldPageFunc_t init;
     ldPageFunc_t loop;
     ldPageFunc_t quit;
@@ -129,16 +126,15 @@ typedef struct  {
 
 
 
-extern void *ldMalloc(uint32_t size);
-extern void *ldCalloc(uint32_t num,uint32_t size);
-extern void ldFree(void *p);
-extern void *ldRealloc(void *ptr,uint32_t newSize);
+
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
 void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot, arm_2d_control_node_t *ptNode);
+#if (USE_LOG_LEVEL>=LOG_LEVEL_NONE)
 void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth);
+#endif
 void* ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot, uint16_t nameId);
 void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity);

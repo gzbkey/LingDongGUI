@@ -52,11 +52,10 @@ typedef struct{
 
 bool xEmitInit(uint8_t size);
 bool xEmit(uint16_t senderId,uint8_t signal,uint64_t value);
-bool xConnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
-bool xDisconnect(xListNode_t* ptList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
-void xDeleteConnect(xListNode_t* ptList,uint16_t nameId);
-
-void xConnectProcess(xListNode_t* ptList,void *dat);
+bool xConnect(xListNode_t* ptRootList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
+bool xDisconnect(xListNode_t* ptRootList,uint16_t senderId,uint8_t signal,uint16_t receiverId,connectFunc func);
+void xDeleteConnect(xListNode_t* ptRootList,uint16_t nameId);
+void xConnectProcess(xListNode_t* ptRootList, void *dat);
 
 #ifdef __cplusplus
 }

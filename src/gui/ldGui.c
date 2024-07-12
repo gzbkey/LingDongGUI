@@ -33,15 +33,13 @@ static uint8_t sysSceneNum=0;
 static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 #ifndef LD_EMIT_SIZE
-#define LD_EMIT_SIZE             8
+#define LD_EMIT_SIZE                    8
 #endif
 
-void ldGuiDraw(ld_scene_t *ptScene,
-               const arm_2d_tile_t *ptTile,
-               bool bIsNewFrame)
+void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
-        ((ldBase_t*)ptItem)->pFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
+        ((ldBase_t*)ptItem)->pFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
     }
 }
 

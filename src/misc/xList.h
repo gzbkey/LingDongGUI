@@ -28,18 +28,21 @@ extern "C" {
 #include "stddef.h"
 #include "stdlib.h"
 #include <stdio.h>
+#include "ldMem.h"
 
-extern void *ldMalloc(uint32_t size);
-extern void ldFree(void *p);
+#ifndef XMALLOC
+#define XMALLOC                         ldMalloc
+#endif
+#ifndef XFREE
+#define XFREE                           ldFree
+#endif
 
 typedef struct listNode {
     struct listNode *next, *prev;
     void *info;
 }xListNode_t;
 
-// struct listNode ;
-
-//#define NEW_LIST(newLink)  xListNode newLink={ &(newLink), &(newLink), NULL }
+#define NEW_LIST(newLink)  xListNode_t newLink={ &(newLink), &(newLink), NULL }
 
 #define list_entry(ptr, type, member)    (type *)((char*)(ptr) - offsetof(type, member))
 

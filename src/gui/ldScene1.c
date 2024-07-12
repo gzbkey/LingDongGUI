@@ -174,9 +174,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
 
-        ldGuiDraw(pTarget,
-                  ptTile,
-                  bIsNewFrame);
+        ldGuiDraw(pTarget,ptTile,bIsNewFrame);
 
         /* update dirty region */
         switch (arm_2d_dynamic_dirty_region_wait_next(

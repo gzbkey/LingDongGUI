@@ -27,6 +27,7 @@ HEADERS += \
     ../../src/gui/ldButton.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldImage.h \
+    ../../src/gui/ldMem.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldScene1.h \
     ../../src/gui/ldWindow.h \

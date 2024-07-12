@@ -48,7 +48,7 @@ const templateWidgetFunc_t templateFunc = {
     .show = (ldShowFunc_t)template_show,
     .frameStart = (ldFrameStartFunc_t)template_on_frame_start,
 };
-ARM_NONNULL(1)
+
 template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
                           template_cfg_t *ptCFG)
 {
@@ -60,14 +60,15 @@ template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
         ptWidget = ldCalloc(1, sizeof(template_t));
         if (NULL == ptWidget)
         {
-            LOG_ERROR("[template] init failed,id:%d", nameId);
+            LOG_ERROR("[init failed][template] id:%d", nameId);
             return NULL;
         }
     }
 
-    ptParent = ldBaseGetWidget(parentNameId);
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
-	
+
+    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
@@ -77,32 +78,42 @@ template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
     ptWidget->use_as__ldBase_t.pFunc = &ldButtonFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
-    LOG_INFO("[button] init,id:%d", nameId);
+    LOG_INFO("[init][template] id:%d", nameId);
     return ptWidget;
 }
 
-ARM_NONNULL(1)
 void template_depose( template_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeTemplate)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][template] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
+    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
+
+    ldFree(ptWidget);
 }
 
-ARM_NONNULL(1)
 void template_on_load( template_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-ARM_NONNULL(1)
 void template_on_frame_start( template_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-ARM_NONNULL(1)
 void template_show(arm_2d_scene_t *pScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL!= ptWidget);

@@ -24,9 +24,6 @@
 #include "xList.h"
 #include "string.h"
 
-#define XMALLOC ldMalloc
-#define XFREE ldFree
-
 static void _xListAddTail(xListNode_t *pList,xListNode_t *newNode)
 {
     xListNode_t * prevObj;

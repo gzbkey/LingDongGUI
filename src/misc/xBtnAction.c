@@ -31,8 +31,6 @@
 
 #define PRESS_LEVEL          0
 
-#define NEW_LIST(newLink)  xListNode_t newLink={ &(newLink), &(newLink), NULL }
-
 NEW_LIST(xBtnLink);
 
 static uint8_t btnCycle=10;
