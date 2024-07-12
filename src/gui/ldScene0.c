@@ -80,6 +80,8 @@ static void __on_scene0_load(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
+
+    ldGuiLoad(ptThis);
 }
 
 static void __on_scene0_depose(arm_2d_scene_t *ptScene)
@@ -120,7 +122,7 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
 
-//    ldGuiFrameStart(ptScene);
+    ldGuiFrameStart(ptScene);
     ldGuiLogicLoop(ptScene);
     ldGuiTouchProcess(ptScene);
     xConnectProcess(&((ld_scene_t*)ptScene)->tLink,ptScene);

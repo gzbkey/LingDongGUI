@@ -81,6 +81,7 @@ static void __on_scene1_load(arm_2d_scene_t *ptScene)
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
+    ldGuiLoad(ptThis);
 }
 
 static void __on_scene1_depose(arm_2d_scene_t *ptScene)
@@ -97,6 +98,8 @@ static void __on_scene1_depose(arm_2d_scene_t *ptScene)
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
+
+    ldGuiQuit(ptThis);
 }
 
 /*----------------------------------------------------------------------------*
@@ -113,15 +116,14 @@ static void __on_scene1_background_complete(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-
 }
 
 static void __on_scene1_frame_start(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
 
-//    ldGuiFrameStart(ptScene);
-//    ldGuiLogicLoop(ptScene);
+    ldGuiFrameStart(ptScene);
+    ldGuiLogicLoop(ptScene);
     ldGuiTouchProcess(ptScene);
     xConnectProcess(&((ld_scene_t*)ptScene)->tLink,ptScene);
 
@@ -140,27 +142,12 @@ static void __on_scene1_frame_complete(arm_2d_scene_t *ptScene)
     arm_2d_helper_control_enum_depose(&ptThis->tEnum);
 
     ldGuiFrameComplete(ptThis);
-//    if(pageNumNow!=pageTarget)
-//    {
-//        ldGuiQuit(ptScene);
-//        pageNumNow=pageTarget;
-//        ldGuiInit(ptScene);
-////        arm_2d_scene1_init(&DISP0_ADAPTER);
-////        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
-//    }
-    /* switch to next scene after 3s */
-//    if (arm_2d_helper_is_time_out(3000, &this.lTimestamp[0])) {
-//
-//    }
 }
 
 static void __before_scene1_switching_out(arm_2d_scene_t *ptScene)
 {
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-
-    ldGuiQuit(ptThis);
-//    pageNumNow=pageTarget;
 }
 
 static

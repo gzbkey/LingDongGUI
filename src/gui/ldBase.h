@@ -80,11 +80,13 @@ typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
 typedef void (*ldDeposeFunc_t)(void *);
 typedef void (*ldShowFunc_t)(ld_scene_t*,void *,void *,bool);
 typedef void (*ldFrameStartFunc_t)(void *);
+typedef void (*ldLoadFunc_t)(void *);
 
 typedef struct {
     ldDeposeFunc_t depose;
-    ldShowFunc_t show;
+    ldLoadFunc_t load;
     ldFrameStartFunc_t frameStart;
+    ldShowFunc_t show;
 }ldBaseWidgetFunc_t;
 
 

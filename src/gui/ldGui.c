@@ -186,6 +186,28 @@ void ldGuiSceneInit(ld_scene_t *ptScene)
     LOG_INFO("[sys] page %s init",ptScene->ldGuiFuncGroup->pageName);
 }
 
+void ldGuiFrameStart(ld_scene_t *ptScene)
+{
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+    {
+        if(((ldBase_t*)ptItem)->pFunc->frameStart!=NULL)
+        {
+            ((ldBase_t*)ptItem)->pFunc->frameStart(ptScene);
+        }
+    }
+}
+
+void ldGuiLoad(ld_scene_t *ptScene)
+{
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+    {
+        if(((ldBase_t*)ptItem)->pFunc->load!=NULL)
+        {
+            ((ldBase_t*)ptItem)->pFunc->load(ptScene);
+        }
+    }
+}
+
 void ldGuiLogicLoop(ld_scene_t *ptScene)
 {
     if(ptScene->ldGuiFuncGroup!=NULL)

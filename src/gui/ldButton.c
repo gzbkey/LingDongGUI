@@ -45,8 +45,9 @@
 
 const ldBaseWidgetFunc_t ldButtonFunc = {
     .depose = (ldDeposeFunc_t)ldButton_depose,
-    .show = (ldShowFunc_t)ldButton_show,
+    .load = (ldLoadFunc_t)ldButton_on_load,
     .frameStart = (ldFrameStartFunc_t)ldButton_on_frame_start,
+    .show = (ldShowFunc_t)ldButton_show,
 };
 
 static bool slotButtonToggle(xConnectInfo_t info,ld_scene_t *ptScene)

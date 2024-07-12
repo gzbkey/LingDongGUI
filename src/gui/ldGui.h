@@ -33,15 +33,21 @@ extern "C" {
 #include "ldButton.h"
 
 
+void ldGuiLoad(ld_scene_t *ptScene);
+void ldGuiFrameStart(ld_scene_t *ptScene);
+void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
+
 
 
 void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup);
 
-void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
+
+
 
 void ldGuiTouchProcess(ld_scene_t *ptScene);
 
 void ldGuiSceneInit(ld_scene_t *ptScene);
+void ldGuiLogicLoop(ld_scene_t *ptScene);
 void ldGuiQuit(ld_scene_t *ptScene);
 void ldGuiFrameComplete(ld_scene_t *ptScene);
 void ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs);
