@@ -114,6 +114,7 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.widgetType = widgetTypeButton;
     ptWidget->use_as__ldBase_t.pFunc = &ldButtonFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
 
     ptWidget->releaseColor = __RGB(217, 225, 244);
     ptWidget->pressColor = __RGB(255, 243, 202);

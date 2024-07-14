@@ -78,14 +78,17 @@ void demoInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
 
-    win=ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
+    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
 
     obj= ldImage_init(ptScene,NULL,1, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
     ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
 
-    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
+    win=ldWindow_init(ptScene,NULL,3, 0, 200, 95, 20, 20);
+    ldWindowSetBgColor(win,GLCD_COLOR_GREEN);
+
+//    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
 }
 
 void demoInit2(ld_scene_t* ptScene)

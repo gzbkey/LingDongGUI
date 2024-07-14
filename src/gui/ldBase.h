@@ -119,6 +119,7 @@ typedef struct  {
     ldWidgetType_t widgetType;
     uint16_t nameId;
     bool isDirtyRegionUpdate:1;
+    bool isDirtyRegionAutoReset:1;
 }ldBase_t;
 
 #define LD_CHK_PTR_RET(ptr,retValue)             if ((ptr) == NULL) { return retValue; }

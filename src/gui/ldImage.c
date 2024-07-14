@@ -115,6 +115,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
     else
     {
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
+        ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
         ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
         ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;

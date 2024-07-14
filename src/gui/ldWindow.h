@@ -32,15 +32,15 @@ extern "C" {
 
 #include "ldImage.h"
 
-#define ldWindow_t ldImage_t
+#define ldWindow_t                      ldImage_t
 
 #define ldWindow_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height)  ldImage_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height,NULL,NULL,true)
 
-#define ldWindow_depose ldImage_depose
-#define ldWindow_on_load ldImage_on_load
-#define ldWindow_on_frame_start ldImage_on_frame_start
-#define ldWindow_show ldImage_show
-
+#define ldWindow_depose                 ldImage_depose
+#define ldWindow_on_load                ldImage_on_load
+#define ldWindow_on_frame_start         ldImage_on_frame_start
+#define ldWindow_show                   ldImage_show
+#define ldWindowSetBgColor              ldImageSetBgColor
 #if defined(__clang__)
 #   pragma clang diagnostic pop
 #endif
