@@ -199,34 +199,38 @@ void ldImage_show( ld_scene_t *ptScene,
 {
     assert(NULL!= ptWidget);
 
-    if((ptWidget->isHidden)||(ptWidget->isTransparent))
-    {
-        return;
-    }
+
 #if 0
     if (bIsNewFrame) {
         
     }
 #endif
-    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion) {
-        if (ptWidget->isColor)
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion,true))
+    {
+        arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
         {
-            ldBaseColor(&tTarget,
-                        NULL,
-                        ptWidget->bgColor,
-                        ptWidget->opacity);
-        }
-        else
-        {
-            ldBaseImage(&tTarget,
-                        &ptWidget->ptImgTile->tRegion,
-                        ptWidget->ptImgTile,
-                        ptWidget->ptMaskTile,
-                        ptWidget->fgColor,
-                        ptWidget->opacity);
+            if((ptWidget->isHidden)||(ptWidget->isTransparent))
+            {
+                break;
+            }
+            if (ptWidget->isColor)
+            {
+                ldBaseColor(&tTarget,
+                            NULL,
+                            ptWidget->bgColor,
+                            ptWidget->opacity);
+            }
+            else
+            {
+                ldBaseImage(&tTarget,
+                            &ptWidget->ptImgTile->tRegion,
+                            ptWidget->ptImgTile,
+                            ptWidget->ptMaskTile,
+                            ptWidget->fgColor,
+                            ptWidget->opacity);
+            }
         }
     }
-
     arm_2d_op_wait_async(NULL);
 }
 

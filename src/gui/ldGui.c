@@ -254,6 +254,7 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
         ldGuiQuit(ptScene);
         ptSysGuiFuncGroup[0]=ptSysGuiFuncGroup[1];
         ptScene->ldGuiFuncGroup=ptSysGuiFuncGroup[0];
+        arm_2d_scene_player_update_scene_background(ptScene->use_as__arm_2d_scene_t.ptPlayer);
         ldGuiSceneInit(ptScene);
     }
 #endif

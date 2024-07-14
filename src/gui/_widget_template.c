@@ -45,8 +45,9 @@
 
 const templateWidgetFunc_t templateFunc = {
     .depose = (ldDeposeFunc_t)template_depose,
-    .show = (ldShowFunc_t)template_show,
+    .load = (ldLoadFunc_t)template_on_load,
     .frameStart = (ldFrameStartFunc_t)template_on_frame_start,
+    .show = (ldShowFunc_t)template_show,
 };
 
 template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
@@ -77,6 +78,7 @@ template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
     ptWidget->use_as__ldBase_t.widgetType = widgetTypeTemplate;
     ptWidget->use_as__ldBase_t.pFunc = &ldButtonFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
 
     LOG_INFO("[init][template] id:%d", nameId);
     return ptWidget;
@@ -118,21 +120,19 @@ void template_show(arm_2d_scene_t *pScene, template_t *ptWidget, const arm_2d_ti
 {
     assert(NULL!= ptWidget);
 
-    if ((ptWidget->isHidden) || (ptWidget->isTransparent))
-    {
-        return;
-    }
-
 #if 0
     if (bIsNewFrame) {
         
     }
 #endif
-    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion,true))
     {
+        arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
+        {
 
 
 
+        }
     }
 
     arm_2d_op_wait_async(NULL);

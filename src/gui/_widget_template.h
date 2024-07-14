@@ -54,13 +54,13 @@ struct template_t
 {
     implement(ldBase_t);
 ARM_PRIVATE(
-    arm_2d_scene_t *ptScene;
+    ld_scene_t *ptScene;
 )
     /* place your public member here */
     
 };
 
-template_t* template_init(arm_2d_scene_t *ptScene, template_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
+template_t* template_init(ld_scene_t *ptScene, template_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
 
 void template_depose( template_t *ptWidget);
 
@@ -68,7 +68,7 @@ void template_on_load( template_t *ptWidget);
 
 void template_on_frame_start( template_t *ptWidget);
 
-void template_show(arm_2d_scene_t *pScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+void template_show(ld_scene_t *pScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

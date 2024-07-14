@@ -17,7 +17,6 @@
  */
 
 #define __LD_BUTTON_IMPLEMENT__
-
 #include "./arm_extra_controls.h"
 #include "./__common.h"
 #include "arm_2d.h"
@@ -162,101 +161,102 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
 {
     assert(NULL != ptWidget);
 
-    if ((ptWidget->isHidden) || (ptWidget->isTransparent))
-    {
-        return;
-    }
-
 #if 0
     if (bIsNewFrame) {
 
     }
 #endif
 
-    arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion,true))
     {
-
-        if ((ptWidget->ptReleaseImgTile == NULL) &&
-            (ptWidget->ptReleaseMaskTile == NULL) &&
-            (ptWidget->ptPressImgTile == NULL) &&
-            (ptWidget->ptPressMaskTile == NULL)) // color
+        arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
         {
-
-            if (ptWidget->isCorner)
+            if((ptWidget->isHidden)||(ptWidget->isTransparent))
             {
-                if (ptWidget->isPressed)
+                break;
+            }
+            if ((ptWidget->ptReleaseImgTile == NULL) &&
+                    (ptWidget->ptReleaseMaskTile == NULL) &&
+                    (ptWidget->ptPressImgTile == NULL) &&
+                    (ptWidget->ptPressMaskTile == NULL)) // color
+            {
+
+                if (ptWidget->isCorner)
                 {
-                    draw_round_corner_box(&tTarget,
-                                          NULL,
-                                          ptWidget->pressColor,
-                                          ptWidget->opacity,
-                                          bIsNewFrame);
+                    if (ptWidget->isPressed)
+                    {
+                        draw_round_corner_box(&tTarget,
+                                              NULL,
+                                              ptWidget->pressColor,
+                                              ptWidget->opacity,
+                                              bIsNewFrame);
+                    }
+                    else
+                    {
+                        draw_round_corner_box(&tTarget,
+                                              NULL,
+                                              ptWidget->releaseColor,
+                                              ptWidget->opacity,
+                                              bIsNewFrame);
+                    }
                 }
                 else
                 {
-                    draw_round_corner_box(&tTarget,
-                                          NULL,
-                                          ptWidget->releaseColor,
-                                          ptWidget->opacity,
-                                          bIsNewFrame);
+                    if (ptWidget->isPressed)
+                    {
+                        ldBaseColor(&tTarget,
+                                    NULL,
+                                    ptWidget->pressColor,
+                                    ptWidget->opacity);
+                    }
+                    else
+                    {
+                        ldBaseColor(&tTarget,
+                                    NULL,
+                                    ptWidget->releaseColor,
+                                    ptWidget->opacity);
+                    }
                 }
             }
             else
             {
-                if (ptWidget->isPressed)
+                if (ptWidget->isCorner)
                 {
-                    ldBaseColor(&tTarget,
-                                NULL,
-                                ptWidget->pressColor,
-                                ptWidget->opacity);
+                    if (ptWidget->isPressed)
+                    {
+                        draw_round_corner_image(ptWidget->ptPressImgTile,
+                                                &tTarget,
+                                                NULL,
+                                                bIsNewFrame);
+                    }
+                    else
+                    {
+                        draw_round_corner_image(ptWidget->ptReleaseImgTile,
+                                                &tTarget,
+                                                NULL,
+                                                bIsNewFrame);
+                    }
                 }
                 else
                 {
-                    ldBaseColor(&tTarget,
-                                NULL,
-                                ptWidget->releaseColor,
-                                ptWidget->opacity);
-                }
-            }
-        }
-        else
-        {
-            if (ptWidget->isCorner)
-            {
-                if (ptWidget->isPressed)
-                {
-                    draw_round_corner_image(ptWidget->ptPressImgTile,
-                                            &tTarget,
-                                            NULL,
-                                            bIsNewFrame);
-                }
-                else
-                {
-                    draw_round_corner_image(ptWidget->ptReleaseImgTile,
-                                            &tTarget,
-                                            NULL,
-                                            bIsNewFrame);
-                }
-            }
-            else
-            {
-                if (ptWidget->isPressed)
-                {
-                    ldBaseImage(&tTarget,
-                                NULL,
-                                ptWidget->ptPressImgTile,
-                                ptWidget->ptPressMaskTile,
-                                ptWidget->pressColor,
-                                ptWidget->opacity);
-                }
-                else
-                {
-                    ldBaseImage(&tTarget,
-                                NULL,
-                                ptWidget->ptReleaseImgTile,
-                                ptWidget->ptReleaseMaskTile,
-                                ptWidget->releaseColor,
-                                ptWidget->opacity);
+                    if (ptWidget->isPressed)
+                    {
+                        ldBaseImage(&tTarget,
+                                    NULL,
+                                    ptWidget->ptPressImgTile,
+                                    ptWidget->ptPressMaskTile,
+                                    ptWidget->pressColor,
+                                    ptWidget->opacity);
+                    }
+                    else
+                    {
+                        ldBaseImage(&tTarget,
+                                    NULL,
+                                    ptWidget->ptReleaseImgTile,
+                                    ptWidget->ptReleaseMaskTile,
+                                    ptWidget->releaseColor,
+                                    ptWidget->opacity);
+                    }
                 }
             }
         }

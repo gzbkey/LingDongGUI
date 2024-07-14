@@ -88,7 +88,7 @@ void demoInit(ld_scene_t* ptScene)
     win=ldWindow_init(ptScene,NULL,3, 0, 200, 95, 20, 20);
     ldWindowSetBgColor(win,GLCD_COLOR_GREEN);
 
-//    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
+    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
 }
 
 void demoInit2(ld_scene_t* ptScene)

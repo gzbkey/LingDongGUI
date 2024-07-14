@@ -47,10 +47,6 @@ extern "C" {
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (16*1024) //BYTE
 
-// <o>LingDongGui signal emit buffer size
-// <i> The size of signal emit buffer to the ldgui
-#define LD_EMIT_SIZE                              (8)
-
 // <o>Number of project pages
 // <i> Maximum number of pages
 #define LD_PAGE_MAX                               (1)
@@ -68,6 +64,10 @@ extern "C" {
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
 #define USE_RADIA_MENU_SCALE                      (0)
+
+// <q>scene switcing support
+// <i> 1:More effects 0£ºLess ram
+#define USE_SCENE_SWITCHING                       (0)
 
 // debug config
 

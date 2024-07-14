@@ -33,9 +33,7 @@
 #include <string.h>
 #include <stdio.h>
 
-
 #include "ldGui.h"
-
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -178,6 +176,10 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
                 {
                     if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate)
                     {
+                        if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionAutoReset)
+                        {
+                            ((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate = false;
+                        }
                         arm_2d_dynamic_dirty_region_update(
                             &ptThis->tDirtyRegionItem,
                             (arm_2d_tile_t*)ptTile,
