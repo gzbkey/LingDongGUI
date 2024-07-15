@@ -69,26 +69,23 @@ struct ldImage_t {
     uint8_t opacity;
     bool isTransparent:1;//window专用
     bool isColor:1;
-    bool isHidden:1;
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* pImgTile, arm_2d_tile_t* pMaskTile, bool isWindow);
-
+ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, bool isWindow);
 void ldImage_depose( ldImage_t *ptWidget);
-
 void ldImage_on_load( ldImage_t *ptWidget);
-
 void ldImage_on_frame_start( ldImage_t *ptWidget);
-
-void ldImage_show( ld_scene_t *ptScene,
-                   ldImage_t *ptWidget,
-                            const arm_2d_tile_t *ptTile, 
-                            bool bIsNewFrame);
+void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor);
+void ldImageSetOpacity(ldImage_t *ptWidget, uint8_t opacity);
+void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
+
+#define ldImageSetHidden                ldBaseSetHidden
+#define ldImageMove                     ldBaseMove
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

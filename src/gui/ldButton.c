@@ -150,16 +150,28 @@ void ldButton_depose(ldButton_t *ptWidget)
 void ldButton_on_load(ldButton_t *ptWidget)
 {
     assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 }
 
 void ldButton_on_frame_start(ldButton_t *ptWidget)
 {
     assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 }
 
 void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 
 #if 0
     if (bIsNewFrame) {
@@ -171,7 +183,7 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
     {
         arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
         {
-            if((ptWidget->isHidden)||(ptWidget->isTransparent))
+            if((ptWidget->use_as__ldBase_t.isHidden)||(ptWidget->isTransparent))
             {
                 break;
             }
@@ -261,9 +273,137 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
             }
         }
     }
-
     arm_2d_op_wait_async(NULL);
 }
+
+void ldButtonSetColor(ldButton_t* ptWidget, ldColor releaseColor, ldColor pressColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->releaseColor=releaseColor;
+    ptWidget->pressColor=pressColor;
+}
+
+void ldButtonSetImage(ldButton_t* ptWidget,arm_2d_tile_t* ptReleaseImgTile,arm_2d_tile_t* ptReleaseMaskTile,arm_2d_tile_t* ptPressImgTile,arm_2d_tile_t* ptPressMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptReleaseImgTile=ptReleaseImgTile;
+    ptWidget->ptReleaseMaskTile=ptReleaseMaskTile;
+    ptWidget->ptPressImgTile=ptPressImgTile;
+    ptWidget->ptPressMaskTile=ptPressMaskTile;
+}
+
+void ldButtonSetSelectImage(ldButton_t* ptWidget,arm_2d_tile_t* ptSelectMaskTile,ldColor selectColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptSelectMaskTile=ptSelectMaskTile;
+    ptWidget->selectColor=selectColor;
+}
+
+void ldButtonSetTransparent(ldButton_t* ptWidget,bool isTransparent)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isTransparent=isTransparent;
+}
+
+void ldButtonSetRoundCorner(ldButton_t* ptWidget,bool isCorner)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isCorner=isCorner;
+}
+
+void ldButtonSetSelect(ldButton_t* ptWidget,bool isSelected)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isSelected=isSelected;
+}
+
+void ldButtonSetFont(ldButton_t *ptWidget, arm_2d_font_t *ptFont)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptFont=ptFont;
+}
+
+void ldButtonSetText(ldButton_t* ptWidget,uint8_t *pStr)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ldFree(ptWidget->pStr);
+    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    strcpy((char*)ptWidget->pStr,(char*)pStr);
+
+}
+
+void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->charColor=charColor;
+}
+
+void ldButtonSetAlign(ldButton_t *ptWidget,uint8_t align)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->align=align;
+}
+
+void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isCheckable=isCheckable;
+}
+
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

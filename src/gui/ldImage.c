@@ -51,17 +51,7 @@ const ldBaseWidgetFunc_t ldImageFunc={
     .show=(ldShowFunc_t)ldImage_show,
 };
 
-ldImage_t* ldImage_init( ld_scene_t *ptScene,
-                         ldImage_t *ptWidget,
-                         uint16_t nameId,
-                         uint16_t parentNameId,
-                         int16_t x,
-                         int16_t y,
-                         int16_t width,
-                         int16_t height,
-                         arm_2d_tile_t* ptImgTile,
-                         arm_2d_tile_t* ptMaskTile,
-                         bool isWindow)
+ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId,uint16_t parentNameId,int16_t x,int16_t y,int16_t width,int16_t height,arm_2d_tile_t* ptImgTile,arm_2d_tile_t* ptMaskTile,bool isWindow)
 {
     assert(NULL!= ptScene);
     ldBase_t* ptParent;
@@ -76,9 +66,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
         }
     }
 
-
     ptWidget->ptScene=ptScene;
-
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
@@ -86,12 +74,9 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
     ptWidget->use_as__ldBase_t.nameId=nameId;
     ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
 
-
     ptWidget->opacity = 255;
     ptWidget->ptImgTile=ptImgTile;
     ptWidget->ptMaskTile=ptMaskTile;
-
-
 
     if(isWindow)
     {
@@ -99,7 +84,8 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,
         {
             ptScene->ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
-            ldImageSetBgColor(ptWidget,__RGB(240,240,240));
+            ptWidget->isColor=true;
+            ptWidget->bgColor=__RGB(240,240,240);
             LOG_INFO("[init][background] id:%d",nameId);
         }
         else
@@ -159,7 +145,6 @@ void ldImage_depose( ldImage_t *ptWidget)
     default:
         break;
     }
-
 #endif
 
     if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeImage)
@@ -176,8 +161,6 @@ void ldImage_depose( ldImage_t *ptWidget)
     xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
     ldFree(ptWidget);
-
-
 }
 
 void ldImage_on_load( ldImage_t *ptWidget)
@@ -192,13 +175,13 @@ void ldImage_on_frame_start( ldImage_t *ptWidget)
     
 }
 
-void ldImage_show( ld_scene_t *ptScene,
-                   ldImage_t *ptWidget,
-                   const arm_2d_tile_t *ptTile,
-                   bool bIsNewFrame)
+void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
     assert(NULL!= ptWidget);
-
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 
 #if 0
     if (bIsNewFrame) {
@@ -209,7 +192,7 @@ void ldImage_show( ld_scene_t *ptScene,
     {
         arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
         {
-            if((ptWidget->isHidden)||(ptWidget->isTransparent))
+            if((ptWidget->use_as__ldBase_t.isHidden)||(ptWidget->isTransparent))
             {
                 break;
             }
@@ -237,11 +220,38 @@ void ldImage_show( ld_scene_t *ptScene,
 void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor)
 {
     assert(NULL!= ptWidget);
-    LD_CHK_PTR_RET(ptWidget,);
-
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isTransparent=false;
     ptWidget->isColor=true;
     ptWidget->bgColor=bgColor;
+}
+
+void ldImageSetOpacity(ldImage_t *ptWidget, uint8_t opacity)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->opacity=opacity;
+}
+
+void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isTransparent=false;
+    ptWidget->ptImgTile=ptImgTile;
+    ptWidget->ptMaskTile=ptMaskTile;
 }
 
 #if defined(__clang__)

@@ -23,6 +23,7 @@
  */
 #include "xConnect.h"
 #include "xQueue.h"
+#include "string.h"
 
 xQueue_t *emitQueue=NULL;
 
@@ -154,28 +155,26 @@ void xConnectProcess(xListNode_t* ptRootList,void *dat)
     relationInfo_t *pRelationInfo;
     xConnectInfo_t connectInfo;
     bool ignoreSignal=false;//忽略相同信号的其他操作
-    if(xQueueGetLength(emitQueue)>0)
+
+    while(xQueueDequeue(emitQueue,&emitInfo,sizeof (emitInfo)))
     {
-        if(xQueueDequeue(emitQueue,&emitInfo,sizeof (emitInfo)))
+        //此处轮训 连接表 所有数据
+        //正向开始遍历list_for_each_safe(temp_pos,safePos, pList)
+        list_for_each_safe(temp_pos,safePos, ptRootList)
         {
-            //此处轮训 连接表 所有数据
-            //正向开始遍历list_for_each_safe(temp_pos,safePos, pList)
-            list_for_each_safe(temp_pos,safePos, ptRootList)
+            pRelationInfo=(relationInfo_t*)temp_pos->info;
+
+            if((pRelationInfo->senderId==emitInfo.senderId)&&(pRelationInfo->signalType==emitInfo.signalType))
             {
-                pRelationInfo=(relationInfo_t*)temp_pos->info;
+                connectInfo.senderId=pRelationInfo->senderId;
+                connectInfo.signalType=pRelationInfo->signalType;
+                connectInfo.receiverId=pRelationInfo->receiverId;
+                connectInfo.value=emitInfo.value;
+                ignoreSignal=pRelationInfo->receiverFunc(connectInfo,dat);
 
-                if((pRelationInfo->senderId==emitInfo.senderId)&&(pRelationInfo->signalType==emitInfo.signalType))
+                if(ignoreSignal==true)
                 {
-                    connectInfo.senderId=pRelationInfo->senderId;
-                    connectInfo.signalType=pRelationInfo->signalType;
-                    connectInfo.receiverId=pRelationInfo->receiverId;
-                    connectInfo.value=emitInfo.value;
-                    ignoreSignal=pRelationInfo->receiverFunc(connectInfo,dat);
-
-                    if(ignoreSignal==true)
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
         }

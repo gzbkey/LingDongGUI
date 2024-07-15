@@ -288,3 +288,27 @@ void ldBaseImage(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, arm_2d_tile_t *
         }
     }
 }
+
+void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->isHidden=isHidden;
+}
+
+void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
+}

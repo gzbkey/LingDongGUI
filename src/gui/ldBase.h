@@ -99,8 +99,6 @@ struct ldPageFuncGroup_t{
 #endif
 };
 
-
-
 struct ld_scene_t {
     implement(arm_2d_scene_t);
 //ARM_PRIVATE(
@@ -120,13 +118,8 @@ typedef struct  {
     uint16_t nameId;
     bool isDirtyRegionUpdate:1;
     bool isDirtyRegionAutoReset:1;
+    bool isHidden:1;
 }ldBase_t;
-
-#define LD_CHK_PTR_RET(ptr,retValue)             if ((ptr) == NULL) { return retValue; }
-
-
-
-
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
@@ -138,6 +131,8 @@ void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth);
 void* ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot, uint16_t nameId);
 void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity);
+void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
+void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
 
 
 #ifdef __cplusplus
