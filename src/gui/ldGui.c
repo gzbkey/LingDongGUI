@@ -39,7 +39,7 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
-        ((ldBase_t*)ptItem)->pFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+        ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
     }
 }
 
@@ -78,7 +78,7 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
             u64Temp=tLocation.iX;
             u64Temp<<=16;
             u64Temp+=tLocation.iY;
-            xEmit(ptWidget->nameId,touchSignal,u64Temp);
+            emit(ptWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -97,7 +97,7 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
                 u64Temp<<=16;
                 u64Temp+=tLocation.iY;
 
-                xEmit(ptWidget->nameId,touchSignal,u64Temp);
+                emit(ptWidget->nameId,touchSignal,u64Temp);
             }
             prevLocation=tLocation;
         }
@@ -124,7 +124,7 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
             u64Temp<<=16;
             u64Temp+=prevLocation.iY;
 
-            xEmit(ptWidget->nameId,touchSignal,u64Temp);
+            emit(ptWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -174,7 +174,7 @@ void ldGuiTouchProcess(ld_scene_t *ptScene)
 
 void ldGuiSceneInit(ld_scene_t *ptScene)
 {
-    xEmitInit(LD_EMIT_SIZE);
+    ldMsgInit(&ptScene->ptMsgQueue,LD_EMIT_SIZE);
 
     if(ptScene->ldGuiFuncGroup!=NULL)
     {
@@ -190,9 +190,9 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
-        if(((ldBase_t*)ptItem)->pFunc->frameStart!=NULL)
+        if(((ldBase_t*)ptItem)->ptGuiFunc->frameStart!=NULL)
         {
-            ((ldBase_t*)ptItem)->pFunc->frameStart(ptScene);
+            ((ldBase_t*)ptItem)->ptGuiFunc->frameStart(ptScene);
         }
     }
 }
@@ -201,9 +201,9 @@ void ldGuiLoad(ld_scene_t *ptScene)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
-        if(((ldBase_t*)ptItem)->pFunc->load!=NULL)
+        if(((ldBase_t*)ptItem)->ptGuiFunc->load!=NULL)
         {
-            ((ldBase_t*)ptItem)->pFunc->load(ptScene);
+            ((ldBase_t*)ptItem)->ptGuiFunc->load(ptScene);
         }
     }
 }
@@ -233,7 +233,7 @@ void ldGuiQuit(ld_scene_t *ptScene)
     {
         if(((ldBase_t *)ptItem))
         {
-            ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
+            ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptItem);
         }
     }
 

@@ -123,8 +123,8 @@ static void __on_scene1_frame_start(arm_2d_scene_t *ptScene)
     ldGuiFrameStart(ptScene);
     ldGuiLogicLoop(ptScene);
     ldGuiTouchProcess(ptScene);
-    xConnectProcess(&((ld_scene_t*)ptScene)->tLink,ptScene);
-
+//    xConnectProcess(&((ld_scene_t*)ptScene)->tLink,ptScene);
+ldMsgProcess(ptScene);
     arm_2d_dynamic_dirty_region_on_frame_start(
                                                 &ptThis->tDirtyRegionItem,
                                                 SCENE_DR_UPDATE);//SCENE_DR_START);
@@ -259,10 +259,11 @@ ld_scene_t *__arm_2d_scene1_init(   arm_2d_scene_player_t *ptDispAdapter,
         },
         .bUserAllocated = bUserAllocated,
         .ldGuiFuncGroup=ptFunc,
+            .ptMsgQueue=NULL,
     };
 
-    ptThis->tLink.next=&ptThis->tLink;
-    ptThis->tLink.prev=&ptThis->tLink;
+//    ptThis->tLink.next=&ptThis->tLink;
+//    ptThis->tLink.prev=&ptThis->tLink;
 
     /* ------------   initialize members of user_scene_0_t begin ---------------*/
 

@@ -32,6 +32,8 @@ extern "C" {
 #include "xList.h"
 #include "ldMem.h"
 #include "ldConfig.h"
+#include "ldMsg.h"
+#include "xQueue.h"
 
 typedef enum{
 widgetTypeBackground,
@@ -108,12 +110,13 @@ struct ld_scene_t {
 //)
     const ldPageFuncGroup_t *ldGuiFuncGroup;
     arm_2d_control_node_t *ptNodeRoot;
-    xListNode_t tLink;
+    xQueue_t *ptMsgQueue;
 };
 
 typedef struct  {
     implement(arm_2d_control_node_t);
-    const ldBaseWidgetFunc_t *pFunc;
+    const ldBaseWidgetFunc_t *ptGuiFunc;
+    ldAssn_t *ptAssn;
     ldWidgetType_t widgetType;
     uint16_t nameId;
     bool isDirtyRegionUpdate:1;

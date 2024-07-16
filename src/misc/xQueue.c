@@ -68,6 +68,10 @@ xQueue_t* xQueueCreate(uint32_t length, uint32_t itemSize)
 
 void xQueueClear(xQueue_t* queue)
 {
+    if(queue==NULL)
+    {
+        return;
+    }
     queue->head=queue->tail;
 }
 
@@ -91,6 +95,10 @@ bool xQueueIsEmpty(xQueue_t *queue)
 
 uint32_t xQueueGetLength(xQueue_t *queue)
 {
+    if(queue==NULL)
+    {
+        return false;
+    }
     if(xQueueIsEmpty(queue)==true)
     {
         return 0;
@@ -119,6 +127,10 @@ bool xQueueEnqueue(xQueue_t *queue,void * pInItem,uint32_t itemSize)
 {
     // 数据首地址 queue->pDataBase+uiItemSize*(queue->tail)
 
+    if(queue==NULL)
+    {
+        return false;
+    }
     //判断是否满
     if(xQueueIsFull(queue)==false)
     {
@@ -134,6 +146,10 @@ bool xQueueEnqueue(xQueue_t *queue,void * pInItem,uint32_t itemSize)
 
 bool xQueueDequeue(xQueue_t *queue,void * pOutItem,uint32_t itemSize)
 {
+    if(queue==NULL)
+    {
+        return false;
+    }
     //判断是否空
     if(xQueueIsEmpty(queue)==false)
     {

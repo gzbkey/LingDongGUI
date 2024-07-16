@@ -13,7 +13,7 @@
 //#include "uiWidget.h"
 //#include "uiDemo.h"
 #include "freeRtosHeap4.h"
-
+#include "ldMsg.h"
 #include "ldGui.h"
 
 #if defined(__clang__)
@@ -59,20 +59,33 @@ const ldPageFuncGroup_t ldGuiFuncGroup1={
 };
 
 
-static bool slotPageJump(xConnectInfo_t info,ld_scene_t *ptScene)
+static bool slotPageJump(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldGuiJumpPage(&ldGuiFuncGroup1,&ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP,1000);
 
     return false;
 }
 
-static bool slotPageJump2(xConnectInfo_t info,ld_scene_t *ptScene)
+static bool slotPageJump2(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldGuiJumpPage(&ldGuiFuncGroup0,&ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP,1000);
 
     return false;
 }
 
+static bool slotTest(ld_scene_t *ptScene,ldMsg_t msg)
+{
+    LOG_DEBUG("test 1111");
+
+    return false;
+}
+
+static bool slotTest2(ld_scene_t *ptScene,ldMsg_t msg)
+{
+    LOG_DEBUG("test 22222");
+
+    return false;
+}
 
 void demoInit(ld_scene_t* ptScene)
 {
@@ -88,7 +101,10 @@ void demoInit(ld_scene_t* ptScene)
     win=ldWindow_init(ptScene,NULL,3, 0, 200, 95, 20, 20);
     ldWindowSetBgColor(win,GLCD_COLOR_GREEN);
 
-    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump);
+//    connect(2,SIGNAL_RELEASE,slotPageJump);
+
+    connect(2,SIGNAL_RELEASE,slotTest);
+    connect(2,SIGNAL_RELEASE,slotTest2);
 }
 
 void demoInit2(ld_scene_t* ptScene)
@@ -101,7 +117,7 @@ void demoInit2(ld_scene_t* ptScene)
 
     ldButton_init(ptScene,NULL,2, 0, 10,100,100,50);
 
-    xConnect(&ptScene->tLink,2,SIGNAL_RELEASE,0,slotPageJump2);
+    connect(2,SIGNAL_RELEASE,slotPageJump2);
 }
 
 int app_2d_main_thread (void *argument)

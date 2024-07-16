@@ -49,13 +49,13 @@ const ldBaseWidgetFunc_t ldButtonFunc = {
     .show = (ldShowFunc_t)ldButton_show,
 };
 
-static bool slotButtonToggle(xConnectInfo_t info,ld_scene_t *ptScene)
+static bool slotButtonToggle(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldButton_t *ptWidget;
 
-    ptWidget = ldBaseGetWidget(ptScene->ptNodeRoot,info.receiverId);
+    ptWidget = msg.ptSender;
 
-    switch (info.signalType)
+    switch (msg.signal)
     {
     case SIGNAL_PRESS:
     {
@@ -111,7 +111,7 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
     ptWidget->use_as__ldBase_t.nameId = nameId;
     ptWidget->use_as__ldBase_t.widgetType = widgetTypeButton;
-    ptWidget->use_as__ldBase_t.pFunc = &ldButtonFunc;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldButtonFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
 
@@ -120,8 +120,8 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ptWidget->selectColor = __RGB(255, 0, 0);
     ptWidget->opacity = 255;
 
-    xConnect(&ptWidget->ptScene->tLink,nameId, SIGNAL_PRESS, nameId, slotButtonToggle);
-    xConnect(&ptWidget->ptScene->tLink,nameId, SIGNAL_RELEASE, nameId, slotButtonToggle);
+    ldMsgConnect(ptWidget, SIGNAL_PRESS, slotButtonToggle);
+    ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotButtonToggle);
 
     LOG_INFO("[init][button] id:%d", nameId);
     return ptWidget;
@@ -141,7 +141,7 @@ void ldButton_depose(ldButton_t *ptWidget)
 
     LOG_INFO("[depose][button] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
-    xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
+    ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
     ldFree(ptWidget->pStr);
     ldFree(ptWidget);

@@ -11,10 +11,8 @@ SOURCES += \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldScene1.c \
     ../../src/misc/freeRtosHeap4.c \
+    ../../src/misc/ldMsg.c \
     ../../src/misc/tlsf.c \
-    ../../src/misc/xBtnAction.c \
-    ../../src/misc/xConnect.c \
-    ../../src/misc/xList.c \
     ../../src/misc/xQueue.c \
     virtualNor/virtualNor.c \
     user/ldConfig.c \
@@ -32,10 +30,8 @@ HEADERS += \
     ../../src/gui/ldScene1.h \
     ../../src/gui/ldWindow.h \
     ../../src/misc/freeRtosHeap4.h \
+    ../../src/misc/ldMsg.h \
     ../../src/misc/tlsf.h \
-    ../../src/misc/xBtnAction.h \
-    ../../src/misc/xConnect.h \
-    ../../src/misc/xList.h \
     ../../src/misc/xLog.h \
     ../../src/misc/xQueue.h \
     virtualNor/virtualNor.h \

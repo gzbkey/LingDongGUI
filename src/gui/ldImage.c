@@ -72,7 +72,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
     ptWidget->use_as__ldBase_t.nameId=nameId;
-    ptWidget->use_as__ldBase_t.pFunc=&ldImageFunc;
+    ptWidget->use_as__ldBase_t.ptGuiFunc=&ldImageFunc;
 
     ptWidget->opacity = 255;
     ptWidget->ptImgTile=ptImgTile;
@@ -153,12 +153,12 @@ void ldImage_depose( ldImage_t *ptWidget)
         {
             arm_ctrl_enum(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.ptChildList, ptItem, PREORDER_TRAVERSAL)
             {
-                ((ldBase_t *)ptItem)->pFunc->depose(ptItem);
+                ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptItem);
             }
         }
     }
 
-    xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
+    ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
     ldFree(ptWidget);
 }
