@@ -2,8 +2,8 @@ import os
 import subprocess
 import sys
 
-def process_image(image_path, output_path ,output_name):
-    command = f'python img2c.py -i {image_path} -o {output_path} --name {output_name}'
+def process_image(output_dir, image_path, output_path ,output_name):
+    command = f'python {output_dir}/img2c.py -i {image_path} -o {output_path} --name {output_name}'
 
     try:
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -30,7 +30,7 @@ def main(argv):
             output_path = os.path.join(current_dir, new_filename)
             output_name = f'_{filename.replace(".", "_")}_'
             print('    ',filename,' -> ',output_name)
-            process_image(image_path, output_path, output_name)
+            process_image(current_dir, image_path, output_path, output_name)
     print('completed\n')
 
 if __name__ == "__main__":
