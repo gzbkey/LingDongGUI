@@ -1,13 +1,47 @@
 # 软件说明
 
-1. ldLatticeBuilder.exe是字体和图片的数据生成软件
-2. createUiFile.py是界面c文件的生成脚本，[使用说明在docs/tutorial/05 development.md](../docs/tutorial/05%20development.md)
+基于arm-2d的工具脚本，进一步简化操作
 
-# ldLatticeBuilder使用方法
+## 图片生成脚本
 
-1. 解压lib压缩包
-2. 将exe文件放到dll文件同一目录即可运行
-3. 拖动图片到左上角区域，可自动复制图片，对于png图片，可以点击选项框，只生成mask，即提取8位透明度数据
-4. 左下角输入文本
-5. 点击build file，生产.c .h .bin文件
-6. 复制文件到项目中，无论GUI中素材使用数组模式还是外部数据模式都共用文件
+### 依赖
+
+```sh
+pip install Pillow
+pip install numpy
+```
+
+### 如何使用
+
+#### 图片和脚本同一目录下
+    python ./auto_img2c.py
+#### 图片在特定文件夹中(如./img)
+    python ./auto_img2c.py ./img
+
+## 字体点阵生成脚本
+
+### 依赖
+
+```sh
+pip install freetype-py
+pip install numpy
+pip install pyyaml
+```
+
+### 如何使用
+
+#### 输出文件和脚本同一目录下
+1. 自动生成yml文件
+    python ./auto_ttf2c.py
+
+2. 修改yml文件
+
+3. python ./auto_ttf2c.py
+    
+#### 输出文件指定文件夹(如./font)
+1. 自动生成yml文件
+    python ./auto_ttf2c.py ./font
+
+2. 修改yml文件
+
+3. python ./auto_ttf2c.py ./font
