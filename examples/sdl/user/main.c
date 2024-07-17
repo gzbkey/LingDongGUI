@@ -8,12 +8,11 @@
 #include "ldScene1.h"
 #include "xLog.h"
 //#include "xBtnAction.h"
-#include "stdbool.h"
 //#include "uiWatch.h"
-//#include "uiWidget.h"
+#include "uiWidget.h"
 //#include "uiDemo.h"
 #include "freeRtosHeap4.h"
-#include "ldMsg.h"
+
 #include "ldGui.h"
 
 #if defined(__clang__)
@@ -36,89 +35,6 @@
 #   pragma GCC diagnostic ignored "-Wformat="
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
-
-void demoInit(ld_scene_t* ptScene);
-void demoInit2(ld_scene_t* ptScene);
-
-const ldPageFuncGroup_t ldGuiFuncGroup0={
-    .init=demoInit,
-    .loop=NULL,
-    .quit=NULL,
-#if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
-    .pageName="demo",
-#endif
-};
-
-const ldPageFuncGroup_t ldGuiFuncGroup1={
-    .init=demoInit2,
-    .loop=NULL,
-    .quit=NULL,
-#if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
-    .pageName="demo  1",
-#endif
-};
-
-
-static bool slotPageJump(ld_scene_t *ptScene,ldMsg_t msg)
-{
-    ldGuiJumpPage(&ldGuiFuncGroup1,&ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP,1000);
-
-    return false;
-}
-
-static bool slotPageJump2(ld_scene_t *ptScene,ldMsg_t msg)
-{
-    ldGuiJumpPage(&ldGuiFuncGroup0,&ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP,1000);
-
-    return false;
-}
-
-static bool slotTest(ld_scene_t *ptScene,ldMsg_t msg)
-{
-    LOG_DEBUG("test 1111");
-
-    return false;
-}
-
-static bool slotTest2(ld_scene_t *ptScene,ldMsg_t msg)
-{
-    LOG_DEBUG("test 22222");
-
-    return false;
-}
-
-void demoInit(ld_scene_t* ptScene)
-{
-    void *obj,*win;
-
-    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
-
-    obj= ldImage_init(ptScene,NULL,1, 0, 100, 100, 50, 50, NULL, NULL,false);
-    ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
-
-    ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
-
-    win=ldWindow_init(ptScene,NULL,3, 0, 200, 95, 20, 20);
-    ldWindowSetBgColor(win,GLCD_COLOR_GREEN);
-
-//    connect(2,SIGNAL_RELEASE,slotPageJump);
-
-    connect(2,SIGNAL_RELEASE,slotTest);
-    connect(2,SIGNAL_RELEASE,slotTest2);
-}
-
-void demoInit2(ld_scene_t* ptScene)
-{
-    void *obj;
-
-    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
-    obj= ldImage_init(ptScene,NULL,1, 0, 200, 100, 50, 50, NULL, NULL,false);
-    ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
-
-    ldButton_init(ptScene,NULL,2, 0, 10,100,100,50);
-
-    connect(2,SIGNAL_RELEASE,slotPageJump2);
-}
 
 int app_2d_main_thread (void *argument)
 {
@@ -172,7 +88,7 @@ int main (void)
 
     disp_adapter0_init();
 #if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-    ldGuiInit(&ldGuiFuncGroup0);
+    ldGuiInit(&uiWidgetFunc);
 #endif
 
     SDL_CreateThread(app_2d_main_thread, "arm-2d thread", NULL);

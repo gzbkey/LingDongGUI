@@ -1,19 +1,18 @@
-#ifndef _UI_WIDGET_H_
-#define _UI_WIDGET_H_
+#ifndef __UI_WIDGET_H__
+#define __UI_WIDGET_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "ldGui.h"
-#include "srcWidget.h"
+#include "ldBase.h"
 
-void uiWidgetInit(arm_2d_scene_t *pScene,uint8_t page);
-void uiWidgetLoop(arm_2d_scene_t *pScene,uint8_t page);
-void uiWidgetQuit(arm_2d_scene_t *pScene, uint8_t page);
+extern const ldPageFuncGroup_t uiWidgetFunc;
+
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_UI_WIDGET_H_
+#endif

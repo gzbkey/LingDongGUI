@@ -14,6 +14,8 @@ SOURCES += \
     ../../src/misc/ldMsg.c \
     ../../src/misc/tlsf.c \
     ../../src/misc/xQueue.c \
+    ../common/demo/widget/uiWidget.c \
+    ../common/demo/widget/uiWidgetLogic.c \
     virtualNor/virtualNor.c \
     user/ldConfig.c \
     user/main.c \
@@ -34,6 +36,8 @@ HEADERS += \
     ../../src/misc/tlsf.h \
     ../../src/misc/xLog.h \
     ../../src/misc/xQueue.h \
+    ../common/demo/widget/uiWidget.h \
+    ../common/demo/widget/uiWidgetLogic.h \
     virtualNor/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
@@ -64,6 +68,8 @@ INCLUDEPATH += $$PWD/virtualNor
 INCLUDEPATH += $$PWD/../common/math
 #INCLUDEPATH += $$PWD/../common/demo
 #INCLUDEPATH += $$files(../common/demo/*, true)
+
+INCLUDEPATH += $$PWD/../common/demo/widget
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc

@@ -28,8 +28,6 @@ extern "C" {
 #include "arm_2d_helper_control.h"
 #include "xLog.h"
 #include "xBtnAction.h"
-#include "xConnect.h"
-#include "xList.h"
 #include "ldMem.h"
 #include "ldConfig.h"
 #include "ldMsg.h"
