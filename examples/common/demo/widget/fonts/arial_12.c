@@ -36,7 +36,7 @@ typedef struct {
 } __ttf_char_descriptor_t;
 
 ARM_SECTION("arm2d.asset.FONT")
-static const uint8_t c_bmpUTF8UserA8Font[] = {
+const uint8_t c_bmpUTF8arial_12A8Font[] = {
 
 
     // Glyph for character {0x0a}
@@ -1001,7 +1001,7 @@ static const uint8_t c_bmpUTF8UserA8Font[] = {
 };
 
 ARM_SECTION("arm2d.asset.FONT")
-static const __ttf_char_descriptor_t c_tUTF8LookUpTableA8[] = {
+ const __ttf_char_descriptor_t c_tUTF8arial_12LookUpTableA8[] = {
 
     { 0, { 7, 8, }, 9, 1, 8, 1, {0x0a} },
     { 8, { 2, 9, }, 3, 1, 9, 1, {0x21} },
@@ -1103,8 +1103,8 @@ static const __ttf_char_descriptor_t c_tUTF8LookUpTableA8[] = {
 
 
 
-ARM_SECTION("arm2d.tile.c_tileUTF8UserFontA8Mask")
-static const arm_2d_tile_t c_tileUTF8UserFontA8Mask = {
+ARM_SECTION("arm2d.tile.c_tileUTF8arial_12A8Mask")
+static const arm_2d_tile_t c_tileUTF8arial_12A8Mask = {
     .tRegion = {
         .tSize = {
             .iWidth = 12,
@@ -1118,7 +1118,7 @@ static const arm_2d_tile_t c_tileUTF8UserFontA8Mask = {
             .chScheme = ARM_2D_COLOUR_8BIT,
         },
     },
-    .pchBuffer = (uint8_t *)c_bmpUTF8UserA8Font,
+    .pchBuffer = (uint8_t *)c_bmpUTF8arial_12A8Font,
 };
 
 #define __UTF8_FONT_SIZE_8__
@@ -1142,9 +1142,9 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_a8_font_get_char_descriptor)
 
     /* use the white space as the default char */
     __ttf_char_descriptor_t *ptUTF8Char =
-        (__ttf_char_descriptor_t *)&c_tUTF8LookUpTableA8[dimof(c_tUTF8LookUpTableA8)-1];
+        (__ttf_char_descriptor_t *)&c_tUTF8arial_12LookUpTableA8[dimof(c_tUTF8arial_12LookUpTableA8)-1];
 
-    arm_foreach(__ttf_char_descriptor_t, c_tUTF8LookUpTableA8, ptChar) {
+    arm_foreach(__ttf_char_descriptor_t, c_tUTF8arial_12LookUpTableA8, ptChar) {
         if (0 == strncmp(   (char *)pchCharCode,
                             (char *)ptChar->chUTF8,
                             ptChar->chCodeLength)) {
@@ -1174,7 +1174,7 @@ struct {
     .use_as__arm_2d_user_font_t = {
         .use_as__arm_2d_font_t = {
             .tileFont = impl_child_tile(
-                c_tileUTF8UserFontA8Mask,
+                c_tileUTF8arial_12A8Mask,
                 0,          /* x offset */
                 0,          /* y offset */
                 12,        /* width */

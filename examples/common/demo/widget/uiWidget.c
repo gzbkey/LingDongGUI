@@ -52,7 +52,10 @@ void uiWidgetInit(ld_scene_t* ptScene)
     connect(2,SIGNAL_RELEASE,slotTest);
     connect(2,SIGNAL_RELEASE,slotTest2);
 
-
+    obj=ldLabel_init(ptScene,NULL,4,0,100,50, 100,50,&FONT_ARIAL_12);
+    ldLabelSetText(obj,"123");
+    ldLabelSetBgColor(obj,GLCD_COLOR_LIGHT_GREY);
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_BOTTOM_LEFT);
 
     uiWidgetLogicInit(ptScene);
 }

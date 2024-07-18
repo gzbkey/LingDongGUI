@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-/*============================ INCLUDES ======================================*/
 #define __LD_IMAGE_IMPLEMENT__
 #define __ARM_2D_HELPER_CONTROL_INHERIT__
 #include "./arm_extra_controls.h"

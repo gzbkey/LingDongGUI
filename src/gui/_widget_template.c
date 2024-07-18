@@ -43,15 +43,14 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-const templateWidgetFunc_t templateFunc = {
+const ldBaseWidgetFunc_t templateFunc = {
     .depose = (ldDeposeFunc_t)template_depose,
     .load = (ldLoadFunc_t)template_on_load,
     .frameStart = (ldFrameStartFunc_t)template_on_frame_start,
     .show = (ldShowFunc_t)template_show,
 };
 
-template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
-                          template_cfg_t *ptCFG)
+template_t* template_init( ld_scene_t *ptScene,template_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
@@ -76,7 +75,7 @@ template_t* template_init( arm_2d_scene_t *ptScene,template_t *ptWidget,
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
     ptWidget->use_as__ldBase_t.nameId = nameId;
     ptWidget->use_as__ldBase_t.widgetType = widgetTypeTemplate;
-    ptWidget->use_as__ldBase_t.pFunc = &ldButtonFunc;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &templateFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
 
@@ -98,7 +97,7 @@ void template_depose( template_t *ptWidget)
 
     LOG_INFO("[depose][template] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
-    xDeleteConnect(&ptWidget->ptScene->tLink,ptWidget->use_as__ldBase_t.nameId);
+    ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
 
     ldFree(ptWidget);
@@ -116,9 +115,13 @@ void template_on_frame_start( template_t *ptWidget)
     
 }
 
-void template_show(arm_2d_scene_t *pScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+void template_show(ld_scene_t *ptScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
-    assert(NULL!= ptWidget);
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 
 #if 0
     if (bIsNewFrame) {

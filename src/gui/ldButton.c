@@ -396,17 +396,6 @@ void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor)
     ptWidget->charColor=charColor;
 }
 
-void ldButtonSetAlign(ldButton_t *ptWidget,uint8_t align)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->align=align;
-}
-
 void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable)
 {
     assert(NULL != ptWidget);

@@ -54,7 +54,8 @@ struct ldButton_t
 {
     implement(ldBase_t);
     ARM_PRIVATE(
-            ld_scene_t *ptScene;)
+            ld_scene_t *ptScene;
+    )
     arm_2d_tile_t *ptReleaseImgTile;
     arm_2d_tile_t *ptReleaseMaskTile;
     arm_2d_tile_t *ptPressImgTile;
@@ -68,7 +69,6 @@ struct ldButton_t
     ldColor pressColor;
     ldColor selectColor;
     uint8_t opacity;
-    uint8_t align : 4;
     bool isTransparent : 1;
     bool isCheckable : 1;
     bool isChecked : 1;

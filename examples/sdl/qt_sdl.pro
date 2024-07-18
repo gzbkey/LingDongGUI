@@ -8,6 +8,7 @@ SOURCES += \
     ../../src/gui/ldButton.c \
     ../../src/gui/ldGui.c \
     ../../src/gui/ldImage.c \
+    ../../src/gui/ldLabel.c \
     ../../src/gui/ldScene0.c \
     ../../src/gui/ldScene1.c \
     ../../src/misc/freeRtosHeap4.c \
@@ -25,6 +26,7 @@ HEADERS += \
     ../../src/gui/ldButton.h \
     ../../src/gui/ldGui.h \
     ../../src/gui/ldImage.h \
+    ../../src/gui/ldLabel.h \
     ../../src/gui/ldMem.h \
     ../../src/gui/ldScene0.h \
     ../../src/gui/ldScene1.h \
