@@ -1,5 +1,6 @@
 #include "uiWidget.h"
 #include "uiWidgetLogic.h"
+#include "fonts/uiFonts.h"
 #include "ldGui.h"
 
 void uiWidgetInit(ld_scene_t* ptScene);
@@ -29,6 +30,7 @@ static bool slotTest2(ld_scene_t *ptScene,ldMsg_t msg)
 
    return false;
 }
+
 void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
@@ -38,7 +40,9 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj= ldImage_init(ptScene,NULL,1, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
-    ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
+    obj=ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
+    ldButtonSetFont(obj,&FONT_ARIAL_16_A8);
+    ldButtonSetText(obj,"123");
 
     win=ldWindow_init(ptScene,NULL,3, 0, 200, 95, 20, 20);
     ldWindowSetBgColor(win,GLCD_COLOR_GREEN);

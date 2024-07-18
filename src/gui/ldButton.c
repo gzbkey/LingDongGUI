@@ -271,6 +271,19 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                     }
                 }
             }
+
+            arm_2d_op_wait_async(NULL);
+
+            if(ptWidget->pStr!=NULL)
+            {
+                ldBaseLabel((arm_2d_tile_t*)ptTile,
+                            &tTarget.tRegion,
+                            ptWidget->pStr,
+                            ptWidget->ptFont,
+                            ARM_2D_ALIGN_CENTRE,
+                            ptWidget->charColor);
+                arm_2d_op_wait_async(NULL);
+            }
         }
     }
     arm_2d_op_wait_async(NULL);

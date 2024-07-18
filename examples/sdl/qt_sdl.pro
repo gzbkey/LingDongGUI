@@ -14,8 +14,6 @@ SOURCES += \
     ../../src/misc/ldMsg.c \
     ../../src/misc/tlsf.c \
     ../../src/misc/xQueue.c \
-    ../common/demo/widget/uiWidget.c \
-    ../common/demo/widget/uiWidgetLogic.c \
     virtualNor/virtualNor.c \
     user/ldConfig.c \
     user/main.c \
@@ -36,8 +34,6 @@ HEADERS += \
     ../../src/misc/tlsf.h \
     ../../src/misc/xLog.h \
     ../../src/misc/xQueue.h \
-    ../common/demo/widget/uiWidget.h \
-    ../common/demo/widget/uiWidgetLogic.h \
     virtualNor/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
@@ -46,12 +42,14 @@ HEADERS += \
     user/ldConfig.h
 
 HEADERS += \ #$$files(../common/demo/*.h, true) \
+           $$files(../common/demo/widget/*.h, true) \
            $$files(../common/Arm-2D/examples/common/controls/*.h) \
            $$files(../common/Arm-2D/Library/Source/*.inc) \
            $$files(../common/Arm-2D/Library/Include/*.h) \
            $$files(../common/Arm-2D/Helper/Include/*.h)
 
 SOURCES += \ #$$files(../common/demo/*.c, true) \
+           $$files(../common/demo/widget/*.c, true) \
            $$files(../common/Arm-2D/examples/common/controls/*.c) \
            $$files(../common/Arm-2D/examples/common/asset/*.c) \
            $$files(../common/Arm-2D/Library/Source/*.c) \

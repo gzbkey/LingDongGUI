@@ -9,9 +9,11 @@ extern "C" {
 #include "stdint.h"
 #include "xQueue.h"
 
+typedef struct ld_scene_t ld_scene_t;
+
 typedef struct ldAssn ldAssn_t;
 typedef struct ldMsg ldMsg_t;
-typedef bool (*assnFunc)(void* ptScene,ldMsg_t msg);
+typedef bool (*assnFunc)(ld_scene_t* ptScene,ldMsg_t msg);
 
 struct ldMsg
 {

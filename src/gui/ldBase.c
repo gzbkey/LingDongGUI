@@ -289,6 +289,15 @@ void ldBaseImage(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, arm_2d_tile_t *
     }
 }
 
+void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,arm_2d_font_t *ptFont,arm_2d_align_t tAlign,ldColor textColor)
+{
+    arm_lcd_text_set_target_framebuffer(ptTile);
+    arm_lcd_text_set_font(ptFont);
+    arm_lcd_text_set_draw_region(ptRegion);
+    arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
+    arm_lcd_printf_label(tAlign,(char*)pStr);
+}
+
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
 {
     assert(NULL != ptWidget);
