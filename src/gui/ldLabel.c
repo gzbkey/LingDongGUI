@@ -105,7 +105,7 @@ void ldLabel_depose( ldLabel_t *ptWidget)
 
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
-
+    ldFree(ptWidget->pStr);
     ldFree(ptWidget);
 }
 
@@ -138,6 +138,10 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
     {
         arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
         {
+            if(ptWidget->use_as__ldBase_t.isHidden)
+            {
+                break;
+            }
 
             if(!ptWidget->isTransparent)
             {
@@ -159,7 +163,8 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
                             ptWidget->pStr,
                             ptWidget->ptFont,
                             ptWidget->tAlign,
-                            ptWidget->charColor);
+                            ptWidget->charColor,
+                            ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             }
         }

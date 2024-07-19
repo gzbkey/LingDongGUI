@@ -53,11 +53,24 @@ typedef struct ldCheckBox_t ldCheckBox_t;
 struct ldCheckBox_t
 {
     implement(ldBase_t);
-ARM_PRIVATE(
-    ld_scene_t *ptScene;
-)
-    /* place your public member here */
-    
+    ARM_PRIVATE(
+            ld_scene_t *ptScene;
+    )
+    arm_2d_align_t tAlign;
+    ldColor bgColor;
+    ldColor fgColor;
+    ldColor charColor;
+    arm_2d_tile_t* ptUncheckedImgTile;
+    arm_2d_tile_t* ptCheckedImgTile;
+    arm_2d_font_t *ptFont;
+    uint8_t* pStr;
+    uint16_t boxWidth;
+    uint8_t radioButtonGroup;
+    bool isChecked:1;
+    bool isCorner:1;
+    bool isWithUncheckedMask:1;
+    bool isWithCheckedMask:1;
+    bool isRadioButton:1;
 };
 
 ldCheckBox_t* ldCheckBox_init(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);

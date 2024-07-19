@@ -56,11 +56,11 @@ struct ldLabel_t
     ARM_PRIVATE(
             ld_scene_t *ptScene;
     )
+    arm_2d_align_t tAlign;
     arm_2d_tile_t *ptImgTile;
+    arm_2d_font_t *ptFont;
     ldColor bgColor;
     ldColor charColor;
-    arm_2d_font_t *ptFont;
-    arm_2d_align_t tAlign;
     uint8_t* pStr;
     bool isTransparent:1;
 };

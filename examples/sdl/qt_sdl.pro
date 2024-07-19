@@ -4,17 +4,6 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    ../../src/gui/ldBase.c \
-    ../../src/gui/ldButton.c \
-    ../../src/gui/ldGui.c \
-    ../../src/gui/ldImage.c \
-    ../../src/gui/ldLabel.c \
-    ../../src/gui/ldScene0.c \
-    ../../src/gui/ldScene1.c \
-    ../../src/misc/freeRtosHeap4.c \
-    ../../src/misc/ldMsg.c \
-    ../../src/misc/tlsf.c \
-    ../../src/misc/xQueue.c \
     virtualNor/virtualNor.c \
     user/ldConfig.c \
     user/main.c \
@@ -22,20 +11,6 @@ SOURCES += \
     user/arm_2d_disp_adapter_0.c
 
 HEADERS += \
-    ../../src/gui/ldBase.h \
-    ../../src/gui/ldButton.h \
-    ../../src/gui/ldGui.h \
-    ../../src/gui/ldImage.h \
-    ../../src/gui/ldLabel.h \
-    ../../src/gui/ldMem.h \
-    ../../src/gui/ldScene0.h \
-    ../../src/gui/ldScene1.h \
-    ../../src/gui/ldWindow.h \
-    ../../src/misc/freeRtosHeap4.h \
-    ../../src/misc/ldMsg.h \
-    ../../src/misc/tlsf.h \
-    ../../src/misc/xLog.h \
-    ../../src/misc/xQueue.h \
     virtualNor/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
@@ -48,7 +23,9 @@ HEADERS += \ #$$files(../common/demo/*.h, true) \
            $$files(../common/Arm-2D/examples/common/controls/*.h) \
            $$files(../common/Arm-2D/Library/Source/*.inc) \
            $$files(../common/Arm-2D/Library/Include/*.h) \
-           $$files(../common/Arm-2D/Helper/Include/*.h)
+           $$files(../common/Arm-2D/Helper/Include/*.h) \
+           $$files(../../src/gui/*.h) \
+           $$files(../../src/misc/*.h)
 
 SOURCES += \ #$$files(../common/demo/*.c, true) \
            $$files(../common/demo/widget/*.c, true) \
@@ -56,7 +33,9 @@ SOURCES += \ #$$files(../common/demo/*.c, true) \
            $$files(../common/Arm-2D/examples/common/asset/*.c) \
            $$files(../common/Arm-2D/Library/Source/*.c) \
            $$files(../common/Arm-2D/Helper/Source/*.c) \
-           $$files(../common/math/*.c, true)
+           $$files(../common/math/*.c, true) \
+           $$files(../../src/gui/*.c) \
+           $$files(../../src/misc/*.c)
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include

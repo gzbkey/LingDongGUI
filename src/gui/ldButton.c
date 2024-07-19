@@ -281,7 +281,8 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                             ptWidget->pStr,
                             ptWidget->ptFont,
                             ARM_2D_ALIGN_CENTRE,
-                            ptWidget->charColor);
+                            ptWidget->charColor,
+                            ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             }
         }

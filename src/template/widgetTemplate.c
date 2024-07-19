@@ -133,7 +133,10 @@ void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_t
     {
         arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
         {
-
+            if(ptWidget->use_as__ldBase_t.isHidden)
+            {
+                break;
+            }
 
 
         }

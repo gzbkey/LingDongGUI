@@ -134,9 +134,9 @@ void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot, arm_2d_control_node_t *
 void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth);
 #endif
 void* ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot, uint16_t nameId);
-void ldBaseColor(arm_2d_tile_t* pTile,arm_2d_region_t* pRegion, ldColor color,uint8_t opacity);
-void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pImgTile,arm_2d_tile_t* pMaskTile,ldColor color,uint8_t opacity);
-void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,arm_2d_font_t *ptFont,arm_2d_align_t tAlign,ldColor textColor);
+void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color, uint8_t opacity);
+void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
+void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
 void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);

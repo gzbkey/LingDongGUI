@@ -65,6 +65,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldLabelSetBgColor(obj,GLCD_COLOR_LIGHT_GREY);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_BOTTOM_LEFT);
 
+    ldCheckBox_init( ptScene,NULL, 5, 0, 150, 10, 50, 20);
+
     uiWidgetLogicInit(ptScene);
 }
 

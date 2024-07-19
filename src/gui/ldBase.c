@@ -218,22 +218,22 @@ void *ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot,uint16_t nameId)
     return NULL;
 }
 
-void ldBaseColor(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, ldColor color, uint8_t opacity)
+void ldBaseColor(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, ldColor color, uint8_t opacity)
 {
-    arm_2d_fill_colour_with_opacity(pTile, pRegion, (__arm_2d_color_t)color, opacity);
+    arm_2d_fill_colour_with_opacity(ptTile, ptRegion, (__arm_2d_color_t)color, opacity);
 }
 
-void ldBaseImage(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, arm_2d_tile_t *pImgTile, arm_2d_tile_t *pMaskTile, ldColor color, uint8_t opacity)
+void ldBaseImage(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor color, uint8_t opacity)
 {
-    if (pImgTile == NULL)
+    if (ptImgTile == NULL)
     {
-        switch (pMaskTile->tInfo.tColourInfo.chScheme)
+        switch (ptMaskTile->tInfo.tColourInfo.chScheme)
         {
         case ARM_2D_COLOUR_1BIT:
         {
-            arm_2d_fill_colour_with_a1_mask_and_opacity(pTile,
-                                                        pRegion,
-                                                        pMaskTile,
+            arm_2d_fill_colour_with_a1_mask_and_opacity(ptTile,
+                                                        ptRegion,
+                                                        ptMaskTile,
                                                         (__arm_2d_color_t){color},
                                                         opacity);
 
@@ -241,27 +241,27 @@ void ldBaseImage(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, arm_2d_tile_t *
         }
         case ARM_2D_COLOUR_MASK_A2:
         {
-            arm_2d_fill_colour_with_a2_mask_and_opacity(pTile,
-                                                        pRegion,
-                                                        pMaskTile,
+            arm_2d_fill_colour_with_a2_mask_and_opacity(ptTile,
+                                                        ptRegion,
+                                                        ptMaskTile,
                                                         (__arm_2d_color_t){color},
                                                         opacity);
             break;
         }
         case ARM_2D_COLOUR_MASK_A4:
         {
-            arm_2d_fill_colour_with_a4_mask_and_opacity(pTile,
-                                                        pRegion,
-                                                        pMaskTile,
+            arm_2d_fill_colour_with_a4_mask_and_opacity(ptTile,
+                                                        ptRegion,
+                                                        ptMaskTile,
                                                         (__arm_2d_color_t){color},
                                                         opacity);
             break;
         }
         case ARM_2D_COLOUR_MASK_A8:
         {
-            arm_2d_fill_colour_with_mask_and_opacity(pTile,
-                                                     pRegion,
-                                                     pMaskTile,
+            arm_2d_fill_colour_with_mask_and_opacity(ptTile,
+                                                     ptRegion,
+                                                     ptMaskTile,
                                                      (__arm_2d_color_t){color},
                                                      opacity);
             break;
@@ -272,29 +272,30 @@ void ldBaseImage(arm_2d_tile_t *pTile, arm_2d_region_t *pRegion, arm_2d_tile_t *
     }
     else
     {
-        if (pMaskTile == NULL)
+        if (ptMaskTile == NULL)
         {
-            arm_2d_tile_copy_with_opacity(pImgTile,
-                                          pTile,
-                                          pRegion,
+            arm_2d_tile_copy_with_opacity(ptImgTile,
+                                          ptTile,
+                                          ptRegion,
                                           opacity);
         }
         else
         {
-            arm_2d_tile_copy_with_src_mask_only(pImgTile,
-                                                pMaskTile,
-                                                pTile,
-                                                pRegion);
+            arm_2d_tile_copy_with_src_mask_only(ptImgTile,
+                                                ptMaskTile,
+                                                ptTile,
+                                                ptRegion);
         }
     }
 }
 
-void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,arm_2d_font_t *ptFont,arm_2d_align_t tAlign,ldColor textColor)
+void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,arm_2d_font_t *ptFont,arm_2d_align_t tAlign,ldColor textColor,uint8_t opacity)
 {
     arm_lcd_text_set_target_framebuffer(ptTile);
     arm_lcd_text_set_font(ptFont);
     arm_lcd_text_set_draw_region(ptRegion);
     arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
+    arm_lcd_text_set_opacity(opacity);
     arm_lcd_printf_label(tAlign,(char*)pStr);
 }
 
