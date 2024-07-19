@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-#define __<CONTROL_NAME>_IMPLEMENT__
+#define __LD_CHECK_BOX_IMPLEMENT__
 
 #include "./arm_extra_controls.h"
 #include "./__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
-#include "template.h"
+#include "ldCheckBox.h"
 #include <assert.h>
 #include <string.h>
 
@@ -43,24 +43,24 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-const ldBaseWidgetFunc_t templateFunc = {
-    .depose = (ldDeposeFunc_t)template_depose,
-    .load = (ldLoadFunc_t)template_on_load,
-    .frameStart = (ldFrameStartFunc_t)template_on_frame_start,
-    .show = (ldShowFunc_t)template_show,
+const ldBaseWidgetFunc_t ldCheckBoxFunc = {
+    .depose = (ldDeposeFunc_t)ldCheckBox_depose,
+    .load = (ldLoadFunc_t)ldCheckBox_on_load,
+    .frameStart = (ldFrameStartFunc_t)ldCheckBox_on_frame_start,
+    .show = (ldShowFunc_t)ldCheckBox_show,
 };
 
-template_t* template_init( ld_scene_t *ptScene,template_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
 
     if (NULL == ptWidget)
     {
-        ptWidget = ldCalloc(1, sizeof(template_t));
+        ptWidget = ldCalloc(1, sizeof(ldCheckBox_t));
         if (NULL == ptWidget)
         {
-            LOG_ERROR("[init failed][template] id:%d", nameId);
+            LOG_ERROR("[init failed][checkBox] id:%d", nameId);
             return NULL;
         }
     }
@@ -74,28 +74,29 @@ template_t* template_init( ld_scene_t *ptScene,template_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
     ptWidget->use_as__ldBase_t.nameId = nameId;
-    ptWidget->use_as__ldBase_t.widgetType = widgetTypeTemplate;
-    ptWidget->use_as__ldBase_t.ptGuiFunc = &templateFunc;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeCheckBox;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldCheckBoxFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
 
-    LOG_INFO("[init][template] id:%d", nameId);
+    LOG_INFO("[init][checkBox] id:%d", nameId);
     return ptWidget;
 }
 
-void template_depose( template_t *ptWidget)
+void ldCheckBox_depose( ldCheckBox_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
     }
-    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeTemplate)
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeCheckBox)
     {
         return;
     }
 
-    LOG_INFO("[depose][template] id:%d", ptWidget->use_as__ldBase_t.nameId);
+    LOG_INFO("[depose][checkBox] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
@@ -103,19 +104,19 @@ void template_depose( template_t *ptWidget)
     ldFree(ptWidget);
 }
 
-void template_on_load( template_t *ptWidget)
+void ldCheckBox_on_load( ldCheckBox_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-void template_on_frame_start( template_t *ptWidget)
+void ldCheckBox_on_frame_start( ldCheckBox_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-void template_show(ld_scene_t *ptScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)

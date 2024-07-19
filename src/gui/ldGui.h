@@ -28,10 +28,11 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldCheckBox.h"
+#include "ldLabel.h"
+#include "ldButton.h"
 #include "ldWindow.h"
 #include "ldImage.h"
-#include "ldButton.h"
-#include "ldLabel.h"
 
 void ldGuiLoad(ld_scene_t *ptScene);
 void ldGuiFrameStart(ld_scene_t *ptScene);

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#ifndef __<CONTROL_NAME>_H__
-#define __<CONTROL_NAME>_H__
+#ifndef __LD_CHECK_BOX_H__
+#define __LD_CHECK_BOX_H__
 
 
 #include "arm_2d.h"
@@ -38,19 +38,19 @@ extern "C"
 
 
 /* OOC header, please DO NOT modify  */
-#ifdef __<CONTROL_NAME>_IMPLEMENT__
-#undef __<CONTROL_NAME>_IMPLEMENT__
+#ifdef __LD_CHECK_BOX_IMPLEMENT__
+#undef __LD_CHECK_BOX_IMPLEMENT__
 #define __ARM_2D_IMPL__
-#elif defined(__<CONTROL_NAME>_INHERIT__)
-#undef __<CONTROL_NAME>_INHERIT__
+#elif defined(__LD_CHECK_BOX_INHERIT__)
+#undef __LD_CHECK_BOX_INHERIT__
 #define __ARM_2D_INHERIT__
 #endif
 #include "arm_2d_utils.h"
 #include "ldBase.h"
 
-typedef struct template_t template_t;
+typedef struct ldCheckBox_t ldCheckBox_t;
 
-struct template_t
+struct ldCheckBox_t
 {
     implement(ldBase_t);
 ARM_PRIVATE(
@@ -60,15 +60,19 @@ ARM_PRIVATE(
     
 };
 
-template_t* template_init(ld_scene_t *ptScene, template_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
+ldCheckBox_t* ldCheckBox_init(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
 
-void template_depose( template_t *ptWidget);
+void ldCheckBox_depose( ldCheckBox_t *ptWidget);
 
-void template_on_load( template_t *ptWidget);
+void ldCheckBox_on_load( ldCheckBox_t *ptWidget);
 
-void template_on_frame_start( template_t *ptWidget);
+void ldCheckBox_on_frame_start( ldCheckBox_t *ptWidget);
 
-void template_show(ld_scene_t *pScene, template_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+void ldCheckBox_show(ld_scene_t *pScene, ldCheckBox_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+
+#define ldCheckBoxSetHidden                ldBaseSetHidden
+#define ldCheckBoxMove                     ldBaseMove
+#define ldCheckBoxSetOpacity               ldBaseSetOpacity
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
