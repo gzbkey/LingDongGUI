@@ -74,17 +74,16 @@ ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
     ptWidget->use_as__ldBase_t.nameId = nameId;
-
     ptWidget->use_as__ldBase_t.widgetType = widgetTypeLabel;
     ptWidget->use_as__ldBase_t.ptGuiFunc = &ldLabelFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
 
     ptWidget->tAlign = ARM_2D_ALIGN_CENTRE;
     ptWidget->bgColor=GLCD_COLOR_WHITE;
     ptWidget->charColor = GLCD_COLOR_BLACK;
     ptWidget->ptFont = ptFont;
-    ptWidget->opacity=255;
 
     LOG_INFO("[init][label] id:%d", nameId);
     return ptWidget;
@@ -144,11 +143,11 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
             {
                 if (ptWidget->ptImgTile==NULL)//color
                 {
-                    ldBaseColor(&tTarget,NULL,ptWidget->bgColor,ptWidget->opacity);
+                    ldBaseColor(&tTarget,NULL,ptWidget->bgColor,ptWidget->use_as__ldBase_t.opacity);
                 }
                 else
                 {
-                    ldBaseImage(&tTarget,NULL,ptWidget->ptImgTile,NULL,0,ptWidget->opacity);
+                    ldBaseImage(&tTarget,NULL,ptWidget->ptImgTile,NULL,0,ptWidget->use_as__ldBase_t.opacity);
                 }
                 arm_2d_op_wait_async(NULL);
             }
@@ -238,16 +237,6 @@ void ldLabelSetBgColor(ldLabel_t *ptWidget, ldColor bgColor)
     ptWidget->bgColor=bgColor;
     ptWidget->isTransparent=false;
     ptWidget->ptImgTile=NULL;
-}
-
-void ldLabelSetOpacity(ldLabel_t *ptWidget, uint8_t opacity)
-{
-    if (ptWidget == NULL)
-    {
-        return;
-    }
-
-    ptWidget->opacity=opacity;
 }
 
 #if defined(__clang__)

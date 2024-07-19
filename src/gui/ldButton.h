@@ -68,7 +68,6 @@ struct ldButton_t
     ldColor releaseColor;
     ldColor pressColor;
     ldColor selectColor;
-    uint8_t opacity;
     bool isTransparent : 1;
     bool isCheckable : 1;
     bool isChecked : 1;
@@ -97,7 +96,7 @@ void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable);
 
 #define ldButtonSetHidden               ldBaseSetHidden
 #define ldButtonMove                    ldBaseMove
-
+#define ldButtonSetOpacity              ldBaseSetOpacity
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

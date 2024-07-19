@@ -62,7 +62,6 @@ struct ldLabel_t
     arm_2d_font_t *ptFont;
     arm_2d_align_t tAlign;
     uint8_t* pStr;
-    uint8_t opacity;
     bool isTransparent:1;
 };
 
@@ -83,6 +82,10 @@ void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign);
 void ldLabelSetBgImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile);
 void ldLabelSetBgColor(ldLabel_t *ptWidget, ldColor bgColor);
 void ldLabelSetOpacity(ldLabel_t *ptWidget, uint8_t opacity);
+
+#define ldLabelSetHidden                ldBaseSetHidden
+#define ldLabelMove                     ldBaseMove
+#define ldLabelSetOpacity               ldBaseSetOpacity
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

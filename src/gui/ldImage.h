@@ -66,7 +66,6 @@ struct ldImage_t {
     ldColor fgColor;
     arm_2d_tile_t* ptImgTile;
     arm_2d_tile_t* ptMaskTile;
-    uint8_t opacity;
     bool isTransparent:1;//window专用
     bool isColor:1;
 };
@@ -81,11 +80,11 @@ void ldImage_on_frame_start( ldImage_t *ptWidget);
 void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor);
-void ldImageSetOpacity(ldImage_t *ptWidget, uint8_t opacity);
 void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
 
 #define ldImageSetHidden                ldBaseSetHidden
 #define ldImageMove                     ldBaseMove
+#define ldImageSetOpacity               ldBaseSetOpacity
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

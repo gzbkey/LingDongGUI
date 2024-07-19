@@ -41,6 +41,11 @@ extern "C" {
 #define ldWindow_on_frame_start         ldImage_on_frame_start
 #define ldWindow_show                   ldImage_show
 #define ldWindowSetBgColor              ldImageSetBgColor
+
+#define ldWindowSetHidden               ldBaseSetHidden
+#define ldWindowMove                    ldBaseMove
+#define ldWindowSetOpacity              ldBaseSetOpacity
+
 #if defined(__clang__)
 #   pragma clang diagnostic pop
 #endif

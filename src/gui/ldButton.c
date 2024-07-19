@@ -114,11 +114,11 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.ptGuiFunc = &ldButtonFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity = 255;
 
     ptWidget->releaseColor = __RGB(217, 225, 244);
     ptWidget->pressColor = __RGB(255, 243, 202);
     ptWidget->selectColor = __RGB(255, 0, 0);
-    ptWidget->opacity = 255;
 
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotButtonToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotButtonToggle);
@@ -200,7 +200,7 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                         draw_round_corner_box(&tTarget,
                                               NULL,
                                               ptWidget->pressColor,
-                                              ptWidget->opacity,
+                                              ptWidget->use_as__ldBase_t.opacity,
                                               bIsNewFrame);
                     }
                     else
@@ -208,7 +208,7 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                         draw_round_corner_box(&tTarget,
                                               NULL,
                                               ptWidget->releaseColor,
-                                              ptWidget->opacity,
+                                              ptWidget->use_as__ldBase_t.opacity,
                                               bIsNewFrame);
                     }
                 }
@@ -219,14 +219,14 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                         ldBaseColor(&tTarget,
                                     NULL,
                                     ptWidget->pressColor,
-                                    ptWidget->opacity);
+                                    ptWidget->use_as__ldBase_t.opacity);
                     }
                     else
                     {
                         ldBaseColor(&tTarget,
                                     NULL,
                                     ptWidget->releaseColor,
-                                    ptWidget->opacity);
+                                    ptWidget->use_as__ldBase_t.opacity);
                     }
                 }
             }
@@ -258,7 +258,7 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                                     ptWidget->ptPressImgTile,
                                     ptWidget->ptPressMaskTile,
                                     ptWidget->pressColor,
-                                    ptWidget->opacity);
+                                    ptWidget->use_as__ldBase_t.opacity);
                     }
                     else
                     {
@@ -267,7 +267,7 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                                     ptWidget->ptReleaseImgTile,
                                     ptWidget->ptReleaseMaskTile,
                                     ptWidget->releaseColor,
-                                    ptWidget->opacity);
+                                    ptWidget->use_as__ldBase_t.opacity);
                     }
                 }
             }

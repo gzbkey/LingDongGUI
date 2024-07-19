@@ -72,8 +72,8 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
     ptWidget->use_as__ldBase_t.nameId=nameId;
     ptWidget->use_as__ldBase_t.ptGuiFunc=&ldImageFunc;
+    ptWidget->use_as__ldBase_t.opacity = 255;
 
-    ptWidget->opacity = 255;
     ptWidget->ptImgTile=ptImgTile;
     ptWidget->ptMaskTile=ptMaskTile;
 
@@ -200,7 +200,7 @@ void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *
                 ldBaseColor(&tTarget,
                             NULL,
                             ptWidget->bgColor,
-                            ptWidget->opacity);
+                            ptWidget->use_as__ldBase_t.opacity);
             }
             else
             {
@@ -209,7 +209,7 @@ void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *
                             ptWidget->ptImgTile,
                             ptWidget->ptMaskTile,
                             ptWidget->fgColor,
-                            ptWidget->opacity);
+                            ptWidget->use_as__ldBase_t.opacity);
             }
         }
     }
@@ -227,17 +227,6 @@ void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor)
     ptWidget->isTransparent=false;
     ptWidget->isColor=true;
     ptWidget->bgColor=bgColor;
-}
-
-void ldImageSetOpacity(ldImage_t *ptWidget, uint8_t opacity)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->opacity=opacity;
 }
 
 void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile)

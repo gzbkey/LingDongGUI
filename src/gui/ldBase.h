@@ -113,10 +113,14 @@ struct ld_scene_t {
 
 typedef struct  {
     implement(arm_2d_control_node_t);
+//    ARM_PRIVATE(
+    arm_2d_region_t tTempRegion;
+//)
     const ldBaseWidgetFunc_t *ptGuiFunc;
     ldAssn_t *ptAssn;
     ldWidgetType_t widgetType;
     uint16_t nameId;
+    uint8_t opacity;
     bool isDirtyRegionUpdate:1;
     bool isDirtyRegionAutoReset:1;
     bool isHidden:1;
@@ -135,7 +139,7 @@ void ldBaseImage(arm_2d_tile_t* pTile,arm_2d_region_t *pRegion,arm_2d_tile_t* pI
 void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,arm_2d_font_t *ptFont,arm_2d_align_t tAlign,ldColor textColor);
 void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
-
+void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
 
 #ifdef __cplusplus
 }

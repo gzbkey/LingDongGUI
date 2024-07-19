@@ -182,10 +182,30 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                         {
                             ((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate = false;
                         }
+
+                        arm_2d_region_t tRegion;
+                        ldBase_t *ptWidget=(ldBase_t *)ptThis->tEnum.ptCurrent;
+#if 0
+                        if((ptWidget->tTempRegion.tLocation.iX==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX)&&
+                                (ptWidget->tTempRegion.tLocation.iY==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY)&&
+                                (ptWidget->tTempRegion.tSize.iWidth==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)&&
+                                (ptWidget->tTempRegion.tSize.iHeight==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight))
+#else
+                        if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
+#endif
+                        {
+                            tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                        }
+                        else
+                        {
+                            tRegion=ptWidget->tTempRegion;
+                            ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                        }
+
                         arm_2d_dynamic_dirty_region_update(
                             &ptThis->tDirtyRegionItem,
                             (arm_2d_tile_t*)ptTile,
-                            &((ldBase_t *)ptThis->tEnum.ptCurrent)->use_as__arm_2d_control_node_t.tRegion,
+                            &tRegion,
                             SCENE_DR_UPDATE);
                     }
                     else
