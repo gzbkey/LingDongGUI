@@ -82,6 +82,9 @@ void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *
 void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor);
 void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
 
+#define ldImageInit(nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile,isWindow) \
+        ldImage_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile,isWindow)
+
 #define ldImageSetHidden                ldBaseSetHidden
 #define ldImageMove                     ldBaseMove
 #define ldImageSetOpacity               ldBaseSetOpacity

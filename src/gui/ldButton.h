@@ -94,6 +94,9 @@ void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor);
 void ldButtonSetAlign(ldButton_t *ptWidget,uint8_t align);
 void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable);
 
+#define ldButtonInit(nameId,parentNameId,x,y,width,height) \
+        ldButton_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
+
 #define ldButtonSetHidden               ldBaseSetHidden
 #define ldButtonMove                    ldBaseMove
 #define ldButtonSetOpacity              ldBaseSetOpacity

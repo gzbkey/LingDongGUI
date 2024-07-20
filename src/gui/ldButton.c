@@ -100,6 +100,10 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
             return NULL;
         }
     }
+    else
+    {
+        memset(ptWidget, 0, sizeof(ldButton_t));
+    }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);

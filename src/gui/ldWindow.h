@@ -34,7 +34,11 @@ extern "C" {
 
 #define ldWindow_t                      ldImage_t
 
-#define ldWindow_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height)  ldImage_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height,NULL,NULL,true)
+#define ldWindow_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height) \
+        ldImage_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height,NULL,NULL,true)
+
+#define ldWindowInit(nameId,parentNameId,x,y,width,height) \
+        ldImageInit(nameId,parentNameId,x,y,width,height,NULL,NULL,true)
 
 #define ldWindow_depose                 ldImage_depose
 #define ldWindow_on_load                ldImage_on_load

@@ -64,6 +64,10 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
             return NULL;
         }
     }
+    else
+    {
+        memset(ptWidget, 0, sizeof(ldImage_t));
+    }
 
     ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;

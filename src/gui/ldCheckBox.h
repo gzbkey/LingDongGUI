@@ -56,7 +56,7 @@ struct ldCheckBox_t
     ARM_PRIVATE(
             ld_scene_t *ptScene;
     )
-    arm_2d_align_t tAlign;
+//    arm_2d_align_t tAlign;
     ldColor bgColor;
     ldColor fgColor;
     ldColor charColor;
@@ -74,14 +74,20 @@ struct ldCheckBox_t
 };
 
 ldCheckBox_t* ldCheckBox_init(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
-
 void ldCheckBox_depose( ldCheckBox_t *ptWidget);
-
 void ldCheckBox_on_load( ldCheckBox_t *ptWidget);
-
 void ldCheckBox_on_frame_start( ldCheckBox_t *ptWidget);
-
 void ldCheckBox_show(ld_scene_t *pScene, ldCheckBox_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+
+void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor);
+void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask);
+void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr);
+void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num);
+void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner);
+void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor);
+
+#define ldCheckBoxInit(nameId,parentNameId,x,y,width,height) \
+        ldCheckBox_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 
 #define ldCheckBoxSetHidden                ldBaseSetHidden
 #define ldCheckBoxMove                     ldBaseMove

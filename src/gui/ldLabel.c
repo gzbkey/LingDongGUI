@@ -64,6 +64,10 @@ ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId
             return NULL;
         }
     }
+    else
+    {
+        memset(ptWidget, 0, sizeof(ldLabel_t));
+    }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);

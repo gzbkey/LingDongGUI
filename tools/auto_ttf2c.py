@@ -79,7 +79,7 @@ struct {{
     arm_2d_char_idx_t tUTF8Table;
 }} ARM_2D_FONT_{base_font_name}_{str(pixel_size).zfill(2)}_A{font_bit_width};
 
-#define FONT_{base_font_name.upper()}_{str(pixel_size).zfill(2)}     ARM_2D_FONT_{base_font_name}_{str(pixel_size).zfill(2)}_A{font_bit_width}
+#define FONT_{base_font_name.upper()}_{str(pixel_size).zfill(2)}          (arm_2d_font_t*)&ARM_2D_FONT_{base_font_name}_{str(pixel_size).zfill(2)}_A{font_bit_width}
 """
             else:
                 for i in range(4):
@@ -90,7 +90,7 @@ struct {{
     arm_2d_char_idx_t tUTF8Table;
 }} ARM_2D_FONT_{base_font_name}_{str(pixel_size).zfill(2)}_A{2**i};
 
-#define FONT_{base_font_name.upper()}_{str(pixel_size).zfill(2)}_A{2**i}     ARM_2D_FONT_{base_font_name}_{str(pixel_size).zfill(2)}_A{2**i}
+#define FONT_{base_font_name.upper()}_{str(pixel_size).zfill(2)}_A{2**i}          (arm_2d_font_t*)&ARM_2D_FONT_{base_font_name}_{str(pixel_size).zfill(2)}_A{2**i}
 """
 
     

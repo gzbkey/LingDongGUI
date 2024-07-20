@@ -13,7 +13,7 @@ struct {
     arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_arial_12_A8;
 
-#define FONT_ARIAL_12     ARM_2D_FONT_arial_12_A8
+#define FONT_ARIAL_12          (arm_2d_font_t*)&ARM_2D_FONT_arial_12_A8
 
 extern const
 struct {
@@ -21,7 +21,7 @@ struct {
     arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_arial_16_A1;
 
-#define FONT_ARIAL_16_A1     ARM_2D_FONT_arial_16_A1
+#define FONT_ARIAL_16_A1          (arm_2d_font_t*)&ARM_2D_FONT_arial_16_A1
 
 extern const
 struct {
@@ -29,7 +29,7 @@ struct {
     arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_arial_16_A2;
 
-#define FONT_ARIAL_16_A2     ARM_2D_FONT_arial_16_A2
+#define FONT_ARIAL_16_A2          (arm_2d_font_t*)&ARM_2D_FONT_arial_16_A2
 
 extern const
 struct {
@@ -37,7 +37,7 @@ struct {
     arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_arial_16_A4;
 
-#define FONT_ARIAL_16_A4     ARM_2D_FONT_arial_16_A4
+#define FONT_ARIAL_16_A4          (arm_2d_font_t*)&ARM_2D_FONT_arial_16_A4
 
 extern const
 struct {
@@ -45,7 +45,7 @@ struct {
     arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_arial_16_A8;
 
-#define FONT_ARIAL_16_A8     ARM_2D_FONT_arial_16_A8
+#define FONT_ARIAL_16_A8          (arm_2d_font_t*)&ARM_2D_FONT_arial_16_A8
 
 #ifdef __cplusplus
 }

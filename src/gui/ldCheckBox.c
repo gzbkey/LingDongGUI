@@ -190,6 +190,10 @@ ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint1
             return NULL;
         }
     }
+    else
+    {
+        memset(ptWidget, 0, sizeof(ldCheckBox_t));
+    }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
@@ -294,9 +298,6 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
             arm_2d_tile_t tChildTile;
             arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
 
-//            LOG_REGION("",tChildTile.tRegion);
-//            arm_2d_fill_colour_with_opacity(&tChildTile, &tChildTile.tRegion, (__arm_2d_color_t){0xff00}, 255);
-
             if ((ptWidget->ptCheckedImgTile==NULL)&&(ptWidget->ptUncheckedImgTile==NULL))//color
             {
 
@@ -305,7 +306,7 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                         draw_round_corner_box(&tTarget,
                                               &tChildTile.tRegion,
                                               ptWidget->fgColor,
-                                              255,
+                                              ptWidget->use_as__ldBase_t.opacity,
                                               bIsNewFrame,
                                               &checkBoxCircleMask);
 
@@ -316,14 +317,9 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                         draw_round_corner_box(&tTarget,
                                               &tChildTile.tRegion,
                                               ptWidget->bgColor,
-                                              255,
+                                              ptWidget->use_as__ldBase_t.opacity,
                                               bIsNewFrame,
                                               &checkBoxCircleSmallMask);
-
-                        tChildTile.tRegion.tLocation.iX+=1;
-                        tChildTile.tRegion.tLocation.iY+=1;
-                        tChildTile.tRegion.tSize.iWidth-=2;
-                        tChildTile.tRegion.tSize.iHeight-=2;
                     }
                     else
                     {
@@ -335,16 +331,15 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                                         &tChildTile.tRegion,
                                         1,
                                         ptWidget->fgColor,
-                                        255);
-LOG_DEBUG("123");
-//                        tChildTile.tRegion.tLocation.iX+=2;
-//                        tChildTile.tRegion.tLocation.iY+=2;
-//                        tChildTile.tRegion.tSize.iWidth-=4;
-//                        tChildTile.tRegion.tSize.iHeight-=4;
+                                        ptWidget->use_as__ldBase_t.opacity);
                     }
 
                     if(ptWidget->isChecked)
                     {
+                        tBoxRegion.tLocation.iX+=2;
+                        tBoxRegion.tLocation.iY+=2;
+                        tBoxRegion.tSize=checkBoxCheckedMask.tRegion.tSize;
+                        arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
 
                         if(ptWidget->isRadioButton)
                         {
@@ -352,18 +347,37 @@ LOG_DEBUG("123");
                                             &tChildTile.tRegion,
                                             5,
                                             ptWidget->fgColor,
-                                            255);
+                                            ptWidget->use_as__ldBase_t.opacity);
                         }
                         else
                         {
-                            ldBaseImage(&tChildTile,
+                            ldBaseImage(&tTarget,
                                         &tChildTile.tRegion,
                                         NULL,
                                         (arm_2d_tile_t*)&checkBoxCheckedMask,
                                         ptWidget->fgColor,
-                                        255);
+                                        ptWidget->use_as__ldBase_t.opacity);
                         }
 
+                    }
+
+                    if(ptWidget->pStr!=NULL)
+                    {
+                        tBoxRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+                        tBoxRegion.tLocation.iX=ptWidget->boxWidth+2;
+                        tBoxRegion.tLocation.iY=0;
+                        tBoxRegion.tSize.iWidth-=tBoxRegion.tLocation.iX;
+
+                        arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+
+                        ldBaseLabel(&tTarget,
+                                    &tChildTile.tRegion,
+                                    ptWidget->pStr,
+                                    ptWidget->ptFont,
+                                    ARM_2D_ALIGN_LEFT,
+                                    ptWidget->charColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                        arm_2d_op_wait_async(NULL);
                     }
             }
             else
@@ -391,24 +405,84 @@ LOG_DEBUG("123");
             }
             arm_2d_op_wait_async(NULL);
 
-            if(ptWidget->pStr!=NULL)
-            {
-                //最后使用，不再生产中间变量，直接修改tTarget
-                tTarget.tRegion.tLocation.iX+=ptWidget->boxWidth+2;
-                tTarget.tRegion.tSize.iWidth-=ptWidget->boxWidth+2;
-                ldBaseLabel(&tTarget,
-                            &tTarget.tRegion,
-                            ptWidget->pStr,
-                            ptWidget->ptFont,
-                            ptWidget->tAlign,
-                            ptWidget->charColor,
-                            ptWidget->use_as__ldBase_t.opacity);
-                arm_2d_op_wait_async(NULL);
-            }
+
         }
     }
 
     arm_2d_op_wait_async(NULL);
+}
+
+void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->bgColor=bgColor;
+    ptWidget->fgColor=fgColor;
+    ptWidget->ptCheckedImgTile=NULL;
+    ptWidget->ptUncheckedImgTile=NULL;
+    ptWidget->boxWidth=CHECK_BOX_SIZE;
+}
+
+void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptUncheckedImgTile=uncheckedImgAddr;
+    ptWidget->ptCheckedImgTile=checkedImgAddr;
+    ptWidget->isWithUncheckedMask=isUncheckedMask;
+    ptWidget->isWithCheckedMask=isCheckedMask;
+    ptWidget->boxWidth=boxWidth;
+}
+
+void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ldFree(ptWidget->pStr);
+    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    strcpy((char*)ptWidget->pStr,(char*)pStr);
+    ptWidget->ptFont=ptFont;
+}
+
+void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->isRadioButton=true;
+    ptWidget->radioButtonGroup=num;
+}
+
+void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isCorner=isCorner;
+}
+
+void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->charColor=charColor;
 }
 
 #if defined(__clang__)

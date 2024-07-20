@@ -44,15 +44,15 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
 
-    obj= ldImage_init(ptScene,NULL,1, 0, 100, 100, 50, 50, NULL, NULL,false);
+    obj= ldImageInit(1, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
-    obj=ldButton_init(ptScene,NULL,2, 0, 10,10,100,50);
-    ldButtonSetFont(obj,&FONT_ARIAL_16_A8);
-    ldButtonSetText(obj,"123");
+    obj=ldButtonInit(2, 0, 10,10,100,50);
+    ldButtonSetFont(obj,FONT_ARIAL_16_A8);
+    ldButtonSetText(obj,(uint8_t*)"123");
     LOG_DEBUG("btn 2 :%p",obj);
 
-    win=ldWindow_init(ptScene,NULL,3, 0, 200, 95, 20, 20);
+    win=ldWindowInit(3, 0, 200, 95, 20, 20);
     ldWindowSetBgColor(win,GLCD_COLOR_GREEN);
 
 //    connect(2,SIGNAL_RELEASE,slotPageJump);
@@ -60,12 +60,15 @@ void uiWidgetInit(ld_scene_t* ptScene)
     connect(2,SIGNAL_RELEASE,slotTest);
 //    connect(2,SIGNAL_RELEASE,slotTest2);
 
-    obj=ldLabel_init(ptScene,NULL,4,0,100,50, 100,50,&FONT_ARIAL_12);
-    ldLabelSetText(obj,"123");
+    obj=ldLabelInit(4,0,100,50, 100,50,FONT_ARIAL_12);
+    ldLabelSetText(obj,(uint8_t*)"123");
     ldLabelSetBgColor(obj,GLCD_COLOR_LIGHT_GREY);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_BOTTOM_LEFT);
 
-    ldCheckBox_init( ptScene,NULL, 5, 0, 150, 10, 50, 20);
+    obj=ldCheckBoxInit(5, 0, 150, 10, 50, 20);
+    ldCheckBoxSetCorner(obj,true);
+    ldCheckBoxSetRadioButtonGroup(obj,0);
+    ldCheckBoxSetText(obj,FONT_ARIAL_12,(uint8_t*)"999");
 
     uiWidgetLogicInit(ptScene);
 }
