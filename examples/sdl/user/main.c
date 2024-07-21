@@ -75,20 +75,18 @@ int main (void)
 //    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
 //    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
-#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-//#if LD_PAGE_STATIC == 0
-//    ldGuiSetPageMax(1);
-//#endif
-//    LD_ADD_PAGE_DEMO;
-#endif
-
     arm_irq_safe {
         arm_2d_init();
     }
 
     disp_adapter0_init();
 #if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-    ldGuiInit(&uiWidgetFunc);
+#if USE_DEMO == 0
+    //user gui page init
+
+#else
+    ldGuiInit(LD_DEMO_GUI_FUNC);
+#endif
 #endif
 
     SDL_CreateThread(app_2d_main_thread, "arm-2d thread", NULL);

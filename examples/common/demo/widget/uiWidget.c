@@ -42,7 +42,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
 
-    ldWindow_init(ptScene,NULL,0, 0, 0, 0, 320, 240);
+    ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
 
     obj= ldImageInit(1, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));

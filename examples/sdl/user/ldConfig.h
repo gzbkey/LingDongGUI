@@ -7,7 +7,6 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
-#include "Virtual_TFT_Port.h"
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 
@@ -22,11 +21,11 @@ extern "C" {
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
-#define LD_CFG_SCEEN_WIDTH                        (VT_WIDTH)
+#define LD_CFG_SCEEN_WIDTH                        (320)
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
-#define LD_CFG_SCEEN_HEIGHT                       (VT_HEIGHT)
+#define LD_CFG_SCEEN_HEIGHT                       (240)
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size
@@ -97,6 +96,25 @@ extern "C" {
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (1)
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
+
+// <o> choose demo to test
+//     <0=> None
+//     <1=> Show all widget
+#define USE_DEMO                                  (1)
+
+#if USE_DEMO == 1
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (1024)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (600)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_FUNC                          &uiWidgetFunc
+#endif
 
 // <<< end of configuration section >>>
 
