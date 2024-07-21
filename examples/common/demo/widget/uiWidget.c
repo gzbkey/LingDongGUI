@@ -67,10 +67,22 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldLabelSetBgColor(obj,GLCD_COLOR_LIGHT_GREY);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_BOTTOM_LEFT);
 
-    obj=ldCheckBoxInit(5, 0, 150, 10, 50, 20);
-    ldCheckBoxSetCorner(obj,true);
+    obj=ldCheckBoxInit(5, 0, 220, 10, 50, 20);
+
     ldCheckBoxSetRadioButtonGroup(obj,0);
     ldCheckBoxSetText(obj,FONT_ARIAL_12,(uint8_t*)"999");
+
+
+    obj=ldCheckBoxInit(6, 0, 220, 40, 50, 20);
+    ldCheckBoxSetRadioButtonGroup(obj,0);
+
+    obj=ldCheckBoxInit(7, 0, 220, 70, 50, 20);
+    ldCheckBoxSetCorner(obj,true);
+
+    obj=ldProgressBarInit(8,0,10,500,300,30);
+    ldProgressBarSetPercent(obj,45);
+//    ldProgressBarSetHorizontal(obj,false);
+    ldProgressBarSetImage(obj,IMAGE_PROGRESSBARBG_BMP,IMAGE_PROGRESSBARFG_BMP);
 
     uiWidgetLogicInit(ptScene);
 }
