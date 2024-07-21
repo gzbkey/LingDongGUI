@@ -20,8 +20,7 @@
 #define __LD_BUTTON_H__
 
 
-#include "arm_2d.h"
-#include "./__common.h"
+
 
 #ifdef __cplusplus
 extern "C"
@@ -45,6 +44,7 @@ extern "C"
 #undef __LD_BUTTON_INHERIT__
 #define __ARM_2D_INHERIT__
 #endif
+
 #include "arm_2d_utils.h"
 #include "ldBase.h"
 

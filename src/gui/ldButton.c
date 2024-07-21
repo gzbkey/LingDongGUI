@@ -21,9 +21,10 @@
 #include "./__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
-#include "ldButton.h"
 #include <assert.h>
 #include <string.h>
+
+#include "ldButton.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push

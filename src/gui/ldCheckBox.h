@@ -19,10 +19,6 @@
 #ifndef __LD_CHECK_BOX_H__
 #define __LD_CHECK_BOX_H__
 
-
-#include "arm_2d.h"
-#include "./__common.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -34,8 +30,6 @@ extern "C"
 #pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
 #pragma clang diagnostic ignored "-Wpadded"
 #endif
-
-
 
 /* OOC header, please DO NOT modify  */
 #ifdef __LD_CHECK_BOX_IMPLEMENT__
@@ -56,7 +50,6 @@ struct ldCheckBox_t
     ARM_PRIVATE(
             ld_scene_t *ptScene;
     )
-//    arm_2d_align_t tAlign;
     ldColor bgColor;
     ldColor fgColor;
     ldColor charColor;

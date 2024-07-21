@@ -17,14 +17,14 @@
  */
 
 #define __LD_CHECK_BOX_IMPLEMENT__
-
 #include "./arm_extra_controls.h"
 #include "./__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
-#include "ldCheckBox.h"
 #include <assert.h>
 #include <string.h>
+
+#include "ldCheckBox.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push

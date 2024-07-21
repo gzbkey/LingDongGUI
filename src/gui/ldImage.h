@@ -19,10 +19,6 @@
 #ifndef __LD_IMAGE_H__
 #define __LD_IMAGE_H__
 
-/*============================ INCLUDES ======================================*/
-#include "arm_2d.h"
-#include "./__common.h"
-
 #ifdef   __cplusplus
 extern "C" {
 #endif
@@ -34,8 +30,6 @@ extern "C" {
 #   pragma clang diagnostic ignored "-Wpadded"
 #endif
 
-/*============================ MACROS ========================================*/
-
 /* OOC header, please DO NOT modify  */
 #ifdef __LD_IMAGE_IMPLEMENT__
 #   undef   __LD_IMAGE_IMPLEMENT__
@@ -44,17 +38,10 @@ extern "C" {
 #   undef   __LD_IMAGE_INHERIT__
 #   define __ARM_2D_INHERIT__
 #endif
+
 #include "arm_2d_utils.h"
 #include "ldBase.h"
-/*============================ MACROS ========================================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
 
-
-
-/*!
- * \brief a user class for user defined control
- */
 typedef struct ldImage_t ldImage_t;
 
 struct ldImage_t {
@@ -69,9 +56,6 @@ struct ldImage_t {
     bool isTransparent:1;//window专用
     bool isColor:1;
 };
-
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ PROTOTYPES ====================================*/
 
 ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, bool isWindow);
 void ldImage_depose( ldImage_t *ptWidget);

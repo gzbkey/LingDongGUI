@@ -19,10 +19,6 @@
 #ifndef __LD_LABEL_H__
 #define __LD_LABEL_H__
 
-
-#include "arm_2d.h"
-#include "./__common.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -35,8 +31,6 @@ extern "C"
 #pragma clang diagnostic ignored "-Wpadded"
 #endif
 
-
-
 /* OOC header, please DO NOT modify  */
 #ifdef __LD_LABEL_IMPLEMENT__
 #undef __LD_LABEL_IMPLEMENT__
@@ -45,6 +39,7 @@ extern "C"
 #undef __LD_LABEL_INHERIT__
 #define __ARM_2D_INHERIT__
 #endif
+
 #include "arm_2d_utils.h"
 #include "ldBase.h"
 
@@ -66,13 +61,9 @@ struct ldLabel_t
 };
 
 ldLabel_t* ldLabel_init(ld_scene_t *ptScene, ldLabel_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,arm_2d_font_t *ptFont);
-
 void ldLabel_depose( ldLabel_t *ptWidget);
-
 void ldLabel_on_load( ldLabel_t *ptWidget);
-
 void ldLabel_on_frame_start( ldLabel_t *ptWidget);
-
 void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent);

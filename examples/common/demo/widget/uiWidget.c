@@ -1,6 +1,7 @@
 #include "uiWidget.h"
 #include "uiWidgetLogic.h"
 #include "fonts/uiFonts.h"
+#include "images/uiImages.h"
 #include "ldGui.h"
 
 void uiWidgetInit(ld_scene_t* ptScene);
@@ -27,7 +28,7 @@ static bool slotTest(ld_scene_t *ptScene,ldMsg_t msg)
 //   ldButtonMove(btn,150,100);
    ldImage_t*img=ldBaseGetWidget(ptScene->ptNodeRoot,1);
 //   ldImageSetHidden(img,!img->use_as__ldBase_t.isHidden);
-   ldImageSetOpacity(img,200);
+   ldImageSetOpacity(img,128);
    return false;
 }
 
@@ -47,10 +48,11 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj= ldImageInit(1, 0, 100, 100, 50, 50, NULL, NULL,false);
     ldImageSetBgColor(obj,__RGB(0xFF,0xFF,0xFF));
 
-    obj=ldButtonInit(2, 0, 10,10,100,50);
+    obj=ldButtonInit(2, 0, 10,10,79,53);
     ldButtonSetFont(obj,FONT_ARIAL_16_A8);
     ldButtonSetText(obj,(uint8_t*)"123");
-    LOG_DEBUG("btn 2 :%p",obj);
+    ldButtonSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldButtonSetImage(obj,IMAGE_KEYRELEASE_PNG,IMAGE_KEYRELEASE_PNG_Mask,IMAGE_KEYPRESS_PNG,IMAGE_KEYPRESS_PNG_Mask);
 
     win=ldWindowInit(3, 0, 200, 95, 20, 20);
     ldWindowSetBgColor(win,GLCD_COLOR_GREEN);

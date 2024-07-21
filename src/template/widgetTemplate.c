@@ -22,9 +22,10 @@
 #include "./__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
-#include "ldTemplate.h"
 #include <assert.h>
 #include <string.h>
+
+#include "ldTemplate.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
