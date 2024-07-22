@@ -168,54 +168,86 @@ static void _progressBarImageShow(ldProgressBar_t *ptWidget,arm_2d_tile_t *ptTar
     };
 
     // bg image
-    do{
-        arm_2d_region_t tInnerRegion = {
-            .tSize = {
-                .iWidth = tBarRegion.tSize.iWidth + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
-                .iHeight = tBarRegion.tSize.iHeight,
-            },
-            .tLocation = {
-                .iX = -ptWidget->ptBgImgTile->tRegion.tSize.iWidth + ptWidget->bgOffset,
-            },
-        };
-        arm_2d_tile_t tileInnerSlot;
-        arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
-        arm_2d_tile_fill_only(ptWidget->ptBgImgTile,&tileInnerSlot,&tInnerRegion);
-        //    arm_2d_tile_fill_only(ptWidget->ptBgImgTile,ptTarget,NULL);
-    }while(0);
-
-    if (ptWidget->permille > 0)
+    if(ptWidget->isHorizontal)
     {
-        // fg image
         do{
-
-//            if(ptWidget->isHorizontal)
-//            {
-//                tBarRegion.tLocation.iX += ptWidget->fgOffset;
-//                tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * ptWidget->permille / 1000;
-//            }
-//            else
-//            {
-//                int16_t temp=tBarRegion.tSize.iHeight*(1000 - ptWidget->permille) / 1000;;
-//                tBarRegion.tLocation.iY += temp + ptWidget->fgOffset;
-//                tBarRegion.tSize.iHeight -= temp;
-//            }
-
             arm_2d_region_t tInnerRegion = {
                 .tSize = {
                     .iWidth = tBarRegion.tSize.iWidth + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
                     .iHeight = tBarRegion.tSize.iHeight,
                 },
                 .tLocation = {
-                    .iX = -ptWidget->ptFgImgTile->tRegion.tSize.iWidth + ptWidget->fgOffset,
+                    .iX = -ptWidget->ptBgImgTile->tRegion.tSize.iWidth + ptWidget->bgOffset,
                 },
             };
-            tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * ptWidget->permille / 1000;
-
             arm_2d_tile_t tileInnerSlot;
             arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
-            arm_2d_tile_fill_only(ptWidget->ptFgImgTile,&tileInnerSlot,&tInnerRegion);
+            arm_2d_tile_fill_only(ptWidget->ptBgImgTile,&tileInnerSlot,&tInnerRegion);
         }while(0);
+    }
+    else
+    {
+        do{
+            arm_2d_region_t tInnerRegion = {
+                .tSize = {
+                    .iWidth = tBarRegion.tSize.iWidth,
+                    .iHeight = tBarRegion.tSize.iHeight + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight,
+                },
+                .tLocation = {
+                    .iY = -ptWidget->ptBgImgTile->tRegion.tSize.iHeight - ptWidget->bgOffset,
+                },
+            };
+            arm_2d_tile_t tileInnerSlot;
+            arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+            arm_2d_tile_fill_only(ptWidget->ptBgImgTile,&tileInnerSlot,&tInnerRegion);
+        }while(0);
+    }
+
+
+    if (ptWidget->permille > 0)
+    {
+        // fg image
+        if(ptWidget->isHorizontal)
+        {
+            do{
+                arm_2d_region_t tInnerRegion = {
+                    .tSize = {
+                        .iWidth = tBarRegion.tSize.iWidth + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
+                        .iHeight = tBarRegion.tSize.iHeight,
+                    },
+                    .tLocation = {
+                        .iX = -ptWidget->ptFgImgTile->tRegion.tSize.iWidth + ptWidget->fgOffset,
+                    },
+                };
+                tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * ptWidget->permille / 1000;
+
+                arm_2d_tile_t tileInnerSlot;
+                arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+                arm_2d_tile_fill_only(ptWidget->ptFgImgTile,&tileInnerSlot,&tInnerRegion);
+            }while(0);
+        }
+        else
+        {
+            do{
+                arm_2d_region_t tInnerRegion = {
+                    .tSize = {
+                        .iWidth = tBarRegion.tSize.iWidth,
+                        .iHeight = tBarRegion.tSize.iHeight + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight,
+                    },
+                    .tLocation = {
+                        .iY = -ptWidget->ptFgImgTile->tRegion.tSize.iHeight - ptWidget->fgOffset,
+                    },
+                };
+                int16_t temp=tBarRegion.tSize.iHeight*(1000 - ptWidget->permille) / 1000;;
+                tBarRegion.tLocation.iY += temp;
+                tBarRegion.tSize.iHeight -= temp;
+
+                arm_2d_tile_t tileInnerSlot;
+                arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+                arm_2d_tile_fill_only(ptWidget->ptFgImgTile,&tileInnerSlot,&tInnerRegion);
+            }while(0);
+        }
+
     }
 
     if(ptWidget->ptFrameImgTile!=NULL)
@@ -255,9 +287,24 @@ static void _progressBarImageShow(ldProgressBar_t *ptWidget,arm_2d_tile_t *ptTar
             }
             else
             {
+                if(ptWidget->ptBgImgTile->tRegion.tSize.iHeight!=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
+                {
+                    ptWidget->bgOffset++;
+                    if (ptWidget->bgOffset >= ptWidget->ptBgImgTile->tRegion.tSize.iHeight)
+                    {
+                        ptWidget->bgOffset = 0;
+                    }
+                }
 
+                if(ptWidget->ptFgImgTile->tRegion.tSize.iHeight!=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
+                {
+                    ptWidget->fgOffset++;
+                    if (ptWidget->fgOffset >= ptWidget->ptFgImgTile->tRegion.tSize.iHeight)
+                    {
+                        ptWidget->fgOffset = 0;
+                    }
+                }
             }
-
         }
 
     }
