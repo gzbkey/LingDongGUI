@@ -60,10 +60,8 @@ ARM_PRIVATE(
     ldColor textColor;
     int16_t scrollOffset;
     int16_t _scrollOffset;
-    int16_t strHeight;
     bool isTransparent:1;
-    bool isRelease:1;
-    bool isWaitInit:1;
+    bool isMoveReset:1;
     bool _isTopScroll:1;
     bool _isBottomScroll:1;
 };

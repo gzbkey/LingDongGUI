@@ -59,7 +59,7 @@ static bool slotTextVerticalScroll(ld_scene_t *ptScene,ldMsg_t msg)
     {
     case SIGNAL_PRESS:
     {
-        ptWidget->isRelease=false;
+        ptWidget->isMoveReset=false;
         ptWidget->_scrollOffset=ptWidget->scrollOffset;
         ptWidget->_isTopScroll=false;
         ptWidget->_isBottomScroll=false;
@@ -74,7 +74,7 @@ static bool slotTextVerticalScroll(ld_scene_t *ptScene,ldMsg_t msg)
     }
     case SIGNAL_RELEASE:
     {
-        ptWidget->isRelease=true;
+        ptWidget->isMoveReset=true;
 
         ptWidget->_scrollOffset=ptWidget->scrollOffset;
 
@@ -84,14 +84,14 @@ static bool slotTextVerticalScroll(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->_isBottomScroll=false;
         }
 
-        if(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight>(ptWidget->strHeight+ptWidget->scrollOffset))
+        if(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight>(ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset))
         {
-            ptWidget->_scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-(ptWidget->strHeight+ptWidget->scrollOffset);
+            ptWidget->_scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-(ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset);
             ptWidget->_isTopScroll=false;
             ptWidget->_isBottomScroll=true;
         }
 
-        if(ptWidget->strHeight<=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
+        if(ptWidget->ptFont->tCharSize.iHeight<=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
         {
             ptWidget->_isTopScroll=true;
             ptWidget->_isBottomScroll=false;
@@ -147,7 +147,6 @@ ldText_t* ldText_init( ld_scene_t *ptScene,ldText_t *ptWidget, uint16_t nameId, 
 
     ptWidget->bgColor=__RGB(255,255,255);
     ptWidget->ptFont=ptFont;
-    ptWidget->isRelease=true;
 
     if(isScroll)
     {
@@ -214,8 +213,35 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
                 break;
             }
 
-            if(ptWidget->isRelease)
+            if(ptWidget->isMoveReset)
             {
+//                if(ptWidget->_isTopScroll)
+//                {
+//                if(ptWidget->scrollOffset>0)
+//                {
+//                    ptWidget->scrollOffset--;
+//                }
+//                if(ptWidget->scrollOffset==0)
+//                {
+//                    ptWidget->isMoveReset=false;
+//                }
+//                }
+
+//                if(ptWidget->_isBottomScroll)
+//                {
+//                if(ptWidget->scrollOffset<(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight))
+//                {
+//                    ptWidget->scrollOffset++;
+//                }
+
+//                if(ptWidget->scrollOffset==ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)
+//                {
+//                    ptWidget->isMoveReset=false;
+//                }
+//                }
+
+//                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
                 int32_t iResult;
                 bool isPiEnd;
 
@@ -225,7 +251,7 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
                 {
                     if(isPiEnd)
                     {
-                        ptWidget->isRelease=false;
+                        ptWidget->isMoveReset=false;
                         ptWidget->scrollOffset=0;
                     }
                     else
@@ -238,12 +264,12 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
                 {
                     if(isPiEnd)
                     {
-                        ptWidget->isRelease=false;
-                        ptWidget->scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight;
+                        ptWidget->isMoveReset=false;
+                        ptWidget->scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight;
                     }
                     else
                     {
-                        ptWidget->scrollOffset=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight)-(ptWidget->_scrollOffset-iResult);
+                        ptWidget->scrollOffset=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)-(ptWidget->_scrollOffset-iResult);
                         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
                     }
                 }
