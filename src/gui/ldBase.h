@@ -58,20 +58,29 @@ widgetTypeKeyboard,
 }ldWidgetType_t;
 
 //btn占用0-9
-#define SIGNAL_NO_OPERATION         BTN_NO_OPERATION
-#define SIGNAL_PRESS                BTN_PRESS           // value = x (2Byte) + y (2Byte)
-#define SIGNAL_HOLD_DOWN            BTN_HOLD_DOWN       // value = x offset(2Byte) + y offset(2Byte) + x (2Byte) + y (2Byte)
-#define SIGNAL_RELEASE              BTN_RELEASE         // value = x speed(2Byte) + y speed(2Byte) + x (2Byte) + y (2Byte)
+#define SIGNAL_NO_OPERATION             BTN_NO_OPERATION
+#define SIGNAL_PRESS                    BTN_PRESS           // value = x (2Byte) + y (2Byte)
+#define SIGNAL_HOLD_DOWN                BTN_HOLD_DOWN       // value = x offset(2Byte) + y offset(2Byte) + x (2Byte) + y (2Byte)
+#define SIGNAL_RELEASE                  BTN_RELEASE         // value = x speed(2Byte) + y speed(2Byte) + x (2Byte) + y (2Byte)
 
 
-#define ldColor                                 COLOUR_INT
+#define GET_SIGNAL_OFFSET_X(dat)        ((dat>>48)&0xFFFF)
+#define GET_SIGNAL_OFFSET_Y(dat)        ((dat>>32)&0xFFFF)
 
-#define CURSOR_WIDTH                            2
+#define GET_SIGNAL_SPEED_X(dat)         ((dat>>48)&0xFFFF)
+#define GET_SIGNAL_SPEED_Y(dat)         ((dat>>32)&0xFFFF)
 
-#define MEM_MODE_FREERTOS_HEAP4                   (0)
-#define MEM_MODE_TLFS                             (1)
-#define MEM_MODE_STDLIB                           (2)
-#define MEM_MODE_USER                             (3)
+#define GET_SIGNAL_VALUE_X(dat)         ((dat>>16)&0xFFFF)
+#define GET_SIGNAL_VALUE_Y(dat)         (dat&0xFFFF)
+
+#define ldColor                         COLOUR_INT
+
+#define CURSOR_WIDTH                    2
+
+#define MEM_MODE_FREERTOS_HEAP4         (0)
+#define MEM_MODE_TLFS                   (1)
+#define MEM_MODE_STDLIB                 (2)
+#define MEM_MODE_USER                   (3)
 
 typedef struct ld_scene_t ld_scene_t;
 typedef void (*ldPageFunc_t)(ld_scene_t*);

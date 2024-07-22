@@ -55,7 +55,7 @@ struct ldLabel_t
     arm_2d_tile_t *ptImgTile;
     arm_2d_font_t *ptFont;
     ldColor bgColor;
-    ldColor charColor;
+    ldColor textColor;
     uint8_t* pStr;
     bool isTransparent:1;
 };
@@ -68,7 +68,7 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
 
 void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent);
 void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr);
-void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor charColor);
+void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor textColor);
 void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign);
 void ldLabelSetBgImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile);
 void ldLabelSetBgColor(ldLabel_t *ptWidget, ldColor bgColor);

@@ -86,7 +86,7 @@ ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId
 
     ptWidget->tAlign = ARM_2D_ALIGN_CENTRE;
     ptWidget->bgColor=GLCD_COLOR_WHITE;
-    ptWidget->charColor = GLCD_COLOR_BLACK;
+    ptWidget->textColor = GLCD_COLOR_BLACK;
     ptWidget->ptFont = ptFont;
 
     LOG_INFO("[init][label] id:%d", nameId);
@@ -162,12 +162,12 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
 
             if(ptWidget->pStr!=NULL)
             {
-                ldBaseLabel((arm_2d_tile_t*)ptTile,
-                            &tTarget.tRegion,
+                ldBaseLabel(&tTarget,
+                            &tTarget_canvas,
                             ptWidget->pStr,
                             ptWidget->ptFont,
                             ptWidget->tAlign,
-                            ptWidget->charColor,
+                            ptWidget->textColor,
                             ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             }
@@ -183,7 +183,6 @@ void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isTransparent=isTransparent;
 }
@@ -194,22 +193,20 @@ void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ldFree(ptWidget->pStr);
     ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
     strcpy((char*)ptWidget->pStr,(char*)pStr);
 }
 
-void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor charColor)
+void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor textColor)
 {
     if(ptWidget==NULL)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->charColor=charColor;
+    ptWidget->textColor=textColor;
 }
 
 void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign)
@@ -218,7 +215,6 @@ void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->tAlign=tAlign;
 }
@@ -229,7 +225,6 @@ void ldLabelSetBgImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->ptImgTile=ptImgTile;
     ptWidget->isTransparent=false;
@@ -241,7 +236,6 @@ void ldLabelSetBgColor(ldLabel_t *ptWidget, ldColor bgColor)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->bgColor=bgColor;
     ptWidget->isTransparent=false;

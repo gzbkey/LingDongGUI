@@ -54,7 +54,6 @@ struct ldImage_t {
     arm_2d_tile_t* ptImgTile;
     arm_2d_tile_t* ptMaskTile;
     bool isTransparent:1;//window专用
-    bool isColor:1;
 };
 
 ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, bool isWindow);

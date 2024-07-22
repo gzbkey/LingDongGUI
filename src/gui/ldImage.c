@@ -88,7 +88,6 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
         {
             ptScene->ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
-            ptWidget->isColor=true;
             ptWidget->bgColor=__RGB(240,240,240);
             LOG_INFO("[init][background] id:%d",nameId);
         }
@@ -200,7 +199,7 @@ void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *
             {
                 break;
             }
-            if (ptWidget->isColor)
+            if((ptWidget->ptImgTile==NULL)&&(ptWidget->ptMaskTile==NULL))
             {
                 ldBaseColor(&tTarget,
                             NULL,
@@ -230,7 +229,8 @@ void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor)
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isTransparent=false;
-    ptWidget->isColor=true;
+    ptWidget->ptImgTile=NULL;
+    ptWidget->ptMaskTile=NULL;
     ptWidget->bgColor=bgColor;
 }
 

@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldText.h"
 #include "ldProgressBar.h"
 #include "ldCheckBox.h"
 #include "ldLabel.h"

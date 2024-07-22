@@ -414,11 +414,11 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
 
 void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor)
 {
-    if(ptWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->bgColor=bgColor;
     ptWidget->fgColor=fgColor;
@@ -429,11 +429,11 @@ void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor)
 
 void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask)
 {
-    if(ptWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->ptUncheckedImgTile=uncheckedImgAddr;
     ptWidget->ptCheckedImgTile=checkedImgAddr;

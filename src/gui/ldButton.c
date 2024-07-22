@@ -281,8 +281,8 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
 
             if(ptWidget->pStr!=NULL)
             {
-                ldBaseLabel((arm_2d_tile_t*)ptTile,
-                            &tTarget.tRegion,
+                ldBaseLabel(&tTarget,
+                            &tTarget_canvas,
                             ptWidget->pStr,
                             ptWidget->ptFont,
                             ARM_2D_ALIGN_CENTRE,
