@@ -84,14 +84,14 @@ static bool slotTextVerticalScroll(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->_isBottomScroll=false;
         }
 
-        if(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight>(ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset))
+        if(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight>(ptWidget->strHeight+ptWidget->scrollOffset))
         {
-            ptWidget->_scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-(ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset);
+            ptWidget->_scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-(ptWidget->strHeight+ptWidget->scrollOffset);
             ptWidget->_isTopScroll=false;
             ptWidget->_isBottomScroll=true;
         }
 
-        if(ptWidget->ptFont->tCharSize.iHeight<=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
+        if(ptWidget->strHeight<=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
         {
             ptWidget->_isTopScroll=true;
             ptWidget->_isBottomScroll=false;
@@ -265,11 +265,11 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
                     if(isPiEnd)
                     {
                         ptWidget->isMoveReset=false;
-                        ptWidget->scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight;
+                        ptWidget->scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight;
                     }
                     else
                     {
-                        ptWidget->scrollOffset=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)-(ptWidget->_scrollOffset-iResult);
+                        ptWidget->scrollOffset=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight)-(ptWidget->_scrollOffset-iResult);
                         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
                     }
                 }
@@ -305,7 +305,7 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
                 arm_lcd_text_set_draw_region(&textShowRegion);
                 arm_lcd_text_set_colour(ptWidget->textColor, GLCD_COLOR_WHITE);
                 arm_lcd_text_set_opacity(ptWidget->use_as__ldBase_t.opacity);
-                arm_lcd_printf("%s",ptWidget->pStr);
+                arm_lcd_text_puts(&textShowRegion,ptWidget->ptFont,ptWidget->pStr,ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             }
         }
@@ -336,6 +336,8 @@ void ldTextSetText(ldText_t* ptWidget,uint8_t *pStr)
     ldFree(ptWidget->pStr);
     ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
     strcpy((char*)ptWidget->pStr,(char*)pStr);
+
+    ptWidget->strHeight=arm_lcd_text_get_box(pStr,ptWidget->ptFont).iHeight;
 }
 
 void ldTextSetTextColor(ldText_t* ptWidget,ldColor charColor)

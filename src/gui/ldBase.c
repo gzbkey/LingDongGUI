@@ -299,6 +299,111 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_printf_label(tAlign,(char*)pStr);
 }
 
+void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str,uint8_t opacity)
+{
+    arm_2d_size_t tCharSize = ptFont->tCharSize;
+    arm_2d_size_t tDrawRegionSize = ptRegion->tSize;
+
+    arm_2d_location_t   tDrawOffset={0,0};
+    arm_2d_char_descriptor_t tCharDescriptor;
+
+    while(*str) {
+        if (*str == '\r') {
+            tDrawOffset.iX = 0;
+        } else if (*str == '\n') {
+            tDrawOffset.iX = 0;
+            tDrawOffset.iY += tCharSize.iHeight;
+        } else if (*str == '\t') {
+            tDrawOffset.iX += tCharSize.iWidth * 4;
+            tDrawOffset.iX -= tDrawOffset.iX % tCharSize.iWidth;
+
+            if (tDrawOffset.iX >= tDrawRegionSize.iWidth) {
+                tDrawOffset.iX = 0;
+                tDrawOffset.iY += tCharSize.iHeight;
+
+                if (tDrawOffset.iY >= tDrawRegionSize.iHeight) {
+                    tDrawOffset.iY = 0;
+                }
+            }
+
+        }else if (*str == '\b') {
+            if (tDrawOffset.iX >= tCharSize.iWidth) {
+                tDrawOffset.iX -= tCharSize.iWidth;
+            } else {
+                tDrawOffset.iX = 0;
+            }
+        } else {
+
+            arm_2d_helper_get_char_descriptor(  ptFont,&tCharDescriptor,str);
+
+            if (tDrawOffset.iX+tCharDescriptor.iAdvance >= tDrawRegionSize.iWidth)
+            {
+                tDrawOffset.iX = 0;
+                tDrawOffset.iY += tCharSize.iHeight;
+            }
+            int16_t iX = tDrawOffset.iX + ptRegion->tLocation.iX;
+            int16_t iY = tDrawOffset.iY + ptRegion->tLocation.iY;
+
+            tDrawOffset.iX
+                += lcd_draw_char(   iX, iY, (uint8_t **)&str, opacity);
+
+            continue;
+        }
+        str++;
+    }
+}
+
+arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont)
+{
+    arm_2d_size_t tCharSize = ptFont->tCharSize;
+    arm_2d_region_t tDrawBox = {
+        .tSize.iHeight = tCharSize.iHeight,
+    };
+    arm_2d_char_descriptor_t tCharDescriptor;
+
+    while(*str) {
+        if (*str == '\r') {
+            tDrawBox.tLocation.iX = 0;
+        } else if (*str == '\n') {
+            tDrawBox.tLocation.iX = 0;
+            tDrawBox.tLocation.iY += tCharSize.iHeight;
+
+            tDrawBox.tSize.iHeight += tCharSize.iHeight;
+        } else if (*str == '\t') {
+            tDrawBox.tLocation.iX += tCharSize.iWidth * 4;
+            tDrawBox.tLocation.iX -= tDrawBox.tLocation.iX
+                                   % tCharSize.iWidth;
+
+            tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
+
+        }else if (*str == '\b') {
+            if (tDrawBox.tLocation.iX >= tCharSize.iWidth) {
+                tDrawBox.tLocation.iX -= tCharSize.iWidth;
+            } else {
+                tDrawBox.tLocation.iX = 0;
+            }
+        } else {
+
+            int8_t chCodeLength = arm_2d_helper_get_utf8_byte_valid_length((uint8_t *)str);
+            if (chCodeLength <= 0) {
+                chCodeLength = 1;
+            }
+
+            arm_2d_helper_get_char_descriptor(  ptFont,&tCharDescriptor,str);
+
+            tDrawBox.tLocation.iX += tCharDescriptor.iAdvance;
+            tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
+
+            str += chCodeLength;
+            continue;
+        }
+
+        str++;
+    }
+
+    return tDrawBox.tSize;
+}
+
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
 {
     assert(NULL != ptWidget);
