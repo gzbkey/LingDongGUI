@@ -82,6 +82,8 @@ widgetTypeKeyboard,
 #define MEM_MODE_STDLIB                 (2)
 #define MEM_MODE_USER                   (3)
 
+#define ANGLE_2_RADIAN(angle)                   ((float)(angle)*0.0174533f)
+
 typedef struct ld_scene_t ld_scene_t;
 typedef void (*ldPageFunc_t)(ld_scene_t*);
 typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
