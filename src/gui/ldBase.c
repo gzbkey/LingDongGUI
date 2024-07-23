@@ -431,8 +431,6 @@ void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
     arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
                                         &ptWidget->use_as__arm_2d_control_node_t.tRegion,
                                         &ptWidget->tTempRegion);
-
-
 }
 
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity)
@@ -445,3 +443,17 @@ void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity)
     ptWidget->isDirtyRegionUpdate = true;
     ptWidget->opacity=opacity;
 }
+
+arm_2d_location_t ldBaseGetRelativeLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation)
+{
+    arm_2d_control_node_t *ptRoot=&ptWidget->use_as__arm_2d_control_node_t;
+
+    while(ptRoot!=NULL)
+    {
+        tLocation.iX-=((ldBase_t*)ptRoot)->use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+        tLocation.iY-=((ldBase_t*)ptRoot)->use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+        ptRoot=ptRoot->ptParent;
+    }
+    return tLocation;
+}
+

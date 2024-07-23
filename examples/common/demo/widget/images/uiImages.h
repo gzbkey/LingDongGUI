@@ -123,6 +123,25 @@ extern const arm_2d_tile_t c_tile_gaugePointer_png_Mask;
 #endif
 
 #if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_indicator_png_GRAY8;
+#define IMAGE_INDICATOR_PNG          (arm_2d_tile_t*)&c_tile_indicator_png_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_indicator_png_RGB565;
+#define IMAGE_INDICATOR_PNG          (arm_2d_tile_t*)&c_tile_indicator_png_RGB565
+#else
+extern const arm_2d_tile_t c_tile_indicator_png_CCCA8888;
+#define IMAGE_INDICATOR_PNG                 (arm_2d_tile_t*)&c_tile_indicator_png_CCCA8888
+extern const arm_2d_tile_t c_tile_indicator_png_A1Mask;
+#define IMAGE_INDICATOR_PNG_A1Mask          (arm_2d_tile_t*)&c_tile_indicator_png_A1Mask
+extern const arm_2d_tile_t c_tile_indicator_png_A2Mask;
+#define IMAGE_INDICATOR_PNG_A2Mask          (arm_2d_tile_t*)&c_tile_indicator_png_A2Mask
+extern const arm_2d_tile_t c_tile_indicator_png_A4Mask;
+#define IMAGE_INDICATOR_PNG_A4Mask          (arm_2d_tile_t*)&c_tile_indicator_png_A4Mask
+extern const arm_2d_tile_t c_tile_indicator_png_Mask;
+#define IMAGE_INDICATOR_PNG_Mask            (arm_2d_tile_t*)&c_tile_indicator_png_Mask
+#endif
+
+#if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_keyPress_png_GRAY8;
 #define IMAGE_KEYPRESS_PNG          (arm_2d_tile_t*)&c_tile_keyPress_png_GRAY8
 #elif LD_CFG_COLOR_DEPTH == 16
@@ -221,6 +240,25 @@ extern const arm_2d_tile_t c_tile_ProgressBarFg_bmp_RGB565;
 #else
 extern const arm_2d_tile_t c_tile_ProgressBarFg_bmp_CCCN888;
 #define IMAGE_PROGRESSBARFG_BMP          &c_tile_ProgressBarFg_bmp_CCCN888
+#endif
+
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_slider_png_GRAY8;
+#define IMAGE_SLIDER_PNG          (arm_2d_tile_t*)&c_tile_slider_png_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_slider_png_RGB565;
+#define IMAGE_SLIDER_PNG          (arm_2d_tile_t*)&c_tile_slider_png_RGB565
+#else
+extern const arm_2d_tile_t c_tile_slider_png_CCCA8888;
+#define IMAGE_SLIDER_PNG                 (arm_2d_tile_t*)&c_tile_slider_png_CCCA8888
+extern const arm_2d_tile_t c_tile_slider_png_A1Mask;
+#define IMAGE_SLIDER_PNG_A1Mask          (arm_2d_tile_t*)&c_tile_slider_png_A1Mask
+extern const arm_2d_tile_t c_tile_slider_png_A2Mask;
+#define IMAGE_SLIDER_PNG_A2Mask          (arm_2d_tile_t*)&c_tile_slider_png_A2Mask
+extern const arm_2d_tile_t c_tile_slider_png_A4Mask;
+#define IMAGE_SLIDER_PNG_A4Mask          (arm_2d_tile_t*)&c_tile_slider_png_A4Mask
+extern const arm_2d_tile_t c_tile_slider_png_Mask;
+#define IMAGE_SLIDER_PNG_Mask            (arm_2d_tile_t*)&c_tile_slider_png_Mask
 #endif
 
 #if LD_CFG_COLOR_DEPTH == 8

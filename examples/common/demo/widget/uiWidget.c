@@ -87,6 +87,16 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldTextInit(9,0,300,10,150,200,FONT_ARIAL_12,true);
     ldTextSetBgImage(obj,IMAGE_LETTER_PAPER_BMP);
     ldTextSetText(obj,"123\n12333");
+
+    obj=ldSliderInit(10,0,50,300,317,(IMAGE_INDICATOR_PNG)->tRegion.tSize.iHeight);
+    ldSliderSetPercent(obj,42);
+    ldSliderSetImage(obj,IMAGE_SLIDER_PNG,IMAGE_SLIDER_PNG_Mask,IMAGE_INDICATOR_PNG,IMAGE_INDICATOR_PNG_Mask);
+    ldSliderSetIndicatorWidth(obj,(IMAGE_INDICATOR_PNG)->tRegion.tSize.iWidth);
+
+    obj=ldSliderInit(11,0,400,300,30,100);
+    ldSliderSetHorizontal(obj,false);
+    ldSliderSetPercent(obj,42);
+
     uiWidgetLogicInit(ptScene);
 }
 

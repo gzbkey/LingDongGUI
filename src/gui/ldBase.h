@@ -151,6 +151,7 @@ arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont);
 void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
+arm_2d_location_t ldBaseGetRelativeLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
 
 #ifdef __cplusplus
 }

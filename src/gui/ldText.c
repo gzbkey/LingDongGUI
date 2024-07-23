@@ -150,9 +150,9 @@ ldText_t* ldText_init( ld_scene_t *ptScene,ldText_t *ptWidget, uint16_t nameId, 
 
     if(isScroll)
     {
-        connect(ptWidget->use_as__ldBase_t.nameId,SIGNAL_PRESS,slotTextVerticalScroll);
-        connect(ptWidget->use_as__ldBase_t.nameId,SIGNAL_HOLD_DOWN,slotTextVerticalScroll);
-        connect(ptWidget->use_as__ldBase_t.nameId,SIGNAL_RELEASE,slotTextVerticalScroll);
+        ldMsgConnect(ptWidget,SIGNAL_PRESS,slotTextVerticalScroll);
+        ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotTextVerticalScroll);
+        ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotTextVerticalScroll);
     }
 
     LOG_INFO("[init][text] id:%d", nameId);

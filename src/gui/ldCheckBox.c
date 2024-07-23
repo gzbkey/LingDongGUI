@@ -215,7 +215,7 @@ ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint1
     ptWidget->charColor=__RGB(0,0,0);
     ptWidget->boxWidth=CHECK_BOX_SIZE;
 
-    connect(nameId,SIGNAL_PRESS,slotCheckBoxToggle);
+    ldMsgConnect(ptWidget,SIGNAL_PRESS,slotCheckBoxToggle);
 
     LOG_INFO("[init][checkBox] id:%d", nameId);
     return ptWidget;

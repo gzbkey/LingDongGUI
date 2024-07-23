@@ -52,13 +52,10 @@ struct ldProgressBar_t
 ARM_PRIVATE(
     ld_scene_t *ptScene;
 )
-
     uint16_t permille;
-
     ldColor bgColor;
     ldColor fgColor;
     ldColor frameColor;
-
     arm_2d_tile_t *ptBgImgTile;
     arm_2d_tile_t *ptFgImgTile;
     arm_2d_tile_t *ptFrameImgTile;
