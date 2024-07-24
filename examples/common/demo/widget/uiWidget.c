@@ -103,6 +103,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldRadialMenuAddItem(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask);
     ldRadialMenuAddItem(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask);
 
+    obj=ldDateTimeInit(13,0,600,100,200,50,FONT_ARIAL_12);
+
     uiWidgetLogicInit(ptScene);
 }
 
