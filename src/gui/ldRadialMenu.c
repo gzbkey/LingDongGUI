@@ -236,7 +236,9 @@ void ldRadialMenu_depose( ldRadialMenu_t *ptWidget)
 
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
-
+    ldFree(ptWidget->ptItemInfoList);
+    ldFree(ptWidget->use_as__ldBase_t.ptItemRegionList);
+    ldFree(ptWidget->pShowList);
     ldFree(ptWidget);
 }
 
@@ -328,7 +330,6 @@ void ldRadialMenu_on_frame_start( ldRadialMenu_t *ptWidget)
 {
     assert(NULL != ptWidget);
 
-
 }
 
 void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
@@ -338,7 +339,6 @@ void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_
     {
         return;
     }
-
 
     if(ptWidget->use_as__ldBase_t.itemCount&&bIsNewFrame)
     {

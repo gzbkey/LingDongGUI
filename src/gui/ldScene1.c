@@ -123,8 +123,7 @@ static void __on_scene1_frame_start(arm_2d_scene_t *ptScene)
     ldGuiFrameStart(ptScene);
     ldGuiLogicLoop(ptScene);
     ldGuiTouchProcess(ptScene);
-//    xConnectProcess(&((ld_scene_t*)ptScene)->tLink,ptScene);
-ldMsgProcess(ptScene);
+    ldMsgProcess(ptScene);
     arm_2d_dynamic_dirty_region_on_frame_start(
                                                 &ptThis->tDirtyRegionItem,
                                                 SCENE_DR_UPDATE);//SCENE_DR_START);
@@ -153,17 +152,17 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
 {
     ld_scene_t *ptThis = (ld_scene_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
+    static ldBase_t* ptCurrentWidget = NULL;
+    static uint8_t itemCount=0;
+    static arm_2d_location_t widgetLoca={0};
 
     ARM_2D_UNUSED(tScreenSize);
 
-    arm_2d_canvas(ptTile, __top_canvas) {
-    /*-----------------------draw the foreground begin-----------------------*/
-
+    arm_2d_canvas(ptTile, __top_canvas)
+    {
         ldGuiDraw(pTarget,ptTile,bIsNewFrame);
 
-        /* update dirty region */
-        switch (arm_2d_dynamic_dirty_region_wait_next(
-            &ptThis->tDirtyRegionItem))
+        switch (arm_2d_dynamic_dirty_region_wait_next(&ptThis->tDirtyRegionItem))
         {
 //        case SCENE_DR_START:
 //        {
@@ -171,36 +170,101 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
 //        }
         case SCENE_DR_UPDATE:
         {
-            do {
-                if (arm_2d_helper_control_enum_get_next_node(&ptThis->tEnum))
-                {
-                    if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate)
+            if(ptCurrentWidget==NULL)
+            {
+                do {
+                    if (arm_2d_helper_control_enum_get_next_node(&ptThis->tEnum))
                     {
-                        if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionAutoReset)
+                        if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate)
                         {
-                            ((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate = false;
+                            if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionAutoReset)
+                            {
+                                ((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate = false;
+                            }
+
+                            arm_2d_region_t tRegion;
+                            ldBase_t *ptWidget=(ldBase_t *)ptThis->tEnum.ptCurrent;
+#if 0
+                            if((ptWidget->tTempRegion.tLocation.iX==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX)&&
+                                    (ptWidget->tTempRegion.tLocation.iY==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY)&&
+                                    (ptWidget->tTempRegion.tSize.iWidth==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)&&
+                                    (ptWidget->tTempRegion.tSize.iHeight==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight))
+#else
+                            if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
+#endif
+                            {
+                                //region no change
+                                tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                            }
+                            else
+                            {
+                                if(ptWidget->itemCount)// widget has item
+                                {
+                                    ptCurrentWidget=ptWidget;
+                                    itemCount=0;
+                                    widgetLoca.iX=0;
+                                    widgetLoca.iY=0;
+                                    widgetLoca= ldBaseGetAbsoluteLocation(ptWidget,widgetLoca);
+                                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
+                                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
+                                    arm_2d_dynamic_dirty_region_update(
+                                                &ptThis->tDirtyRegionItem,
+                                                (arm_2d_tile_t*)ptTile,
+                                                &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
+                                                SCENE_DR_UPDATE);
+                                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
+                                    itemCount++;
+                                    break;
+                                }
+                                else// widget update region
+                                {
+                                    tRegion=ptWidget->tTempRegion;
+                                    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                }
+                            }
+
+                            arm_2d_dynamic_dirty_region_update(
+                                        &ptThis->tDirtyRegionItem,
+                                        (arm_2d_tile_t*)ptTile,
+                                        &tRegion,
+                                        SCENE_DR_UPDATE);
                         }
-                        arm_2d_dynamic_dirty_region_update(
-                            &ptThis->tDirtyRegionItem,
-                            (arm_2d_tile_t*)ptTile,
-                            &((ldBase_t *)ptThis->tEnum.ptCurrent)->use_as__arm_2d_control_node_t.tRegion,
-                            SCENE_DR_UPDATE);
+                        else
+                        {
+                            continue;
+                        }
                     }
                     else
                     {
-                        continue;
+                        arm_2d_dynamic_dirty_region_change_user_region_index_only(
+                                    &ptThis->tDirtyRegionItem,
+                                    SCENE_DR_DONE);
                     }
+                    break;
+                } while (true);
+            }
+            else
+            {
+                if(itemCount<ptCurrentWidget->itemCount)
+                {
+                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
+                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
+                    arm_2d_dynamic_dirty_region_update(
+                                &ptThis->tDirtyRegionItem,
+                                (arm_2d_tile_t*)ptTile,
+                                &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
+                                SCENE_DR_UPDATE);
+                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
+                    itemCount++;
                 }
                 else
                 {
+                    ptCurrentWidget=NULL;
                     arm_2d_dynamic_dirty_region_change_user_region_index_only(
-                        &ptThis->tDirtyRegionItem,
-                        SCENE_DR_DONE);
+                                &ptThis->tDirtyRegionItem,
+                                SCENE_DR_UPDATE);
                 }
-                break;
-            } while (true);
-
-
+            }
             break;
         }
         case SCENE_DR_DONE:
@@ -208,7 +272,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
         default:
             break;
         }
-    /*-----------------------draw the foreground end  -----------------------*/
     }
     ARM_2D_OP_WAIT_ASYNC();
 
@@ -259,22 +322,14 @@ ld_scene_t *__arm_2d_scene1_init(   arm_2d_scene_player_t *ptDispAdapter,
         },
         .bUserAllocated = bUserAllocated,
         .ldGuiFuncGroup=ptFunc,
-            .ptMsgQueue=NULL,
+        .ptMsgQueue=NULL,
     };
 
-//    ptThis->tLink.next=&ptThis->tLink;
-//    ptThis->tLink.prev=&ptThis->tLink;
-
-    /* ------------   initialize members of user_scene_0_t begin ---------------*/
-
     ldGuiSceneInit(ptThis);
-
 
     arm_2d_scene_player_dynamic_dirty_region_init(
                                                 &ptThis->tDirtyRegionItem,
                                                 &ptThis->use_as__arm_2d_scene_t);
-
-    /* ------------   initialize members of user_scene_0_t end   ---------------*/
 
     arm_2d_scene_player_append_scenes(  ptDispAdapter,
                                         &this.use_as__arm_2d_scene_t,
