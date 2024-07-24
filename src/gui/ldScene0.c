@@ -210,6 +210,17 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                                         widgetLoca.iX=0;
                                         widgetLoca.iY=0;
                                         widgetLoca= ldBaseGetAbsoluteLocation(ptWidget,widgetLoca);
+
+                                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
+                                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
+
+                                        arm_2d_dynamic_dirty_region_update(
+                                                    &ptThis->tDirtyRegionItem,
+                                                    (arm_2d_tile_t*)ptTile,
+                                                    &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
+                                                    SCENE_DR_UPDATE);
+                                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
+                                        itemCount++;
                                         break;
                                     }
                                     else// widget update region
