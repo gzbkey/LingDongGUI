@@ -268,6 +268,9 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                     else
                     {
                         ptCurrentWidget=NULL;
+                        arm_2d_dynamic_dirty_region_change_user_region_index_only(
+                                                            &ptThis->tDirtyRegionItem,
+                                                            SCENE_DR_UPDATE);
                     }
                 }
                 break;

@@ -14,7 +14,7 @@
 
 2. **简单易用**
     * 对ARM-2D进行二次封装，极大降低ARM-2D的使用难度
-    * 使用类似Qt的信号槽模式，轻松实现多对多触发
+    * 事件触发使用信号槽模式，轻松实现多对多触发
     * 界面代码和功能代码分离，逻辑清晰
 
 3. **支持原生API**
@@ -22,7 +22,6 @@
 
 4. **动态自动裁剪**
     * 无需宏定义裁剪，自适应最小化体积
-    * 未使用的控件，不会编译到程序中
 
 5. **自由扩展控件**
     * 使用脚本自动生成新控件框架，专注实现显示效果
@@ -62,18 +61,18 @@ widget demo sdl
 | ✅ | check box + radio button| 复选框 + 单选功能，支持自定义图片和文字显示 |
 | ✅ | radia menu | 旋转菜单 |
 | ✅ | label | 简单文本显示 |
-| ✅ | scroll selecter | 滚动选择器 |
-| ✅ | date time | 日期和时间 |
-| ✅ | icon slider | 滑动图标 |
-| ✅ | gauge | 仪表盘 |
-| ✅ | qr code | 二维码 |
-| ✅ | table | 表格 |
-| ✅ | keyboard | 键盘 |
-| ✅ | line edit | 编辑框 |
-| ✅ | graph | 波形图 |
-| ✅ | combo box | 下拉框 |
-| ✅ | arc bar | 圆环进度条 |
-| 🔲 | slider | 滑动条 |
+| ✅ | slider | 滑动条 |
+| 🔲 | scroll selecter | 滚动选择器 |
+| 🔲 | date time | 日期和时间 |
+| 🔲 | icon slider | 滑动图标 |
+| 🔲 | gauge | 仪表盘 |
+| 🔲 | qr code | 二维码 |
+| 🔲 | table | 表格 |
+| 🔲 | keyboard | 键盘 |
+| 🔲 | line edit | 编辑框 |
+| 🔲 | graph | 波形图 |
+| 🔲 | combo box | 下拉框 |
+| 🔲 | arc bar | 圆环进度条 |
 
 ## 文件结构
 |名称|类型|说明|
