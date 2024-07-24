@@ -289,6 +289,39 @@ void ldBaseImage(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t
     }
 }
 
+void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,bool bIsNewFrame)
+{
+    arm_2d_location_t tCentre = {
+                    .iX = ptImgTile->tRegion.tSize.iWidth >> 1,
+                    .iY = ptImgTile->tRegion.tSize.iHeight >> 1,
+                };
+
+    if (ptMaskTile != NULL)
+    {
+        arm_2dp_tile_transform_with_src_mask_and_opacity(
+                    ptOP,         //!< control block
+                    ptImgTile,        //!< source tile
+                    ptMaskTile,          //!< source mask
+                    ptTile,             //!< target tile
+                    ptRegion,               //!< target region
+                    tCentre,            //!< pivot on source
+                    0,           //!< rotation angle
+                    scale,           //!< zoom scale
+                    255         //!< opacity
+                    );
+    }
+    else
+    {
+            arm_2dp_tile_transform_only((arm_2d_op_trans_t*)ptOP,
+                                        ptImgTile,
+                                        ptTile,
+                                        ptRegion,
+                                        tCentre,
+                                        0,
+                                        scale);
+    }
+}
+
 void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,arm_2d_font_t *ptFont,arm_2d_align_t tAlign,ldColor textColor,uint8_t opacity)
 {
     arm_lcd_text_set_target_framebuffer(ptTile);

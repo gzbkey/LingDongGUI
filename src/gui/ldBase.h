@@ -153,6 +153,7 @@ void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth);
 void* ldBaseGetWidget(arm_2d_control_node_t *ptNodeRoot, uint16_t nameId);
 void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color, uint8_t opacity);
 void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
+void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,bool bIsNewFrame);
 void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
 void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str,uint8_t opacity);
 arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont);

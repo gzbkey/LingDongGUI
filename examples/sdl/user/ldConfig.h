@@ -57,13 +57,9 @@ extern "C" {
 
 // widget config
 
-// <q>Opacity support
-// <i> There is no need to adjust the opacity of the widget. Please turn off this option
-#define USE_OPACITY                               (0)
-
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      (0)
+#define USE_RADIA_MENU_SCALE                      (1)
 
 // <q>scene switcing support
 // <i> 1:More effects 0：Less ram

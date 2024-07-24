@@ -137,8 +137,14 @@ static bool slotMenuSelect(ld_scene_t *ptScene,ldMsg_t msg)
 
             for(int8_t i=ptWidget->itemCount-1;i>=0;i--)
             {
-                if(((tClickLocal.iX>ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iX)&&(tClickLocal.iX<(ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iX+ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tSize.iWidth-1))&&(tClickLocal.iY>ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iY)&&(tClickLocal.iY<(ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iY+ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tSize.iHeight-1)))&&
-                   ((tReleaseLoc.iX>ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iX)&&(tReleaseLoc.iX<(ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iX+ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tSize.iWidth-1))&&(tReleaseLoc.iY>ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iY)&&(tReleaseLoc.iY<(ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iY+ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tSize.iHeight-1))))
+                if(((tClickLocal.iX>ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iX)&&
+                    (tClickLocal.iX<(ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iX+ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tSize.iWidth-1))&&
+                    (tClickLocal.iY>ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iY)&&
+                    (tClickLocal.iY<(ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iY+ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tSize.iHeight-1)))&&
+                   ((tReleaseLoc.iX>ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iX)&&
+                    (tReleaseLoc.iX<(ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iX+ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tSize.iWidth-1))&&
+                    (tReleaseLoc.iY>ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iY)&&
+                    (tReleaseLoc.iY<(ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iY+ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tSize.iHeight-1))))
                 {
                     ldRadialMenuSelectItem(ptWidget,ptWidget->pShowList[i]);
                     LOG_DEBUG("click item %d",ptWidget->pShowList[i]);
@@ -246,7 +252,7 @@ static void _autoScalePercent(ldRadialMenu_t *ptWidget)
     for(uint8_t i=0;i<ptWidget->itemCount;i++)
     {
         //计算缩放比例
-        ptWidget->pItemList[i].scalePercent=(ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iY)*50/ptWidget->yAxis+50;
+        ptWidget->pItemList[i].scalePercent=(ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iY)*50/ptWidget->yAxis+50;
 
         if((ptWidget->pItemList[i].scalePercent%10)>=5)
         {
@@ -267,7 +273,7 @@ static void _sortByYAxis(ldRadialMenuItem_t* arr, uint8_t* indexArr, int size)
     {
         for (j = 0; j < size - 1 - i; j++)
         {
-            if(arr[indexArr[j]].itemRegion.tLocation.iY>arr[indexArr[j+1]].itemRegion.tLocation.iY)
+            if(arr[indexArr[j]].use_as__ldBaseItem_t.itemRegion.tLocation.iY>arr[indexArr[j+1]].use_as__ldBaseItem_t.itemRegion.tLocation.iY)
             {
                 int temp = indexArr[j];
                 indexArr[j] = indexArr[j + 1];
@@ -282,11 +288,11 @@ static void _autoSort(ldRadialMenu_t *ptWidget)
     //计算坐标
     for(uint8_t i=0;i<ptWidget->itemCount;i++)
     {
-        ptWidget->pItemList[i].itemRegion.tLocation.iX  = ptWidget->originPos.iX - (arm_cos_f32(ANGLE_2_RADIAN(ptWidget->pItemList[i].angle+ptWidget->nowAngle)) * (ptWidget->xAxis>>1))-(ptWidget->pItemList[i].itemRegion.tSize.iWidth>>1);
-        ptWidget->pItemList[i].itemRegion.tLocation.iY  = ptWidget->originPos.iY + (arm_sin_f32(ANGLE_2_RADIAN(ptWidget->pItemList[i].angle+ptWidget->nowAngle)) * (ptWidget->yAxis>>1))-(ptWidget->pItemList[i].itemRegion.tSize.iHeight>>1);
+        ptWidget->pItemList[i].use_as__ldBaseItem_t.itemRegion.tLocation.iX  = ptWidget->originPos.iX - (arm_cos_f32(ANGLE_2_RADIAN(ptWidget->pItemList[i].angle+ptWidget->nowAngle)) * (ptWidget->xAxis>>1))-(ptWidget->pItemList[i].use_as__ldBaseItem_t.itemRegion.tSize.iWidth>>1);
+        ptWidget->pItemList[i].use_as__ldBaseItem_t.itemRegion.tLocation.iY  = ptWidget->originPos.iY + (arm_sin_f32(ANGLE_2_RADIAN(ptWidget->pItemList[i].angle+ptWidget->nowAngle)) * (ptWidget->yAxis>>1))-(ptWidget->pItemList[i].use_as__ldBaseItem_t.itemRegion.tSize.iHeight>>1);
 #if USE_RADIA_MENU_SCALE == 1
         //计算缩放比例
-        ptWidget->pItemList[i].scalePercent=(ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion.tLocation.iY)*50/ptWidget->yAxis+50;
+        ptWidget->pItemList[i].scalePercent=(ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion.tLocation.iY)*50/ptWidget->yAxis+50;
 #endif
     }
 
@@ -399,16 +405,16 @@ void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_
                 {
                     do {
                         arm_2d_tile_t tChildTile;
-                        arm_2d_tile_generate_child(&tTarget, &ptWidget->pItemList[ptWidget->pShowList[i]].itemRegion, &tChildTile, false);
+                        arm_2d_tile_generate_child(&tTarget, &ptWidget->pItemList[ptWidget->pShowList[i]].use_as__ldBaseItem_t.itemRegion, &tChildTile, false);
 
 #if USE_RADIA_MENU_SCALE == 1
                         if(ptWidget->pItemList[i].scalePercent>=100)
                         {
-                            ldBaseImage(&tempTile,(arm_2d_tile_t*)&tempRes,ptWidget->pItemList[ptWidget->pShowList[i]].isWithMask,255);
+                            ldBaseImage(&tChildTile,NULL,ptWidget->pItemList[ptWidget->pShowList[i]].ptImgTile,ptWidget->pItemList[ptWidget->pShowList[i]].ptMaskTile,0,ptWidget->use_as__ldBase_t.opacity);
                         }
                         else
                         {
-                            ldBaseImageScale(&tempTile,(arm_2d_tile_t*)&tempRes,ptWidget->pItemList[ptWidget->pShowList[i]].isWithMask,ptWidget->pItemList[i].scalePercent/100.0,&ptWidget->pItemList[i].op,bIsNewFrame);
+                            ldBaseImageScale(&tChildTile,NULL,ptWidget->pItemList[ptWidget->pShowList[i]].ptImgTile,ptWidget->pItemList[ptWidget->pShowList[i]].ptMaskTile,ptWidget->pItemList[i].scalePercent/100.0,&ptWidget->pItemList[i].op,bIsNewFrame);
                         }
 #else
                         ldBaseImage(&tChildTile,NULL,ptWidget->pItemList[ptWidget->pShowList[i]].ptImgTile,ptWidget->pItemList[ptWidget->pShowList[i]].ptMaskTile,0,ptWidget->use_as__ldBase_t.opacity);
@@ -437,7 +443,7 @@ void ldRadialMenuAddItem(ldRadialMenu_t *ptWidget, arm_2d_tile_t *ptImgTile, arm
     {
         ptWidget->pItemList[ptWidget->itemCount].ptImgTile=ptImgTile;
         ptWidget->pItemList[ptWidget->itemCount].ptMaskTile=ptMaskTile;
-        ptWidget->pItemList[ptWidget->itemCount].itemRegion=ptImgTile->tRegion;
+        ptWidget->pItemList[ptWidget->itemCount].use_as__ldBaseItem_t.itemRegion=ptImgTile->tRegion;
 
         ptWidget->itemCount++;
 
@@ -472,7 +478,7 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *ptWidget,uint8_t num)
     ptWidget->targetItem=num;
 
     ldRadialMenuItem_t* targetItem=&ptWidget->pItemList[ptWidget->targetItem];
-    if((targetItem->itemRegion.tLocation.iX+(targetItem->itemRegion.tSize.iWidth>>1))<(ptRegion->tSize.iWidth>>1))// left
+    if((targetItem->use_as__ldBaseItem_t.itemRegion.tLocation.iX+(targetItem->use_as__ldBaseItem_t.itemRegion.tSize.iWidth>>1))<(ptRegion->tSize.iWidth>>1))// left
     {
         if(ptWidget->targetItem<ptWidget->selectItem)
         {

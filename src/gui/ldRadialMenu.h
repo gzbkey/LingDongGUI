@@ -50,11 +50,12 @@ typedef struct ldRadialMenu_t ldRadialMenu_t;
 #define USE_RADIA_MENU_SCALE     1
 #endif
 
+
+
 typedef struct {
+    implement(ldBaseItem_t);
     arm_2d_tile_t *ptImgTile;
     arm_2d_tile_t *ptMaskTile;
-    arm_2d_region_t itemRegion;
-    arm_2d_region_t tTempItemRegion;
     uint8_t count;
 #if USE_RADIA_MENU_SCALE == 1
     uint8_t scalePercent;
