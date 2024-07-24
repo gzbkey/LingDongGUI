@@ -490,3 +490,15 @@ arm_2d_location_t ldBaseGetRelativeLocation(ldBase_t *ptWidget,arm_2d_location_t
     return tLocation;
 }
 
+arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation)
+{
+    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
+
+    while(ptNode!=NULL)
+    {
+        tLocation.iX+=((ldBase_t*)ptNode)->use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+        tLocation.iY+=((ldBase_t*)ptNode)->use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+        ptNode=ptNode->ptParent;
+    }
+    return tLocation;
+}

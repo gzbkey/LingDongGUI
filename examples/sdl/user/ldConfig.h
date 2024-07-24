@@ -59,7 +59,7 @@ extern "C" {
 
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      (1)
+#define USE_RADIA_MENU_SCALE                      (0)
 
 // <q>scene switcing support
 // <i> 1:More effects 0：Less ram
@@ -90,7 +90,7 @@ extern "C" {
 #endif
 
 #define LD_DEBUG                                  (0)
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (1)
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
 
 // <o> choose demo to test

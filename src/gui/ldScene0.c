@@ -156,7 +156,8 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
     ld_scene_t *ptThis = (ld_scene_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
     static ldBase_t* ptCurrentWidget = NULL;
-    static uint8_t itemCount = 0;
+    static uint8_t itemCount=0;
+    static arm_2d_location_t widgetLoca={0};
 
     ARM_2D_UNUSED(tScreenSize);
 
@@ -165,8 +166,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
         ldGuiDraw(pTarget,ptTile,bIsNewFrame);
 
-        if(ptCurrentWidget==NULL)
-        {
             switch (arm_2d_dynamic_dirty_region_wait_next(
                         &ptThis->tDirtyRegionItem))
             {
@@ -176,62 +175,90 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
             //        }
             case SCENE_DR_UPDATE:
             {
-                do {
-                    if (arm_2d_helper_control_enum_get_next_node(&ptThis->tEnum))
-                    {
-                        if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate)
+                if(ptCurrentWidget==NULL)
+                {
+                    do {
+                        if (arm_2d_helper_control_enum_get_next_node(&ptThis->tEnum))
                         {
-                            if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionAutoReset)
+                            if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate)
                             {
-                                ((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate = false;
-                            }
+                                if(((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionAutoReset)
+                                {
+                                    ((ldBase_t *)ptThis->tEnum.ptCurrent)->isDirtyRegionUpdate = false;
+                                }
 
-                            arm_2d_region_t tRegion;
-                            ldBase_t *ptWidget=(ldBase_t *)ptThis->tEnum.ptCurrent;
+                                arm_2d_region_t tRegion;
+                                ldBase_t *ptWidget=(ldBase_t *)ptThis->tEnum.ptCurrent;
 #if 0
-                            if((ptWidget->tTempRegion.tLocation.iX==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX)&&
-                                    (ptWidget->tTempRegion.tLocation.iY==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY)&&
-                                    (ptWidget->tTempRegion.tSize.iWidth==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)&&
-                                    (ptWidget->tTempRegion.tSize.iHeight==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight))
+                                if((ptWidget->tTempRegion.tLocation.iX==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX)&&
+                                        (ptWidget->tTempRegion.tLocation.iY==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY)&&
+                                        (ptWidget->tTempRegion.tSize.iWidth==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)&&
+                                        (ptWidget->tTempRegion.tSize.iHeight==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight))
 #else
-                            if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
+                                if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
 #endif
-                            {
-                                //region no change
-                                tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                {
+                                    //region no change
+                                    tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                }
+                                else
+                                {
+                                    if(ptWidget->itemCount)// widget has item
+                                    {
+                                        ptCurrentWidget=ptWidget;
+                                        itemCount=0;
+                                        widgetLoca.iX=0;
+                                        widgetLoca.iY=0;
+                                        widgetLoca= ldBaseGetAbsoluteLocation(ptWidget,widgetLoca);
+                                        break;
+                                    }
+                                    else// widget update region
+                                    {
+                                        tRegion=ptWidget->tTempRegion;
+                                        ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                    }
+                                }
+
+                                arm_2d_dynamic_dirty_region_update(
+                                            &ptThis->tDirtyRegionItem,
+                                            (arm_2d_tile_t*)ptTile,
+                                            &tRegion,
+                                            SCENE_DR_UPDATE);
                             }
                             else
                             {
-                                if(ptWidget->hsaItem)// widget has item
-                                {
-
-                                }
-                                else// widget update region
-                                {
-                                    tRegion=ptWidget->tTempRegion;
-                                    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
-                                }
+                                continue;
                             }
-
-                            arm_2d_dynamic_dirty_region_update(
-                                        &ptThis->tDirtyRegionItem,
-                                        (arm_2d_tile_t*)ptTile,
-                                        &tRegion,
-                                        SCENE_DR_UPDATE);
                         }
                         else
                         {
-                            continue;
+                            arm_2d_dynamic_dirty_region_change_user_region_index_only(
+                                        &ptThis->tDirtyRegionItem,
+                                        SCENE_DR_DONE);
                         }
+                        break;
+                    } while (true);
+                }
+                else
+                {
+                    if(itemCount<ptCurrentWidget->itemCount)
+                    {
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
+
+                        arm_2d_dynamic_dirty_region_update(
+                                    &ptThis->tDirtyRegionItem,
+                                    (arm_2d_tile_t*)ptTile,
+                                    &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
+                                    SCENE_DR_UPDATE);
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
+                        itemCount++;
                     }
                     else
                     {
-                        arm_2d_dynamic_dirty_region_change_user_region_index_only(
-                                    &ptThis->tDirtyRegionItem,
-                                    SCENE_DR_DONE);
+                        ptCurrentWidget=NULL;
                     }
-                    break;
-                } while (true);
+                }
                 break;
             }
             case SCENE_DR_DONE:
@@ -239,11 +266,8 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
             default:
                 break;
             }
-        }
-        else
-        {
 
-        }
+
     /*-----------------------draw the foreground end  -----------------------*/
     }
     ARM_2D_OP_WAIT_ASYNC();

@@ -122,6 +122,11 @@ struct ld_scene_t {
     xQueue_t *ptMsgQueue;
 };
 
+typedef struct {
+    arm_2d_region_t itemRegion;
+    arm_2d_region_t tTempItemRegion;
+}ldBaseItemRegion_t;
+
 typedef struct  {
     implement(arm_2d_control_node_t);
 //    ARM_PRIVATE(
@@ -129,19 +134,15 @@ typedef struct  {
 //)
     const ldBaseWidgetFunc_t *ptGuiFunc;
     ldAssn_t *ptAssn;
+    ldBaseItemRegion_t *ptItemRegionList;
     ldWidgetType_t widgetType;
     uint16_t nameId;
     uint8_t opacity;
+    uint8_t itemCount;
     bool isDirtyRegionUpdate:1;
     bool isDirtyRegionAutoReset:1;
     bool isHidden:1;
-    bool hsaItem:1;
 }ldBase_t;
-
-typedef struct {
-    arm_2d_region_t itemRegion;
-    arm_2d_region_t tTempItemRegion;
-}ldBaseItem_t;
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
@@ -161,6 +162,7 @@ void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
 arm_2d_location_t ldBaseGetRelativeLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
+arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
 
 #ifdef __cplusplus
 }

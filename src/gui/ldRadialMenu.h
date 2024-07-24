@@ -47,21 +47,20 @@ extern "C"
 typedef struct ldRadialMenu_t ldRadialMenu_t;
 
 #ifndef USE_RADIA_MENU_SCALE
-#define USE_RADIA_MENU_SCALE     1
+#define USE_RADIA_MENU_SCALE            1
 #endif
 
 
 
 typedef struct {
-    implement(ldBaseItem_t);
     arm_2d_tile_t *ptImgTile;
     arm_2d_tile_t *ptMaskTile;
-    uint8_t count;
+    uint16_t angle;
+//    uint8_t count;
 #if USE_RADIA_MENU_SCALE == 1
     uint8_t scalePercent;
-#endif
-    uint16_t angle;
     arm_2d_op_trans_msk_opa_t op;
+#endif
 }ldRadialMenuItem_t;
 
 struct ldRadialMenu_t
@@ -71,8 +70,8 @@ struct ldRadialMenu_t
             ld_scene_t *ptScene;
     )
 
-    ldRadialMenuItem_t *pItemList;
-    uint8_t itemCount;
+    ldRadialMenuItem_t *ptItemInfoList;
+//    uint8_t itemCount;
     uint8_t itemMax;
     uint16_t xAxis;
     uint16_t yAxis;
@@ -84,7 +83,6 @@ struct ldRadialMenu_t
     uint32_t timer;
     uint8_t *pShowList;
     bool isMove:1;
-    bool isWaitInit:1;
 };
 
 ldRadialMenu_t* ldRadialMenu_init(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax);
