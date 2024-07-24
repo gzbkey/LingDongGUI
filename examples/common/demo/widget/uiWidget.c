@@ -100,6 +100,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldRadialMenuInit(12,0,500,200,150,100,100,80,5);
     ldRadialMenuAddItem(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask);
     ldRadialMenuAddItem(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask);
+    ldRadialMenuAddItem(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask);
+    ldRadialMenuAddItem(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask);
 
     uiWidgetLogicInit(ptScene);
 }

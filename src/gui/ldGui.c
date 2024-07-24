@@ -110,10 +110,10 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
         {
             //cal speed
             deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
-            prevLocation.iX=(prevLocation.iX-pressLocation.iX);
-            prevLocation.iY=(prevLocation.iY-pressLocation.iY);
-            prevLocation.iX=(pressLocation.iX*100)/deltaMoveTime;
-            prevLocation.iY=(pressLocation.iY*100)/deltaMoveTime;
+            pressLocation.iX=(prevLocation.iX-pressLocation.iX);
+            pressLocation.iY=(prevLocation.iY-pressLocation.iY);
+            pressLocation.iX=(pressLocation.iX*100)/deltaMoveTime;
+            pressLocation.iY=(pressLocation.iY*100)/deltaMoveTime;
 
             // x speed,y speed,x,y
             u64Temp=pressLocation.iX;

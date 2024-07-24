@@ -135,7 +135,13 @@ typedef struct  {
     bool isDirtyRegionUpdate:1;
     bool isDirtyRegionAutoReset:1;
     bool isHidden:1;
+    bool hsaItem:1;
 }ldBase_t;
+
+typedef struct {
+    arm_2d_region_t itemRegion;
+    arm_2d_region_t tTempItemRegion;
+}ldBaseItem_t;
 
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 

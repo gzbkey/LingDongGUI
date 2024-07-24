@@ -93,6 +93,8 @@ void ldRadialMenu_on_frame_start( ldRadialMenu_t *ptWidget);
 void ldRadialMenu_show(ld_scene_t *pScene, ldRadialMenu_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldRadialMenuAddItem(ldRadialMenu_t *ptWidget,arm_2d_tile_t *ptImgTile,arm_2d_tile_t *ptMaskTile);
+void ldRadialMenuSelectItem(ldRadialMenu_t *ptWidget,uint8_t num);
+void ldRadialMenuOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset);
 
 #define ldRadialMenuInit(nameId,parentNameId,x,y,width,height,xAxis,yAxis,itemMax) \
         ldRadialMenu_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,xAxis,yAxis,itemMax)
