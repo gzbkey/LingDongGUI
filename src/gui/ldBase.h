@@ -63,6 +63,8 @@ widgetTypeKeyboard,
 #define SIGNAL_HOLD_DOWN                BTN_HOLD_DOWN       // value = x offset(2Byte) + y offset(2Byte) + x (2Byte) + y (2Byte)
 #define SIGNAL_RELEASE                  BTN_RELEASE         // value = x speed(2Byte) + y speed(2Byte) + x (2Byte) + y (2Byte)
 
+#define SIGNAL_CLICKED_ITEM         12                  // value = item num
+#define SIGNAL_EDITING_FINISHED     13
 
 #define GET_SIGNAL_OFFSET_X(dat)        ((dat>>48)&0xFFFF)
 #define GET_SIGNAL_OFFSET_Y(dat)        ((dat>>32)&0xFFFF)

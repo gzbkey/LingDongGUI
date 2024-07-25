@@ -105,6 +105,15 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     obj=ldDateTimeInit(13,0,600,100,200,50,FONT_ARIAL_12);
 
+    const uint8_t *iconName[5]={"11","22","33","44","55"};
+
+    obj=ldIconSliderInit(14,0,500,350,150,65,48,2,5,1,1,FONT_ARIAL_12);
+    ldIconSliderAddIcon(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask,iconName[0]);
+    ldIconSliderAddIcon(obj,IMAGE_BOOK_PNG,IMAGE_BOOK_PNG_Mask,iconName[1]);
+    ldIconSliderAddIcon(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask,iconName[2]);
+    ldIconSliderAddIcon(obj,IMAGE_CHART_PNG,IMAGE_CHART_PNG_Mask,iconName[3]);
+    ldIconSliderAddIcon(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask,iconName[4]);
+
     uiWidgetLogicInit(ptScene);
 }
 

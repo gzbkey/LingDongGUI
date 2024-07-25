@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldIconSlider.h"
 #include "ldDateTime.h"
 #include "ldRadialMenu.h"
 #include "ldSlider.h"
