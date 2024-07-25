@@ -335,7 +335,10 @@ void ldTextSetText(ldText_t* ptWidget,uint8_t *pStr)
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ldFree(ptWidget->pStr);
     ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
-    strcpy((char*)ptWidget->pStr,(char*)pStr);
+    if(ptWidget->pStr!=NULL)
+    {
+        strcpy((char*)ptWidget->pStr,(char*)pStr);
+    }
 
     ptWidget->strHeight=arm_lcd_text_get_box(pStr,ptWidget->ptFont).iHeight;
 }

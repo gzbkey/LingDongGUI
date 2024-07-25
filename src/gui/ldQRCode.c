@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-#define __LD_LABEL_IMPLEMENT__
+#define __LD_QR_CODE_IMPLEMENT__
+
 #include "./arm_extra_controls.h"
 #include "./__common.h"
 #include "arm_2d.h"
@@ -24,7 +25,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "ldLabel.h"
+#include "ldQRCode.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -43,30 +44,30 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-const ldBaseWidgetFunc_t ldLabelFunc = {
-    .depose = (ldDeposeFunc_t)ldLabel_depose,
-    .load = (ldLoadFunc_t)ldLabel_on_load,
-    .frameStart = (ldFrameStartFunc_t)ldLabel_on_frame_start,
-    .show = (ldShowFunc_t)ldLabel_show,
+const ldBaseWidgetFunc_t ldQRCodeFunc = {
+    .depose = (ldDeposeFunc_t)ldQRCode_depose,
+    .load = (ldLoadFunc_t)ldQRCode_on_load,
+    .frameStart = (ldFrameStartFunc_t)ldQRCode_on_frame_start,
+    .show = (ldShowFunc_t)ldQRCode_show,
 };
 
-ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId,uint16_t parentNameId,int16_t x,int16_t y,int16_t width,int16_t height,arm_2d_font_t *ptFont)
+ldQRCode_t* ldQRCode_init(ld_scene_t *ptScene, ldQRCode_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* pStr, ldColor qrColor, ldColor bgColor, uint8_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
+    uint8_t *ptText = NULL;
 
     if (NULL == ptWidget)
     {
-        ptWidget = ldCalloc(1, sizeof(ldLabel_t));
-        if (NULL == ptWidget)
+        ptWidget = ldCalloc(1, sizeof(ldQRCode_t));
+        ptText = ldCalloc(1,strlen((char*)pStr)+1);
+        if ((NULL == ptWidget) || (NULL == ptText))
         {
-            LOG_ERROR("[init failed][label] id:%d", nameId);
+            ldFree(ptWidget);
+            ldFree(ptText);
+            LOG_ERROR("[init failed][QRCode] id:%d", nameId);
             return NULL;
         }
-    }
-    else
-    {
-        memset(ptWidget, 0, sizeof(ldLabel_t));
     }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
@@ -78,54 +79,58 @@ ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
     ptWidget->use_as__ldBase_t.nameId = nameId;
-    ptWidget->use_as__ldBase_t.widgetType = widgetTypeLabel;
-    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldLabelFunc;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeQRCode;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldQRCodeFunc;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
 
-    ptWidget->tAlign = ARM_2D_ALIGN_CENTRE;
-    ptWidget->bgColor=GLCD_COLOR_WHITE;
-    ptWidget->textColor = GLCD_COLOR_BLACK;
-    ptWidget->ptFont = ptFont;
+    strcpy((char*)ptText,(char*)pStr);
+    ptWidget->pStr=ptText;
+    ptWidget->qrEcc=qrEcc;
+    qrMaxVersion=(qrMaxVersion==0)?1:qrMaxVersion;
+    ptWidget->qrMaxVersion=qrMaxVersion;
+    ptWidget->qrZoom=qrZoom;
+    ptWidget->qrColor=qrColor;
+    ptWidget->bgColor=bgColor;
 
-    LOG_INFO("[init][label] id:%d", nameId);
+    LOG_INFO("[init][QRCode] id:%d", nameId);
     return ptWidget;
 }
 
-void ldLabel_depose( ldLabel_t *ptWidget)
+void ldQRCode_depose( ldQRCode_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
     }
-    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeLabel)
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeQRCode)
     {
         return;
     }
 
-    LOG_INFO("[depose][label] id:%d", ptWidget->use_as__ldBase_t.nameId);
+    LOG_INFO("[depose][QRCode] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
-    ldFree(ptWidget->pStr);
+
     ldFree(ptWidget);
 }
 
-void ldLabel_on_load( ldLabel_t *ptWidget)
+void ldQRCode_on_load( ldQRCode_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-void ldLabel_on_frame_start( ldLabel_t *ptWidget)
+void ldQRCode_on_frame_start( ldQRCode_t *ptWidget)
 {
     assert(NULL != ptWidget);
     
 }
 
-void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+void ldQRCode_show(ld_scene_t *ptScene, ldQRCode_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -147,49 +152,63 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
                 break;
             }
 
-            if(!ptWidget->isTransparent)
-            {
-                if (ptWidget->ptImgTile==NULL)//color
-                {
-                    ldBaseColor(&tTarget,NULL,ptWidget->bgColor,ptWidget->use_as__ldBase_t.opacity);
-                }
-                else
-                {
-                    ldBaseImage(&tTarget,NULL,ptWidget->ptImgTile,NULL,0,ptWidget->use_as__ldBase_t.opacity);
-                }
-                arm_2d_op_wait_async(NULL);
-            }
+            uint8_t *qr0;
+            uint8_t *tempBuffer;
+            uint32_t qrSize;
+            bool ret;
+            ldColor tempColor;
 
-            if(ptWidget->pStr!=NULL)
+            qr0=ldCalloc(1,qrcodegen_BUFFER_LEN_FOR_VERSION(ptWidget->qrMaxVersion));
+            tempBuffer=ldCalloc(1,qrcodegen_BUFFER_LEN_FOR_VERSION(ptWidget->qrMaxVersion));
+
+            if((qr0!=NULL)&&(tempBuffer!=NULL))
             {
-                ldBaseLabel(&tTarget,
-                            &tTarget_canvas,
-                            ptWidget->pStr,
-                            ptWidget->ptFont,
-                            ptWidget->tAlign,
-                            ptWidget->textColor,
-                            ptWidget->use_as__ldBase_t.opacity);
-                arm_2d_op_wait_async(NULL);
+                ret = qrcodegen_encodeText((const char*)ptWidget->pStr,tempBuffer, qr0, (enum qrcodegen_Ecc)ptWidget->qrEcc,ptWidget->qrMaxVersion, ptWidget->qrMaxVersion,qrcodegen_Mask_AUTO,true);
+
+                if (ret)
+                {
+                    qrSize = qrcodegen_getSize(qr0);
+
+                    for (uint32_t y = 0; y < qrSize; y++)
+                    {
+                        for (uint32_t x = 0; x < qrSize; x++)
+                        {
+                            if(qrcodegen_getModule(qr0, x, y))
+                            {
+                                tempColor=ptWidget->qrColor;
+                            }
+                            else
+                            {
+                                tempColor=ptWidget->bgColor;
+                            }
+                            arm_2d_region_t tBoxRegion = {
+                                .tLocation = {
+                                    .iX = x*ptWidget->qrZoom,
+                                    .iY = y*ptWidget->qrZoom,
+                                },
+                                .tSize = {
+                                    .iWidth=ptWidget->qrZoom,
+                                    .iHeight=ptWidget->qrZoom,
+                                }
+                            };
+                            arm_2d_tile_t tChildTile;
+                            arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+                            ldBaseColor(&tChildTile,NULL,tempColor,ptWidget->use_as__ldBase_t.opacity);
+                        }
+                    }
+                }
             }
+            ldFree(qr0);
+            ldFree(tempBuffer);
         }
     }
-
     arm_2d_op_wait_async(NULL);
 }
 
-void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent)
+void ldQRCodeSetText(ldQRCode_t *ptWidget, uint8_t *pStr)
 {
-    if(ptWidget==NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->isTransparent=isTransparent;
-}
-
-void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr)
-{
-    if(ptWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
@@ -200,49 +219,6 @@ void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr)
     {
         strcpy((char*)ptWidget->pStr,(char*)pStr);
     }
-}
-
-void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor textColor)
-{
-    if(ptWidget==NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->textColor=textColor;
-}
-
-void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign)
-{
-    if(ptWidget==NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->tAlign=tAlign;
-}
-
-void ldLabelSetBgImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile)
-{
-    if(ptWidget==NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->ptImgTile=ptImgTile;
-    ptWidget->isTransparent=false;
-}
-
-void ldLabelSetBgColor(ldLabel_t *ptWidget, ldColor bgColor)
-{
-    if(ptWidget==NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->bgColor=bgColor;
-    ptWidget->isTransparent=false;
-    ptWidget->ptImgTile=NULL;
 }
 
 #if defined(__clang__)

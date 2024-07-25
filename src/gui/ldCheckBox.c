@@ -451,7 +451,10 @@ void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pSt
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ldFree(ptWidget->pStr);
     ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
-    strcpy((char*)ptWidget->pStr,(char*)pStr);
+    if(ptWidget->pStr!=NULL)
+    {
+        strcpy((char*)ptWidget->pStr,(char*)pStr);
+    }
     ptWidget->ptFont=ptFont;
 }
 

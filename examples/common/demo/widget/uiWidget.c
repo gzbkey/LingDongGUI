@@ -114,6 +114,10 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldIconSliderAddIcon(obj,IMAGE_CHART_PNG,IMAGE_CHART_PNG_Mask,iconName[3]);
     ldIconSliderAddIcon(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask,iconName[4]);
 
+    obj=ldQRCodeInit(15,0,600,10,200,200,"ldgui",GLCD_COLOR_BLUE,GLCD_COLOR_WHITE,QR_ECC_7,2,5);
+    ldQRCodeSetOpacity(obj,100);
+
+
     uiWidgetLogicInit(ptScene);
 }
 

@@ -66,7 +66,7 @@ widget demo sdl
 | ✅ | date time | 日期和时间 |
 | ✅ | icon slider | 滑动图标 |
 | 🔲 | gauge | 仪表盘 |
-| 🔲 | qr code | 二维码 |
+| ✅ | qr code | 二维码 |
 | 🔲 | table | 表格 |
 | 🔲 | keyboard | 键盘 |
 | 🔲 | line edit | 编辑框 |
