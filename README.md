@@ -62,7 +62,7 @@ widget demo sdl
 | ✅ | radia menu | 旋转菜单 |
 | ✅ | label | 简单文本显示 |
 | ✅ | slider | 滑动条 |
-| 🔲 | scroll selecter | 滚动选择器 |
+| ✅ | scroll selecter | 滚动选择器 |
 | ✅ | date time | 日期和时间 |
 | ✅ | icon slider | 滑动图标 |
 | 🔲 | gauge | 仪表盘 |

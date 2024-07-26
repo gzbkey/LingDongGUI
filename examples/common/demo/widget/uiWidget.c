@@ -38,6 +38,9 @@ static bool slotTest2(ld_scene_t *ptScene,ldMsg_t msg)
 
    return false;
 }
+const uint8_t *pStrGroup[]={"1","10","123","99","7"};
+
+const uint8_t *iconName[5]={"11","22","33","44","55"};
 
 void uiWidgetInit(ld_scene_t* ptScene)
 {
@@ -105,7 +108,6 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     obj=ldDateTimeInit(13,0,600,100,200,50,FONT_ARIAL_12);
 
-    const uint8_t *iconName[5]={"11","22","33","44","55"};
 
     obj=ldIconSliderInit(14,0,500,350,150,65,48,2,5,1,1,FONT_ARIAL_12);
     ldIconSliderAddIcon(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask,iconName[0]);
@@ -117,6 +119,10 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldQRCodeInit(15,0,600,10,200,200,"ldgui",GLCD_COLOR_BLUE,GLCD_COLOR_WHITE,QR_ECC_7,2,5);
     ldQRCodeSetOpacity(obj,100);
 
+
+    obj=ldScrollSelecterInit(16,0,700,200,30,50,FONT_ARIAL_12);
+    ldScrollSelecterSetItems(obj,pStrGroup,5);
+    ldScrollSelecterSetBgColor(obj,GLCD_COLOR_WHITE);
 
     uiWidgetLogicInit(ptScene);
 }

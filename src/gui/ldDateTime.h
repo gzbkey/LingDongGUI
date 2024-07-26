@@ -66,7 +66,6 @@ ARM_PRIVATE(
     ldColor bgColor;
     ldColor textColor;
     arm_2d_font_t *ptFont;
-    uint8_t opacity;
     bool isTransparent:1;
 };
 

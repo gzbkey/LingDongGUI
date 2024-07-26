@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldScrollSelecter.h"
 #include "ldQrCode.h"
 #include "ldIconSlider.h"
 #include "ldDateTime.h"
