@@ -124,12 +124,29 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldScrollSelecterSetItems(obj,pStrGroup,5);
     ldScrollSelecterSetBgColor(obj,GLCD_COLOR_WHITE);
 
+    obj=ldGaugeInit(17,0,700,300,120,98,IMAGE_GAUGE_PNG,IMAGE_GAUGE_PNG_Mask,0,10);
+    ldGaugeSetPointerImage(obj,NULL,IMAGE_GAUGEPOINTER_PNG_Mask,5,45);
+    ldGaugeSetPointerColor(obj,GLCD_COLOR_BLUE);
+    ldGaugeSetAngle(obj,120);
+
     uiWidgetLogicInit(ptScene);
 }
 
 void uiWidgetLoop(ld_scene_t* ptScene)
 {
+    static int64_t timer=0;
+    static float angle=120;
 
+    ldGauge_t *ptGauge=ldBaseGetWidgetById(17);
+    if(ldTimeOut(100,&timer,true))
+    {
+        ldGaugeSetAngle(ptGauge,angle);
+        angle+=1;
+        if(angle>=360)
+        {
+            angle=0;
+        }
+    }
 
 
 

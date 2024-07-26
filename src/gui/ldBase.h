@@ -166,6 +166,8 @@ void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
 arm_2d_location_t ldBaseGetRelativeLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
 arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
 
+#define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
+
 #ifdef __cplusplus
 }
 #endif
