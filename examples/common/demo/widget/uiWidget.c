@@ -42,6 +42,7 @@ const uint8_t *pStrGroup[]={"1","10","123","99","7"};
 
 const uint8_t *iconName[5]={"11","22","33","44","55"};
 
+const uint8_t *pComboBoxStrGroup[3]={"11","22","00"};
 void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
@@ -128,6 +129,10 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldGaugeSetPointerImage(obj,NULL,IMAGE_GAUGEPOINTER_PNG_Mask,5,45);
     ldGaugeSetPointerColor(obj,GLCD_COLOR_BLUE);
     ldGaugeSetAngle(obj,120);
+
+    obj=ldComboBoxInit(18,0,700,420,100,30,FONT_ARIAL_12);
+
+    ldComboBoxSetItems(obj,pComboBoxStrGroup,3);
 
     uiWidgetLogicInit(ptScene);
 }

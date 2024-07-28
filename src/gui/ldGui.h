@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldComboBox.h"
 #include "ldGauge.h"
 #include "ldScrollSelecter.h"
 #include "ldQrCode.h"
