@@ -117,7 +117,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldIconSliderAddIcon(obj,IMAGE_CHART_PNG,IMAGE_CHART_PNG_Mask,iconName[3]);
     ldIconSliderAddIcon(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask,iconName[4]);
 
-    obj=ldQRCodeInit(15,0,600,10,200,200,"ldgui",GLCD_COLOR_BLUE,GLCD_COLOR_WHITE,QR_ECC_7,2,5);
+    obj=ldQRCodeInit(15,0,500,10,200,200,"ldgui",GLCD_COLOR_BLUE,GLCD_COLOR_WHITE,QR_ECC_7,2,5);
     ldQRCodeSetOpacity(obj,100);
 
 
@@ -133,6 +133,21 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldComboBoxInit(18,0,700,420,100,30,FONT_ARIAL_12);
 
     ldComboBoxSetItems(obj,pComboBoxStrGroup,3);
+
+    obj=ldGraphInit(19,0,830,10,100,100,2);
+    ldGraphSetAxis(obj,80,80,5);
+    ldGraphSetGridOffset(obj,4);
+    ldGraphAddSeries(obj,GLCD_COLOR_NIXIE_TUBE,2,16);
+    srand(10);
+    for (int i = 0; i < 16; i++)
+    {
+        ldGraphSetValue(obj,0,i,rand() % 81);
+    }
+    ldGraphAddSeries(obj,GLCD_COLOR_LIGHT_GREY,2,16);
+    for (int i = 0; i < 16; i++)
+    {
+        ldGraphSetValue(obj,1,i,rand() % 81);
+    }
 
     uiWidgetLogicInit(ptScene);
 }

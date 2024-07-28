@@ -150,7 +150,6 @@ static bool slotIconSliderScroll(ld_scene_t *ptScene,ldMsg_t msg)
         ptWidget->isAutoMove=false;
         ptWidget->isHoldMove=false;
         _scrollOffset=ptWidget->scrollOffset;
-        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -275,6 +274,7 @@ static bool slotIconSliderScroll(ld_scene_t *ptScene,ldMsg_t msg)
     default:
         break;
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     return false;
 }
 
@@ -488,6 +488,7 @@ void ldIconSlider_show(ld_scene_t *ptScene, ldIconSlider_t *ptWidget, const arm_
                     ptWidget->scrollOffset=targetOffset;
                 }
             }
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
     }
 

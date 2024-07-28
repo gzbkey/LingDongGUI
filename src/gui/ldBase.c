@@ -502,3 +502,156 @@ arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t
     }
     return tLocation;
 }
+
+
+void ldBaseDrawCircle(arm_2d_tile_t *pTile, int centerX, int centerY, int radius, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
+{
+    int x, y;
+    int opacity;
+
+    if(radius==0)
+    {
+        opacityMin=opacityMax;
+    }
+
+    for (y = centerY - radius; y <= centerY + radius; y++)
+    {
+        for (x = centerX - radius; x <= centerX + radius; x++)
+        {
+            int distance = (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+            int sqrRadius = radius * radius;
+
+            if (distance <= sqrRadius) {
+                if (distance == sqrRadius) {
+                    opacity = opacityMin;
+                } else {
+                    double ratio = (double)distance / sqrRadius;
+                    opacity = (int)(opacityMax - (opacityMax - opacityMin) * ratio);
+                }
+
+                arm_2d_location_t point={
+                    .iX=x,
+                    .iY=y,
+                };
+                arm_2d_draw_point(pTile,point, color,opacity);
+            }
+        }
+    }
+}
+
+#define ipart_(X) ((int)(X))
+#define round_(X) ((int)(((float)(X))+0.5f))
+#define fpart_(X) (((float)(X))-(float)ipart_(X))
+#define rfpart_(X) (1.0-fpart_(X))
+#define swap_(a,b)    (a=(a)+(b),b=(a)-(b),a=(a)-(b))
+
+static void _setPixelAlpha(arm_2d_tile_t *pTile,int x, int y, float brightness, ldColor color)
+{
+    arm_2d_location_t point={
+        .iX=x,
+        .iY=y,
+    };
+    arm_2d_draw_point(pTile,point, color,brightness*255);
+}
+
+/**
+ * @brief   吴小林抗锯齿直线算法
+ *
+ * @param   pTile           目标控件指针
+ * @param   x0              直线起始坐标x
+ * @param   y0              直线起始坐标y
+ * @param   x1              直线结束坐标x
+ * @param   y1              直线结束坐标y
+ * @param   color           直线颜色
+ */
+void ldBaseDrawLine0(arm_2d_tile_t *pTile,int16_t x0 , int16_t y0 , int16_t x1 , int16_t y1,ldColor color)
+{
+    int steep = abs(y1 - y0) > abs(x1 - x0) ;
+
+    // swap the co-ordinates if slope > 1 or we
+    // draw backwards
+    if (steep)
+    {
+        swap_(x0, y0);
+        swap_(x1, y1);
+    }
+    if (x0 > x1)
+    {
+        swap_(x0, x1);
+        swap_(y0, y1);
+    }
+
+    //compute the slope
+    float dx = x1-x0;
+    float dy = y1-y0;
+    float gradient = dy/dx;
+    if (dx == 0.0)
+        gradient = 1;
+
+    int xpxl1 = x0;
+    int xpxl2 = x1;
+    float intersectY = y0;
+    int  x;
+
+    if (steep)
+    {
+        for (x = xpxl1; x <= xpxl2; x++)
+        {
+            _setPixelAlpha(pTile,ipart_(intersectY), x, rfpart_(intersectY),color);
+            _setPixelAlpha(pTile,ipart_(intersectY) + 1, x,fpart_(intersectY),color);
+            intersectY += gradient;
+        }
+    }
+    else
+    {
+        for (x = xpxl1; x <= xpxl2; x++)
+        {
+            _setPixelAlpha(pTile,x, ipart_(intersectY),rfpart_(intersectY),color);
+            _setPixelAlpha(pTile,x, ipart_(intersectY)+1,fpart_(intersectY),color);
+            intersectY += gradient;
+        }
+    }
+}
+
+void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
+{
+    if(lineSize<=1)
+    {
+        ldBaseDrawLine0(pTile,x0,y0,x1,y1,color);
+    }
+    else
+    {
+        uint16_t t;
+        int32_t xerr=0,yerr=0,delta_x,delta_y,distance;
+        int32_t incx,incy,xPos,yPos;
+
+        delta_x=x1-x0; //计算坐标增量
+        delta_y=y1-y0;
+        xPos=x0;
+        yPos=y0;
+        if(delta_x>0)incx=1; //设置单步方向
+        else if(delta_x==0)incx=0;//垂直线
+        else {incx=-1;delta_x=-delta_x;}
+        if(delta_y>0)incy=1;
+        else if(delta_y==0)incy=0;//水平线
+        else{incy=-1;delta_y=-delta_y;}
+        if( delta_x>delta_y)distance=delta_x; //选取基本增量坐标轴
+        else distance=delta_y;
+        for(t=0;t<=distance+1;t++ )//画线输出
+        {
+            ldBaseDrawCircle(pTile,xPos,yPos,lineSize/2,color,opacityMax,opacityMin);
+            xerr+=delta_x ;
+            yerr+=delta_y ;
+            if(xerr>distance)
+            {
+                xerr-=distance;
+                xPos+=incx;
+            }
+            if(yerr>distance)
+            {
+                yerr-=distance;
+                yPos+=incy;
+            }
+        }
+    }
+}
