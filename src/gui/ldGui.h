@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldTable.h"
 #include "ldGraph.h"
 #include "ldComboBox.h"
 #include "ldGauge.h"
@@ -44,6 +45,11 @@ extern "C" {
 #include "ldButton.h"
 #include "ldWindow.h"
 #include "ldImage.h"
+
+extern uint8_t cursorBlinkCount;
+extern bool cursorBlinkFlag;
+
+#define CURSOR_BLINK_TIMEOUT        50 // 500/SYS_TICK_CYCLE_MS
 
 void ldGuiLoad(ld_scene_t *ptScene);
 void ldGuiFrameStart(ld_scene_t *ptScene);

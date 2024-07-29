@@ -91,7 +91,6 @@ void ldButtonSetSelect(ldButton_t* ptWidget,bool isSelected);
 void ldButtonSetFont(ldButton_t *ptWidget, arm_2d_font_t *ptFont);
 void ldButtonSetText(ldButton_t* ptWidget,uint8_t *pStr);
 void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor);
-void ldButtonSetAlign(ldButton_t *ptWidget,uint8_t align);
 void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable);
 
 #define ldButtonInit(nameId,parentNameId,x,y,width,height) \

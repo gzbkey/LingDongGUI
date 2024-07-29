@@ -146,6 +146,12 @@ typedef struct  {
     bool isHidden:1;
 }ldBase_t;
 
+typedef enum{
+    typeString,
+    typeInt,
+    typeFloat
+}ldEditType_t;
+
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);

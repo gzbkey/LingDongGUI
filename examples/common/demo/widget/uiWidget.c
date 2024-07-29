@@ -149,6 +149,21 @@ void uiWidgetInit(ld_scene_t* ptScene)
         ldGraphSetValue(obj,1,i,rand() % 81);
     }
 
+    obj=ldTableInit(20,0,780,150,200,100,6,6,1,FONT_ARIAL_12);
+    ldTableSetExcelType(obj,FONT_ARIAL_12);
+//    ldTableSetKeyboard(obj,ID_KB);
+
+    ldTableSetItemText(obj,1,1,(uint8_t*)"id",FONT_ARIAL_12);
+    ldTableSetItemText(obj,1,2,(uint8_t*)"name",FONT_ARIAL_12);
+    ldTableSetItemText(obj,1,3,(uint8_t*)"size",FONT_ARIAL_12);
+
+    ldTableSetItemText(obj,2,1,(uint8_t*)"1",FONT_ARIAL_12);
+    ldTableSetItemText(obj,2,2,(uint8_t*)"button",FONT_ARIAL_12);
+    ldTableSetItemText(obj,2,3,(uint8_t*)"30*20",FONT_ARIAL_12);
+
+    ldTableSetItemText(obj,3,1,(uint8_t*)"2",FONT_ARIAL_12);
+    ldTableSetItemText(obj,3,2,(uint8_t*)"image",FONT_ARIAL_12);
+    ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",FONT_ARIAL_12);
     uiWidgetLogicInit(ptScene);
 }
 

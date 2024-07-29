@@ -25,6 +25,8 @@ static volatile int16_t deltaMoveTime;
 static volatile arm_2d_location_t prevLocation;
 static void *prevWidget;
 static uint8_t pageNumNow=0;
+uint8_t cursorBlinkCount=0;
+bool cursorBlinkFlag=false;
 
 #if USE_SCENE_SWITCHING == 1
 bool isGuiSwthcnScene=false;

@@ -67,7 +67,7 @@ widget demo sdl
 | ✅ | icon slider | 滑动图标 |
 | ✅ | gauge | 仪表盘 |
 | ✅ | qr code | 二维码 |
-| 🔲 | table | 表格 |
+| ✅ | table | 表格 |
 | 🔲 | keyboard | 键盘 |
 | 🔲 | line edit | 编辑框 |
 | ✅ | graph | 波形图 |
