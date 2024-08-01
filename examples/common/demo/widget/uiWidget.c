@@ -164,6 +164,10 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldTableSetItemText(obj,3,1,(uint8_t*)"2",FONT_ARIAL_12);
     ldTableSetItemText(obj,3,2,(uint8_t*)"image",FONT_ARIAL_12);
     ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",FONT_ARIAL_12);
+
+    obj=ldLineEditInit(21,0,850,300,100,50,FONT_ARIAL_12,16);
+    ldLineEditSetText(obj,"123");
+
     uiWidgetLogicInit(ptScene);
 }
 

@@ -25,6 +25,7 @@ static volatile int16_t deltaMoveTime;
 static volatile arm_2d_location_t prevLocation;
 static void *prevWidget;
 static uint8_t pageNumNow=0;
+int64_t sysTimer=0;
 uint8_t cursorBlinkCount=0;
 bool cursorBlinkFlag=false;
 
@@ -196,6 +197,12 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         {
             ((ldBase_t*)ptItem)->ptGuiFunc->frameStart(ptScene);
         }
+    }
+
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,&sysTimer,true))
+    {
+//        xBtnTick(SYS_TICK_CYCLE_MS);
+        cursorBlinkCount++;
     }
 }
 
