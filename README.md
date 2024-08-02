@@ -68,8 +68,8 @@ widget demo sdl
 | ✅ | gauge | 仪表盘 |
 | ✅ | qr code | 二维码 |
 | ✅ | table | 表格 |
-| 🔲 | keyboard | 键盘 |
-| 🔲 | line edit | 编辑框 |
+| ✅ | keyboard | 键盘 |
+| ✅ | line edit | 编辑框 |
 | ✅ | graph | 波形图 |
 | ✅ | combo box | 下拉框 |
 | 🔲 | arc bar | 圆环进度条 |

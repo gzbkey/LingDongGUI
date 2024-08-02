@@ -62,38 +62,35 @@ static bool slotEditEnd(ld_scene_t *ptScene,ldMsg_t msg)
 
 static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
 {
-//    ldCommonKB_t *kb;
+    ldKeyboard_t *kb;
 
     ldLineEdit_t *ptWidget=msg.ptSender;
 
     if(msg.signal==SIGNAL_PRESS)
     {
         ptWidget->isEditing=true;
-        cursorBlinkFlag=true;
-        cursorBlinkCount=0;
         if(ptWidget->kbNameId)
         {
-
-//            kb=ldBaseGetWidgetById(ptWidget->kbNameId);
-//            if(kb!=NULL)
-//            {
-//                kb->editType=ptWidget->editType;
-//                kb->ppStr=&ptWidget->pText;
-//                kb->strMax=ptWidget->textMax;
-//                kb->editorId=ptWidget->nameId;
-//                cursorBlinkFlag=true;
-//                cursorBlinkCount=0;
-//                ldBaseSetHidden((ldCommon_t*)kb,false);
-//                if((pResTile->tRegion.tLocation.iY+pResTile->tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
-//                {
-//                    ldBaseMove((ldCommon_t*)kb,0,LD_CFG_SCEEN_HEIGHT/2);
-//                    ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
-//                }
-//                else
-//                {
-//                    ldBaseMove((ldCommon_t*)kb,0,0);
-//                }
-//            }
+            kb=ldBaseGetWidgetById(ptWidget->kbNameId);
+            if(kb!=NULL)
+            {
+                kb->editType=ptWidget->editType;
+                kb->ppStr=&ptWidget->ptText;
+                kb->strMax=ptWidget->textMax;
+                kb->editorId=ptWidget->use_as__ldBase_t.nameId;
+                cursorBlinkFlag=true;
+                cursorBlinkCount=0;
+                ldKeyboardSetHidden(kb,false);
+                if((ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
+                {
+                    ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT);
+                    ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
+                }
+                else
+                {
+                    ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                }
+            }
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     }
@@ -196,9 +193,11 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
         }
     }
 
-    if(arm_2d_helper_pfb_is_region_active(ptTile,&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion,true))
+    arm_2d_region_t globalRegion=ldBaseGetAbsoluteRegion(ptWidget);
+
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
             if(ptWidget->use_as__ldBase_t.isHidden)
             {

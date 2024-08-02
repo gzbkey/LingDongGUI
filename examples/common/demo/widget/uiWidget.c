@@ -165,9 +165,24 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldTableSetItemText(obj,3,2,(uint8_t*)"image",FONT_ARIAL_12);
     ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",FONT_ARIAL_12);
 
-    obj=ldLineEditInit(21,0,850,300,100,50,FONT_ARIAL_12,16);
+    obj=ldLineEditInit(21,0,850,400,100,50,FONT_ARIAL_12,16);
     ldLineEditSetText(obj,"123");
+//    ldLineEditSetKeyboard(obj,22);
 
+
+
+    win=ldWindowInit(23, 0, 850, 450, 100, 100);
+    ldWindowSetBgColor(win,GLCD_COLOR_GREEN);
+
+    obj=ldButtonInit(24, 23, 8,3,30,30);
+    ldBase_t* pr=ldBaseGetParent(obj);
+
+    ldButtonSetFont(obj,FONT_ARIAL_16_A8);
+    ldButtonSetText(obj,(uint8_t*)"123");
+
+//    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
+
+//    ldKeyboardInit(22,0,FONT_ARIAL_12);
     uiWidgetLogicInit(ptScene);
 }
 

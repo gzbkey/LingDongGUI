@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+#define __ARM_2D_IMPL__
+#define __ARM_2D_INHERIT__
+#include "arm_2d.h"
 #include "ldGui.h"
 #include "ldScene0.h"
 #include "ldScene1.h"
@@ -60,17 +63,23 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
     }
     case SIGNAL_PRESS:
     {
-        ptWidget=NULL;
-        if(ptWidget==NULL)
+//        ptWidget=(ldBase_t*)ldBaseControlFindNodeWithLocation(ptScene->ptNodeRoot,tLocation);
+        ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
+
+        while(ptWidget->isHidden)
         {
-            ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
-#if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
-            if(ptWidget!=NULL)
-            {
-                LOG_DEBUG("click widget id:%d",ptWidget->nameId);
-            }
-#endif
+            LOG_DEBUG("widget id:%d, is hidden.",ptWidget->nameId);
+            ptWidget=ldBaseGetParent(ptWidget);
+            LOG_DEBUG("find parent widget id:%d",ptWidget->nameId);
         }
+
+#if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
+        if(ptWidget!=NULL)
+        {
+            LOG_DEBUG("click widget id:%d",ptWidget->nameId);
+        }
+#endif
+
         prevLocation=tLocation;
         prevWidget=ptWidget;//准备数据,释放时候使用
         pressLocation=tLocation;

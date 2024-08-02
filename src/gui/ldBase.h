@@ -152,6 +152,16 @@ typedef enum{
     typeFloat
 }ldEditType_t;
 
+//typedef struct  {
+//    implement(ldBase_t);
+//    ldEditType_t editType;
+//    uint16_t editorId;
+//    uint8_t **ppStr;
+//    uint8_t strMax;
+//}ldBaseKB_t;
+
+
+
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
@@ -171,8 +181,15 @@ void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
 arm_2d_location_t ldBaseGetRelativeLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
 arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t tLocation);
-
+arm_2d_region_t ldBaseGetAbsoluteRegion(ldBase_t *ptWidget);
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
+
+ldBase_t* ldBaseGetParent(ldBase_t* ptWidget);
+void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
+
+arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
+                                                arm_2d_control_node_t *ptRoot,
+                                                arm_2d_location_t tLocation);
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 

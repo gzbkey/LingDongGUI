@@ -503,6 +503,23 @@ arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t
     return tLocation;
 }
 
+arm_2d_region_t ldBaseGetAbsoluteRegion(ldBase_t *ptWidget)
+{
+    arm_2d_region_t tRegion={
+        .tLocation={0},
+        .tSize=ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize,
+    };
+    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
+
+    while(ptNode!=NULL)
+    {
+        tRegion.tLocation.iX+=((ldBase_t*)ptNode)->use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+        tRegion.tLocation.iY+=((ldBase_t*)ptNode)->use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+        ptNode=ptNode->ptParent;
+    }
+    return tRegion;
+}
+
 
 void ldBaseDrawCircle(arm_2d_tile_t *pTile, int centerX, int centerY, int radius, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
 {
@@ -654,4 +671,86 @@ void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int
             }
         }
     }
+}
+
+ldBase_t* ldBaseGetParent(ldBase_t* ptWidget)
+{
+    return ptWidget->use_as__arm_2d_control_node_t.ptParent;
+}
+
+void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
+{
+    ldBase_t *ptWidget= ptScene->ptNodeRoot;
+
+    LOG_REGION("",ptWidget->use_as__arm_2d_control_node_t.tRegion);
+
+    ldBaseMove(ptWidget,offsetX,offsetY);
+
+    int16_t minX = MIN(0, offsetX);
+    int16_t minY = MIN(0, offsetY);
+    int16_t maxX = MAX(LD_CFG_SCEEN_WIDTH, offsetX + bgWidth);
+    int16_t maxY = MAX(LD_CFG_SCEEN_HEIGHT, offsetX + bgHeight);
+
+
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=maxX-minX;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=maxY-minY;
+
+    LOG_REGION("",ptWidget->use_as__arm_2d_control_node_t.tRegion);
+
+    arm_2d_scene_player_update_scene_background(ptScene->use_as__arm_2d_scene_t.ptPlayer);
+}
+
+arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
+                                                arm_2d_control_node_t *ptRoot,
+                                                arm_2d_location_t tLocation)
+{
+    arm_2d_control_node_t *ptNode = NULL;
+    arm_2d_control_node_t *ptContainer = NULL;
+
+    ptNode = ptRoot;
+
+    if (NULL == ptNode) {
+        return NULL;
+    }
+
+    arm_ctrl_enum(ptRoot, ptItem, BOTTOM_UP_TRAVERSAL) {
+        LOG_DEBUG("test type = %d, id = %d",((ldBase_t*)ptItem)->widgetType,((ldBase_t*)ptItem)->nameId);
+
+//        arm_2d_region_t tempRegion=ldBaseGetAbsoluteRegion(ptItem);
+//        if (arm_2d_is_point_inside_region(&tempRegion, &tLocation))
+//        {
+//            LOG_DEBUG("test id = %d",((ldBase_t*)ptItem)->nameId);
+//            LOG_REGION("",ptItem->tRegion);
+//            ptNode = ptItem;
+//        }
+//        ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+    }
+
+//    do {
+//        arm_2d_region_t tempRegion=ldBaseGetAbsoluteRegion(ptNode);
+//        if (!arm_2d_is_point_inside_region(&tempRegion, &tLocation)) {
+//            /* out of region */
+//            if (NULL == ptNode->ptNext) {
+//                /* no more peers */
+//                return ptContainer;
+//            }
+
+//            /* try next peer */
+//            ptNode = ptNode->ptNext;
+//            continue;
+//        } else if (NULL == ptNode->ptChildList) {
+//            /* it is the one */
+//            break;
+//        } else {
+//            /* it is a container */
+//            ptContainer = ptNode;
+//            ptNode = ptNode->ptChildList;
+
+//            /* search the child nodes */
+//            continue;
+//        }
+
+//    } while(true);
+
+    return ptNode;
 }

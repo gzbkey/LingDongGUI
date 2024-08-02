@@ -130,9 +130,11 @@ void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_t
         
     }
 #endif
-    if(arm_2d_helper_pfb_is_region_active(ptTile,&ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion,true))
+    arm_2d_region_t globalRegion=ldBaseGetAbsoluteRegion(ptWidget);
+
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        arm_2d_container(ptTile, tTarget, &ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion)
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
             if(ptWidget->use_as__ldBase_t.isHidden)
             {
