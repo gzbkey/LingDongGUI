@@ -192,7 +192,7 @@ void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth)
 {
     for (int i = 0; i < depth; ++i)
     {
-        LOG_NORMAL("  "); // 打印缩进
+        LOG_PRINT("  "); // 打印缩进
     }
 
     LOG_NORMAL("type:%02d,id:%02d",((ldBase_t*)ptNodeRoot)->widgetType,((ldBase_t*)ptNodeRoot)->nameId);
@@ -682,8 +682,6 @@ void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t 
 {
     ldBase_t *ptWidget= ptScene->ptNodeRoot;
 
-    LOG_REGION("",ptWidget->use_as__arm_2d_control_node_t.tRegion);
-
     ldBaseMove(ptWidget,offsetX,offsetY);
 
     int16_t minX = MIN(0, offsetX);
@@ -691,13 +689,12 @@ void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t 
     int16_t maxX = MAX(LD_CFG_SCEEN_WIDTH, offsetX + bgWidth);
     int16_t maxY = MAX(LD_CFG_SCEEN_HEIGHT, offsetX + bgHeight);
 
-
     ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=maxX-minX;
     ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=maxY-minY;
 
-    LOG_REGION("",ptWidget->use_as__arm_2d_control_node_t.tRegion);
+    extern void ldGuiUpdateScene(void);
 
-    arm_2d_scene_player_update_scene_background(ptScene->use_as__arm_2d_scene_t.ptPlayer);
+    ldGuiUpdateScene();
 }
 
 arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
@@ -705,7 +702,11 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
                                                 arm_2d_location_t tLocation)
 {
     arm_2d_control_node_t *ptNode = NULL;
-    arm_2d_control_node_t *ptContainer = NULL;
+    arm_2d_control_node_t *ptCandidate = NULL;
+    arm_2d_control_node_t *ptTheLastContainer = NULL;
+
+    /* tVisibleArea is an absolute region in the virtual screen */
+    arm_2d_region_t tVisibleArea = {0};
 
     ptNode = ptRoot;
 
@@ -713,44 +714,88 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
         return NULL;
     }
 
-    arm_ctrl_enum(ptRoot, ptItem, BOTTOM_UP_TRAVERSAL) {
-        LOG_DEBUG("test type = %d, id = %d",((ldBase_t*)ptItem)->widgetType,((ldBase_t*)ptItem)->nameId);
+    /* this must be the root node */
+    assert(NULL == ptRoot->ptParent);
 
-//        arm_2d_region_t tempRegion=ldBaseGetAbsoluteRegion(ptItem);
-//        if (arm_2d_is_point_inside_region(&tempRegion, &tLocation))
-//        {
-//            LOG_DEBUG("test id = %d",((ldBase_t*)ptItem)->nameId);
-//            LOG_REGION("",ptItem->tRegion);
-//            ptNode = ptItem;
-//        }
-//        ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+    /* get the root node region which is a relative region of the host tile
+     * IMPORTANT: The region of the control root MUST be an absolute region
+     */
+    tVisibleArea = ptRoot->tRegion;
+    tVisibleArea.tLocation.iX=0;
+    tVisibleArea.tLocation.iY=0;
+
+    if (tVisibleArea.tSize.iWidth <= 0 || tVisibleArea.tSize.iHeight <= 0) {
+        assert(false); /* The root node region should have a valid size */
+        return NULL;
     }
 
-//    do {
-//        arm_2d_region_t tempRegion=ldBaseGetAbsoluteRegion(ptNode);
-//        if (!arm_2d_is_point_inside_region(&tempRegion, &tLocation)) {
-//            /* out of region */
-//            if (NULL == ptNode->ptNext) {
-//                /* no more peers */
-//                return ptContainer;
-//            }
+    do {
+        arm_2d_region_t tControlRegion = ptNode->tRegion;
 
-//            /* try next peer */
-//            ptNode = ptNode->ptNext;
-//            continue;
-//        } else if (NULL == ptNode->ptChildList) {
-//            /* it is the one */
-//            break;
-//        } else {
-//            /* it is a container */
-//            ptContainer = ptNode;
-//            ptNode = ptNode->ptChildList;
+        /* the node address is an relative address inside the container */
+        tControlRegion.tLocation.iX += tVisibleArea.tLocation.iX;
+        tControlRegion.tLocation.iY += tVisibleArea.tLocation.iY;
 
-//            /* search the child nodes */
-//            continue;
-//        }
+        bool bInsideControlRegion = false;
 
-//    } while(true);
+        /* we have to make sure the control's region is inside the visible area */
+        if (arm_2d_region_intersect(&tControlRegion, &tVisibleArea, &tControlRegion)) {
 
-    return ptNode;
+
+            /* if it is inside the visible area, we check the touch point */
+            bInsideControlRegion = arm_2d_is_point_inside_region(&tControlRegion, &tLocation);
+        }
+
+        if (bInsideControlRegion) {
+            /* update candidate */
+            ptCandidate = ptNode;
+        }
+
+        if (NULL != ptNode->ptNext) {
+            /* There are more peers in the list, let's check them first */
+            ptNode = ptNode->ptNext;
+            continue;
+        }
+
+        /* When we reach here, we have already visited all peers in the list */
+        if (NULL == ptCandidate) {
+            /* the touch point hits nothing, let's end the search and
+             * return NULL
+             */
+            break;
+        }
+
+        if (ptCandidate == ptTheLastContainer) {
+            /* the only candidate is the container, i.e. the touch point hits
+             * no controls in the container, let's return the container.
+             */
+            break;
+        }
+
+        if (NULL == ptCandidate->ptChildList) {
+            /* the touch point hits a leaf, let's return the candidate */
+            break;
+        }
+
+        /* When we reach here, the most recent candidate is a container, we
+         * have to jump into it
+         */
+        ptCandidate = ptNode;                   /* update candidate */
+        ptTheLastContainer = ptNode;            /* update the last container */
+
+        /* since we jump into a container, we have to update the visible
+         * area to fit the container
+         */
+        tVisibleArea.tLocation.iX += ptNode->tRegion.tLocation.iX;
+        tVisibleArea.tLocation.iY += ptNode->tRegion.tLocation.iY;
+
+        /* use the clipped size */
+        tVisibleArea.tSize = tControlRegion.tSize;
+
+        /* search the child nodes */
+        ptNode = ptNode->ptChildList;
+
+    } while(true);
+
+    return ptCandidate;
 }

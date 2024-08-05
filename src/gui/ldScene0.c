@@ -51,7 +51,7 @@
 #   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
 #   pragma clang diagnostic ignored "-Wunused-function"
 #   pragma clang diagnostic ignored "-Wmissing-declarations"
-#   pragma clang diagnostic ignored "-Wimplicit-int-conversion" 
+#   pragma clang diagnostic ignored "-Wimplicit-int-conversion"
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   pragma diag_suppress 64,177
 #elif __IS_COMPILER_IAR__
@@ -194,8 +194,25 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                             if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
 #endif
                             {
+                                widgetLoca.iX=0;
+                                widgetLoca.iY=0;
+
+                                widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
+//                                LOG_LOCATION("",widgetLoca);
                                 //region no change
                                 tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+
+//                                LOG_REGION("o",tRegion);
+                                tRegion.tLocation.iX+=widgetLoca.iX;
+                                tRegion.tLocation.iY+=widgetLoca.iY;
+//                                LOG_REGION("n",tRegion);
+
+//                                if((tRegion.tLocation.iX>=LD_CFG_SCEEN_WIDTH)||(tRegion.tLocation.iY>=LD_CFG_SCEEN_HEIGHT)||((tRegion.tLocation.iX+tRegion.tSize.iWidth)<=0)||((tRegion.tLocation.iY+tRegion.tSize.iHeight)<=0))
+//                                {
+//                                    LOG_LOCATION("",widgetLoca);
+//                                    LOG_REGION("err",tRegion);
+//                                    continue;
+//                                }
                             }
                             else
                             {
@@ -219,8 +236,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                                 }
                                 else// widget update region
                                 {
+                                    widgetLoca.iX=0;
+                                    widgetLoca.iY=0;
+                                    widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
+
                                     tRegion=ptWidget->tTempRegion;
                                     ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                    tRegion.tLocation.iX+=widgetLoca.iX;
+                                    tRegion.tLocation.iY+=widgetLoca.iY;
                                 }
                             }
 
@@ -305,7 +328,7 @@ ld_scene_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .use_as__arm_2d_scene_t = {
 
             /* the canvas colour */
-            .tCanvas = {GLCD_COLOR_WHITE}, 
+            .tCanvas = {GLCD_COLOR_WHITE},
 
             /* Please uncommon the callbacks if you need them
              */

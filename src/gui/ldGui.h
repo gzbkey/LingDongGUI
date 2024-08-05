@@ -35,7 +35,7 @@ extern "C" {
 #include "ldComboBox.h"
 #include "ldGauge.h"
 #include "ldScrollSelecter.h"
-#include "ldQrCode.h"
+#include "ldQRCode.h"
 #include "ldIconSlider.h"
 #include "ldDateTime.h"
 #include "ldRadialMenu.h"
@@ -72,6 +72,8 @@ void ldGuiLogicLoop(ld_scene_t *ptScene);
 void ldGuiQuit(ld_scene_t *ptScene);
 void ldGuiFrameComplete(ld_scene_t *ptScene);
 void ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs);
+void ldGuiUpdateScene(void);
+
 #ifdef __cplusplus
 }
 #endif

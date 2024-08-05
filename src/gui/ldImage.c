@@ -82,6 +82,9 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
     ptWidget->ptImgTile=ptImgTile;
     ptWidget->ptMaskTile=ptMaskTile;
 
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+
     if(isWindow)
     {
         if(nameId==0)
@@ -93,7 +96,6 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
         }
         else
         {
-            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
             ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
             ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
@@ -103,8 +105,6 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
     }
     else
     {
-        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate=true;
-        ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
         ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
         ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;

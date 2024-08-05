@@ -81,14 +81,10 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
                 cursorBlinkFlag=true;
                 cursorBlinkCount=0;
                 ldKeyboardSetHidden(kb,false);
+                ldKeyboardMove(kb,0,0);
                 if((ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
                 {
-                    ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT);
                     ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
-                }
-                else
-                {
-                    ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
                 }
             }
         }

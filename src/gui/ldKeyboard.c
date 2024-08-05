@@ -623,7 +623,7 @@ ldKeyboard_t* ldKeyboard_init( ld_scene_t *ptScene,ldKeyboard_t *ptWidget, uint1
 
     ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = 0;
-    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = LD_CFG_SCEEN_HEIGHT>>1;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = LD_CFG_SCEEN_HEIGHT;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = LD_CFG_SCEEN_WIDTH;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = LD_CFG_SCEEN_HEIGHT;
     ptWidget->use_as__ldBase_t.nameId = nameId;
@@ -726,11 +726,11 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
         
     }
 #endif
-    arm_2d_region_t globalRegion=ldBaseGetAbsoluteRegion(ptWidget);
+//    arm_2d_region_t globalRegion=ldBaseGetAbsoluteRegion(ptWidget);
 
-    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&kbRegion,true))
     {
-        arm_2d_container(ptTile, tTarget, &globalRegion)
+        arm_2d_container(ptTile, tTarget, &kbRegion)
         {
             if(ptWidget->use_as__ldBase_t.isHidden)
             {

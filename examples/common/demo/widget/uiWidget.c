@@ -43,6 +43,7 @@ const uint8_t *pStrGroup[]={"1","10","123","99","7"};
 const uint8_t *iconName[5]={"11","22","33","44","55"};
 
 const uint8_t *pComboBoxStrGroup[3]={"11","22","00"};
+#define ID_KB  22
 void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
@@ -151,7 +152,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     obj=ldTableInit(20,0,780,150,200,100,6,6,1,FONT_ARIAL_12);
     ldTableSetExcelType(obj,FONT_ARIAL_12);
-//    ldTableSetKeyboard(obj,ID_KB);
+    ldTableSetKeyboard(obj,ID_KB);
 
     ldTableSetItemText(obj,1,1,(uint8_t*)"id",FONT_ARIAL_12);
     ldTableSetItemText(obj,1,2,(uint8_t*)"name",FONT_ARIAL_12);
@@ -167,7 +168,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     obj=ldLineEditInit(21,0,850,400,100,50,FONT_ARIAL_12,16);
     ldLineEditSetText(obj,"123");
-//    ldLineEditSetKeyboard(obj,22);
+    ldLineEditSetKeyboard(obj,ID_KB);
 
 
 
@@ -182,7 +183,9 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 
-//    ldKeyboardInit(22,0,FONT_ARIAL_12);
+    ldKeyboardInit(ID_KB,0,FONT_ARIAL_12);
+//ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-200);
+
     uiWidgetLogicInit(ptScene);
 }
 

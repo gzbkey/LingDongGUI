@@ -42,6 +42,8 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 #define LD_EMIT_SIZE                    8
 #endif
 
+bool isFullWidgetUpdate=false;
+
 void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
@@ -63,8 +65,8 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
     }
     case SIGNAL_PRESS:
     {
-//        ptWidget=(ldBase_t*)ldBaseControlFindNodeWithLocation(ptScene->ptNodeRoot,tLocation);
-        ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
+        ptWidget=(ldBase_t*)ldBaseControlFindNodeWithLocation(ptScene->ptNodeRoot,tLocation);
+//        ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
 
         while(ptWidget->isHidden)
         {
@@ -198,8 +200,19 @@ void ldGuiSceneInit(ld_scene_t *ptScene)
     LOG_INFO("[sys] page %s init",ptScene->ldGuiFuncGroup->pageName);
 }
 
+void ldGuiUpdateScene(void)
+{
+    isFullWidgetUpdate=true;
+}
+
 void ldGuiFrameStart(ld_scene_t *ptScene)
 {
+    if(isFullWidgetUpdate==true)
+    {
+        arm_2d_scene_player_update_scene_background(ptScene->use_as__arm_2d_scene_t.ptPlayer);
+        isFullWidgetUpdate=false;
+    }
+	
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
         if(((ldBase_t*)ptItem)->ptGuiFunc->frameStart!=NULL)
