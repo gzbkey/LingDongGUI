@@ -81,10 +81,16 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
                 cursorBlinkFlag=true;
                 cursorBlinkCount=0;
                 ldKeyboardSetHidden(kb,false);
-                ldKeyboardMove(kb,0,0);
+
                 if((ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)>(LD_CFG_SCEEN_HEIGHT/2))
                 {
+                    ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT>>1);
                     ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
+
+                }
+                else
+                {
+                    ldKeyboardMove(kb,0,0);
                 }
             }
         }
@@ -182,10 +188,11 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
     }
 
     if (bIsNewFrame) {
-        if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&bIsNewFrame&&ptWidget->isEditing)
+        if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&ptWidget->isEditing)
         {
             cursorBlinkCount=0;
             cursorBlinkFlag=!cursorBlinkFlag;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
     }
 
@@ -247,7 +254,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 arm_2d_op_wait_async(NULL);
             }
 
-            if((cursorBlinkFlag)&&(ptWidget->isEditing))
+            if(cursorBlinkFlag&&ptWidget->isEditing)
             {
                 arm_2d_draw_box(&tTarget,
                                 &((arm_2d_region_t){tempRegion.tLocation.iX+strSize.iWidth,

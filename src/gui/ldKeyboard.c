@@ -99,7 +99,7 @@ const uint8_t addSubStr[]="±";
 #define NUM_BTN_H   (((LD_CFG_SCEEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE)
 
 #define NUM_OFFSET_W(num)    (KB_SPACE+(NUM_BTN_W+KB_SPACE)*num)
-#define NUM_OFFSET_H(num)    (KB_SPACE+(NUM_BTN_H+KB_SPACE)*num)
+#define NUM_OFFSET_H(num)    (KB_SPACE+(NUM_BTN_H+KB_SPACE)*num+(LD_CFG_SCEEN_HEIGHT>>1))
 
 const kbBtnInfo_t numBtnInfo[4][4]={
     {
@@ -175,7 +175,7 @@ const uint8_t asciiShiftUpperStr[]="SHIFT";
 #define QWERT_BTN_H   (((LD_CFG_SCEEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE)
 
 #define QWERT_OFFSET_W(num)    (QWERT_BTN_W_SPACE*(num/2)+KB_SPACE+QWERT_BTN_W*(num%2)/2) // (KB_SPACE+((QWERT_BTN_W+KB_SPACE)>>1)*num)
-#define QWERT_OFFSET_H(num)    (KB_SPACE+(QWERT_BTN_H+KB_SPACE)*num)
+#define QWERT_OFFSET_H(num)    (KB_SPACE+(QWERT_BTN_H+KB_SPACE)*num+(LD_CFG_SCEEN_HEIGHT>>1))
 
 const kbBtnInfo_t asciiBtnInfo[4][10]={
     {
@@ -302,7 +302,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget)
         },
         .tSize={
             .iWidth=LD_CFG_SCEEN_WIDTH,
-            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
+            .iHeight=LD_CFG_SCEEN_HEIGHT,
         },
     };
 
@@ -377,7 +377,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget)
     if(ptWidget->kbValue<=sizeof (kbValueSpecial))
     {
         retRegion.tLocation.iX=0;
-        retRegion.tLocation.iY=0;
+        retRegion.tLocation.iY=LD_CFG_SCEEN_HEIGHT>>1;
         retRegion.tSize.iWidth=LD_CFG_SCEEN_WIDTH;
         retRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT>>1;
     }
@@ -504,30 +504,34 @@ static bool slotKBProcess(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldKeyboard_t *ptWidget=msg.ptSender;
 
-    arm_2d_region_t kbRegion={
-        .tLocation={
-            .iX=0,
-            .iY=LD_CFG_SCEEN_HEIGHT>>1,
-        },
-        .tSize={
-            .iWidth=LD_CFG_SCEEN_WIDTH,
-            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
-        },
-    };
+//    arm_2d_region_t kbRegion={
+//        .tLocation={
+//            .iX=0,
+//            .iY=LD_CFG_SCEEN_HEIGHT>>1,
+//        },
+//        .tSize={
+//            .iWidth=LD_CFG_SCEEN_WIDTH,
+//            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
+//        },
+//    };
 
-    kbRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+//    kbRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
 
     switch (msg.signal)
     {
     case SIGNAL_PRESS:
     {
-        arm_2d_location_t parentPos={0};
-        parentPos=ldBaseGetAbsoluteLocation(ptWidget,parentPos);
+//        arm_2d_location_t parentPos={0};
+//        parentPos=ldBaseGetAbsoluteLocation(ptWidget,parentPos);
 //        ldPoint_t parentPos=ldBaseGetGlobalPos(ptWidget->parentWidget);
         ptWidget->clickPoint.iX=(int16_t)GET_SIGNAL_VALUE_X(msg.value);
         ptWidget->clickPoint.iY=(int16_t)GET_SIGNAL_VALUE_Y(msg.value);
-        ptWidget->clickPoint.iX-=(kbRegion.tLocation.iX+parentPos.iX);
-        ptWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.iY);
+//        ptWidget->clickPoint.iX-=(kbRegion.tLocation.iX+parentPos.iX);
+//        ptWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.iY);
+//        LOG_LOCATION("kb",ptWidget->clickPoint);
+//        LOG_REGION("kb",ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion);
+//        ptWidget->clickPoint.iY-=LD_CFG_SCEEN_HEIGHT>>1;
+//        LOG_LOCATION("",ptWidget->clickPoint);
         ptWidget->isClick=false;
         ptWidget->use_as__ldBase_t.tTempRegion =_keyboardGetClickRegion(ptWidget);
         ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
@@ -685,7 +689,7 @@ void ldKeyboard_on_frame_start( ldKeyboard_t *ptWidget)
 
 static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget,arm_2d_tile_t *parentTile,arm_2d_region_t *pBtnRegion,uint8_t *pStr,ldColor btnColor,ldColor charColor,bool bIsNewFrame)
 {
-    arm_2d_tile_t btnTile;
+//    arm_2d_tile_t btnTile;
     draw_round_corner_box(parentTile,pBtnRegion,btnColor,255,bIsNewFrame);
 //    arm_2d_tile_generate_child(parentTile,pBtnRegion,&btnTile,false);
 //    LOG_REGION("",btnTile.tRegion);
@@ -713,11 +717,11 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
     arm_2d_region_t kbRegion={
             .tLocation={
                 .iX=0,
-                .iY=(LD_CFG_SCEEN_HEIGHT>>1)+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY,
+                .iY=0,//(LD_CFG_SCEEN_HEIGHT>>1),//+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY,
             },
             .tSize={
                 .iWidth=LD_CFG_SCEEN_WIDTH,
-                .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
+                .iHeight=LD_CFG_SCEEN_HEIGHT,//>>1,
             },
         };
 
@@ -745,13 +749,21 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
             {
                 isExit=false;
                 ptWidget->upperState=0;
+                ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=LD_CFG_SCEEN_HEIGHT;
                 ldKeyboardSetHidden(ptWidget,true);
-                ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_EDITING_FINISHED,0);
+                emit(ptWidget->editorId,SIGNAL_EDITING_FINISHED,0);
 
                 ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,0);
+                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
             }
 
-            ldBaseColor(&tTarget,NULL,__RGB(208,211,220),255);
+            ldBaseColor(&tTarget,
+                        &((arm_2d_region_t){0,
+                                            (LD_CFG_SCEEN_HEIGHT>>1),
+                                            LD_CFG_SCEEN_WIDTH,
+                                            (LD_CFG_SCEEN_HEIGHT>>1)}),
+                        __RGB(208,211,220),
+                        ptWidget->use_as__ldBase_t.opacity);
 
             if(ptWidget->isNumber)
             {

@@ -706,7 +706,7 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
     arm_2d_control_node_t *ptTheLastContainer = NULL;
 
     /* tVisibleArea is an absolute region in the virtual screen */
-    arm_2d_region_t tVisibleArea = {0};
+    arm_2d_region_t tVisibleArea = {{0,0},{LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT}};
 
     ptNode = ptRoot;
 
@@ -720,14 +720,14 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
     /* get the root node region which is a relative region of the host tile
      * IMPORTANT: The region of the control root MUST be an absolute region
      */
-    tVisibleArea = ptRoot->tRegion;
-    tVisibleArea.tLocation.iX=0;
-    tVisibleArea.tLocation.iY=0;
+//    tVisibleArea = ptRoot->tRegion;
+//    tVisibleArea.tLocation.iX=0;
+//    tVisibleArea.tLocation.iY=0;
 
-    if (tVisibleArea.tSize.iWidth <= 0 || tVisibleArea.tSize.iHeight <= 0) {
-        assert(false); /* The root node region should have a valid size */
-        return NULL;
-    }
+//    if (tVisibleArea.tSize.iWidth <= 0 || tVisibleArea.tSize.iHeight <= 0) {
+//        assert(false); /* The root node region should have a valid size */
+//        return NULL;
+//    }
 
     do {
         arm_2d_region_t tControlRegion = ptNode->tRegion;
@@ -738,30 +738,39 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
 
         bool bInsideControlRegion = false;
 
+//        LOG_REGION("tControlRegion",tControlRegion);
+//        LOG_REGION("tVisibleArea",tVisibleArea);
         /* we have to make sure the control's region is inside the visible area */
         if (arm_2d_region_intersect(&tControlRegion, &tVisibleArea, &tControlRegion)) {
 
 
             /* if it is inside the visible area, we check the touch point */
             bInsideControlRegion = arm_2d_is_point_inside_region(&tControlRegion, &tLocation);
+//            LOG_DEBUG("bInsideControlRegion :%d",bInsideControlRegion);
         }
 
         if (bInsideControlRegion) {
             /* update candidate */
             ptCandidate = ptNode;
+//            LOG_DEBUG(" - update");
         }
 
         if (NULL != ptNode->ptNext) {
             /* There are more peers in the list, let's check them first */
             ptNode = ptNode->ptNext;
+//            LOG_REGION(" - next",ptNode->tRegion);
+//            LOG_REGION(" - select widget",ptCandidate->tRegion);
             continue;
         }
+
+//        LOG_REGION(" - now widget",ptCandidate->tRegion);
 
         /* When we reach here, we have already visited all peers in the list */
         if (NULL == ptCandidate) {
             /* the touch point hits nothing, let's end the search and
              * return NULL
              */
+//            LOG_DEBUG(" - end");
             break;
         }
 
@@ -769,32 +778,49 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
             /* the only candidate is the container, i.e. the touch point hits
              * no controls in the container, let's return the container.
              */
+//            LOG_DEBUG(" - last");
             break;
         }
 
         if (NULL == ptCandidate->ptChildList) {
             /* the touch point hits a leaf, let's return the candidate */
+//            LOG_DEBUG(" - no child");
             break;
         }
+
+//        LOG_DEBUG("----------------------container");
 
         /* When we reach here, the most recent candidate is a container, we
          * have to jump into it
          */
-        ptCandidate = ptNode;                   /* update candidate */
+         ptNode=ptCandidate;                   /* update candidate */
         ptTheLastContainer = ptNode;            /* update the last container */
 
-        /* since we jump into a container, we have to update the visible
-         * area to fit the container
-         */
-        tVisibleArea.tLocation.iX += ptNode->tRegion.tLocation.iX;
-        tVisibleArea.tLocation.iY += ptNode->tRegion.tLocation.iY;
+//        LOG_REGION("current win",ptCandidate->tRegion);
 
-        /* use the clipped size */
-        tVisibleArea.tSize = tControlRegion.tSize;
+        arm_2d_region_t temp;
+        if (arm_2d_region_intersect(&tControlRegion, &tVisibleArea, &temp))
+        {
+            tVisibleArea = temp;
+        }
+        else
+        {
+            /* since we jump into a container, we have to update the visible
+             * area to fit the container
+             */
+            tVisibleArea.tLocation.iX += ptNode->tRegion.tLocation.iX;
+            tVisibleArea.tLocation.iY += ptNode->tRegion.tLocation.iY;
+
+            /* use the clipped size */
+            tVisibleArea.tSize = tControlRegion.tSize;
+        }
+
+//        LOG_REGION("new tVisibleArea",tVisibleArea);
 
         /* search the child nodes */
         ptNode = ptNode->ptChildList;
 
+//        LOG_DEBUG("loop next");
     } while(true);
 
     return ptCandidate;

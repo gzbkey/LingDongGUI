@@ -228,10 +228,9 @@ static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
     ldTable_t *ptWidget;
     int16_t x,y;
     int16_t offsetX,offsetY;
-    arm_2d_tile_t *pResTile;
     ldTableItem_t *currentItem;
     int64_t tempTimer;
-//    ldCommonKB_t *kb;
+    ldKeyboard_t *kb;
 
     ptWidget=msg.ptSender;;
 
@@ -242,7 +241,6 @@ static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
     {
         arm_2d_location_t tLocation={0};
         tLocation=ldBaseGetAbsoluteLocation(ptWidget,tLocation);
-//        ldPoint_t parentPos=ldBaseGetGlobalPos(ptWidget->parentWidget);
         x=(int16_t)GET_SIGNAL_VALUE_X(msg.value)-tLocation.iX;
         y=(int16_t)GET_SIGNAL_VALUE_Y(msg.value)-tLocation.iY;
 
@@ -281,27 +279,27 @@ static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
             }
         }
 
-//        if(currentItem->isEditable)
-//        {
-//            tempTimer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+        if(currentItem->isEditable)
+        {
+            tempTimer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
 
-//            if((tempTimer-ptWidget->timer)<500)
-//            {
-//                currentItem->isEditing=true;
-//                if(ptWidget->kbNameId)
-//                {
-//                    kb=ldBaseGetWidgetById(ptWidget->kbNameId);
-//                    if(kb!=NULL)
-//                    {
-//                        kb->editType=currentItem->editType;
-//                        kb->ppStr=&currentItem->pText;
-//                        kb->strMax=currentItem->textMax;
-//                        kb->editorId=ptWidget->nameId;
-//                        cursorBlinkFlag=true;
-//                        cursorBlinkCount=0;
-//                        ldBaseSetHidden((ldCommon_t*)kb,false);
+            if((tempTimer-ptWidget->timer)<500)
+            {
+                currentItem->isEditing=true;
+                if(ptWidget->kbNameId)
+                {
+                    kb=ldBaseGetWidgetById(ptWidget->kbNameId);
+                    if(kb!=NULL)
+                    {
+                        kb->editType=currentItem->editType;
+                        kb->ppStr=&currentItem->pText;
+                        kb->strMax=currentItem->textMax;
+                        kb->editorId=ptWidget->use_as__ldBase_t.nameId;
+                        cursorBlinkFlag=true;
+                        cursorBlinkCount=0;
+                        ldKeyboardSetHidden(kb,false);
 
-//                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
+                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
 
 //                        if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
 //                        {
@@ -312,11 +310,21 @@ static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
 //                        {
 //                            ldBaseMove((ldCommon_t*)kb,0,0);
 //                        }
-//                    }
-//                }
-//            }
-//            ptWidget->timer=tempTimer;
-//        }
+
+                        if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
+                        {
+                            ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT);
+                            ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
+                        }
+                        else
+                        {
+                            ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT/2);
+                        }
+                    }
+                }
+            }
+            ptWidget->timer=tempTimer;
+        }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
@@ -600,21 +608,27 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
                         {
                             cursorBlinkCount=0;
                             cursorBlinkFlag=!cursorBlinkFlag;
+                            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
                         }
 
-//                        if(item->isEditing)
-//                        {
-//                            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-//                            if(cursorBlinkFlag)
-//                            {
+                        if(cursorBlinkFlag&&item->isEditing)
+                        {
 //                                arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
 //                                itemRegion.tLocation.iX+=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
 //                                itemRegion.tLocation.iY+=showRegion.tLocation.iY;
 //                                itemRegion.tSize.iWidth=CURSOR_WIDTH;
 //                                itemRegion.tSize.iHeight=item->pFontDict->lineStrHeight;
 //                                arm_2d_draw_box(&tTarget,&itemRegion,1,0,255);
-//                            }
-//                        }
+                                arm_2d_size_t strSize=arm_lcd_text_get_box(item->pText, item->ptFont);
+                                arm_2d_draw_box(&tTarget,
+                                                &((arm_2d_region_t){item->tLocation.iX+strSize.iWidth,
+                                                                    ((tTarget_canvas.tSize.iHeight-item->ptFont->tCharSize.iHeight)>>1)+2,
+                                                                    CURSOR_WIDTH,
+                                                                    item->ptFont->tCharSize.iHeight}),
+                                                1,
+                                                0,
+                                                ptWidget->use_as__ldBase_t.opacity);
+                        }
 
                         tItemTile.tRegion.tSize.iWidth+=CURSOR_WIDTH;
 

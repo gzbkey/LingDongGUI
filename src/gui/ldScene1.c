@@ -51,7 +51,7 @@
 #   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
 #   pragma clang diagnostic ignored "-Wunused-function"
 #   pragma clang diagnostic ignored "-Wmissing-declarations"
-#   pragma clang diagnostic ignored "-Wimplicit-int-conversion" 
+#   pragma clang diagnostic ignored "-Wimplicit-int-conversion"
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   pragma diag_suppress 64,177
 #elif __IS_COMPILER_IAR__
@@ -124,6 +124,7 @@ static void __on_scene1_frame_start(arm_2d_scene_t *ptScene)
     ldGuiLogicLoop(ptScene);
     ldGuiTouchProcess(ptScene);
     ldMsgProcess(ptScene);
+
     arm_2d_dynamic_dirty_region_on_frame_start(
                                                 &ptThis->tDirtyRegionItem,
                                                 SCENE_DR_UPDATE);//SCENE_DR_START);
@@ -193,8 +194,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
                             if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
 #endif
                             {
+                                widgetLoca.iX=0;
+                                widgetLoca.iY=0;
+
+                                widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
                                 //region no change
                                 tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                tRegion.tLocation.iX+=widgetLoca.iX;
+                                tRegion.tLocation.iY+=widgetLoca.iY;
                             }
                             else
                             {
@@ -218,8 +225,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
                                 }
                                 else// widget update region
                                 {
+                                    widgetLoca.iX=0;
+                                    widgetLoca.iY=0;
+                                    widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
+
                                     tRegion=ptWidget->tTempRegion;
                                     ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                    tRegion.tLocation.iX+=widgetLoca.iX;
+                                    tRegion.tLocation.iY+=widgetLoca.iY;
                                 }
                             }
 
@@ -304,7 +317,7 @@ ld_scene_t *__arm_2d_scene1_init(   arm_2d_scene_player_t *ptDispAdapter,
         .use_as__arm_2d_scene_t = {
 
             /* the canvas colour */
-            .tCanvas = {GLCD_COLOR_WHITE}, 
+            .tCanvas = {GLCD_COLOR_WHITE},
 
             /* Please uncommon the callbacks if you need them
              */
