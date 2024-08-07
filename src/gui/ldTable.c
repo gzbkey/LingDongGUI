@@ -546,6 +546,14 @@ void ldTable_depose( ldTable_t *ptWidget)
 
     LOG_INFO("[depose][table] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
+    for(uint16_t i=0;i<(ptWidget->columnCount*ptWidget->rowCount);i++)
+    {
+        if(!ptWidget->ptItemInfo[i].isStaticText)
+        {
+            ldFree(ptWidget->ptItemInfo[i].pText);
+        }
+    }
+
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
     ldFree(ptWidget->pColumnWidth);

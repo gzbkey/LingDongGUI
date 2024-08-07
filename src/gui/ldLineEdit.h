@@ -55,7 +55,7 @@ struct ldLineEdit_t
     arm_2d_font_t *ptFont;
     uint16_t kbNameId;
     ldColor textColor;
-    uint8_t *ptText;
+    uint8_t *pText;
     uint8_t textMax;
     bool isEditing:1;
     bool isCorner:1;
@@ -69,7 +69,7 @@ void ldLineEdit_on_load( ldLineEdit_t *ptWidget);
 void ldLineEdit_on_frame_start( ldLineEdit_t *ptWidget);
 void ldLineEdit_show(ld_scene_t *pScene, ldLineEdit_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *ptText);
+void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *pText);
 void ldLineEditSetKeyboard(ldLineEdit_t* ptWidget,uint16_t kbNameId);
 void ldLineEditSetType(ldLineEdit_t* ptWidget,ldEditType_t editType);
 

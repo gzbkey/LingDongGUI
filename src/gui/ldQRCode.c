@@ -55,16 +55,16 @@ ldQRCode_t* ldQRCode_init(ld_scene_t *ptScene, ldQRCode_t *ptWidget, uint16_t na
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
-    uint8_t *ptText = NULL;
+    uint8_t *pText = NULL;
 
     if (NULL == ptWidget)
     {
         ptWidget = ldCalloc(1, sizeof(ldQRCode_t));
-        ptText = ldCalloc(1,strlen((char*)pStr)+1);
-        if ((NULL == ptWidget) || (NULL == ptText))
+        pText = ldCalloc(1,strlen((char*)pStr)+1);
+        if ((NULL == ptWidget) || (NULL == pText))
         {
             ldFree(ptWidget);
-            ldFree(ptText);
+            ldFree(pText);
             LOG_ERROR("[init failed][QRCode] id:%d", nameId);
             return NULL;
         }
@@ -85,8 +85,8 @@ ldQRCode_t* ldQRCode_init(ld_scene_t *ptScene, ldQRCode_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
 
-    strcpy((char*)ptText,(char*)pStr);
-    ptWidget->pStr=ptText;
+    strcpy((char*)pText,(char*)pStr);
+    ptWidget->pStr=pText;
     ptWidget->qrEcc=qrEcc;
     qrMaxVersion=(qrMaxVersion==0)?1:qrMaxVersion;
     ptWidget->qrMaxVersion=qrMaxVersion;

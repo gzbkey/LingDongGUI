@@ -75,7 +75,7 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
             if(kb!=NULL)
             {
                 kb->editType=ptWidget->editType;
-                kb->ppStr=&ptWidget->ptText;
+                kb->ppStr=&ptWidget->pText;
                 kb->strMax=ptWidget->textMax;
                 kb->editorId=ptWidget->use_as__ldBase_t.nameId;
                 cursorBlinkFlag=true;
@@ -104,15 +104,15 @@ ldLineEdit_t* ldLineEdit_init( ld_scene_t *ptScene,ldLineEdit_t *ptWidget, uint1
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
-    uint8_t *ptText = NULL;
+    uint8_t *pText = NULL;
 
     if (NULL == ptWidget)
     {
         ptWidget = ldCalloc(1, sizeof(ldLineEdit_t));
-        ptText = (uint8_t *)ldCalloc(1,(textMax+1)*sizeof(uint8_t));
-        if ((NULL == ptWidget)||(NULL == ptText))
+        pText = (uint8_t *)ldCalloc(1,(textMax+1)*sizeof(uint8_t));
+        if ((NULL == ptWidget)||(NULL == pText))
         {
-            ldFree(ptText);
+            ldFree(pText);
             ldFree(ptWidget);
             LOG_ERROR("[init failed][lineEdit] id:%d", nameId);
             return NULL;
@@ -134,7 +134,7 @@ ldLineEdit_t* ldLineEdit_init( ld_scene_t *ptScene,ldLineEdit_t *ptWidget, uint1
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
 
-    ptWidget->ptText=ptText;
+    ptWidget->pText=pText;
     ptWidget->textMax=textMax;
     ptWidget->ptFont=ptFont;
     ptWidget->textColor=GLCD_COLOR_BLACK;
@@ -163,7 +163,7 @@ void ldLineEdit_depose( ldLineEdit_t *ptWidget)
 
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
-    ldFree(ptWidget->ptText);
+    ldFree(ptWidget->pText);
     ldFree(ptWidget);
 }
 
@@ -235,8 +235,8 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 tempRegion.tSize.iWidth-=CURSOR_WIDTH;
             }
 
-            arm_2d_size_t strSize=arm_lcd_text_get_box(ptWidget->ptText, ptWidget->ptFont);
-            if(ptWidget->ptText!=NULL)
+            arm_2d_size_t strSize=arm_lcd_text_get_box(ptWidget->pText, ptWidget->ptFont);
+            if(ptWidget->pText!=NULL)
             {
 
                 arm_2d_align_t tAlign=ARM_2D_ALIGN_LEFT;
@@ -246,7 +246,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 }
                 ldBaseLabel(&tTarget,
                             &tempRegion,
-                            ptWidget->ptText,
+                            ptWidget->pText,
                             ptWidget->ptFont,
                             tAlign,
                             ptWidget->textColor,
@@ -271,7 +271,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
     arm_2d_op_wait_async(NULL);
 }
 
-void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *ptText)
+void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *pText)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -280,15 +280,15 @@ void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *ptText)
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
-    uint16_t textLen=strlen((char*)ptText);
+    uint16_t textLen=strlen((char*)pText);
     if(ptWidget->textMax==0)
     {
-        ptWidget->ptText=ldRealloc(ptWidget->ptText,textLen+1);
+        ptWidget->pText=ldRealloc(ptWidget->pText,textLen+1);
     }
 
     if((textLen<ptWidget->textMax)||(ptWidget->textMax==0))
     {
-        strcpy((char*)ptWidget->ptText,(char*)ptText);
+        strcpy((char*)ptWidget->pText,(char*)pText);
     }
 }
 
