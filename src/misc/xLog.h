@@ -101,14 +101,16 @@ extern "C" {
 #endif
 #if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
 #define LOG_DEBUG(fmt, ...)             LOG_PRINT(ANSI_BLUE"[D] " ANSI_RESET fmt LOG_END,##__VA_ARGS__)
-#define LOG_REGION(str,region)          LOG_PRINT("[REGION] %s %d,%d,%d,%d" LOG_END,str,(region).tLocation.iX,(region).tLocation.iY,(region).tSize.iWidth,(region).tSize.iHeight);
-#define LOG_LOCATION(str,location)      LOG_PRINT("[LOCATION] %s x=%d,y=%d" LOG_END,str,(location).iX,(location).iY);
-#define LOG_POINT(str,point)            LOG_PRINT("[POINT] %s x=%d,y=%d" LOG_END,str,(point).x,(point).y);
-#define LOG_XY(str,x,y)                 LOG_PRINT("[XY] %s x=%d,y=%d" LOG_END,str,(x),(y));
+#define LOG_REGION(str,region)          LOG_PRINT("[REGION] %s %d,%d,%d,%d" LOG_END,str,(region).tLocation.iX,(region).tLocation.iY,(region).tSize.iWidth,(region).tSize.iHeight)
+#define LOG_LOCATION(str,location)      LOG_PRINT("[LOCATION] %s x=%d,y=%d" LOG_END,str,(location).iX,(location).iY)
+#define LOG_SIZE(str,size)              LOG_PRINT("[SIZE] %s w=%d,h=%d" LOG_END,str,(size).iWidth,(size).iHeight)
+#define LOG_POINT(str,point)            LOG_PRINT("[POINT] %s x=%d,y=%d" LOG_END,str,(point).x,(point).y)
+#define LOG_XY(str,x,y)                 LOG_PRINT("[XY] %s x=%d,y=%d" LOG_END,str,(x),(y))
 #else
 #define LOG_DEBUG(...)                  {}
 #define LOG_REGION(...)                 {}
 #define LOG_LOCATION(...)               {}
+#define LOG_SIZE(...)                   {}
 #define LOG_POINT(...)                  {}
 #define LOG_XY(...)                     {}
 #endif

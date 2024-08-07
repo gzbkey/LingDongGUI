@@ -394,46 +394,48 @@ arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont)
     };
     arm_2d_char_descriptor_t tCharDescriptor;
 
-    while(*str) {
-        if (*str == '\r') {
-            tDrawBox.tLocation.iX = 0;
-        } else if (*str == '\n') {
-            tDrawBox.tLocation.iX = 0;
-            tDrawBox.tLocation.iY += tCharSize.iHeight;
-
-            tDrawBox.tSize.iHeight += tCharSize.iHeight;
-        } else if (*str == '\t') {
-            tDrawBox.tLocation.iX += tCharSize.iWidth * 4;
-            tDrawBox.tLocation.iX -= tDrawBox.tLocation.iX
-                                   % tCharSize.iWidth;
-
-            tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
-
-        }else if (*str == '\b') {
-            if (tDrawBox.tLocation.iX >= tCharSize.iWidth) {
-                tDrawBox.tLocation.iX -= tCharSize.iWidth;
-            } else {
+    if(str!=NULL)
+    {
+        while(*str) {
+            if (*str == '\r') {
                 tDrawBox.tLocation.iX = 0;
+            } else if (*str == '\n') {
+                tDrawBox.tLocation.iX = 0;
+                tDrawBox.tLocation.iY += tCharSize.iHeight;
+
+                tDrawBox.tSize.iHeight += tCharSize.iHeight;
+            } else if (*str == '\t') {
+                tDrawBox.tLocation.iX += tCharSize.iWidth * 4;
+                tDrawBox.tLocation.iX -= tDrawBox.tLocation.iX
+                        % tCharSize.iWidth;
+
+                tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
+
+            }else if (*str == '\b') {
+                if (tDrawBox.tLocation.iX >= tCharSize.iWidth) {
+                    tDrawBox.tLocation.iX -= tCharSize.iWidth;
+                } else {
+                    tDrawBox.tLocation.iX = 0;
+                }
+            } else {
+
+                int8_t chCodeLength = arm_2d_helper_get_utf8_byte_valid_length((uint8_t *)str);
+                if (chCodeLength <= 0) {
+                    chCodeLength = 1;
+                }
+
+                arm_2d_helper_get_char_descriptor(  ptFont,&tCharDescriptor,str);
+
+                tDrawBox.tLocation.iX += tCharDescriptor.iAdvance;
+                tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
+
+                str += chCodeLength;
+                continue;
             }
-        } else {
 
-            int8_t chCodeLength = arm_2d_helper_get_utf8_byte_valid_length((uint8_t *)str);
-            if (chCodeLength <= 0) {
-                chCodeLength = 1;
-            }
-
-            arm_2d_helper_get_char_descriptor(  ptFont,&tCharDescriptor,str);
-
-            tDrawBox.tLocation.iX += tCharDescriptor.iAdvance;
-            tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
-
-            str += chCodeLength;
-            continue;
+            str++;
         }
-
-        str++;
     }
-
     return tDrawBox.tSize;
 }
 
@@ -824,4 +826,121 @@ arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
     } while(true);
 
     return ptCandidate;
+}
+
+arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign)
+{
+    switch (tAlign)
+    {
+    case ARM_2D_ALIGN_LEFT:
+    {
+        childRegion.tLocation.iX=0;
+        if(childRegion.tSize.iWidth>parentRegion.tSize.iWidth)
+        {
+            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+        }
+
+        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+        {
+            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
+        }
+        else
+        {
+            childRegion.tLocation.iY=0;
+            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+        }
+        break;
+    }
+    case ARM_2D_ALIGN_RIGHT:
+    {
+        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+        {
+            childRegion.tLocation.iX=parentRegion.tSize.iWidth-childRegion.tSize.iWidth;
+        }
+        else
+        {
+            childRegion.tLocation.iX=0;
+            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+        }
+
+        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+        {
+            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
+        }
+        else
+        {
+            childRegion.tLocation.iY=0;
+            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+        }
+        break;
+    }
+    case ARM_2D_ALIGN_TOP:
+    {
+        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+        {
+            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
+        }
+        else
+        {
+            childRegion.tLocation.iX=0;
+            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+        }
+
+        childRegion.tLocation.iY=0;
+        if(childRegion.tSize.iHeight>parentRegion.tSize.iHeight)
+        {
+            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+        }
+        break;
+    }
+    case ARM_2D_ALIGN_BOTTOM:
+    {
+        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+        {
+            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
+        }
+        else
+        {
+            childRegion.tLocation.iX=0;
+            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+        }
+
+        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+        {
+            childRegion.tLocation.iY=parentRegion.tSize.iHeight-childRegion.tSize.iHeight;
+        }
+        else
+        {
+            childRegion.tLocation.iY=0;
+            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+        }
+        break;
+    }
+    case ARM_2D_ALIGN_CENTRE:
+    {
+        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+        {
+            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
+        }
+        else
+        {
+            childRegion.tLocation.iX=0;
+            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+        }
+
+        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+        {
+            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
+        }
+        else
+        {
+            childRegion.tLocation.iY=0;
+            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return childRegion;
 }

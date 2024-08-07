@@ -150,7 +150,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
         ldGraphSetValue(obj,1,i,rand() % 81);
     }
 
-    obj=ldTableInit(20,0,780,150,200,100,6,6,1,FONT_ARIAL_12);
+    obj=ldTableInit(20,0,780,150,200,100,10,6,1,FONT_ARIAL_12);
     ldTableSetExcelType(obj,FONT_ARIAL_12);
     ldTableSetKeyboard(obj,ID_KB);
 

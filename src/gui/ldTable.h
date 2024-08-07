@@ -93,6 +93,7 @@ ARM_PRIVATE(
     int64_t timer;
     uint16_t kbNameId;
     bool isBgTransparent:1;
+    bool isAlignGrid:1;
 };
 
 ldTable_t* ldTable_init(ld_scene_t *ptScene, ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, arm_2d_font_t *ptFont);
@@ -111,8 +112,9 @@ void ldTableSetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_a
 void ldTableSetItemImage(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t* ptImgTile,arm_2d_tile_t *ptMaskTile,ldColor maskColor);
 void ldTableSetItemButton(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t *ptReleaseImgTile,arm_2d_tile_t *ptReleaseMaskTile,ldColor releaseImgMaskColor,arm_2d_tile_t *ptPressImgTile,arm_2d_tile_t *ptPressMaskTile,ldColor pressImgMaskColor,bool isCheckable);
 void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId);
-void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable);
+void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax);
 void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont);
+void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid);
 
 #define ldTableInit(nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace,ptFont) \
         ldTable_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace,ptFont)
