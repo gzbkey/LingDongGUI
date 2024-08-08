@@ -521,17 +521,8 @@ static bool slotKBProcess(ld_scene_t *ptScene,ldMsg_t msg)
     {
     case SIGNAL_PRESS:
     {
-//        arm_2d_location_t parentPos={0};
-//        parentPos=ldBaseGetAbsoluteLocation(ptWidget,parentPos);
-//        ldPoint_t parentPos=ldBaseGetGlobalPos(ptWidget->parentWidget);
         ptWidget->clickPoint.iX=(int16_t)GET_SIGNAL_VALUE_X(msg.value);
         ptWidget->clickPoint.iY=(int16_t)GET_SIGNAL_VALUE_Y(msg.value);
-//        ptWidget->clickPoint.iX-=(kbRegion.tLocation.iX+parentPos.iX);
-//        ptWidget->clickPoint.iY-=(kbRegion.tLocation.iY+parentPos.iY);
-//        LOG_LOCATION("kb",ptWidget->clickPoint);
-//        LOG_REGION("kb",ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion);
-//        ptWidget->clickPoint.iY-=LD_CFG_SCEEN_HEIGHT>>1;
-//        LOG_LOCATION("",ptWidget->clickPoint);
         ptWidget->isClick=false;
         ptWidget->use_as__ldBase_t.tTempRegion =_keyboardGetClickRegion(ptWidget);
         ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
