@@ -65,6 +65,10 @@ ldTemplate_t* ldTemplate_init( ld_scene_t *ptScene,ldTemplate_t *ptWidget, uint1
             return NULL;
         }
     }
+    else
+    {
+        memset(ptWidget, 0, sizeof(ldTemplate_t));
+    }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);

@@ -186,6 +186,11 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldKeyboardInit(ID_KB,0,FONT_ARIAL_12);
 //ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-200);
 
+    obj=ldArcInit(25,0,450,450,101,101,IMAGE_ARC_QUARTER_PNG_Mask,IMAGE_ARC_QUARTER_MASK_PNG_Mask,__RGB(240,240,240));
+    ldArcSetBgAngle(obj,0,350);
+    ldArcSetFgAngle(obj,30);
+    ldArcSetColor(obj,__RGB(173, 216, 230),__RGB(144, 238, 144));
+
     uiWidgetLogicInit(ptScene);
 }
 
@@ -197,6 +202,8 @@ void uiWidgetLoop(ld_scene_t* ptScene)
     ldGauge_t *ptGauge=ldBaseGetWidgetById(17);
     if(ldTimeOut(100,&timer,true))
     {
+//        ldArcSetRotationAngle(ldBaseGetWidgetById(25),angle);
+
         ldGaugeSetAngle(ptGauge,angle);
         angle+=1;
         if(angle>=360)

@@ -57,6 +57,26 @@ widgetTypeTable,
 widgetTypeKeyboard,
 }ldWidgetType_t;
 
+
+#ifndef SET_BITS
+#define SET_BITS(data,value)                    ((data)|=(value))
+#endif
+#ifndef CLR_BITS
+#define CLR_BITS(data,value)                    ((data)&=~(value))
+#endif
+#ifndef SETBIT
+#define SETBIT(data,move)                       ((data)|=(1<<(move)))
+#endif
+#ifndef CLRBIT
+#define CLRBIT(data,move)                       ((data)&=~(1<<(move)))
+#endif
+#ifndef GETBIT
+#define GETBIT(data,move)                       (((data)>>(move))&0x01)
+#endif
+#ifndef PUTBIT
+#define PUTBIT(data,value,move)                 ((value)?SETBIT(data,move):CLRBIT(data,move))
+#endif
+
 //btn占用0-9
 #define SIGNAL_NO_OPERATION             BTN_NO_OPERATION
 #define SIGNAL_PRESS                    BTN_PRESS           // value = x (2Byte) + y (2Byte)
