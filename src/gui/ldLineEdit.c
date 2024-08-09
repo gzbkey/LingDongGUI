@@ -188,10 +188,13 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
     }
 
     if (bIsNewFrame) {
-        if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&ptWidget->isEditing)
+        if(ptWidget->isEditing)
         {
-            cursorBlinkCount=0;
-            cursorBlinkFlag=!cursorBlinkFlag;
+            if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
+            {
+                cursorBlinkCount=0;
+                cursorBlinkFlag=!cursorBlinkFlag;
+            }
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
     }
@@ -238,7 +241,6 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
             arm_2d_size_t strSize=arm_lcd_text_get_box(ptWidget->pText, ptWidget->ptFont);
             if(ptWidget->pText!=NULL)
             {
-
                 arm_2d_align_t tAlign=ARM_2D_ALIGN_LEFT;
                 if(strSize.iWidth>tempRegion.tSize.iWidth)
                 {

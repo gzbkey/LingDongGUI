@@ -24,8 +24,13 @@ extern "C" {
 #endif
 
 #include "ldConfig.h"
+
 #ifndef LOG_PRINT
 #include "stdio.h"
+#endif
+
+#if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
+#include "arm_2d_helper.h"
 #endif
 
 #define LOG_LEVEL_NONE                  (0)
@@ -106,7 +111,7 @@ extern "C" {
 #define LOG_SIZE(str,size)              LOG_PRINT("[SIZE] %s w=%d,h=%d" LOG_END,str,(size).iWidth,(size).iHeight)
 #define LOG_POINT(str,point)            LOG_PRINT("[POINT] %s x=%d,y=%d" LOG_END,str,(point).x,(point).y)
 #define LOG_XY(str,x,y)                 LOG_PRINT("[XY] %s x=%d,y=%d" LOG_END,str,(x),(y))
-#define LOG_TIME_STAMP(fmt, ...)        LOG_PRINT(ANSI_BLUE"[T] %lld " ANSI_RESET fmt LOG_END,arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp()),##__VA_ARGS__)
+#define LOG_TIME_STAMP(fmt, ...)        LOG_PRINT(ANSI_BLUE"[T] %I64d " ANSI_RESET fmt LOG_END,arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp()),##__VA_ARGS__)
 #else
 #define LOG_DEBUG(...)                  {}
 #define LOG_REGION(...)                 {}
@@ -116,21 +121,6 @@ extern "C" {
 #define LOG_XY(...)                     {}
 #define LOG_TIME_STAMP(...)             {}
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #ifdef __cplusplus
 }

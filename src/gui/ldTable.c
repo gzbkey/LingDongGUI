@@ -648,10 +648,13 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
                                         ptWidget->use_as__ldBase_t.opacity);
                         }
 
-                        if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&bIsNewFrame&&item->isEditing)
+                        if(item->isEditing)
                         {
-                            cursorBlinkCount=0;
-                            cursorBlinkFlag=!cursorBlinkFlag;
+                            if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
+                            {
+                                cursorBlinkCount=0;
+                                cursorBlinkFlag=!cursorBlinkFlag;
+                            }
                             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
                         }
 

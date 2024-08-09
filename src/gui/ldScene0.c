@@ -196,23 +196,13 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                             {
                                 widgetLoca.iX=0;
                                 widgetLoca.iY=0;
-
                                 widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
-//                                LOG_LOCATION("",widgetLoca);
+
                                 //region no change
                                 tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
 
-//                                LOG_REGION("o",tRegion);
                                 tRegion.tLocation.iX+=widgetLoca.iX;
                                 tRegion.tLocation.iY+=widgetLoca.iY;
-//                                LOG_REGION("n",tRegion);
-
-//                                if((tRegion.tLocation.iX>=LD_CFG_SCEEN_WIDTH)||(tRegion.tLocation.iY>=LD_CFG_SCEEN_HEIGHT)||((tRegion.tLocation.iX+tRegion.tSize.iWidth)<=0)||((tRegion.tLocation.iY+tRegion.tSize.iHeight)<=0))
-//                                {
-//                                    LOG_LOCATION("",widgetLoca);
-//                                    LOG_REGION("err",tRegion);
-//                                    continue;
-//                                }
                             }
                             else
                             {
