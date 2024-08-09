@@ -167,8 +167,9 @@ void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
     }
 }
 
-void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot,arm_2d_control_node_t *ptNode)
+void ldBaseNodeRemove(arm_2d_control_node_t *ptNode)
 {
+    arm_2d_control_node_t *ptNodeRoot=ldBaseGetRootNode(ptNode);
     arm_2d_control_node_t *ptNext=ptNode->ptNext;
 
     arm_ctrl_enum(ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
@@ -909,4 +910,16 @@ arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_
         break;
     }
     return childRegion;
+}
+
+arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode)
+{
+    do{
+        if(ptNode->ptParent==NULL)
+        {
+            return ptNode;
+        }
+        ptNode=ptNode->ptParent;
+    }
+    while(true);
 }

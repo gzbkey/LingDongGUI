@@ -56,9 +56,9 @@ typedef struct ldGraph_t ldGraph_t;
 struct ldGraph_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     uint16_t xAxisMax;
     uint16_t yAxisMax;
     uint16_t xAxisOffset;

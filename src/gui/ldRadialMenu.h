@@ -66,9 +66,9 @@ typedef struct {
 struct ldRadialMenu_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
 
     ldRadialMenuItem_t *ptItemInfoList;
 //    uint8_t itemCount;

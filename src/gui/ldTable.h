@@ -74,9 +74,9 @@ typedef struct ldTable_t ldTable_t;
 struct ldTable_t
 {
     implement(ldBase_t);
-ARM_PRIVATE(
-    ld_scene_t *ptScene;
-)
+//ARM_PRIVATE(
+//    ld_scene_t *ptScene;
+//)
 
     uint8_t rowCount;
     uint8_t columnCount;

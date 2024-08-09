@@ -46,9 +46,9 @@ typedef struct ldImage_t ldImage_t;
 
 struct ldImage_t {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     ldColor bgColor;
     ldColor fgColor;
     arm_2d_tile_t* ptImgTile;

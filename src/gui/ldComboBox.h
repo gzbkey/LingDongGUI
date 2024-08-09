@@ -49,9 +49,9 @@ typedef struct ldComboBox_t ldComboBox_t;
 struct ldComboBox_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     arm_2d_tile_t *ptDropdownImgTile;
     arm_2d_tile_t *ptDropdownMaskTile;
     uint8_t itemMax;

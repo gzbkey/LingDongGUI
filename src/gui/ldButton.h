@@ -53,9 +53,9 @@ typedef struct ldButton_t ldButton_t;
 struct ldButton_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     arm_2d_tile_t *ptReleaseImgTile;
     arm_2d_tile_t *ptReleaseMaskTile;
     arm_2d_tile_t *ptPressImgTile;

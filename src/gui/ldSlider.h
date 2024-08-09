@@ -49,9 +49,9 @@ typedef struct ldSlider_t ldSlider_t;
 struct ldSlider_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     uint16_t permille;
     ldColor bgColor;
     ldColor frameColor;

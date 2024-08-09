@@ -49,9 +49,9 @@ typedef struct ldKeyboard_t ldKeyboard_t;
 struct ldKeyboard_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     uint8_t **ppStr;
     arm_2d_font_t *ptFont;
     arm_2d_location_t clickPoint;

@@ -70,7 +70,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
         memset(ptWidget, 0, sizeof(ldImage_t));
     }
 
-    ptWidget->ptScene=ptScene;
+//    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
@@ -162,7 +162,7 @@ void ldImage_depose( ldImage_t *ptWidget)
     }
 
     ldMsgDelConnect(ptWidget);
-    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
     ldFree(ptWidget);
 }
 

@@ -55,9 +55,9 @@ typedef struct ldQRCode_t ldQRCode_t;
 struct ldQRCode_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     uint8_t qrEcc;
     uint8_t qrMaxVersion;
     uint8_t qrZoom;

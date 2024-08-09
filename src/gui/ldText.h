@@ -49,9 +49,9 @@ typedef struct ldText_t ldText_t;
 struct ldText_t
 {
     implement(ldBase_t);
-ARM_PRIVATE(
-    ld_scene_t *ptScene;
-)
+//ARM_PRIVATE(
+//    ld_scene_t *ptScene;
+//)
     arm_2d_helper_pi_slider_t tPISlider;
     arm_2d_tile_t *ptImgTile;
     arm_2d_font_t *ptFont;

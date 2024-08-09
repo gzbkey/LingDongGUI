@@ -49,9 +49,9 @@ typedef struct ldScrollSelecter_t ldScrollSelecter_t;
 struct ldScrollSelecter_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     arm_2d_font_t *ptFont;
     arm_2d_tile_t *ptImgTile;
     const uint8_t **ppItemStrGroup;

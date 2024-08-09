@@ -616,7 +616,7 @@ ldKeyboard_t* ldKeyboard_init( ld_scene_t *ptScene,ldKeyboard_t *ptWidget, uint1
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
-    ptWidget->ptScene=ptScene;
+//    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = 0;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = LD_CFG_SCEEN_HEIGHT;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = LD_CFG_SCEEN_WIDTH;
@@ -661,7 +661,7 @@ void ldKeyboard_depose( ldKeyboard_t *ptWidget)
     LOG_INFO("[depose][keyboard] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     ldMsgDelConnect(ptWidget);
-    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
 
     ldFree(ptWidget);
 }

@@ -73,7 +73,7 @@ ldArc_t* ldArc_init( ld_scene_t *ptScene,ldArc_t *ptWidget, uint16_t nameId, uin
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
-    ptWidget->ptScene=ptScene;
+//    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
@@ -116,7 +116,8 @@ void ldArc_depose( ldArc_t *ptWidget)
     LOG_INFO("[depose][arc] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     ldMsgDelConnect(ptWidget);
-    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
+
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
 
     ldFree(ptWidget);
 }

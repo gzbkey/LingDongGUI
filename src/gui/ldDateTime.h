@@ -51,9 +51,9 @@ typedef struct ldDateTime_t ldDateTime_t;
 struct ldDateTime_t
 {
     implement(ldBase_t);
-ARM_PRIVATE(
-    ld_scene_t *ptScene;
-)
+//ARM_PRIVATE(
+//    ld_scene_t *ptScene;
+//)
     arm_2d_align_t tAlign;
     uint8_t month;
     uint8_t day;

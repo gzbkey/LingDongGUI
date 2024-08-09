@@ -49,9 +49,9 @@ typedef struct ldLineEdit_t ldLineEdit_t;
 struct ldLineEdit_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     arm_2d_font_t *ptFont;
     uint16_t kbNameId;
     ldColor textColor;

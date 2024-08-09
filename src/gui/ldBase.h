@@ -185,7 +185,7 @@ typedef enum{
 bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
-void ldBaseNodeRemove(arm_2d_control_node_t *ptNodeRoot, arm_2d_control_node_t *ptNode);
+void ldBaseNodeRemove(arm_2d_control_node_t *ptNode);
 #if (USE_LOG_LEVEL>=LOG_LEVEL_NONE)
 void ldBaseNodeTreePrint(arm_2d_control_node_t *ptNodeRoot, int depth);
 #endif
@@ -212,6 +212,7 @@ arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_
 arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(
                                                 arm_2d_control_node_t *ptRoot,
                                                 arm_2d_location_t tLocation);
+arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 

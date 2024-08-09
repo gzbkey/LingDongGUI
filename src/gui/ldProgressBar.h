@@ -49,9 +49,9 @@ typedef struct ldProgressBar_t ldProgressBar_t;
 struct ldProgressBar_t
 {
     implement(ldBase_t);
-ARM_PRIVATE(
-    ld_scene_t *ptScene;
-)
+//ARM_PRIVATE(
+//    ld_scene_t *ptScene;
+//)
     uint16_t permille;
     ldColor bgColor;
     ldColor fgColor;

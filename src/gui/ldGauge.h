@@ -49,9 +49,9 @@ typedef struct ldGauge_t ldGauge_t;
 struct ldGauge_t
 {
     implement(ldBase_t);
-    ARM_PRIVATE(
-            ld_scene_t *ptScene;
-    )
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
     arm_2d_tile_t *ptBgImgTile;
     arm_2d_tile_t *ptBgMaskTile;
     arm_2d_tile_t *ptPointerImgTile;
