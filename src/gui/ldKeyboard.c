@@ -305,6 +305,9 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget)
             .iHeight=LD_CFG_SCEEN_HEIGHT,
         },
     };
+    ptWidget->kbValue=KB_VALUE_NONE;
+    clickPos.iX=-1;
+    clickPos.iY=-1;
 
     if(ptWidget->isNumber)
     {
@@ -372,8 +375,8 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget)
                 }
             }
         }
-
     }
+
     if(ptWidget->kbValue<=sizeof (kbValueSpecial))
     {
         retRegion.tLocation.iX=0;
@@ -504,19 +507,6 @@ static bool slotKBProcess(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldKeyboard_t *ptWidget=msg.ptSender;
 
-//    arm_2d_region_t kbRegion={
-//        .tLocation={
-//            .iX=0,
-//            .iY=LD_CFG_SCEEN_HEIGHT>>1,
-//        },
-//        .tSize={
-//            .iWidth=LD_CFG_SCEEN_WIDTH,
-//            .iHeight=LD_CFG_SCEEN_HEIGHT>>1,
-//        },
-//    };
-
-//    kbRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
-
     switch (msg.signal)
     {
     case SIGNAL_PRESS:
@@ -535,10 +525,11 @@ static bool slotKBProcess(ld_scene_t *ptScene,ldMsg_t msg)
         ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
         ptWidget->isClick=true;
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-        ptWidget->clickPoint.iX=-1;
-        ptWidget->clickPoint.iY=-1;
-        clickPos.iX=-1;
-        clickPos.iY=-1;
+
+        if((ptWidget->kbValue==KB_VALUE_NONE)&&(clickPos.iX==-1)&&(clickPos.iY==-1)&&((int16_t)GET_SIGNAL_VALUE_Y(msg.value)<(LD_CFG_SCEEN_HEIGHT>>1)))
+        {
+            isExit=true;
+        }
 
         switch (ptWidget->kbValue)
         {
@@ -589,6 +580,11 @@ static bool slotKBProcess(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight=LD_CFG_SCEEN_HEIGHT>>1;
         }
 
+
+        ptWidget->clickPoint.iX=-1;
+        ptWidget->clickPoint.iY=-1;
+        clickPos.iX=-1;
+        clickPos.iY=-1;
         ptWidget->kbValue=KB_VALUE_NONE;
 
     }
