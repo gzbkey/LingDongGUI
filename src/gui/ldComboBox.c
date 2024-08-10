@@ -98,7 +98,17 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
 
     tLocation = ldBaseGetAbsoluteLocation(ptWidget,tLocation);
 
-    clickItemNum=((y-tLocation.iY))/ptWidget->itemHeight;
+    int16_t tempOffset=y-tLocation.iY;
+
+    if((tempOffset<0)||(tempOffset>=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight))
+    {
+        clickItemNum=SHOW_ITEM_NUM;
+    }
+    else
+    {
+        clickItemNum=tempOffset/ptWidget->itemHeight;
+    }
+
 
     switch (msg.signal) {
     case SIGNAL_PRESS:
@@ -112,16 +122,14 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->itemPreSelect=clickItemNum-1;
         }
         ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+        ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight=ptWidget->itemHeight*(ptWidget->itemCount+1);
         if(ptWidget->isExpand)
         {
-            ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight=ptWidget->itemHeight*(ptWidget->itemCount+1);
             ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight;
         }
         else
         {
-            ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight=ptWidget->itemHeight;
-            ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight;
-
+            ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->itemHeight;
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
@@ -136,7 +144,6 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
                 ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,ptWidget->itemSelect);
             }
             ptWidget->isExpand=false;
-
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
