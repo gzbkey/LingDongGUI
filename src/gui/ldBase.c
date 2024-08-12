@@ -506,24 +506,6 @@ arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t
     return tLocation;
 }
 
-arm_2d_region_t ldBaseGetAbsoluteRegion(ldBase_t *ptWidget)
-{
-    arm_2d_region_t tRegion={
-        .tLocation={0},
-        .tSize=ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize,
-    };
-    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
-
-    while(ptNode!=NULL)
-    {
-        tRegion.tLocation.iX+=((ldBase_t*)ptNode)->use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
-        tRegion.tLocation.iY+=((ldBase_t*)ptNode)->use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
-        ptNode=ptNode->ptParent;
-    }
-    return tRegion;
-}
-
-
 void ldBaseDrawCircle(arm_2d_tile_t *pTile, int centerX, int centerY, int radius, ldColor color,uint8_t opacityMax, uint8_t opacityMin)
 {
     int x, y;
@@ -698,101 +680,6 @@ void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t 
     extern void ldGuiUpdateScene(void);
 
     ldGuiUpdateScene();
-}
-
-arm_2d_control_node_t *ldBaseControlFindNodeWithLocation(arm_2d_control_node_t *ptRoot,arm_2d_location_t tLocation)
-{
-    arm_2d_control_node_t *ptNode = NULL;
-    arm_2d_control_node_t *ptCandidate = NULL;
-    arm_2d_control_node_t *ptTheLastContainer = NULL;
-
-    /* tVisibleArea is an absolute region in the virtual screen */
-    arm_2d_region_t tVisibleArea = {{0,0},{LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT}};
-
-    ptNode = ptRoot;
-
-    if (NULL == ptNode) {
-        return NULL;
-    }
-
-    /* this must be the root node */
-    assert(NULL == ptRoot->ptParent);
-
-    /* get the root node region which is a relative region of the host tile
-     * IMPORTANT: The region of the control root MUST be an absolute region
-     */
-
-    do {
-        arm_2d_region_t tControlRegion = ptNode->tRegion;
-
-        /* the node coordinate is an relative coordinate inside the container */
-        tControlRegion.tLocation.iX += tVisibleArea.tLocation.iX;
-        tControlRegion.tLocation.iY += tVisibleArea.tLocation.iY;
-
-        bool bInsideControlRegion = false;
-
-        /* we have to make sure the control's region is inside the visible area */
-        if (arm_2d_region_intersect(&tControlRegion, &tVisibleArea, &tControlRegion)) {
-
-            /* if it is inside the visible area, we check the touch point */
-            bInsideControlRegion = arm_2d_is_point_inside_region(&tControlRegion, &tLocation);
-        }
-
-        if (bInsideControlRegion) {
-            /* update candidate */
-            ptCandidate = ptNode;
-        }
-
-        if (NULL != ptNode->ptNext) {
-            /* There are more peers in the list, let's check them first */
-            ptNode = ptNode->ptNext;
-            continue;
-        }
-
-        /* When we reach here, we have already visited all peers in the list */
-        if (NULL == ptCandidate) {
-            /* the touch point hits nothing, let's end the search and
-             * return NULL
-             */
-            break;
-        }
-
-        if (ptCandidate == ptTheLastContainer) {
-            /* the only candidate is the container, i.e. the touch point hits
-             * no controls in the container, let's return the container.
-             */
-            break;
-        }
-
-        if (NULL == ptCandidate->ptChildList) {
-            /* the touch point hits a leaf, let's return the candidate */
-            break;
-        }
-
-        /* When we reach here, the most recent candidate is a container, we
-         * have to jump into it
-         */
-        ptTheLastContainer = ptCandidate;       /* update the last container */
-
-        /* read the candidate region */
-        tControlRegion = ptCandidate->tRegion;
-
-        /* the candidate coordinate is an relative coordinate inside the container */
-        tControlRegion.tLocation.iX += tVisibleArea.tLocation.iX;
-        tControlRegion.tLocation.iY += tVisibleArea.tLocation.iY;
-
-        /* update visible area */
-        if (!arm_2d_region_intersect(&tControlRegion, &tVisibleArea, &tVisibleArea)) {
-            /* this should not happen */
-            assert(false);
-        }
-
-        /* search the child nodes */
-        ptNode = ptCandidate->ptChildList;
-
-    } while(true);
-
-    return ptCandidate;
 }
 
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign)

@@ -199,7 +199,8 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
         }
     }
 
-    arm_2d_region_t globalRegion=ldBaseGetAbsoluteRegion(ptWidget);
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,false);
 
     if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {

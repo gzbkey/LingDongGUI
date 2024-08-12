@@ -65,8 +65,7 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
     }
     case SIGNAL_PRESS:
     {
-        ptWidget=(ldBase_t*)ldBaseControlFindNodeWithLocation(ptScene->ptNodeRoot,tLocation);
-//        ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
+        ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
 
         while(ptWidget->isHidden)
         {
