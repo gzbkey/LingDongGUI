@@ -99,7 +99,7 @@ ldGauge_t* ldGauge_init( ld_scene_t *ptScene,ldGauge_t *ptWidget, uint16_t nameI
     ptWidget->centreOffsetX=centreOffsetX;
     ptWidget->centreOffsetY=centreOffsetY;
 
-    LOG_INFO("[init][gauge] id:%d", nameId);
+    LOG_INFO("[init][gauge] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

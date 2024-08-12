@@ -155,7 +155,7 @@ ldText_t* ldText_init( ld_scene_t *ptScene,ldText_t *ptWidget, uint16_t nameId, 
         ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotTextVerticalScroll);
     }
 
-    LOG_INFO("[init][text] id:%d", nameId);
+    LOG_INFO("[init][text] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

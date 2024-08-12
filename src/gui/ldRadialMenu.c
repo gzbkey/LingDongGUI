@@ -216,7 +216,7 @@ ldRadialMenu_t* ldRadialMenu_init( ld_scene_t *ptScene,ldRadialMenu_t *ptWidget,
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotMenuSelect);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotMenuSelect);
 
-    LOG_INFO("[init][radialMenu] id:%d", nameId);
+    LOG_INFO("[init][radialMenu] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

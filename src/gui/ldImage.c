@@ -92,7 +92,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
             ptScene->ptNodeRoot=(arm_2d_control_node_t*)ptWidget;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeBackground;
             ptWidget->bgColor=__RGB(240,240,240);
-            LOG_INFO("[init][background] id:%d",nameId);
+            LOG_INFO("[init][background] id:%d, size:%llu", nameId,sizeof (*ptWidget));
         }
         else
         {
@@ -100,7 +100,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
             ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
             ptWidget->isTransparent=true;
             ptWidget->use_as__ldBase_t.widgetType=widgetTypeWindow;
-            LOG_INFO("[init][window] id:%d",nameId);
+            LOG_INFO("[init][window] id:%d, size:%llu", nameId,sizeof (*ptWidget));
         }
     }
     else
@@ -108,7 +108,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
         ptParent=ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
         ldBaseNodeAdd((arm_2d_control_node_t*)ptParent,(arm_2d_control_node_t*)ptWidget);
         ptWidget->use_as__ldBase_t.widgetType=widgetTypeImage;
-        LOG_INFO("[init][image] id:%d",nameId);
+        LOG_INFO("[init][image] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     }
     return ptWidget;
 }

@@ -94,7 +94,7 @@ ldQRCode_t* ldQRCode_init(ld_scene_t *ptScene, ldQRCode_t *ptWidget, uint16_t na
     ptWidget->qrColor=qrColor;
     ptWidget->bgColor=bgColor;
 
-    LOG_INFO("[init][QRCode] id:%d", nameId);
+    LOG_INFO("[init][QRCode] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

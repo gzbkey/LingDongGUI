@@ -87,7 +87,7 @@ ldProgressBar_t* ldProgressBar_init( ld_scene_t *ptScene,ldProgressBar_t *ptWidg
     ptWidget->isHorizontal=true;
     ptWidget->timer=0;
 
-    LOG_INFO("[init][progressBar] id:%d", nameId);
+    LOG_INFO("[init][progressBar] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

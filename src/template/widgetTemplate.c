@@ -73,7 +73,6 @@ ldTemplate_t* ldTemplate_init( ld_scene_t *ptScene,ldTemplate_t *ptWidget, uint1
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
-    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
@@ -85,7 +84,7 @@ ldTemplate_t* ldTemplate_init( ld_scene_t *ptScene,ldTemplate_t *ptWidget, uint1
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
 
-    LOG_INFO("[init][template] id:%d", nameId);
+    LOG_INFO("[init][template] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -104,7 +103,7 @@ void ldTemplate_depose( ldTemplate_t *ptWidget)
     LOG_INFO("[depose][template] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     ldMsgDelConnect(ptWidget);
-    ldBaseNodeRemove(ptWidget->ptScene->ptNodeRoot,(arm_2d_control_node_t*)ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
 
     ldFree(ptWidget);
 }
@@ -112,13 +111,19 @@ void ldTemplate_depose( ldTemplate_t *ptWidget)
 void ldTemplate_on_load( ldTemplate_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 }
 
 void ldTemplate_on_frame_start( ldTemplate_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 }
 
 void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
@@ -134,7 +139,9 @@ void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_t
         
     }
 #endif
-    arm_2d_region_t globalRegion=ldBaseGetAbsoluteRegion(ptWidget);
+
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,false);
 
     if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {

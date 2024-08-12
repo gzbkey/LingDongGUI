@@ -143,7 +143,7 @@ ldLineEdit_t* ldLineEdit_init( ld_scene_t *ptScene,ldLineEdit_t *ptWidget, uint1
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotLineEditProcess);
     ldMsgConnect(ptWidget,SIGNAL_EDITING_FINISHED,slotEditEnd);
 
-    LOG_INFO("[init][lineEdit] id:%d", nameId);
+    LOG_INFO("[init][lineEdit] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 
