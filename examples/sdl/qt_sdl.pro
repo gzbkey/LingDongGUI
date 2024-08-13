@@ -24,6 +24,7 @@ HEADERS += \ #$$files(../common/demo/*.h, true) \
            $$files(../common/Arm-2D/Library/Source/*.inc) \
            $$files(../common/Arm-2D/Library/Include/*.h) \
            $$files(../common/Arm-2D/Helper/Include/*.h) \
+           $$files(../common/math/*.h) \
            $$files(../../src/gui/*.h) \
            $$files(../../src/misc/*.h)
 
