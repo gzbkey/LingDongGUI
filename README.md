@@ -73,6 +73,7 @@ widget demo sdl
 | ✅ | graph | 波形图 |
 | ✅ | combo box | 下拉框 |
 | ✅ | arc bar | 圆环进度条 |
+| ✅ | animation | gif动画 |
 | 🔲 | calendar | 日历 |
 | 🔲 | message box | 消息框 |
 | 🔲 | clock | 模拟时钟 |

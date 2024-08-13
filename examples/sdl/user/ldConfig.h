@@ -100,7 +100,7 @@ extern "C" {
 
 #if USE_DEMO == 1
 #undef LD_CFG_COLOR_DEPTH
-#define LD_CFG_COLOR_DEPTH                        (32)
+#define LD_CFG_COLOR_DEPTH                        (16)
 #undef LD_CFG_SCEEN_WIDTH
 #define LD_CFG_SCEEN_WIDTH                        (1024)
 #undef LD_CFG_SCEEN_HEIGHT

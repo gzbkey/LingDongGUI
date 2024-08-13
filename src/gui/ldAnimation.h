@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#ifndef __LD_TEMPLATE_H__
-#define __LD_TEMPLATE_H__
+#ifndef __LD_ANIMATION_H__
+#define __LD_ANIMATION_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -34,38 +34,40 @@ extern "C"
 
 
 /* OOC header, please DO NOT modify  */
-#ifdef __LD_TEMPLATE_IMPLEMENT__
-#undef __LD_TEMPLATE_IMPLEMENT__
+#ifdef __LD_ANIMATION_IMPLEMENT__
+#undef __LD_ANIMATION_IMPLEMENT__
 #define __ARM_2D_IMPL__
-#elif defined(__LD_TEMPLATE_INHERIT__)
-#undef __LD_TEMPLATE_INHERIT__
+#elif defined(__LD_ANIMATION_INHERIT__)
+#undef __LD_ANIMATION_INHERIT__
 #define __ARM_2D_INHERIT__
 #endif
 #include "arm_2d_utils.h"
 #include "ldBase.h"
 
-typedef struct ldTemplate_t ldTemplate_t;
+typedef struct ldAnimation_t ldAnimation_t;
 
-struct ldTemplate_t
+struct ldAnimation_t
 {
     implement(ldBase_t);
 
-    /* place your public member here */
-    
+    arm_2d_tile_t *ptImgTile;
+    arm_2d_region_t showRegion;
+    int64_t frameTimer;
+    uint16_t periodMs;
 };
 
-ldTemplate_t* ldTemplate_init(ld_scene_t *ptScene, ldTemplate_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
-void ldTemplate_depose( ldTemplate_t *ptWidget);
-void ldTemplate_on_load( ldTemplate_t *ptWidget);
-void ldTemplate_on_frame_start( ldTemplate_t *ptWidget);
-void ldTemplate_show(ld_scene_t *pScene, ldTemplate_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+ldAnimation_t* ldAnimation_init(ld_scene_t *ptScene, ldAnimation_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t *ptImgTile, uint16_t periodMs);
+void ldAnimation_depose( ldAnimation_t *ptWidget);
+void ldAnimation_on_load( ldAnimation_t *ptWidget);
+void ldAnimation_on_frame_start( ldAnimation_t *ptWidget);
+void ldAnimation_show(ld_scene_t *pScene, ldAnimation_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-#define ldTemplateInit(nameId,parentNameId,x,y,width,height) \
-        ldTemplate_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
+#define ldAnimationInit(nameId,parentNameId,x,y,width,height,ptImgTile,periodMs) \
+        ldAnimation_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptImgTile,periodMs)
 
-#define ldTemplateSetHidden                ldBaseSetHidden
-#define ldTemplateMove                     ldBaseMove
-#define ldTemplateSetOpacity               ldBaseSetOpacity
+#define ldAnimationSetHidden                ldBaseSetHidden
+#define ldAnimationMove                     ldBaseMove
+#define ldAnimationSetOpacity               ldBaseSetOpacity
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

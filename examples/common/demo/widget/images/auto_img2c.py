@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from PIL import Image
 
 def process_image(output_dir, image_path, output_path ,output_name):
     command = f'python {output_dir}/img2c.py -i {image_path} -o {output_path} --name {output_name}'
@@ -52,6 +53,10 @@ def main(argv):
             text_file_name=filename.replace(".", "_")
             print('    ',filename,' -> ',text_file_name)
             process_image(current_dir, image_path, output_path, output_name)
+            with Image.open(image_path) as img:
+                imgW, imgH = img.size
+                header_content += f"""
+// {filename} < {imgW}x{imgH} >"""
 
             header_content += f"""
 #if LD_CFG_COLOR_DEPTH == 8
@@ -62,26 +67,32 @@ extern const arm_2d_tile_t c_tile_{text_file_name}_RGB565;
 #define IMAGE_{text_file_name.upper()}          (arm_2d_tile_t*)&c_tile_{text_file_name}_RGB565
 #else"""
             print(file_extension)
-            if(file_extension=='.png'):
+            if(file_extension=='.png' or file_extension=='.gif'):
                 header_content += f"""
 extern const arm_2d_tile_t c_tile_{text_file_name}_CCCA8888;
-#define IMAGE_{text_file_name.upper()}                 (arm_2d_tile_t*)&c_tile_{text_file_name}_CCCA8888
-extern const arm_2d_tile_t c_tile_{text_file_name}_A1Mask;
-#define IMAGE_{text_file_name.upper()}_A1Mask          (arm_2d_tile_t*)&c_tile_{text_file_name}_A1Mask
-extern const arm_2d_tile_t c_tile_{text_file_name}_A2Mask;
-#define IMAGE_{text_file_name.upper()}_A2Mask          (arm_2d_tile_t*)&c_tile_{text_file_name}_A2Mask
-extern const arm_2d_tile_t c_tile_{text_file_name}_A4Mask;
-#define IMAGE_{text_file_name.upper()}_A4Mask          (arm_2d_tile_t*)&c_tile_{text_file_name}_A4Mask
-extern const arm_2d_tile_t c_tile_{text_file_name}_Mask;
-#define IMAGE_{text_file_name.upper()}_Mask            (arm_2d_tile_t*)&c_tile_{text_file_name}_Mask
-#endif
-"""
+#define IMAGE_{text_file_name.upper()}          (arm_2d_tile_t*)&c_tile_{text_file_name}_CCCA8888
+#endif"""
             else:
                 header_content += f"""
 extern const arm_2d_tile_t c_tile_{text_file_name}_CCCN888;
-#define IMAGE_{text_file_name.upper()}          &c_tile_{text_file_name}_CCCN888
-#endif
+#define IMAGE_{text_file_name.upper()}          (arm_2d_tile_t*)&c_tile_{text_file_name}_CCCN888
+#endif"""
+
+            if(file_extension=='.png'):
+                header_content += f"""
+extern const arm_2d_tile_t c_tile_{text_file_name}_A1Mask;
+#define IMAGE_{text_file_name.upper()}_A1Mask   (arm_2d_tile_t*)&c_tile_{text_file_name}_A1Mask
+extern const arm_2d_tile_t c_tile_{text_file_name}_A2Mask;
+#define IMAGE_{text_file_name.upper()}_A2Mask   (arm_2d_tile_t*)&c_tile_{text_file_name}_A2Mask
+extern const arm_2d_tile_t c_tile_{text_file_name}_A4Mask;
+#define IMAGE_{text_file_name.upper()}_A4Mask   (arm_2d_tile_t*)&c_tile_{text_file_name}_A4Mask
+extern const arm_2d_tile_t c_tile_{text_file_name}_Mask;
+#define IMAGE_{text_file_name.upper()}_Mask     (arm_2d_tile_t*)&c_tile_{text_file_name}_Mask
 """
+            else:
+                header_content += f"""
+"""
+
 
             with open(f"{current_dir}/uiImages.h", 'w') as file:
                 file.write(header_content_start)

@@ -55,6 +55,7 @@ widgetTypeScrollSelecter,
 widgetTypeLabel,
 widgetTypeTable,
 widgetTypeKeyboard,
+widgetTypeAnimation,
 }ldWidgetType_t;
 
 
