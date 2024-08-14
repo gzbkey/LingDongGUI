@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldList.h"
 #include "ldAnimation.h"
 #include "ldArc.h"
 #include "ldKeyboard.h"

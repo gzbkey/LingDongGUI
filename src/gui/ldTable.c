@@ -265,6 +265,7 @@ static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
             _totalItemHeight+=ptWidget->itemSpace;
             _totalItemHeight+=ptWidget->pRowHeight[i];
         }
+        _totalItemHeight+=ptWidget->itemSpace;
 
         if(currentItem->isButton)
         {

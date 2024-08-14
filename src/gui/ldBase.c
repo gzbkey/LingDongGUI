@@ -810,3 +810,42 @@ arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode)
     }
     while(true);
 }
+
+int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion,int16_t currentOffset,uint8_t itemCount,uint8_t itemHeight,uint8_t space)
+{
+    int16_t offsetTemp,listHeight;
+    uint8_t row;
+    int16_t targetOffset;
+
+    offsetTemp=currentOffset;
+    targetOffset=currentOffset;
+
+    for(row=0;row<itemCount;row++)
+    {
+        offsetTemp+=itemHeight+space;
+        if(offsetTemp>0)
+        {
+            break;
+        }
+    }
+
+    if(offsetTemp<((itemHeight+space)>>1))
+    {
+        targetOffset-=offsetTemp;
+    }
+    else
+    {
+        targetOffset+=itemHeight-offsetTemp+space;
+    }
+
+    if(currentOffset<0)
+    {
+        listHeight=itemCount*(itemHeight+space)+space;
+
+        if((targetOffset+listHeight)<widgetRegion.tSize.iHeight)
+        {
+            targetOffset=widgetRegion.tSize.iHeight-listHeight;
+        }
+    }
+    return targetOffset;
+}

@@ -199,11 +199,42 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
         return;
     }
 
-#if 0
     if (bIsNewFrame) {
-        
+        if(ptWidget->isMoveReset)
+        {
+            int32_t iResult;
+            bool isPiEnd;
+
+            isPiEnd=arm_2d_helper_pi_slider(&ptWidget->tPISlider, ptWidget->_scrollOffset, &iResult);
+
+            if(ptWidget->_isTopScroll)
+            {
+                if(isPiEnd)
+                {
+                    ptWidget->isMoveReset=false;
+                    ptWidget->scrollOffset=0;
+                }
+                else
+                {
+                    ptWidget->scrollOffset=ptWidget->_scrollOffset-iResult;
+                    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                }
+            }
+            if(ptWidget->_isBottomScroll)
+            {
+                if(isPiEnd)
+                {
+                    ptWidget->isMoveReset=false;
+                    ptWidget->scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight;
+                }
+                else
+                {
+                    ptWidget->scrollOffset=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight)-(ptWidget->_scrollOffset-iResult);
+                    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                }
+            }
+        }
     }
-#endif
 
     arm_2d_region_t globalRegion;
     arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,false);
@@ -217,67 +248,7 @@ void ldText_show(ld_scene_t *ptScene, ldText_t *ptWidget, const arm_2d_tile_t *p
                 break;
             }
 
-            if(ptWidget->isMoveReset)
-            {
-//                if(ptWidget->_isTopScroll)
-//                {
-//                if(ptWidget->scrollOffset>0)
-//                {
-//                    ptWidget->scrollOffset--;
-//                }
-//                if(ptWidget->scrollOffset==0)
-//                {
-//                    ptWidget->isMoveReset=false;
-//                }
-//                }
 
-//                if(ptWidget->_isBottomScroll)
-//                {
-//                if(ptWidget->scrollOffset<(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight))
-//                {
-//                    ptWidget->scrollOffset++;
-//                }
-
-//                if(ptWidget->scrollOffset==ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)
-//                {
-//                    ptWidget->isMoveReset=false;
-//                }
-//                }
-
-//                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-
-                int32_t iResult;
-                bool isPiEnd;
-
-                isPiEnd=arm_2d_helper_pi_slider(&ptWidget->tPISlider, ptWidget->_scrollOffset, &iResult);
-
-                if(ptWidget->_isTopScroll)
-                {
-                    if(isPiEnd)
-                    {
-                        ptWidget->isMoveReset=false;
-                        ptWidget->scrollOffset=0;
-                    }
-                    else
-                    {
-                        ptWidget->scrollOffset=ptWidget->_scrollOffset-iResult;
-                        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-                    }
-                }
-                if(ptWidget->_isBottomScroll)
-                {
-                    if(isPiEnd)
-                    {
-                        ptWidget->isMoveReset=false;
-                        ptWidget->scrollOffset=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight;
-                    }
-                    else
-                    {
-                        ptWidget->scrollOffset=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->strHeight)-(ptWidget->_scrollOffset-iResult);
-                        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-                    }
-                }
-            }
 
             if(!ptWidget->isTransparent)
             {

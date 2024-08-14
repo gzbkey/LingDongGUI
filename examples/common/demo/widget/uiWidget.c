@@ -44,6 +44,31 @@ const uint8_t *iconName[5]={"11","22","33","44","55"};
 
 const uint8_t *pComboBoxStrGroup[3]={"11","22","00"};
 #define ID_KB  22
+
+void listItemProcess(ldList_t *ptWidget,uint8_t itemNum,arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,arm_2d_location_t clickPos,bool bIsNewFrame)
+{
+//    arm_2d_draw_box(ptTile,ptRegion,1,0,255);
+    ptRegion->tSize.iHeight-=1;
+    draw_round_corner_box(  ptTile,
+                            ptRegion,
+                            GLCD_COLOR_BLACK,
+                            64,
+                            bIsNewFrame);
+
+    arm_lcd_text_set_target_framebuffer(ptTile);
+    arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
+    arm_lcd_text_set_draw_region(ptRegion);
+    arm_lcd_text_set_colour(GLCD_COLOR_BLACK, GLCD_COLOR_WHITE);
+    arm_lcd_text_location(0,0);
+    arm_lcd_printf_label(ARM_2D_ALIGN_CENTRE,"%d",itemNum);
+
+    if((clickPos.iX!=-1)&&(clickPos.iY!=-1))
+    {
+        LOG_DEBUG("itemNum %d",ptWidget->selectItem);
+        LOG_LOCATION("",clickPos);
+    }
+}
+
 void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
@@ -184,12 +209,14 @@ void uiWidgetInit(ld_scene_t* ptScene)
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 
     ldKeyboardInit(ID_KB,0,FONT_ARIAL_12);
-//ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-200);
 
     obj=ldArcInit(25,0,450,450,101,101,IMAGE_ARC_QUARTER_PNG_Mask,IMAGE_ARC_QUARTER_MASK_PNG_Mask,__RGB(240,240,240));
     ldArcSetBgAngle(obj,0,350);
     ldArcSetFgAngle(obj,30);
     ldArcSetColor(obj,__RGB(173, 216, 230),__RGB(144, 238, 144));
+
+    obj=ldListInit(26,0,850,280,100,100);
+    ldListSetItemFunc(obj,listItemProcess);
 
     uiWidgetLogicInit(ptScene);
 }

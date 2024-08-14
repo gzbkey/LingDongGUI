@@ -34,28 +34,29 @@ extern "C" {
 #include "xQueue.h"
 
 typedef enum{
-widgetTypeBackground,
-widgetTypeWindow,
-widgetTypeButton,
-widgetTypeImage,
-widgetTypeText,
-widgetTypeLineEdit,
-widgetTypeGraph,
-widgetTypeCheckBox,
-widgetTypeSlider,
-widgetTypeProgressBar,
-widgetTypeGauge,
-widgetTypeQRCode,
-widgetTypeDateTime,
-widgetTypeIconSlider,
-widgetTypeComboBox,
-widgetTypeArc,
-widgetTypeRadialMenu,
-widgetTypeScrollSelecter,
-widgetTypeLabel,
-widgetTypeTable,
-widgetTypeKeyboard,
-widgetTypeAnimation,
+    widgetTypeBackground,
+    widgetTypeWindow,
+    widgetTypeButton,
+    widgetTypeImage,
+    widgetTypeText,
+    widgetTypeLineEdit,
+    widgetTypeGraph,
+    widgetTypeCheckBox,
+    widgetTypeSlider,
+    widgetTypeProgressBar,
+    widgetTypeGauge,
+    widgetTypeQRCode,
+    widgetTypeDateTime,
+    widgetTypeIconSlider,
+    widgetTypeComboBox,
+    widgetTypeArc,
+    widgetTypeRadialMenu,
+    widgetTypeScrollSelecter,
+    widgetTypeLabel,
+    widgetTypeTable,
+    widgetTypeKeyboard,
+    widgetTypeAnimation,
+    widgetTypeList,
 }ldWidgetType_t;
 
 
@@ -207,6 +208,7 @@ ldBase_t* ldBaseGetParent(ldBase_t* ptWidget);
 void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign);
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
+int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion, int16_t currentOffset, uint8_t itemCount, uint8_t itemHeight, uint8_t space);
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 
