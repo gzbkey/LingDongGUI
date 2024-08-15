@@ -663,6 +663,11 @@ ldBase_t* ldBaseGetParent(ldBase_t* ptWidget)
     return ptWidget->use_as__arm_2d_control_node_t.ptParent;
 }
 
+ldBase_t* ldBaseGetChildList(ldBase_t* ptWidget)
+{
+    return ptWidget->use_as__arm_2d_control_node_t.ptChildList;
+}
+
 void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
 {
     ldBase_t *ptWidget= ptScene->ptNodeRoot;

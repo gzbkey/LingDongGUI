@@ -71,7 +71,7 @@ void listItemProcess(ldList_t *ptWidget,uint8_t itemNum,arm_2d_tile_t *ptTile,ar
 
 void uiWidgetInit(ld_scene_t* ptScene)
 {
-    void *obj,*win;
+    void *obj,*win,*list;
 
     ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
 
@@ -206,7 +206,6 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldButtonSetFont(obj,FONT_ARIAL_16_A8);
     ldButtonSetText(obj,(uint8_t*)"123");
 
-//    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 
     ldKeyboardInit(ID_KB,0,FONT_ARIAL_12);
 
@@ -215,8 +214,17 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldArcSetFgAngle(obj,30);
     ldArcSetColor(obj,__RGB(173, 216, 230),__RGB(144, 238, 144));
 
-    obj=ldListInit(26,0,850,280,100,100);
-    ldListSetItemFunc(obj,listItemProcess);
+    list=ldListInit(26,0,850,280,100,100);
+//    ldListSetItemFunc(list,listItemProcess);
+    ldListSetItemHeight(list,30);
+    ldListSetText(list,pStrGroup,5, FONT_ARIAL_12);
+    ldListSetAlign(list,ARM_2D_ALIGN_LEFT);
+//    ldListSetItemContainer(list,5);
+
+    obj=ldButtonInit(27, 26, 10,3,20,20);
+     ldListSetItemWidget(list,1,obj);
+
+//    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 
     uiWidgetLogicInit(ptScene);
 }
