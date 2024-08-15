@@ -31,19 +31,29 @@ pip install Pillow
     2. 运行后，会提示输入跳帧参数，不需要跳帧，则直接回车。
     3. 跳帧参数输入最小值是2
 
-原理
+---
+参数为2原理
 
 ![参数为2原理](../docs/tools/demo_frames_interval_2.png)
 
+参数为3原理
+
 ![参数为3原理](../docs/tools/demo_frames_interval_3.png)
 
-实际输出效果
+---
+无跳帧实际输出效果
 
 ![无跳帧](../docs/tools/demo_frames_interval_0_out.png)
 
+参数为2实际输出效果
+
 ![参数为2](../docs/tools/demo_frames_interval_2_out.png)
 
+参数为3实际输出效果
+
 ![参数为3](../docs/tools/demo_frames_interval_3_out.png)
+
+---
 
 ### 如何使用
 
