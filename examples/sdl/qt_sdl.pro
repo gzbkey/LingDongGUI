@@ -53,7 +53,7 @@ INCLUDEPATH += $$PWD/../common/demo/widget
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc
-INCLUDEPATH += $$PWD/../../src/template
+#INCLUDEPATH += $$PWD/../../src/template
 
 contains(QT_ARCH, i386){
 INCLUDEPATH += $$PWD/sdl2/32/include/SDL2

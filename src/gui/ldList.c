@@ -194,7 +194,6 @@ void ldList_on_frame_start( ldList_t *ptWidget)
     {
         return;
     }
-     LOG_DEBUG("start");
 }
 
 // 相对list的坐标
@@ -211,6 +210,17 @@ arm_2d_location_t _ldListGetContentLocation(ldList_t *ptWidget,uint8_t itemNum)
     return contentLoc;
 }
 
+static void _ldListRefreshChildWidget(ldList_t* ptWidget)
+{
+    ldBase_t* ptChildList=ldBaseGetChildList((ldBase_t*)ptWidget);
+    arm_ctrl_enum((arm_2d_control_node_t*)ptChildList, ptItem, PREORDER_TRAVERSAL)
+    {
+        ldBase_t* itemWidget=(ldBase_t*)ptItem;
+
+        itemWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=((arm_2d_location_t*)itemWidget->pInfo)->iY+ptWidget->offset;
+    }
+}
+
 void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
@@ -220,7 +230,6 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
     }
 
     if (bIsNewFrame) {
-         LOG_DEBUG("frame");
         if(ptWidget->isMoveReset)
         {
             if(ptWidget->_offset>ptWidget->offset)
@@ -247,16 +256,14 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
                 }
             }
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+            _ldListRefreshChildWidget(ptWidget);
         }
-
-        if(ptWidget->_offset!=ptWidget->offset)
+        else
         {
-            ldBase_t* ptChildList=ldBaseGetChildList((ldBase_t*)ptWidget);
-            arm_ctrl_enum((arm_2d_control_node_t*)ptChildList, ptItem, PREORDER_TRAVERSAL)
+            if(ptWidget->_offset!=ptWidget->offset)
             {
-                ldBase_t* itemWidget=(ldBase_t*)ptItem;
-
-                itemWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=((arm_2d_location_t*)itemWidget->pInfo)->iY+ptWidget->offset;
+                _ldListRefreshChildWidget(ptWidget);
             }
         }
     }
