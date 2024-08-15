@@ -94,10 +94,12 @@ static bool slotListScroll(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->clickItemPos=ldBaseGetAbsoluteLocation((ldBase_t*)ptWidget,ptWidget->clickItemPos);
             ptWidget->clickItemPos.iX=(int16_t)GET_SIGNAL_VALUE_X(msg.value)-ptWidget->clickItemPos.iX;
             ptWidget->clickItemPos.iY=(int16_t)GET_SIGNAL_VALUE_Y(msg.value)-ptWidget->clickItemPos.iY;
-
             ptWidget->selectItem=((-ptWidget->offset)+ptWidget->clickItemPos.iY)/ptWidget->itemHeight;
-
             ptWidget->clickItemPos.iY%=ptWidget->itemHeight;
+
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+            LOG_DEBUG("click item %d",ptWidget->selectItem);
         }
         break;
     }
@@ -140,7 +142,13 @@ ldList_t* ldList_init( ld_scene_t *ptScene,ldList_t *ptWidget, uint16_t nameId, 
     ptWidget->use_as__ldBase_t.opacity=255;
 
     ptWidget->itemHeight=30;
-    ptWidget->itemCount=10;
+    ptWidget->bgColor=GLCD_COLOR_WHITE;
+    ptWidget->textColor=GLCD_COLOR_BLACK;
+    ptWidget->selectColor=GLCD_COLOR_DARK_GREY;
+    ptWidget->isCorner=true;
+    ptWidget->margin.top=1;
+    ptWidget->margin.bottom=1;
+    ptWidget->padding.left=5;
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotListScroll);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotListScroll);
@@ -188,6 +196,19 @@ void ldList_on_frame_start( ldList_t *ptWidget)
     }
 }
 
+// 相对list的坐标
+arm_2d_location_t _ldListGetContentLocation(ldList_t *ptWidget,uint8_t itemNum)
+{
+    arm_2d_location_t contentLoc={0};
+
+    contentLoc.iX=ptWidget->margin.left+ptWidget->padding.left;
+    contentLoc.iY=ptWidget->margin.top+ptWidget->padding.top;
+
+    contentLoc.iY+=itemNum*ptWidget->itemHeight;
+
+    contentLoc.iY+=ptWidget->offset;
+}
+
 void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
@@ -227,7 +248,7 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
     }
 
     arm_2d_region_t globalRegion;
-    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,false);
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
     if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
@@ -244,26 +265,77 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
                     .iHeight=ptWidget->itemHeight,
                 },
             };
+            arm_2d_region_t contentRegion;
+            ldColor bgColor;
 
-            if(ptWidget->ptItemFunc!=NULL)
+//                arm_2d_location_t clickPos={-1,-1};
+
+            itemRegion.tLocation.iX+=ptWidget->margin.left;
+            itemRegion.tLocation.iY+=ptWidget->margin.top;
+            itemRegion.tSize.iWidth-=ptWidget->margin.left+ptWidget->margin.right;
+            itemRegion.tSize.iHeight-=ptWidget->margin.top+ptWidget->margin.bottom;
+
+            contentRegion=itemRegion;
+            contentRegion.tLocation.iX=ptWidget->padding.left;
+            contentRegion.tLocation.iY=ptWidget->padding.top;
+            contentRegion.tSize.iWidth-=ptWidget->padding.left+ptWidget->padding.right;
+            contentRegion.tSize.iHeight-=ptWidget->padding.top+ptWidget->padding.bottom;
+
+            for(uint8_t i=0;i<ptWidget->itemCount;i++)
             {
-                arm_2d_location_t clickPos={-1,-1};
-                for(uint8_t i=0;i<ptWidget->itemCount;i++)
-                {
-                    itemRegion.tLocation.iY=i*ptWidget->itemHeight+ptWidget->offset;
+                itemRegion.tLocation.iY=i*ptWidget->itemHeight+ptWidget->offset;
 
-                    arm_2d_container(&tTarget,tItemTile , &itemRegion)
+                arm_2d_container(&tTarget,tItemTile , &itemRegion)
+                {
+                    if(!ptWidget->isTransparent)
                     {
-                        if((ptWidget->selectItem==i)&&(ptWidget->clickItemPos.iX!=-1)&&(ptWidget->clickItemPos.iY!=-1))
+                        if(ptWidget->selectItem==i)
                         {
-                            clickPos=ptWidget->clickItemPos;
-                            ptWidget->clickItemPos.iX=-1;
-                            ptWidget->clickItemPos.iY=-1;
+                            bgColor=ptWidget->selectColor;
                         }
-                        ptWidget->ptItemFunc(ptWidget,i,&tItemTile,&tItemTile_canvas,clickPos,bIsNewFrame);
-                        clickPos.iX=-1;
-                        clickPos.iY=-1;
+                        else
+                        {
+                            bgColor=ptWidget->bgColor;
+                        }
+                        if(ptWidget->isCorner)
+                        {
+                            draw_round_corner_box(&tItemTile,
+                                                  NULL,
+                                                  bgColor,
+                                                  ptWidget->use_as__ldBase_t.opacity,
+                                                  bIsNewFrame);
+                        }
+                        else
+                        {
+                            ldBaseColor(&tItemTile,
+                                        NULL,
+                                        bgColor,
+                                        ptWidget->use_as__ldBase_t.opacity);
+                        }
                     }
+
+                    if(ptWidget->ppItemStrGroup!=NULL)
+                    {
+                        ldBaseLabel(&tItemTile,
+                                    &contentRegion,
+                                    (uint8_t*)ptWidget->ppItemStrGroup[i],
+                                    ptWidget->ptFont,
+                                    ptWidget->tAlign,
+                                    ptWidget->textColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
+
+                        arm_2d_op_wait_async(NULL);
+
+//                        if((ptWidget->selectItem==i)&&(ptWidget->clickItemPos.iX!=-1)&&(ptWidget->clickItemPos.iY!=-1))
+//                        {
+//                            clickPos=ptWidget->clickItemPos;
+//                            ptWidget->clickItemPos.iX=-1;
+//                            ptWidget->clickItemPos.iY=-1;
+//                        }
+//                        ptWidget->ptItemFunc(ptWidget,i,&tItemTile,&tItemTile_canvas,clickPos,bIsNewFrame);
+//                        clickPos.iX=-1;
+//                        clickPos.iY=-1;
                 }
             }
         }
@@ -280,6 +352,92 @@ void ldListSetItemFunc(ldList_t *ptWidget,ldListItemFunc_t ptItemFunc)
         return;
     }
     ptWidget->ptItemFunc=ptItemFunc;
+}
+
+void ldListSetItemHeight(ldList_t* ptWidget,uint8_t itemHeight)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->itemHeight=itemHeight;
+}
+
+void ldListSetText(ldList_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize, arm_2d_font_t *ptFont)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->itemCount=arraySize;
+    ptWidget->ptFont=ptFont;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ppItemStrGroup=pStrArray;
+}
+
+void ldListSetTextColor(ldList_t* ptWidget,ldColor textColor)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->textColor=textColor;
+}
+
+void ldListSetAlign(ldList_t *ptWidget,arm_2d_align_t tAlign)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->tAlign=tAlign;
+}
+
+//void ldListSetBgImage(ldList_t *ptWidget, arm_2d_tile_t *ptImgTile)
+//{
+//    if(ptWidget==NULL)
+//    {
+//        return;
+//    }
+//    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+//    ptWidget->ptImgTile=ptImgTile;
+//    ptWidget->isTransparent=false;
+//}
+
+void ldListSetBgColor(ldList_t *ptWidget, ldColor bgColor)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->bgColor=bgColor;
+    ptWidget->isTransparent=false;
+//    ptWidget->ptImgTile=NULL;
+}
+
+void ldListSetSelectColor(ldList_t* ptWidget,ldColor selectColor)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->selectColor=selectColor;
+}
+
+void ldListSetItemWidget(ldList_t* ptWidget,uint8_t itemNum,ldBase_t* childWidget)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    arm_2d_location_t pos=_ldListGetContentLocation(ptWidget,itemNum);
+    childWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX+=pos.iX;
+    childWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY+=pos.iY;
 }
 
 #if defined(__clang__)

@@ -49,19 +49,36 @@ typedef struct ldList_t ldList_t;
 //void listItemProcess(ldList_t *ptWidget,uint8_t itemNum,arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,arm_2d_location_t clickPos,bool bIsNewFrame)
 typedef void (*ldListItemFunc_t)(ldList_t *,uint8_t,arm_2d_tile_t*,arm_2d_region_t*,arm_2d_location_t,bool);
 
+typedef struct ldBody{
+    uint8_t top;
+    uint8_t bottom;
+    uint8_t left;
+    uint8_t right;
+}ldBody_t;
+
 struct ldList_t
 {
     implement(ldBase_t);
 
     arm_2d_location_t clickItemPos;
     ldListItemFunc_t ptItemFunc;
+    arm_2d_align_t tAlign;
+    arm_2d_font_t *ptFont;
+    const uint8_t **ppItemStrGroup;
+    ldColor bgColor;
+    ldColor textColor;
+    ldColor selectColor;
     int16_t offset;
     int16_t _offset;
     uint8_t itemHeight;
     uint8_t itemCount;
     uint8_t selectItem;
+    ldBody_t padding;// 边框到内容中间的部分
+    ldBody_t margin;// 边框以外的区域
     bool isMoveReset:1;
     bool isHoldMove:1;
+    bool isCorner:1;
+    bool isTransparent:1;
 };
 
 ldList_t* ldList_init(ld_scene_t *ptScene, ldList_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
@@ -70,7 +87,14 @@ void ldList_on_load( ldList_t *ptWidget);
 void ldList_on_frame_start( ldList_t *ptWidget);
 void ldList_show(ld_scene_t *pScene, ldList_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-void ldListSetItemFunc(ldList_t *ptWidget,ldListItemFunc_t ptItemFunc);
+//void ldListSetItemFunc(ldList_t *ptWidget,ldListItemFunc_t ptItemFunc);
+void ldListSetItemHeight(ldList_t* ptWidget,uint8_t itemHeight);
+void ldListSetText(ldList_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize, arm_2d_font_t *ptFont);
+
+void ldListSetTextColor(ldList_t* ptWidget,ldColor textColor);
+void ldListSetAlign(ldList_t *ptWidget,arm_2d_align_t tAlign);
+void ldListSetBgColor(ldList_t *ptWidget, ldColor bgColor);
+void ldListSetSelectColor(ldList_t* ptWidget,ldColor selectColor);
 
 #define ldListInit(nameId,parentNameId,x,y,width,height) \
         ldList_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)

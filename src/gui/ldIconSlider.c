@@ -265,7 +265,7 @@ static bool slotIconSliderScroll(ld_scene_t *ptScene,ldMsg_t msg)
                     selectItem=(-1);
                 }
                 ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,selectItem);
-                LOG_DEBUG("icon slider click item %d",selectItem);
+                LOG_DEBUG("click item %d",selectItem);
             }
         }
         ptWidget->isWaitMove=true;
@@ -493,7 +493,7 @@ void ldIconSlider_show(ld_scene_t *ptScene, ldIconSlider_t *ptWidget, const arm_
     }
 
     arm_2d_region_t globalRegion;
-    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,false);
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
     if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {

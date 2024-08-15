@@ -33,6 +33,7 @@ pip install Pillow
 
 ### 实例说明
 原图如下
+
 ![原图](../docs/tools/demo.gif)
 
 ---
