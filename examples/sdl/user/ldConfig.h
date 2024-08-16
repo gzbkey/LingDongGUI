@@ -93,10 +93,13 @@ extern "C" {
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (1)
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
 
+#ifndef USE_DEMO
 // <o> choose demo to test
 //     <0=> None
 //     <1=> Show all widget
-#define USE_DEMO                                  (1)
+//     <2=> Printer
+#define USE_DEMO                                  (2)
+#endif
 
 #if USE_DEMO == 1
 #undef LD_CFG_COLOR_DEPTH
@@ -109,7 +112,23 @@ extern "C" {
 #define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
 #define LD_DEMO_GUI_FUNC                          &uiWidgetFunc
+#endif
+
+#if USE_DEMO == 2
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (480)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (272)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
+#define LD_DEMO_GUI_FUNC                          &uiLogoFunc
 #endif
 
 // <<< end of configuration section >>>

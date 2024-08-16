@@ -57,16 +57,12 @@ extern "C" {
 
 // widget config
 
-// <q>Opacity support
-// <i> There is no need to adjust the opacity of the widget. Please turn off this option
-#define USE_OPACITY                               (0)
-
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
 #define USE_RADIA_MENU_SCALE                      (0)
 
 // <q>scene switcing support
-// <i> 1:More effects 0£ºLess ram
+// <i> 1:More effects 0:Less ram
 #define USE_SCENE_SWITCHING                       (0)
 
 // debug config
@@ -96,6 +92,41 @@ extern "C" {
 #define LD_DEBUG                                  (0)
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
+
+// <o> choose demo to test
+//     <0=> None
+//     <1=> Show all widget
+#define USE_DEMO                                  (0)
+
+#if USE_DEMO == 1
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (1024)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (600)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
+#define LD_DEMO_GUI_FUNC                          &uiWidgetFunc
+#endif
+
+#if USE_DEMO == 2
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (480)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (272)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
+#define LD_DEMO_GUI_FUNC                          &uiLogoFunc
+#endif
 
 // <<< end of configuration section >>>
 

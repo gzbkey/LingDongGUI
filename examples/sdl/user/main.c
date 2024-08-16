@@ -8,9 +8,7 @@
 #include "ldScene1.h"
 #include "xLog.h"
 //#include "xBtnAction.h"
-//#include "uiWatch.h"
-#include "uiWidget.h"
-//#include "uiDemo.h"
+#include LD_DEMO_GUI_INCLUDE
 #include "freeRtosHeap4.h"
 
 #include "ldGui.h"

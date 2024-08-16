@@ -15,7 +15,7 @@ def create_default_font_config(file_path):
     default_config = """arial.ttf:
   - pixelSize: 12
     fontBitWidth: 8
-    string: " !\\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+    string: " !\\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~±"
   - pixelSize: 16
     string: '012345678'"""
     with open(file_path, 'w') as file:
@@ -121,6 +121,7 @@ def main(argv):
             pass
 
     generate_font_data_for_each_config(font_config,output_dir)
+    os.remove(font_txt_path)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -18,7 +18,9 @@ const ldPageFuncGroup_t uiTemplateFunc={
 
 void uiTemplateInit(ld_scene_t* ptScene)
 {
+    void *obj,*win;
 
+    ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
 
 
 

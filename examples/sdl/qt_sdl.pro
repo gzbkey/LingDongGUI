@@ -1,7 +1,11 @@
 TEMPLATE = app
-#CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
+
+#//     <0=> None
+#//     <1=> Show all widget
+#//     <2=> Printer
+USE_DEMO=2
 
 SOURCES += \
     virtualNor/virtualNor.c \
@@ -18,9 +22,7 @@ HEADERS += \
     user/arm_2d_user_arch_port.h \
     user/ldConfig.h
 
-HEADERS += \ #$$files(../common/demo/*.h, true) \
-           $$files(../common/demo/widget/*.h, true) \
-           $$files(../common/Arm-2D/examples/common/controls/*.h) \
+HEADERS += $$files(../common/Arm-2D/examples/common/controls/*.h) \
            $$files(../common/Arm-2D/Library/Source/*.inc) \
            $$files(../common/Arm-2D/Library/Include/*.h) \
            $$files(../common/Arm-2D/Helper/Include/*.h) \
@@ -28,15 +30,30 @@ HEADERS += \ #$$files(../common/demo/*.h, true) \
            $$files(../../src/gui/*.h) \
            $$files(../../src/misc/*.h)
 
-SOURCES += \ #$$files(../common/demo/*.c, true) \
-           $$files(../common/demo/widget/*.c, true) \
-           $$files(../common/Arm-2D/examples/common/controls/*.c) \
+SOURCES += $$files(../common/Arm-2D/examples/common/controls/*.c) \
            $$files(../common/Arm-2D/examples/common/asset/*.c) \
            $$files(../common/Arm-2D/Library/Source/*.c) \
            $$files(../common/Arm-2D/Helper/Source/*.c) \
            $$files(../common/math/*.c, true) \
            $$files(../../src/gui/*.c) \
            $$files(../../src/misc/*.c)
+
+contains(USE_DEMO, 1){
+message(demo: Show all widget)
+DEFINES += USE_DEMO=1
+HEADERS += $$files(../common/demo/widget/*.h, true)
+SOURCES += $$files(../common/demo/widget/*.c, true)
+INCLUDEPATH += $$PWD/../common/demo/widget
+}
+
+contains(USE_DEMO, 2){
+message(demo: Printer)
+DEFINES += USE_DEMO=2
+HEADERS += $$files(../common/demo/printer/*.h, true)
+SOURCES += $$files(../common/demo/printer/*.c, true)
+INCLUDEPATH += $$PWD/../common/demo/printer
+}
+
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
@@ -46,14 +63,9 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 INCLUDEPATH += $$PWD/user
 INCLUDEPATH += $$PWD/virtualNor
 INCLUDEPATH += $$PWD/../common/math
-#INCLUDEPATH += $$PWD/../common/demo
-#INCLUDEPATH += $$files(../common/demo/*, true)
-
-INCLUDEPATH += $$PWD/../common/demo/widget
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc
-#INCLUDEPATH += $$PWD/../../src/template
 
 contains(QT_ARCH, i386){
 INCLUDEPATH += $$PWD/sdl2/32/include/SDL2
