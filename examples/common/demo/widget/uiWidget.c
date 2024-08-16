@@ -68,7 +68,9 @@ void listItemProcess(ldList_t *ptWidget,uint8_t itemNum,arm_2d_tile_t *ptTile,ar
         LOG_LOCATION("",clickPos);
     }
 }
-
+const uint8_t titleStr[]="title";
+const uint8_t msgStr[]="12345678abcdefg\n\r99556";
+const uint8_t *pBtnStr[]={"11","22","33"};
 void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*win,*list;
@@ -223,6 +225,12 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     obj=ldButtonInit(27, 26, 10,3,20,20);
      ldListSetItemWidget(list,1,obj);
+
+     obj=ldMessageBoxInit(28,0,200,150,FONT_ARIAL_12);
+
+     ldMessageBoxSetTitle(obj,titleStr);
+     ldMessageBoxSetMsg(obj,msgStr);
+     ldMessageBoxSetBtn(obj,pBtnStr,3);
 
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 

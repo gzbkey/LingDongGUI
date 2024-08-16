@@ -46,22 +46,11 @@ extern "C"
 
 typedef struct ldList_t ldList_t;
 
-//void listItemProcess(ldList_t *ptWidget,uint8_t itemNum,arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,arm_2d_location_t clickPos,bool bIsNewFrame)
-typedef void (*ldListItemFunc_t)(ldList_t *,uint8_t,arm_2d_tile_t*,arm_2d_region_t*,arm_2d_location_t,bool);
-
-typedef struct ldBody{
-    uint8_t top;
-    uint8_t bottom;
-    uint8_t left;
-    uint8_t right;
-}ldBody_t;
-
 struct ldList_t
 {
     implement(ldBase_t);
 
     arm_2d_location_t clickItemPos;
-    ldListItemFunc_t ptItemFunc;
     arm_2d_align_t tAlign;
     arm_2d_font_t *ptFont;
     const uint8_t **ppItemStrGroup;
@@ -87,7 +76,6 @@ void ldList_on_load( ldList_t *ptWidget);
 void ldList_on_frame_start( ldList_t *ptWidget);
 void ldList_show(ld_scene_t *pScene, ldList_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-//void ldListSetItemFunc(ldList_t *ptWidget,ldListItemFunc_t ptItemFunc);
 void ldListSetItemHeight(ldList_t* ptWidget,uint8_t itemHeight);
 void ldListSetText(ldList_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize, arm_2d_font_t *ptFont);
 

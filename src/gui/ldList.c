@@ -289,8 +289,6 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
             arm_2d_region_t contentRegion;
             ldColor bgColor;
 
-//                arm_2d_location_t clickPos={-1,-1};
-
             itemRegion.tLocation.iX+=ptWidget->margin.left;
             itemRegion.tLocation.iY+=ptWidget->margin.top;
             itemRegion.tSize.iWidth-=ptWidget->margin.left+ptWidget->margin.right;
@@ -347,32 +345,12 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
                     }
 
                         arm_2d_op_wait_async(NULL);
-
-//                        if((ptWidget->selectItem==i)&&(ptWidget->clickItemPos.iX!=-1)&&(ptWidget->clickItemPos.iY!=-1))
-//                        {
-//                            clickPos=ptWidget->clickItemPos;
-//                            ptWidget->clickItemPos.iX=-1;
-//                            ptWidget->clickItemPos.iY=-1;
-//                        }
-//                        ptWidget->ptItemFunc(ptWidget,i,&tItemTile,&tItemTile_canvas,clickPos,bIsNewFrame);
-//                        clickPos.iX=-1;
-//                        clickPos.iY=-1;
                 }
             }
         }
     }
 
     arm_2d_op_wait_async(NULL);
-}
-
-void ldListSetItemFunc(ldList_t *ptWidget,ldListItemFunc_t ptItemFunc)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-    ptWidget->ptItemFunc=ptItemFunc;
 }
 
 void ldListSetItemHeight(ldList_t* ptWidget,uint8_t itemHeight)

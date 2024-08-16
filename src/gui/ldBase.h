@@ -57,6 +57,7 @@ typedef enum{
     widgetTypeKeyboard,
     widgetTypeAnimation,
     widgetTypeList,
+    widgetTypeMessageBox,
 }ldWidgetType_t;
 
 
@@ -151,7 +152,7 @@ typedef struct {
     arm_2d_region_t tTempItemRegion;
 }ldBaseItemRegion_t;
 
-typedef struct  {
+typedef struct {
     implement(arm_2d_control_node_t);
 //    ARM_PRIVATE(
     arm_2d_region_t tTempRegion;
@@ -175,13 +176,12 @@ typedef enum{
     typeFloat
 }ldEditType_t;
 
-//typedef struct  {
-//    implement(ldBase_t);
-//    ldEditType_t editType;
-//    uint16_t editorId;
-//    uint8_t **ppStr;
-//    uint8_t strMax;
-//}ldBaseKB_t;
+typedef struct {
+    uint8_t top;
+    uint8_t bottom;
+    uint8_t left;
+    uint8_t right;
+}ldBody_t;
 
 
 
