@@ -1,6 +1,9 @@
-arial.ttf:
-  - pixelSize: 12
-    fontBitWidth: 8
-    string: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~±"
+# arial.ttf:
+#   - pixelSize: 12
+#     fontBitWidth: 8
+#     string: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~±"
+
+simsun.ttc:
   - pixelSize: 48
+    fontBitWidth: 8
     string: '灵动GUI'

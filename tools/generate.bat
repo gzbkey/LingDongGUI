@@ -25,6 +25,7 @@ copy /y "gif2png.py" "!target_dir!\\images\\gif\\gif2png.py"
 copy /y "auto_img2c.py" "!target_dir!\\images\\auto_img2c.py"
 copy /y "img2c.py" "!target_dir!\\images\\img2c.py"
 copy /y "auto_ttf2c.py" "!target_dir!\\fonts\\auto_ttf2c.py"
+copy /y "auto_ttf2c.bat" "!target_dir!\\fonts\\auto_ttf2c.bat"
 copy /y "ttf2c.py" "!target_dir!\\fonts\\ttf2c.py"
 
 pushd "!src_dir!"
@@ -44,16 +45,16 @@ popd
 (
 echo.
 echo ===================================
-echo  操作指南 - Operation Guide
+echo      指   - Operation Guide
 echo ===================================
 echo.
-echo 1. 进入pageTool文件夹
+echo 1.     pageTool 募   
 echo 1. Navigate to the pageTool folder
 echo.
-echo 2. 运行uiPageCreate.py脚本：python uiPageCreate.py
+echo 2.     uiPageCreate.py 疟   python uiPageCreate.py
 echo 2. Run the uiPageCreate.py script: python uiPageCreate.py
 echo.
-echo 3. 生成的页面文件复制到user目录下使用
+echo 3.    傻 页   募    频 user目录  使  
 echo 3. The generated page files are copied to the user directory for use
 echo.
 ) > "!readme_file!"

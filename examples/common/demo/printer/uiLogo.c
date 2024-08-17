@@ -22,7 +22,7 @@ void uiLogoInit(ld_scene_t* ptScene)
 
     ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
 
-    obj=ldLabelInit(ID_LOGO,ID_BG,0,0,200,200,FONT_ARIAL_48_A8);
+    obj=ldLabelInit(ID_LOGO,ID_BG,0,0,200,200,FONT_SIMSUN_48_A8);
     ldLabelSetText(obj,"灵动GUI");
 
     uiLogoLogicInit(ptScene);
