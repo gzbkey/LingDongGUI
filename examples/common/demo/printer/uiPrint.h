@@ -16,6 +16,7 @@ extern const ldPageFuncGroup_t uiPrintFunc;
 #define ID_LIST                         2
 #define ID_BTN_PRINT                    3
 #define ID_IMG                          4
+#define ID_DATE_TIME                    5
 
 #ifdef __cplusplus
 }

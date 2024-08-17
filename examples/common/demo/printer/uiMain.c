@@ -60,6 +60,8 @@ void uiMainInit(ld_scene_t* ptScene)
     connect(ID_BTN_WAIT,SIGNAL_RELEASE,slotJumpWait);
     connect(ID_BTN_SET,SIGNAL_RELEASE,slotJumpSet);
 
+
+
     uiMainLogicInit(ptScene);
 }
 

@@ -34,7 +34,7 @@ void uiLogoLoop(ld_scene_t* ptScene)
 {
     if(ldTimeOut(1000,false))
     {
-        ldGuiJumpPage(uiMainFunc,ARM_2D_SCENE_SWITCH_MODE_ERASE_LEFT,1000);
+        ldGuiJumpPage(uiMainFunc,ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE,3000);
     }
 
 

@@ -84,6 +84,8 @@ void ldListSetAlign(ldList_t *ptWidget,arm_2d_align_t tAlign);
 void ldListSetBgColor(ldList_t *ptWidget, ldColor bgColor);
 void ldListSetSelectColor(ldList_t* ptWidget,ldColor selectColor);
 void ldListSetItemWidget(ldList_t* ptWidget,uint8_t itemNum,ldBase_t* childWidget);
+int8_t ldListGetSelectItem(ldList_t* ptWidget);
+void ldListSetSelectItem(ldList_t* ptWidget,int8_t itemNum);
 
 #define ldListInit(nameId,parentNameId,x,y,width,height) \
         ldList_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)

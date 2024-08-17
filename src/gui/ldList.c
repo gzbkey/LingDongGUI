@@ -447,6 +447,26 @@ void ldListSetItemWidget(ldList_t* ptWidget,uint8_t itemNum,ldBase_t* childWidge
     *((arm_2d_location_t*)childWidget->pInfo)=childWidget->use_as__arm_2d_control_node_t.tRegion.tLocation;
 }
 
+int8_t ldListGetSelectItem(ldList_t* ptWidget)
+{
+    if(ptWidget==NULL)
+    {
+        return -1;
+    }
+    return ptWidget->selectItem;
+}
+
+void ldListSetSelectItem(ldList_t* ptWidget,int8_t itemNum)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->selectItem=itemNum;
+}
+
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
