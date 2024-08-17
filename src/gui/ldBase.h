@@ -183,9 +183,14 @@ typedef struct {
     uint8_t right;
 }ldBody_t;
 
+typedef int64_t ldTimer_t;
 
+bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer);
 
-bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset);
+#define ldTimeOut(__ms, isReset, ...) ({static int64_t arm_2d_safe_name(s_lTimestamp); \
+                                          __ldTimeOut(__ms, \
+                                                      isReset, \
+                                                      (&arm_2d_safe_name(s_lTimestamp),##__VA_ARGS__));})
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
 void ldBaseNodeRemove(arm_2d_control_node_t *ptNode);
@@ -211,7 +216,7 @@ void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t 
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign);
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
 int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion, int16_t currentOffset, uint8_t itemCount, uint8_t itemHeight, uint8_t space);
-
+void ldBaseSetCenter(ldBase_t *ptWidget);
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 
 #ifdef __cplusplus

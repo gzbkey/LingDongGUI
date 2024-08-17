@@ -261,7 +261,7 @@ static void _progressBarImageShow(ldProgressBar_t *ptWidget,arm_2d_tile_t *ptTar
 
     if (bIsNewFrame)
     {
-        if(ldTimeOut(PROGRESS_BAR_SPEED,&ptWidget->timer,true))
+        if(ldTimeOut(PROGRESS_BAR_SPEED,true,&ptWidget->timer))
         {
             if(ptWidget->isHorizontal)
             {

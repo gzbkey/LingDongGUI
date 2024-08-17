@@ -115,7 +115,7 @@ __WEAK void *ldRealloc(void *ptr, uint32_t newSize)
     return p;
 }
 
-bool ldTimeOut(uint16_t ms, int64_t *pTimer, bool isReset)
+bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer)
 {
     int64_t lPeriod;
     int64_t lTimestamp = arm_2d_helper_get_system_timestamp();
@@ -804,6 +804,15 @@ arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_
     return childRegion;
 }
 
+void ldBaseSetCenter(ldBase_t *ptWidget)
+{
+    if(ptWidget->use_as__arm_2d_control_node_t.ptParent!=NULL)
+    {
+        ptWidget->use_as__arm_2d_control_node_t.tRegion=ldBaseGetAlignRegion(ptWidget->use_as__arm_2d_control_node_t.ptParent->tRegion,
+                                                    ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                                    ARM_2D_ALIGN_CENTRE);
+    }
+}
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode)
 {
     do{

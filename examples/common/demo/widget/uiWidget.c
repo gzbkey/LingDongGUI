@@ -239,11 +239,10 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
 void uiWidgetLoop(ld_scene_t* ptScene)
 {
-    static int64_t timer=0;
     static float angle=120;
 
     ldGauge_t *ptGauge=ldBaseGetWidgetById(17);
-    if(ldTimeOut(100,&timer,true))
+    if(ldTimeOut(100,true))
     {
 //        ldArcSetRotationAngle(ldBaseGetWidgetById(25),angle);
 

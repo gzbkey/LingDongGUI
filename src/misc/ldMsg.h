@@ -34,6 +34,7 @@ bool ldMsgEmit(xQueue_t *ptQueue, void *ptSender, uint8_t signal, uint64_t value
 bool ldMsgConnect(void *ptSender, uint8_t signal, assnFunc pFunc);
 void ldMsgDelConnect(void *ptSender);
 void ldMsgProcess(void *ptScene);
+
 #define connect(senderId,signal,func)      ldMsgConnect(ldBaseGetWidget(ptScene->ptNodeRoot,senderId),signal,func)
 
 #define emit(senderId,signal,value)                   ldMsgEmit(ptScene->ptMsgQueue,ldBaseGetWidget(ptScene->ptNodeRoot,senderId),signal,value)

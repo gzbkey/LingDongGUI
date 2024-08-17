@@ -346,7 +346,7 @@ void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_
         if(ptWidget->offsetAngle!=0)
 #else
         bool isTimeOut=false;
-        if(ldTimeOut(MOVE_CYCLE_MS,&ptWidget->timer,true))
+        if(ldTimeOut(MOVE_CYCLE_MS,true,&ptWidget->timer))
         {
             isTimeOut=true;
         }

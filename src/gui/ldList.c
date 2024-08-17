@@ -99,6 +99,7 @@ static bool slotListScroll(ld_scene_t *ptScene,ldMsg_t msg)
 
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
+            ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,ptWidget->selectItem);
             LOG_DEBUG("click item %d",ptWidget->selectItem);
         }
         break;
@@ -213,6 +214,10 @@ arm_2d_location_t _ldListGetContentLocation(ldList_t *ptWidget,uint8_t itemNum)
 static void _ldListRefreshChildWidget(ldList_t* ptWidget)
 {
     ldBase_t* ptChildList=ldBaseGetChildList((ldBase_t*)ptWidget);
+    if(NULL == ptChildList)
+    {
+        return ;
+    }
     arm_ctrl_enum((arm_2d_control_node_t*)ptChildList, ptItem, PREORDER_TRAVERSAL)
     {
         ldBase_t* itemWidget=(ldBase_t*)ptItem;

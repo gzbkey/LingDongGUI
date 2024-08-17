@@ -47,10 +47,6 @@ extern "C" {
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 
-// <o>Number of project pages
-// <i> Maximum number of pages
-#define LD_PAGE_MAX                               (1)
-
 // <q>External NOR support
 // <i> Read external nor, please enable this option
 #define USE_VIRTUAL_RESOURCE                      (0)
@@ -59,11 +55,11 @@ extern "C" {
 
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      (0)
+#define USE_RADIA_MENU_SCALE                      (1)
 
 // <q>scene switcing support
 // <i> 1:More effects 0：Less ram
-#define USE_SCENE_SWITCHING                       (0)
+#define USE_SCENE_SWITCHING                       (1)
 
 // debug config
 

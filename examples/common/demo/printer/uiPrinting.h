@@ -1,5 +1,5 @@
-#ifndef __UI_TEMPLATE_H__
-#define __UI_TEMPLATE_H__
+#ifndef __UI_PRINTING_H__
+#define __UI_PRINTING_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,9 +7,9 @@ extern "C" {
 
 #include "ldBase.h"
 #include "fonts/uiFonts.h"
-#include "images/uiImages.h"
+//#include "images/uiImages.h"
 
-extern const ldPageFuncGroup_t uiTemplateFunc;
+extern const ldPageFuncGroup_t uiPrintingFunc;
 
 #define ID_BG                           0
 

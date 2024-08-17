@@ -20,7 +20,7 @@ void uiTemplateInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
 
-    ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
+    obj=ldWindowInit(ID_BG, ID_BG, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
 
 
 
