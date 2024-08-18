@@ -92,14 +92,28 @@ static bool slotMsgBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
         if(clickNum>=0)
         {
             CLRBIT(ptWidget->isBtnPressed,clickNum);
+            ptWidget->clickNum=clickNum;
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
         break;
     }
     default:
         break;
     }
 
+    return false;
+}
+
+bool slotMsgBoxClose(ld_scene_t *ptScene,ldMsg_t msg)
+{
+    ldMessageBox_t *ptWidget= msg.ptSender;
+    if(ptWidget->ptFunc!=NULL)
+    {
+        ptWidget->ptFunc(ptWidget);
+    }
+    ptWidget->clickNum=-1;
+    ptWidget->use_as__ldBase_t.ptGuiFunc->depose(ptWidget);
     return false;
 }
 
@@ -171,9 +185,11 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
     ptWidget->btnRegion.tLocation.iY=ptWidget->padding.top+ptWidget->titleHeight+ptWidget->msgHeight;
     ptWidget->btnRegion.tSize.iWidth=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->padding.left-ptWidget->padding.right)/ptWidget->btnCount-LD_MSG_BOX_SPACE*2;
     ptWidget->btnRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->padding.top-ptWidget->padding.bottom-ptWidget->titleHeight-ptWidget->msgHeight;
+    ptWidget->clickNum=-1;
 
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotMsgBoxToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotMsgBoxToggle);
+    ldMsgConnect(ptWidget, SIGNAL_FINISHED, slotMsgBoxClose);
 
     LOG_INFO("[init][messageBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
@@ -340,6 +356,14 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
 
                 arm_2d_op_wait_async(NULL);
             } while (false);
+
+            if(bIsNewFrame)
+            {
+                if(ptWidget->clickNum>=0)
+                {
+                    ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_FINISHED,ptWidget->clickNum);
+                }
+            }
         }
     }
 
@@ -387,6 +411,16 @@ void ldMessageBoxSetBtn(ldMessageBox_t* ptWidget,const uint8_t *pStrArray[],uint
     ptWidget->btnRegion.tLocation.iY=ptWidget->padding.top+ptWidget->titleHeight+ptWidget->msgHeight;
     ptWidget->btnRegion.tSize.iWidth=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->padding.left-ptWidget->padding.right)/ptWidget->btnCount-LD_MSG_BOX_SPACE*2;
     ptWidget->btnRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->padding.top-ptWidget->padding.bottom-ptWidget->titleHeight-ptWidget->msgHeight;
+}
+
+void ldMessageBoxSetCallback(ldMessageBox_t* ptWidget,ldMsgBoxFunc_t ptFunc)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->ptFunc=ptFunc;
 }
 
 #if defined(__clang__)

@@ -527,7 +527,7 @@ ldTable_t* ldTable_init( ld_scene_t *ptScene,ldTable_t *ptWidget, uint16_t nameI
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotTableProcess);
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotTableProcess);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotTableProcess);
-    ldMsgConnect(ptWidget,SIGNAL_EDITING_FINISHED,slotEditEnd);
+    ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotEditEnd);
 
     LOG_INFO("[init][table] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
