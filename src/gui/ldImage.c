@@ -70,7 +70,6 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
         memset(ptWidget, 0, sizeof(ldImage_t));
     }
 
-//    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
@@ -78,6 +77,7 @@ ldImage_t* ldImage_init( ld_scene_t *ptScene,ldImage_t *ptWidget,uint16_t nameId
     ptWidget->use_as__ldBase_t.nameId=nameId;
     ptWidget->use_as__ldBase_t.ptGuiFunc=&ldImageFunc;
     ptWidget->use_as__ldBase_t.opacity = 255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptWidget->ptImgTile=ptImgTile;
     ptWidget->ptMaskTile=ptMaskTile;

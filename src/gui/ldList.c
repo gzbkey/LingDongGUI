@@ -141,6 +141,7 @@ ldList_t* ldList_init( ld_scene_t *ptScene,ldList_t *ptWidget, uint16_t nameId, 
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptWidget->itemHeight=30;
     ptWidget->bgColor=GLCD_COLOR_WHITE;

@@ -117,7 +117,6 @@ ldSlider_t* ldSlider_init( ld_scene_t *ptScene,ldSlider_t *ptWidget, uint16_t na
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
-//    ptWidget->ptScene=ptScene;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
@@ -128,6 +127,7 @@ ldSlider_t* ldSlider_init( ld_scene_t *ptScene,ldSlider_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptWidget->bgColor=__RGB(0xe7, 0xea, 0xea);
     ptWidget->frameColor=__RGB(0xd6, 0xd6, 0xd6);
