@@ -811,6 +811,7 @@ void ldBaseSetCenter(ldBase_t *ptWidget)
         ptWidget->use_as__arm_2d_control_node_t.tRegion=ldBaseGetAlignRegion(ptWidget->use_as__arm_2d_control_node_t.ptParent->tRegion,
                                                     ptWidget->use_as__arm_2d_control_node_t.tRegion,
                                                     ARM_2D_ALIGN_CENTRE);
+        ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
     }
 }
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode)
@@ -862,4 +863,9 @@ int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion,int16_t current
         }
     }
     return targetOffset;
+}
+
+void ldBaseSetDeleteLater(ldBase_t *ptWidget)
+{
+    ptWidget->deleteLaterCount=2;
 }

@@ -213,6 +213,15 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
 	
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
+        if(((ldBase_t*)ptItem)->deleteLaterCount>0)
+        {
+            ((ldBase_t*)ptItem)->deleteLaterCount--;
+            if(((ldBase_t*)ptItem)->deleteLaterCount==0)
+            {
+                ((ldBase_t*)ptItem)->ptGuiFunc->depose(ptItem);
+            }
+        }
+
         if(((ldBase_t*)ptItem)->ptGuiFunc->frameStart!=NULL)
         {
             ((ldBase_t*)ptItem)->ptGuiFunc->frameStart(ptScene);

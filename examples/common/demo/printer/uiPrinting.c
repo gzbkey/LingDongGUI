@@ -1,5 +1,4 @@
 #include "uiPrinting.h"
-#include "uiPrintingLogic.h"
 #include "ldGui.h"
 
 void uiPrintingInit(ld_scene_t* ptScene);
@@ -173,7 +172,6 @@ void uiPrintingInit(ld_scene_t* ptScene)
 
 
 
-    uiPrintingLogicInit(ptScene);
 
 }
 
@@ -199,7 +197,6 @@ void uiPrintingLoop(ld_scene_t* ptScene)
 
 
 
-    uiPrintingLogicLoop(ptScene);
 }
 
 void uiPrintingQuit(ld_scene_t* ptScene)
@@ -208,5 +205,4 @@ void uiPrintingQuit(ld_scene_t* ptScene)
 
 
 
-    uiPrintingLogicQuit(ptScene);
 }

@@ -93,6 +93,14 @@ static bool slotMsgBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
         {
             CLRBIT(ptWidget->isBtnPressed,clickNum);
             ptWidget->clickNum=clickNum;
+            if(ptWidget->ptFunc!=NULL)
+            {
+                ptWidget->ptFunc(ptWidget);
+            }
+            ptWidget->clickNum=-1;
+            ptWidget->use_as__ldBase_t.isHidden=true;
+            ldBaseSetDeleteLater((ldBase_t*)ptWidget);
+//            ptWidget->use_as__ldBase_t.ptGuiFunc->depose(ptWidget);
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
@@ -102,18 +110,6 @@ static bool slotMsgBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
         break;
     }
 
-    return false;
-}
-
-bool slotMsgBoxClose(ld_scene_t *ptScene,ldMsg_t msg)
-{
-    ldMessageBox_t *ptWidget= msg.ptSender;
-    if(ptWidget->ptFunc!=NULL)
-    {
-        ptWidget->ptFunc(ptWidget);
-    }
-    ptWidget->clickNum=-1;
-    ptWidget->use_as__ldBase_t.ptGuiFunc->depose(ptWidget);
     return false;
 }
 
@@ -149,7 +145,6 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
-    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     if(x==(-1)&&y==(-1))
     {
@@ -169,6 +164,7 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
         ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
         ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
     }
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptWidget->padding.top=10;
     ptWidget->padding.bottom=10;
@@ -190,7 +186,6 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
 
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotMsgBoxToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotMsgBoxToggle);
-    ldMsgConnect(ptWidget, SIGNAL_FINISHED, slotMsgBoxClose);
 
     LOG_INFO("[init][messageBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
@@ -357,14 +352,6 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
 
                 arm_2d_op_wait_async(NULL);
             } while (false);
-
-            if(bIsNewFrame)
-            {
-                if(ptWidget->clickNum>=0)
-                {
-                    ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_FINISHED,ptWidget->clickNum);
-                }
-            }
         }
     }
 

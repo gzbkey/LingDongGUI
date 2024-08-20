@@ -74,6 +74,7 @@ struct ldMessageBox_t
     bool isCorner:1;
     uint8_t isBtnPressed:3;
     int8_t clickNum:2;
+//    bool isWaitEnd:1;
 };
 
 ldMessageBox_t* ldMessageBox_init(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);

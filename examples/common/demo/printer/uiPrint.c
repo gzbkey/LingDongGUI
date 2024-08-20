@@ -1,5 +1,4 @@
 #include "uiPrint.h"
-#include "uiPrintLogic.h"
 #include "ldGui.h"
 
 void uiPrintInit(ld_scene_t* ptScene);
@@ -88,7 +87,6 @@ void uiPrintInit(ld_scene_t* ptScene)
     ldDateTimeSetTime(obj,20,10,0);
 
 
-    uiPrintLogicInit(ptScene);
 }
 
 void uiPrintLoop(ld_scene_t* ptScene)
@@ -97,7 +95,6 @@ void uiPrintLoop(ld_scene_t* ptScene)
 
 
 
-    uiPrintLogicLoop(ptScene);
 }
 
 void uiPrintQuit(ld_scene_t* ptScene)
@@ -106,5 +103,4 @@ void uiPrintQuit(ld_scene_t* ptScene)
 
 
 
-    uiPrintLogicQuit(ptScene);
 }

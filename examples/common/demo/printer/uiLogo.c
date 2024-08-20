@@ -1,5 +1,4 @@
 #include "uiLogo.h"
-#include "uiLogoLogic.h"
 #include "ldGui.h"
 
 void uiLogoInit(ld_scene_t* ptScene);
@@ -26,8 +25,6 @@ void uiLogoInit(ld_scene_t* ptScene)
     ldLabelSetText(obj,"灵动GUI");
     ldBaseSetCenter(obj);
 
-
-    uiLogoLogicInit(ptScene);
 }
 
 void uiLogoLoop(ld_scene_t* ptScene)
@@ -39,7 +36,6 @@ void uiLogoLoop(ld_scene_t* ptScene)
 
 
 
-    uiLogoLogicLoop(ptScene);
 }
 
 void uiLogoQuit(ld_scene_t* ptScene)
@@ -48,5 +44,4 @@ void uiLogoQuit(ld_scene_t* ptScene)
 
 
 
-    uiLogoLogicQuit(ptScene);
 }

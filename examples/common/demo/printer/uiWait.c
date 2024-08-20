@@ -1,5 +1,4 @@
 #include "uiWait.h"
-#include "uiWaitLogic.h"
 #include "ldGui.h"
 
 void uiWaitInit(ld_scene_t* ptScene);
@@ -24,7 +23,6 @@ void uiWaitInit(ld_scene_t* ptScene)
 
 
 
-    uiWaitLogicInit(ptScene);
 }
 
 void uiWaitLoop(ld_scene_t* ptScene)
@@ -33,7 +31,6 @@ void uiWaitLoop(ld_scene_t* ptScene)
 
 
 
-    uiWaitLogicLoop(ptScene);
 }
 
 void uiWaitQuit(ld_scene_t* ptScene)
@@ -42,5 +39,4 @@ void uiWaitQuit(ld_scene_t* ptScene)
 
 
 
-    uiWaitLogicQuit(ptScene);
 }

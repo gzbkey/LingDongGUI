@@ -1,5 +1,4 @@
 #include "uiSet.h"
-#include "uiSetLogic.h"
 #include "ldGui.h"
 
 void uiSetInit(ld_scene_t* ptScene);
@@ -24,7 +23,6 @@ void uiSetInit(ld_scene_t* ptScene)
 
 
 
-    uiSetLogicInit(ptScene);
 }
 
 void uiSetLoop(ld_scene_t* ptScene)
@@ -33,7 +31,6 @@ void uiSetLoop(ld_scene_t* ptScene)
 
 
 
-    uiSetLogicLoop(ptScene);
 }
 
 void uiSetQuit(ld_scene_t* ptScene)
@@ -42,5 +39,4 @@ void uiSetQuit(ld_scene_t* ptScene)
 
 
 
-    uiSetLogicQuit(ptScene);
 }

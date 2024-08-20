@@ -168,6 +168,7 @@ typedef struct {
     bool isDirtyRegionUpdate:1;
     bool isDirtyRegionAutoReset:1;
     bool isHidden:1;
+    uint8_t deleteLaterCount:2;
 }ldBase_t;
 
 typedef enum{
@@ -217,6 +218,8 @@ arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
 int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion, int16_t currentOffset, uint8_t itemCount, uint8_t itemHeight, uint8_t space);
 void ldBaseSetCenter(ldBase_t *ptWidget);
+void ldBaseSetDeleteLater(ldBase_t *ptWidget);
+
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 
 #ifdef __cplusplus
