@@ -330,7 +330,41 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_text_set_draw_region(ptRegion);
     arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
     arm_lcd_text_set_opacity(opacity);
-    arm_lcd_printf_label(tAlign,(char*)pStr);
+    arm_lcd_text_location(0,0);
+//    arm_lcd_printf_label(tAlign,(char*)pStr);
+    arm_2d_size_t tLabelSize = arm_lcd_get_string_line_box((char*)pStr);
+
+    arm_2d_region_t tOriginalDrawRegion = *ptRegion;
+
+    arm_2d_region_t tLabelRegion = {
+        .tLocation = tOriginalDrawRegion.tLocation,
+        .tSize = tLabelSize,
+    };
+
+    switch (tAlign & (ARM_2D_ALIGN_LEFT | ARM_2D_ALIGN_RIGHT)) {
+        case ARM_2D_ALIGN_LEFT:
+            break;
+        case ARM_2D_ALIGN_RIGHT:
+            tLabelRegion.tLocation.iX += tOriginalDrawRegion.tSize.iWidth - tLabelSize.iWidth;
+            break;
+        default:
+            tLabelRegion.tLocation.iX += (tOriginalDrawRegion.tSize.iWidth - tLabelSize.iWidth) >> 1;
+            break;
+    }
+
+    switch (tAlign & (ARM_2D_ALIGN_TOP | ARM_2D_ALIGN_BOTTOM)) {
+        case ARM_2D_ALIGN_TOP:
+            break;
+        case ARM_2D_ALIGN_BOTTOM:
+            tLabelRegion.tLocation.iY += tOriginalDrawRegion.tSize.iHeight - tLabelSize.iHeight;
+            break;
+        default:
+            tLabelRegion.tLocation.iY += (tOriginalDrawRegion.tSize.iHeight - tLabelSize.iHeight) >> 1;
+            break;
+    }
+    arm_lcd_text_set_draw_region(&tLabelRegion);
+    arm_lcd_puts((char*)pStr);
+    arm_lcd_text_set_draw_region(&tOriginalDrawRegion);
 }
 
 void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str,uint8_t opacity)
