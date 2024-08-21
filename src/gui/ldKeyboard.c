@@ -638,7 +638,7 @@ ldKeyboard_t* ldKeyboard_init( ld_scene_t *ptScene,ldKeyboard_t *ptWidget, uint1
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotKBProcess);
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotKBProcess);
 
-    LOG_INFO("[init][keyboard] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][keyboard] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

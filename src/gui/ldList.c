@@ -156,7 +156,7 @@ ldList_t* ldList_init( ld_scene_t *ptScene,ldList_t *ptWidget, uint16_t nameId, 
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotListScroll);
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotListScroll);
 
-    LOG_INFO("[init][list] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][list] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

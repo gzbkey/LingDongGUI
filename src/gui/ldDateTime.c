@@ -95,7 +95,7 @@ ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint1
     ptWidget->pFormatStr=defaultFormat;
     ptWidget->formatStrTemp[0]=0;
 
-    LOG_INFO("[init][dateTime] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][dateTime] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

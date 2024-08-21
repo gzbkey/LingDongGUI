@@ -34,15 +34,16 @@
   </conditions>
 
   <components>
-    <component Cclass="LingDongGui" Cgroup="ldgui" Csub="Core" Cversion="0.7.0" condition="Arm-2D">
+    <component Cclass="LingDongGui" Cgroup="ldgui" Cversion="0.8.0" condition="Arm-2D">
       <description>ldgui core files</description>
       <files>
         <file category="include" name="src/gui/" />
+        <file category="sourceC" name="src/gui/ldAnimation.c" />
         <file category="sourceC" name="src/gui/ldArc.c" />
+        <file category="sourceC" name="src/gui/ldBase.c" />
         <file category="sourceC" name="src/gui/ldButton.c" />
         <file category="sourceC" name="src/gui/ldCheckBox.c" />
         <file category="sourceC" name="src/gui/ldComboBox.c" />
-        <file category="sourceC" name="src/gui/ldCommon.c" />
         <file category="sourceC" name="src/gui/ldDateTime.c" />
         <file category="sourceC" name="src/gui/ldGauge.c" />
         <file category="sourceC" name="src/gui/ldGraph.c" />
@@ -52,22 +53,23 @@
         <file category="sourceC" name="src/gui/ldKeyboard.c" />
         <file category="sourceC" name="src/gui/ldLabel.c" />
         <file category="sourceC" name="src/gui/ldLineEdit.c" />
+        <file category="sourceC" name="src/gui/ldList.c" />
+        <file category="sourceC" name="src/gui/ldMessageBox.c" />
         <file category="sourceC" name="src/gui/ldProgressBar.c" />
         <file category="sourceC" name="src/gui/ldQRCode.c" />
         <file category="sourceC" name="src/gui/ldRadialMenu.c" />
         <file category="sourceC" name="src/gui/ldScene0.c" />
+        <file category="sourceC" name="src/gui/ldScene1.c" />
         <file category="sourceC" name="src/gui/ldScrollSelecter.c" />
+        <file category="sourceC" name="src/gui/ldSlider.c" />
         <file category="sourceC" name="src/gui/ldTable.c" />
         <file category="sourceC" name="src/gui/ldText.c" />
-        <file category="sourceC" name="src/gui/ldWindow.c" />
 
         <file category="include" name="src/misc/" />
         <file category="sourceC" name="src/misc/freeRtosHeap4.c" />
+        <file category="sourceC" name="src/misc/ldMsg.c" />
         <file category="sourceC" name="src/misc/qrcodegen.c" />
         <file category="sourceC" name="src/misc/tlsf.c" />
-        <file category="sourceC" name="src/misc/xBtnAction.c" />
-        <file category="sourceC" name="src/misc/xConnect.c" />
-        <file category="sourceC" name="src/misc/xList.c" />
         <file category="sourceC" name="src/misc/xQueue.c" />
         <file category="sourceC" name="src/misc/xString.c" />
 
@@ -79,31 +81,26 @@
 #define __ARM_2D_USER_APP_CFG_H__ "ldConfig.h"
       </RTE_Components_h>
     </component>
-    <component Cclass="LingDongGui" Cgroup="examples" Csub="demo" Cversion="1.0.0" condition="Arm-2D">
-      <description>ldgui demo example</description>
+    <component Cclass="LingDongGui Demo" Cgroup="widget" Cversion="1.0.0" condition="Arm-2D">
+      <description>ldgui demo</description>
       <files>
         <file category="include" name="examples/common/demo/" />
-        <file category="header"  name="examples/common/demo/uiDemo.h" attr="config" version="1.0.0" />
-
-        <file category="include" name="examples/common/demo/watch/" />
-        <file category="sourceC" name="examples/common/demo/watch/srcWatch.c" version="1.0.0" />
-        <file category="header"  name="examples/common/demo/watch/srcWatch.h" version="1.0.0" />
-        <file category="sourceC" name="examples/common/demo/watch/uiWatch.c" version="1.0.0" />
-        <file category="header"  name="examples/common/demo/watch/uiWatch.h" version="1.0.0" />
-
         <file category="include" name="examples/common/demo/widget/" />
-        <file category="sourceC" name="examples/common/demo/widget/srcWidget.c" version="1.0.0" />
-        <file category="header"  name="examples/common/demo/widget/srcWidget.h" version="1.0.0" />
         <file category="sourceC" name="examples/common/demo/widget/uiWidget.c" version="1.0.0" />
-        <file category="header"  name="examples/common/demo/widget/uiWidget.h" version="1.0.0" />
+      </files>
+    </component>
+    <component Cclass="LingDongGui Demo" Cgroup="printer" Cversion="1.0.0" condition="Arm-2D">
+      <description>ldgui demo</description>
+      <files>
+        <file category="include" name="examples/common/demo/" />
+        <file category="include" name="examples/common/demo/printer/" />
+        <file category="sourceC" name="examples/common/demo/printer/uiLogo.c" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/printer/uiMain.c" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/printer/uiPrint.c" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/printer/uiPrinting.c" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/printer/uiSet.c" version="1.0.0" />
+        <file category="sourceC" name="examples/common/demo/printer/uiWait.c" version="1.0.0" />
       </files>
     </component>
   </components>
-
-  <!-- optional taxonomy section for defining new component Class and Group names -->
-
-  <taxonomy>
-    <description Cclass="LingDongGui" Cgroup="ldgui">A gui based on arm-2d</description>
-  </taxonomy>
-
 </package>

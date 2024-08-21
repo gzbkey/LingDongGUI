@@ -97,7 +97,7 @@ ldArc_t* ldArc_init( ld_scene_t *ptScene,ldArc_t *ptWidget, uint16_t nameId, uin
     ptWidget->endAngle_x10[1]=1800;
     ptWidget->rotationAngle_x10=0;
 
-    LOG_INFO("[init][arc] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][arc] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

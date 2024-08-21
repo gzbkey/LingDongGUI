@@ -390,7 +390,7 @@ ldIconSlider_t* ldIconSlider_init( ld_scene_t *ptScene,ldIconSlider_t *ptWidget,
         ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotIconSliderScroll);
     }
 
-    LOG_INFO("[init][iconSlider] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][iconSlider] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

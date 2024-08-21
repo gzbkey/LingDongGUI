@@ -89,7 +89,7 @@ ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId
     ptWidget->textColor = GLCD_COLOR_BLACK;
     ptWidget->ptFont = ptFont;
 
-    LOG_INFO("[init][label] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][label] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

@@ -89,7 +89,7 @@ ldAnimation_t* ldAnimation_init( ld_scene_t *ptScene,ldAnimation_t *ptWidget, ui
     ptWidget->showRegion.tSize=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize;
     ptWidget->periodMs=periodMs;
 
-    LOG_INFO("[init][animation] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][animation] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

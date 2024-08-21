@@ -171,7 +171,7 @@ ldScrollSelecter_t* ldScrollSelecter_init( ld_scene_t *ptScene,ldScrollSelecter_
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotScrollSelecterScroll);
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotScrollSelecterScroll);
 
-    LOG_INFO("[init][scrollSelecter] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][scrollSelecter] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

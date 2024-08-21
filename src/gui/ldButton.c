@@ -129,7 +129,7 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotButtonToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotButtonToggle);
 
-    LOG_INFO("[init][button] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][button] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

@@ -122,7 +122,7 @@ ldGraph_t* ldGraph_init( ld_scene_t *ptScene,ldGraph_t *ptWidget, uint16_t nameI
     ldGraphSetAxis(ptWidget,width-ptWidget->frameSpace*2,height-ptWidget->frameSpace*2,5);
     ldGraphSetGridOffset(ptWidget,5);
 
-    LOG_INFO("[init][graph] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][graph] id:%d, size:%d", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
 

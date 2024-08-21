@@ -1,5 +1,4 @@
 #include "uiWidget.h"
-#include "uiWidgetLogic.h"
 #include "fonts/uiFonts.h"
 #include "images/uiImages.h"
 #include "ldGui.h"
@@ -234,7 +233,6 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 
-    uiWidgetLogicInit(ptScene);
 }
 
 void uiWidgetLoop(ld_scene_t* ptScene)
@@ -256,7 +254,6 @@ void uiWidgetLoop(ld_scene_t* ptScene)
 
 
 
-    uiWidgetLogicLoop(ptScene);
 }
 
 void uiWidgetQuit(ld_scene_t* ptScene)
@@ -265,5 +262,4 @@ void uiWidgetQuit(ld_scene_t* ptScene)
 
 
 
-    uiWidgetLogicQuit(ptScene);
 }
