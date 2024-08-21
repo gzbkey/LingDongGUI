@@ -87,6 +87,8 @@ static void __on_scene1_depose(arm_2d_scene_t *ptScene)
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
+    ldGuiQuit(ptThis);
+
     ptScene->ptPlayer = NULL;
 
     arm_2d_scene_player_dynamic_dirty_region_depose(
@@ -96,8 +98,6 @@ static void __on_scene1_depose(arm_2d_scene_t *ptScene)
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
-
-    ldGuiQuit(ptThis);
 }
 
 /*----------------------------------------------------------------------------*
