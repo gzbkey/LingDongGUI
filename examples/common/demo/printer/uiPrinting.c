@@ -31,7 +31,7 @@ static bool slotJumpPrint(ld_scene_t *ptScene,ldMsg_t msg)
     return false;
 }
 
-static void _msgBoxCallback(ldMessageBox_t *ptWidget)
+static void _msgBoxCallback(ld_scene_t *ptScene,ldMessageBox_t *ptWidget)
 {
     if(ptWidget->clickNum==0)
     {
@@ -39,7 +39,11 @@ static void _msgBoxCallback(ldMessageBox_t *ptWidget)
     }
     else
     {
-        isPause=false;
+        ldButton_t *btn=ldBaseGetWidgetById(ID_BTN_PAUSE);
+        if(btn->isPressed==false)
+        {
+            isPause=false;
+        }
     }
 }
 
@@ -139,7 +143,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     obj=ldImageInit(ID_IMG_PERCENT,ID_BG,360,55,40,33,IMAGE_PERCENT_BMP,NULL,false);
 
     obj=ldLabelInit(ID_LABEL_PERCENT,ID_BG,410,60,80,20,FONT_SIMHEI_20);
-    ldLabelSetText(obj,"60%%");
+    ldLabelSetText(obj,"60%");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
@@ -161,7 +165,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
     obj=ldLabelInit(ID_LABEL_PRINT_PERCENT,ID_BG,400,232,70,20,FONT_SIMSUN_18);
-    ldLabelSetText(obj,"0%%");
+    ldLabelSetText(obj,"0%");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_RIGHT);
@@ -190,7 +194,7 @@ void uiPrintingLoop(ld_scene_t* ptScene)
         }
         ldProgressBarSetPercent(ptWidget,percent);
 
-        sprintf(buf,"%d%%%%",percent);
+        sprintf(buf,"%d%%",percent);
 
         ldLabelSetText(label,buf);
     }

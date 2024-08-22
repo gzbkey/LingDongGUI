@@ -46,7 +46,7 @@ extern "C"
 
 typedef struct ldMessageBox_t ldMessageBox_t;
 
-typedef void (*ldMsgBoxFunc_t)(ldMessageBox_t *);
+typedef void (*ldMsgBoxFunc_t)(ld_scene_t *ptScene,ldMessageBox_t *);
 
 struct ldMessageBox_t
 {

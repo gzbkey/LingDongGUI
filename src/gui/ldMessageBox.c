@@ -95,7 +95,7 @@ static bool slotMsgBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->clickNum=clickNum;
             if(ptWidget->ptFunc!=NULL)
             {
-                ptWidget->ptFunc(ptWidget);
+                ptWidget->ptFunc(ptScene,ptWidget);
             }
             ptWidget->clickNum=-1;
             ptWidget->use_as__ldBase_t.isHidden=true;
