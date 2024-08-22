@@ -331,40 +331,22 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
     arm_lcd_text_set_opacity(opacity);
     arm_lcd_text_location(0,0);
-//    arm_lcd_printf_label(tAlign,(char*)pStr);
-    arm_2d_size_t tLabelSize = arm_lcd_get_string_line_box((char*)pStr);
 
-    arm_2d_region_t tOriginalDrawRegion = *ptRegion;
+    arm_2d_size_t tLabelSize = arm_lcd_text_get_box((char*)pStr,ptFont);
 
     arm_2d_region_t tLabelRegion = {
-        .tLocation = tOriginalDrawRegion.tLocation,
+        .tLocation = ptRegion->tLocation,
         .tSize = tLabelSize,
     };
 
-    switch (tAlign & (ARM_2D_ALIGN_LEFT | ARM_2D_ALIGN_RIGHT)) {
-        case ARM_2D_ALIGN_LEFT:
-            break;
-        case ARM_2D_ALIGN_RIGHT:
-            tLabelRegion.tLocation.iX += tOriginalDrawRegion.tSize.iWidth - tLabelSize.iWidth;
-            break;
-        default:
-            tLabelRegion.tLocation.iX += (tOriginalDrawRegion.tSize.iWidth - tLabelSize.iWidth) >> 1;
-            break;
-    }
+    tLabelRegion= ldBaseGetAlignRegion(*ptRegion,tLabelRegion,tAlign);
 
-    switch (tAlign & (ARM_2D_ALIGN_TOP | ARM_2D_ALIGN_BOTTOM)) {
-        case ARM_2D_ALIGN_TOP:
-            break;
-        case ARM_2D_ALIGN_BOTTOM:
-            tLabelRegion.tLocation.iY += tOriginalDrawRegion.tSize.iHeight - tLabelSize.iHeight;
-            break;
-        default:
-            tLabelRegion.tLocation.iY += (tOriginalDrawRegion.tSize.iHeight - tLabelSize.iHeight) >> 1;
-            break;
-    }
+//    arm_lcd_text_puts(&tLabelRegion,ptFont,(char*)pStr,opacity);
+
+    tLabelRegion.tSize.iWidth+=1;//强制加宽，防止自动换行
     arm_lcd_text_set_draw_region(&tLabelRegion);
     arm_lcd_puts((char*)pStr);
-    arm_lcd_text_set_draw_region(&tOriginalDrawRegion);
+    arm_lcd_text_set_draw_region(ptRegion);
 }
 
 void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str,uint8_t opacity)
@@ -373,7 +355,6 @@ void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str
     arm_2d_size_t tDrawRegionSize = ptRegion->tSize;
 
     arm_2d_location_t   tDrawOffset={0,0};
-    arm_2d_char_descriptor_t tCharDescriptor;
 
     while(*str) {
         if (*str == '\r') {
@@ -401,19 +382,21 @@ void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str
                 tDrawOffset.iX = 0;
             }
         } else {
-
-            arm_2d_helper_get_char_descriptor(  ptFont,&tCharDescriptor,str);
-
-            if (tDrawOffset.iX+tCharDescriptor.iAdvance >= tDrawRegionSize.iWidth)
-            {
-                tDrawOffset.iX = 0;
-                tDrawOffset.iY += tCharSize.iHeight;
-            }
             int16_t iX = tDrawOffset.iX + ptRegion->tLocation.iX;
             int16_t iY = tDrawOffset.iY + ptRegion->tLocation.iY;
 
             tDrawOffset.iX
                 += lcd_draw_char(   iX, iY, (uint8_t **)&str, opacity);
+
+//            if ((tDrawOffset.iX >= tDrawRegionSize.iWidth) && (*str != '\n')){ //自动检查是否二次换行
+            if (tDrawOffset.iX >= tDrawRegionSize.iWidth) {
+                tDrawOffset.iX = 0;
+                tDrawOffset.iY += tCharSize.iHeight;
+
+                if (tDrawOffset.iY >= tDrawRegionSize.iHeight) {
+                    tDrawOffset.iY = 0;
+                }
+            }
 
             continue;
         }
@@ -723,118 +706,140 @@ void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t 
 
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign)
 {
-    switch (tAlign)
-    {
-    case ARM_2D_ALIGN_LEFT:
-    {
-        childRegion.tLocation.iX=0;
-        if(childRegion.tSize.iWidth>parentRegion.tSize.iWidth)
-        {
-            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
-        }
+    switch (tAlign & (ARM_2D_ALIGN_LEFT | ARM_2D_ALIGN_RIGHT)) {
+        case ARM_2D_ALIGN_LEFT:
+            break;
+        case ARM_2D_ALIGN_RIGHT:
+            childRegion.tLocation.iX += parentRegion.tSize.iWidth - childRegion.tSize.iWidth;
+            break;
+        default:
+            childRegion.tLocation.iX += (parentRegion.tSize.iWidth - childRegion.tSize.iWidth) >> 1;
+            break;
+    }
 
-        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
-        {
-            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
-        }
-        else
-        {
-            childRegion.tLocation.iY=0;
-            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
-        }
-        break;
+    switch (tAlign & (ARM_2D_ALIGN_TOP | ARM_2D_ALIGN_BOTTOM)) {
+        case ARM_2D_ALIGN_TOP:
+            break;
+        case ARM_2D_ALIGN_BOTTOM:
+            childRegion.tLocation.iY += parentRegion.tSize.iHeight - childRegion.tSize.iHeight;
+            break;
+        default:
+            childRegion.tLocation.iY += (parentRegion.tSize.iHeight - childRegion.tSize.iHeight) >> 1;
+            break;
     }
-    case ARM_2D_ALIGN_RIGHT:
-    {
-        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
-        {
-            childRegion.tLocation.iX=parentRegion.tSize.iWidth-childRegion.tSize.iWidth;
-        }
-        else
-        {
-            childRegion.tLocation.iX=0;
-            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
-        }
 
-        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
-        {
-            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
-        }
-        else
-        {
-            childRegion.tLocation.iY=0;
-            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
-        }
-        break;
-    }
-    case ARM_2D_ALIGN_TOP:
-    {
-        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
-        {
-            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
-        }
-        else
-        {
-            childRegion.tLocation.iX=0;
-            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
-        }
+//    switch (tAlign)
+//    {
+//    case ARM_2D_ALIGN_LEFT:
+//    {
+//        childRegion.tLocation.iX=0;
+//        if(childRegion.tSize.iWidth>parentRegion.tSize.iWidth)
+//        {
+//            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+//        }
 
-        childRegion.tLocation.iY=0;
-        if(childRegion.tSize.iHeight>parentRegion.tSize.iHeight)
-        {
-            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
-        }
-        break;
-    }
-    case ARM_2D_ALIGN_BOTTOM:
-    {
-        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
-        {
-            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
-        }
-        else
-        {
-            childRegion.tLocation.iX=0;
-            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
-        }
+//        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+//        {
+//            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iY=0;
+//            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+//        }
+//        break;
+//    }
+//    case ARM_2D_ALIGN_RIGHT:
+//    {
+//        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+//        {
+//            childRegion.tLocation.iX=parentRegion.tSize.iWidth-childRegion.tSize.iWidth;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iX=0;
+//            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+//        }
 
-        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
-        {
-            childRegion.tLocation.iY=parentRegion.tSize.iHeight-childRegion.tSize.iHeight;
-        }
-        else
-        {
-            childRegion.tLocation.iY=0;
-            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
-        }
-        break;
-    }
-    case ARM_2D_ALIGN_CENTRE:
-    {
-        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
-        {
-            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
-        }
-        else
-        {
-            childRegion.tLocation.iX=0;
-            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
-        }
+//        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+//        {
+//            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iY=0;
+//            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+//        }
+//        break;
+//    }
+//    case ARM_2D_ALIGN_TOP:
+//    {
+//        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+//        {
+//            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iX=0;
+//            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+//        }
 
-        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
-        {
-            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
-        }
-        else
-        {
-            childRegion.tLocation.iY=0;
-            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
-        }
-        break;
-    }
-    default:
-        break;
-    }
+//        childRegion.tLocation.iY=0;
+//        if(childRegion.tSize.iHeight>parentRegion.tSize.iHeight)
+//        {
+//            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+//        }
+//        break;
+//    }
+//    case ARM_2D_ALIGN_BOTTOM:
+//    {
+//        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+//        {
+//            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iX=0;
+//            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+//        }
+
+//        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+//        {
+//            childRegion.tLocation.iY=parentRegion.tSize.iHeight-childRegion.tSize.iHeight;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iY=0;
+//            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+//        }
+//        break;
+//    }
+//    case ARM_2D_ALIGN_CENTRE:
+//    {
+//        if(childRegion.tSize.iWidth<parentRegion.tSize.iWidth)
+//        {
+//            childRegion.tLocation.iX=(parentRegion.tSize.iWidth-childRegion.tSize.iWidth)>>1;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iX=0;
+//            childRegion.tSize.iWidth=parentRegion.tSize.iWidth;
+//        }
+
+//        if(childRegion.tSize.iHeight<parentRegion.tSize.iHeight)
+//        {
+//            childRegion.tLocation.iY=(parentRegion.tSize.iHeight-childRegion.tSize.iHeight)>>1;
+//        }
+//        else
+//        {
+//            childRegion.tLocation.iY=0;
+//            childRegion.tSize.iHeight=parentRegion.tSize.iHeight;
+//        }
+//        break;
+//    }
+//    default:
+//        break;
+//    }
     return childRegion;
 }
 
