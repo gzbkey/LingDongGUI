@@ -37,32 +37,42 @@
 
 /*============================ MACROS ========================================*/
 
+#if defined (__riscv)
 
+#include "aic_common.h"
+
+#undef arm_irq_safe
+#undef arm_exit_irq_safe
+#define arm_irq_safe  arm_using(  uint32_t ARM_2D_SAFE_NAME(temp) = 0 )
+#define arm_exit_irq_safe    continue
+
+#else
 
 #if defined (_MSC_VER) 
 #   include <stdint.h>
 #   define __STATIC_FORCEINLINE static __forceinline
 #   define __STATIC_INLINE static __inline
 #   define __ALIGNED(x) __declspec(align(x))
-#   define __WEAK
+#   define __WEAK __attribute__((weak))
 #elif defined ( __APPLE_CC__ )
 #   include <stdint.h>
 #   define  __ALIGNED(x) __attribute__((aligned(x)))
 #   define __STATIC_FORCEINLINE static inline __attribute__((always_inline)) 
 #   define __STATIC_INLINE static inline
-#   define __WEAK
+#   define __WEAK __attribute__((weak))
 #else
 #   include <stdint.h>
 #   define  __ALIGNED(x) __attribute__((aligned(x)))
 #   define __STATIC_FORCEINLINE static inline __attribute__((always_inline)) 
 #   define __STATIC_INLINE static inline
-#   define __WEAK
+#   define __WEAK __attribute__((weak))
 #endif
 
 #undef arm_irq_safe
 #undef arm_exit_irq_safe
 #define arm_irq_safe  arm_using(  uint32_t ARM_2D_SAFE_NAME(temp) = 0 )
 #define arm_exit_irq_safe    continue
+
 
 /**
   \brief   Reverse byte order (16 bit)
@@ -82,6 +92,7 @@ __STATIC_FORCEINLINE uint32_t __REV16(uint32_t value)
     return ret;
 }
 
+#endif
 
 #endif  /* end of __ARM_2D_USER_ARCH_PORT_H__ */
 

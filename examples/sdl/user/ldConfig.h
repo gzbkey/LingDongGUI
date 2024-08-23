@@ -58,7 +58,7 @@ extern "C" {
 #define USE_RADIA_MENU_SCALE                      (1)
 
 // <q>scene switcing support
-// <i> 1:More effects 0：Less ram
+// <i> 1:More effects 0:Less ram
 #define USE_SCENE_SWITCHING                       (1)
 
 // debug config

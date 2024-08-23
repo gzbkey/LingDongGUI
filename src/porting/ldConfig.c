@@ -1,4 +1,6 @@
 #include "ldConfig.h"
+#include "arm_2d_types.h"
+#include "ldMem.h"
 
 /**
  * @brief   获取触摸坐标
@@ -95,6 +97,32 @@ void __disp_adapter0_request_async_flushing(
 }
 #endif
 
+#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
+int64_t arm_2d_helper_get_system_timestamp(void)
+{
+    struct timespec timestamp;
+    clock_gettime(CLOCK_MONOTONIC, &timestamp);
+
+    return 1000000ul * timestamp.tv_sec + timestamp.tv_nsec / 1000ul;
+}
+
+uint32_t arm_2d_helper_get_reference_clock_frequency(void)
+{
+    return 1000000ul;
+}
+#else
+#if defined (__riscv)
+int64_t arm_2d_helper_get_system_timestamp(void)
+{
+    return (int64_t)clock();
+}
+
+uint32_t arm_2d_helper_get_reference_clock_frequency(void)
+{
+    return CLOCKS_PER_SEC;
+}
+#endif
+#endif
 
 #if ( !__x86_64__ && !__i386__ && !__APPLE__ )
 
@@ -108,7 +136,7 @@ void *__arm_2d_allocate_scratch_memory( uint32_t wSize,
     /* ensure nAlign is 2^n */
     assert((((~nAlign) + 1) & nAlign) == nAlign);
 
-    void *pBuff = ldCalloc(wSize);
+    void *pBuff = ldCalloc(1,wSize);
     assert(0 == ((uintptr_t)pBuff & (nAlign - 1)));
     
     return pBuff;
@@ -131,7 +159,7 @@ void * __disp_adapter0_aligned_malloc(size_t nSize, size_t nAlign)
     /* ensure nAlign is 2^n */
     assert((((~nAlign) + 1) & nAlign) == nAlign);
 
-    void * pMem = ldCalloc(nSize);
+    void * pMem = ldCalloc(1,nSize);
     assert( 0 == ((uintptr_t)pMem & (nAlign - 1)));
     return pMem;
 }
