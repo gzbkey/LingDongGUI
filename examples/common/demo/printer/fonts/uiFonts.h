@@ -47,6 +47,14 @@ struct {
 
 #define FONT_SIMHEI_20          (arm_2d_font_t*)&ARM_2D_FONT_simhei_20_A8
 
+extern const
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_simhei_18_A8;
+
+#define FONT_SIMHEI_18          (arm_2d_font_t*)&ARM_2D_FONT_simhei_18_A8
+
 #ifdef __cplusplus
 }
 #endif

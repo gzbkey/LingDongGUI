@@ -45,7 +45,15 @@ bool isFullWidgetUpdate=false;
 
 void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
-    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL) {
+    ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+
+    if(ptScene->ldGuiFuncGroup->draw!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
+    }
+
+    ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
+    arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
         ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
     }
 }
@@ -221,11 +229,12 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
                 ((ldBase_t*)ptItem)->ptGuiFunc->depose(ptItem);
             }
         }
-
+#ifdef FRAME_START
         if(((ldBase_t*)ptItem)->ptGuiFunc->frameStart!=NULL)
         {
             ((ldBase_t*)ptItem)->ptGuiFunc->frameStart(ptScene);
         }
+#endif
     }
 
     if(ldTimeOut(SYS_TICK_CYCLE_MS,true))

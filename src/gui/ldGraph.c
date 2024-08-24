@@ -73,7 +73,9 @@ const arm_2d_tile_t c_tile_graphDefalutDot_Mask = {
 const ldBaseWidgetFunc_t ldGraphFunc = {
     .depose = (ldDeposeFunc_t)ldGraph_depose,
     .load = (ldLoadFunc_t)ldGraph_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldGraph_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldGraph_show,
 };
 

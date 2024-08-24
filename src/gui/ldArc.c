@@ -47,7 +47,9 @@
 const ldBaseWidgetFunc_t ldArcFunc = {
     .depose = (ldDeposeFunc_t)ldArc_depose,
     .load = (ldLoadFunc_t)ldArc_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldArc_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldArc_show,
 };
 

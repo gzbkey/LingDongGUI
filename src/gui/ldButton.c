@@ -46,7 +46,9 @@
 const ldBaseWidgetFunc_t ldButtonFunc = {
     .depose = (ldDeposeFunc_t)ldButton_depose,
     .load = (ldLoadFunc_t)ldButton_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldButton_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldButton_show,
 };
 
@@ -293,6 +295,16 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                             ptWidget->charColor,
                             ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
+            }
+
+            if(ptWidget->ptSelectMaskTile!=NULL)
+            {
+                ldBaseImage(&tTarget,
+                            NULL,
+                            NULL,
+                            ptWidget->ptSelectMaskTile,
+                            ptWidget->selectColor,
+                            ptWidget->use_as__ldBase_t.opacity);
             }
         }
     }

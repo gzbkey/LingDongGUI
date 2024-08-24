@@ -73,6 +73,7 @@ void ldScrollSelecter_on_frame_start( ldScrollSelecter_t *ptWidget);
 void ldScrollSelecter_show(ld_scene_t *pScene, ldScrollSelecter_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize);
+void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor);
 void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
 void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,arm_2d_tile_t *ptImgTile);
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);

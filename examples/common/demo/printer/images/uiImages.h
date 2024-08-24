@@ -272,6 +272,90 @@ extern const arm_2d_tile_t c_tile_percent_bmp_CCCN888;
 #define IMAGE_PERCENT_BMP          (arm_2d_tile_t*)&c_tile_percent_bmp_CCCN888
 #endif
 
+// readyBtn1.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn1_bmp_GRAY8;
+#define IMAGE_READYBTN1_BMP          (arm_2d_tile_t*)&c_tile_readyBtn1_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn1_bmp_RGB565;
+#define IMAGE_READYBTN1_BMP          (arm_2d_tile_t*)&c_tile_readyBtn1_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn1_bmp_CCCN888;
+#define IMAGE_READYBTN1_BMP          (arm_2d_tile_t*)&c_tile_readyBtn1_bmp_CCCN888
+#endif
+
+// readyBtn2.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn2_bmp_GRAY8;
+#define IMAGE_READYBTN2_BMP          (arm_2d_tile_t*)&c_tile_readyBtn2_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn2_bmp_RGB565;
+#define IMAGE_READYBTN2_BMP          (arm_2d_tile_t*)&c_tile_readyBtn2_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn2_bmp_CCCN888;
+#define IMAGE_READYBTN2_BMP          (arm_2d_tile_t*)&c_tile_readyBtn2_bmp_CCCN888
+#endif
+
+// readyBtn3.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn3_bmp_GRAY8;
+#define IMAGE_READYBTN3_BMP          (arm_2d_tile_t*)&c_tile_readyBtn3_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn3_bmp_RGB565;
+#define IMAGE_READYBTN3_BMP          (arm_2d_tile_t*)&c_tile_readyBtn3_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn3_bmp_CCCN888;
+#define IMAGE_READYBTN3_BMP          (arm_2d_tile_t*)&c_tile_readyBtn3_bmp_CCCN888
+#endif
+
+// readyBtn3_off.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn3_off_bmp_GRAY8;
+#define IMAGE_READYBTN3_OFF_BMP          (arm_2d_tile_t*)&c_tile_readyBtn3_off_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn3_off_bmp_RGB565;
+#define IMAGE_READYBTN3_OFF_BMP          (arm_2d_tile_t*)&c_tile_readyBtn3_off_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn3_off_bmp_CCCN888;
+#define IMAGE_READYBTN3_OFF_BMP          (arm_2d_tile_t*)&c_tile_readyBtn3_off_bmp_CCCN888
+#endif
+
+// readyBtn4.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn4_bmp_GRAY8;
+#define IMAGE_READYBTN4_BMP          (arm_2d_tile_t*)&c_tile_readyBtn4_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn4_bmp_RGB565;
+#define IMAGE_READYBTN4_BMP          (arm_2d_tile_t*)&c_tile_readyBtn4_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn4_bmp_CCCN888;
+#define IMAGE_READYBTN4_BMP          (arm_2d_tile_t*)&c_tile_readyBtn4_bmp_CCCN888
+#endif
+
+// readyBtn4_off.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn4_off_bmp_GRAY8;
+#define IMAGE_READYBTN4_OFF_BMP          (arm_2d_tile_t*)&c_tile_readyBtn4_off_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn4_off_bmp_RGB565;
+#define IMAGE_READYBTN4_OFF_BMP          (arm_2d_tile_t*)&c_tile_readyBtn4_off_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn4_off_bmp_CCCN888;
+#define IMAGE_READYBTN4_OFF_BMP          (arm_2d_tile_t*)&c_tile_readyBtn4_off_bmp_CCCN888
+#endif
+
+// readyBtn5.bmp < 220x60 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_readyBtn5_bmp_GRAY8;
+#define IMAGE_READYBTN5_BMP          (arm_2d_tile_t*)&c_tile_readyBtn5_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_readyBtn5_bmp_RGB565;
+#define IMAGE_READYBTN5_BMP          (arm_2d_tile_t*)&c_tile_readyBtn5_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_readyBtn5_bmp_CCCN888;
+#define IMAGE_READYBTN5_BMP          (arm_2d_tile_t*)&c_tile_readyBtn5_bmp_CCCN888
+#endif
+
 // smallRoom.png < 200x180 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_smallRoom_png_GRAY8;

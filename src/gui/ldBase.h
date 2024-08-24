@@ -111,17 +111,22 @@ typedef enum{
 
 typedef struct ld_scene_t ld_scene_t;
 typedef void (*ldPageFunc_t)(ld_scene_t*);
+typedef void (*ldDrawFunc_t)(ld_scene_t *,arm_2d_tile_t *,bool);
 typedef struct ldPageFuncGroup_t ldPageFuncGroup_t;
 
 typedef void (*ldDeposeFunc_t)(void *);
 typedef void (*ldShowFunc_t)(ld_scene_t*,void *,void *,bool);
+#ifdef FRAME_START
 typedef void (*ldFrameStartFunc_t)(void *);
+#endif
 typedef void (*ldLoadFunc_t)(void *);
 
 typedef struct {
     ldDeposeFunc_t depose;
     ldLoadFunc_t load;
+#ifdef FRAME_START
     ldFrameStartFunc_t frameStart;
+#endif
     ldShowFunc_t show;
 }ldBaseWidgetFunc_t;
 
@@ -130,6 +135,7 @@ struct ldPageFuncGroup_t{
     ldPageFunc_t init;
     ldPageFunc_t loop;
     ldPageFunc_t quit;
+    ldDrawFunc_t draw;
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     uint8_t pageName[16];
 #endif

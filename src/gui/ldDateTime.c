@@ -47,7 +47,9 @@
 const ldBaseWidgetFunc_t ldDateTimeFunc = {
     .depose = (ldDeposeFunc_t)ldDateTime_depose,
     .load = (ldLoadFunc_t)ldDateTime_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldDateTime_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldDateTime_show,
 };
 

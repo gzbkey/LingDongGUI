@@ -49,7 +49,9 @@
 const ldBaseWidgetFunc_t ldMessageBoxFunc = {
     .depose = (ldDeposeFunc_t)ldMessageBox_depose,
     .load = (ldLoadFunc_t)ldMessageBox_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldMessageBox_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldMessageBox_show,
 };
 

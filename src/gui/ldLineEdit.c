@@ -48,7 +48,9 @@
 const ldBaseWidgetFunc_t ldLineEditFunc = {
     .depose = (ldDeposeFunc_t)ldLineEdit_depose,
     .load = (ldLoadFunc_t)ldLineEdit_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldLineEdit_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldLineEdit_show,
 };
 

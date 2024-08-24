@@ -148,7 +148,9 @@ static struct {
 const ldBaseWidgetFunc_t ldCheckBoxFunc = {
     .depose = (ldDeposeFunc_t)ldCheckBox_depose,
     .load = (ldLoadFunc_t)ldCheckBox_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldCheckBox_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldCheckBox_show,
 };
 

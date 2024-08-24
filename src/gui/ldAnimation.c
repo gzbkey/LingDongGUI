@@ -47,7 +47,9 @@
 const ldBaseWidgetFunc_t ldAnimationFunc = {
     .depose = (ldDeposeFunc_t)ldAnimation_depose,
     .load = (ldLoadFunc_t)ldAnimation_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldAnimation_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldAnimation_show,
 };
 

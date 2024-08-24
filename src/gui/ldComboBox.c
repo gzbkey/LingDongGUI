@@ -78,7 +78,9 @@ const arm_2d_tile_t c_tile_dropDownV_Mask = {
 const ldBaseWidgetFunc_t ldComboBoxFunc = {
     .depose = (ldDeposeFunc_t)ldComboBox_depose,
     .load = (ldLoadFunc_t)ldComboBox_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldComboBox_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldComboBox_show,
 };
 

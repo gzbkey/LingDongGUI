@@ -49,7 +49,9 @@
 const ldBaseWidgetFunc_t ldListFunc = {
     .depose = (ldDeposeFunc_t)ldList_depose,
     .load = (ldLoadFunc_t)ldList_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldList_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldList_show,
 };
 

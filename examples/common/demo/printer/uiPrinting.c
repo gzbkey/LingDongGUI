@@ -24,6 +24,7 @@ static const uint8_t msgStr[]="是否停止打印";
 static const uint8_t *pBtnStr[]={"是","否"};
 
 static bool isPause=false;
+static uint8_t percent=0;
 
 static bool slotJumpPrint(ld_scene_t *ptScene,ldMsg_t msg)
 {
@@ -171,18 +172,13 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_RIGHT);
 
 
-
-
-
-
-
-
+    percent=0;
 }
 
 void uiPrintingLoop(ld_scene_t* ptScene)
 {
     uint8_t buf[10];
-    static uint8_t percent=0;
+
     if(ldTimeOut(100,true)&&!isPause)
     {
         ldProgressBar_t* ptWidget = ldBaseGetWidgetById(ID_PROG_BAR);

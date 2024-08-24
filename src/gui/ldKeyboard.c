@@ -289,7 +289,9 @@ static uint8_t _letterOffset[3]={0,32,32};
 const ldBaseWidgetFunc_t ldKeyboardFunc = {
     .depose = (ldDeposeFunc_t)ldKeyboard_depose,
     .load = (ldLoadFunc_t)ldKeyboard_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldKeyboard_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldKeyboard_show,
 };
 

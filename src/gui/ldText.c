@@ -47,7 +47,9 @@
 const ldBaseWidgetFunc_t ldTextFunc = {
     .depose = (ldDeposeFunc_t)ldText_depose,
     .load = (ldLoadFunc_t)ldText_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldText_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldText_show,
 };
 
@@ -175,7 +177,10 @@ void ldText_depose( ldText_t *ptWidget)
 
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
-    ldFree(ptWidget->pStr);
+    if(!ptWidget->_isStatic)
+    {
+        ldFree(ptWidget->pStr);
+    }
     ldFree(ptWidget);
 }
 
@@ -315,6 +320,19 @@ void ldTextSetText(ldText_t* ptWidget,uint8_t *pStr)
         strcpy((char*)ptWidget->pStr,(char*)pStr);
     }
 
+    ptWidget->strHeight=arm_lcd_text_get_box(pStr,ptWidget->ptFont).iHeight;
+}
+
+void ldTextSetStaticText(ldText_t* ptWidget,const uint8_t *pStr)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->_isStatic=true;
+    ptWidget->pStr=pStr;
     ptWidget->strHeight=arm_lcd_text_get_box(pStr,ptWidget->ptFont).iHeight;
 }
 

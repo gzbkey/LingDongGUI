@@ -47,7 +47,9 @@
 const ldBaseWidgetFunc_t ldImageFunc={
     .depose=(ldDeposeFunc_t)ldImage_depose,
     .load = (ldLoadFunc_t)ldImage_on_load,
+#ifdef FRAME_START
     .frameStart=(ldFrameStartFunc_t)ldImage_on_frame_start,
+#endif
     .show=(ldShowFunc_t)ldImage_show,
 };
 

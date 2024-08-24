@@ -52,7 +52,9 @@
 const ldBaseWidgetFunc_t ldRadialMenuFunc = {
     .depose = (ldDeposeFunc_t)ldRadialMenu_depose,
     .load = (ldLoadFunc_t)ldRadialMenu_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldRadialMenu_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldRadialMenu_show,
 };
 

@@ -21,9 +21,9 @@ static bool slotJumpPrint(ld_scene_t *ptScene,ldMsg_t msg)
     return false;
 }
 
-static bool slotJumpWait(ld_scene_t *ptScene,ldMsg_t msg)
+static bool slotJumpReady(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiWaitFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPage(uiReadyFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
     return false;
 }
 
@@ -56,7 +56,7 @@ void uiMainInit(ld_scene_t* ptScene)
     ldButtonSetText(obj,"设置");
 
     connect(ID_BTN_PRINT,SIGNAL_RELEASE,slotJumpPrint);
-    connect(ID_BTN_WAIT,SIGNAL_RELEASE,slotJumpWait);
+    connect(ID_BTN_WAIT,SIGNAL_RELEASE,slotJumpReady);
     connect(ID_BTN_SET,SIGNAL_RELEASE,slotJumpSet);
 
 

@@ -49,7 +49,9 @@
 const ldBaseWidgetFunc_t ldGaugeFunc = {
     .depose = (ldDeposeFunc_t)ldGauge_depose,
     .load = (ldLoadFunc_t)ldGauge_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldGauge_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldGauge_show,
 };
 

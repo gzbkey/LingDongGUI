@@ -46,7 +46,9 @@
 const ldBaseWidgetFunc_t ldLabelFunc = {
     .depose = (ldDeposeFunc_t)ldLabel_depose,
     .load = (ldLoadFunc_t)ldLabel_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldLabel_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldLabel_show,
 };
 

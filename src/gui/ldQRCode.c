@@ -47,7 +47,9 @@
 const ldBaseWidgetFunc_t ldQRCodeFunc = {
     .depose = (ldDeposeFunc_t)ldQRCode_depose,
     .load = (ldLoadFunc_t)ldQRCode_on_load,
+#ifdef FRAME_START
     .frameStart = (ldFrameStartFunc_t)ldQRCode_on_frame_start,
+#endif
     .show = (ldShowFunc_t)ldQRCode_show,
 };
 
