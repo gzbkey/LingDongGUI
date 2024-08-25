@@ -54,16 +54,20 @@ struct ldScrollSelecter_t
 //    )
     arm_2d_font_t *ptFont;
     arm_2d_tile_t *ptImgTile;
+    arm_2d_tile_t *ptIndicatorTile;
     const uint8_t **ppItemStrGroup;
     int16_t scrollOffset;
+    int16_t itemSpace;
     ldColor charColor;
     ldColor bgColor;
+    ldColor indicatorColor;
     uint8_t itemSelect;
     uint8_t moveOffset;
     uint8_t itemCount;
     bool isTransparent:1;
     bool isWaitMove:1;
     bool isAutoMove:1;
+    bool is3Row:1;
 };
 
 ldScrollSelecter_t* ldScrollSelecter_init(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);
@@ -79,6 +83,7 @@ void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,arm_2d_tile_t *ptImg
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
 void ldScrollSelecterSelectItem(ldScrollSelecter_t *pWidget, uint8_t itemNum);
+void lldScrollSelecterSetOneRowMode(ldScrollSelecter_t *ptWidget, bool isOneRow);
 
 #define ldScrollSelecterInit(nameId,parentNameId,x,y,width,height,ptFont) \
         ldScrollSelecter_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)

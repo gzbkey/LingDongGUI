@@ -67,7 +67,7 @@ static uint8_t _ldScrollSelecterAutoItem(ldScrollSelecter_t *ptWidget,int16_t of
     offset=-offset;
     int16_t temp1,temp2;
 
-    uint16_t itemSpace=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)/2+ptWidget->ptFont->tCharSize.iHeight;
+    uint16_t itemSpace=ptWidget->itemSpace+ptWidget->ptFont->tCharSize.iHeight;
 
     temp1=offset%itemSpace;
     temp2=offset/itemSpace;
@@ -160,14 +160,36 @@ ldScrollSelecter_t* ldScrollSelecter_init( ld_scene_t *ptScene,ldScrollSelecter_
 
     ptWidget->itemCount=0;
     ptWidget->ppItemStrGroup=NULL;
-#if USE_OPACITY == 1
-    ptWidget->opacity=255;
-#endif
     ptWidget->charColor=0;
     ptWidget->ptFont=ptFont;
     ptWidget->isTransparent=true;
     ptWidget->bgColor=0;
     ptWidget->moveOffset=1;
+    ptWidget->indicatorColor=GLCD_COLOR_DARK_GREY;
+
+    ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight*3;
+
+    if(ptWidget->itemSpace>0)
+    {
+        ptWidget->itemSpace=ptWidget->itemSpace>>1;
+        ptWidget->is3Row=true;
+        LOG_INFO("[init auto][scrollSelecter] 3 row mode");
+    }
+    else
+    {
+        ptWidget->is3Row=false;
+        ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight;
+
+        LOG_INFO("[init auto][scrollSelecter] 1 row mode");
+        if(ptWidget->itemSpace>0)
+        {
+            ptWidget->itemSpace=ptWidget->itemSpace>>1;
+        }
+        else
+        {
+            ptWidget->itemSpace=0;
+        }
+    }
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotScrollSelecterScroll);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotScrollSelecterScroll);
@@ -219,7 +241,7 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
 
     if((ptWidget->isWaitMove)&&(bIsNewFrame))
     {
-        int16_t targetOffset=(-ptWidget->itemSelect)*((ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)/2+ptWidget->ptFont->tCharSize.iHeight);
+        int16_t targetOffset=(-ptWidget->itemSelect)*(ptWidget->itemSpace+ptWidget->ptFont->tCharSize.iHeight);
 
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         if(ptWidget->scrollOffset==targetOffset)
@@ -272,7 +294,6 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                 arm_2d_op_wait_async(NULL);
             }
 
-            uint16_t space=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)/2;
             arm_2d_region_t itemsRegion={
                 .tLocation={
                     .iX=0,
@@ -280,13 +301,17 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                 },
                 .tSize={
                     .iWidth=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
-                    .iHeight=ptWidget->ptFont->tCharSize.iHeight+space,
+                    .iHeight=ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace,
                 }
             };
 
             for(uint8_t strGroupCount=0;strGroupCount<ptWidget->itemCount;strGroupCount++)
             {
-                itemsRegion.tLocation.iY=(strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+space))+ptWidget->scrollOffset;
+                itemsRegion.tLocation.iY=(strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace))+ptWidget->scrollOffset;
+                if(ptWidget->is3Row)
+                {
+                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight;
+                }
 
                 ldBaseLabel(&tTarget,
                             &itemsRegion,
@@ -295,6 +320,24 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                             ARM_2D_ALIGN_BOTTOM,
                             ptWidget->charColor,
                             ptWidget->use_as__ldBase_t.opacity);
+            }
+
+            if(ptWidget->is3Row)
+            {
+                if(ptWidget->ptIndicatorTile==NULL)
+                {
+#define LINE_HEIGHT   2
+                    itemsRegion.tLocation.iY=ptWidget->ptFont->tCharSize.iHeight+((ptWidget->itemSpace+LINE_HEIGHT)>>1);
+                    itemsRegion.tSize.iHeight=LINE_HEIGHT;
+                    arm_2d_draw_box(&tTarget,&itemsRegion,1,ptWidget->indicatorColor,255);
+
+                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace;
+                    arm_2d_draw_box(&tTarget,&itemsRegion,1,ptWidget->indicatorColor,255);
+                }
+                else
+                {
+                    ldBaseImage(&tTarget,NULL,NULL,ptWidget->ptIndicatorTile,ptWidget->indicatorColor,ptWidget->use_as__ldBase_t.opacity);
+                }
             }
             arm_2d_op_wait_async(NULL);
         }
@@ -305,6 +348,7 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
 
 void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -316,6 +360,7 @@ void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrAr
 
 void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -326,6 +371,7 @@ void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor
 
 void ldScrollSelecterSetBgColor(ldScrollSelecter_t* ptWidget,ldColor bgColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -338,6 +384,7 @@ void ldScrollSelecterSetBgColor(ldScrollSelecter_t* ptWidget,ldColor bgColor)
 
 void ldScrollSelecterSetBgImage(ldScrollSelecter_t* ptWidget,arm_2d_tile_t *ptImgTile)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -349,6 +396,7 @@ void ldScrollSelecterSetBgImage(ldScrollSelecter_t* ptWidget,arm_2d_tile_t *ptIm
 
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* ptWidget,bool isTransparent)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -359,6 +407,7 @@ void ldScrollSelecterSetTransparent(ldScrollSelecter_t* ptWidget,bool isTranspar
 
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *ptWidget, uint8_t speed)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -376,6 +425,7 @@ void ldScrollSelecterSetSpeed(ldScrollSelecter_t *ptWidget, uint8_t speed)
 
 void ldScrollSelecterSelectItem(ldScrollSelecter_t *ptWidget, uint8_t itemNum)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -386,6 +436,34 @@ void ldScrollSelecterSelectItem(ldScrollSelecter_t *ptWidget, uint8_t itemNum)
     }
     ptWidget->itemSelect=itemNum;
     ptWidget->isWaitMove=true;
+}
+
+void lldScrollSelecterSetOneRowMode(ldScrollSelecter_t *ptWidget, bool isOneRow)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->is3Row=isOneRow;
+
+    if(ptWidget->is3Row)
+    {
+        ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight*3;
+    }
+    else
+    {
+        ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight;
+    }
+
+    if(ptWidget->itemSpace>0)
+    {
+        ptWidget->itemSpace=ptWidget->itemSpace>>1;
+    }
+    else
+    {
+        ptWidget->itemSpace=0;
+    }
 }
 
 #if defined(__clang__)
