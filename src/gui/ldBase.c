@@ -853,6 +853,7 @@ void ldBaseSetCenter(ldBase_t *ptWidget)
         ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
     }
 }
+
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode)
 {
     do{

@@ -36,6 +36,57 @@ void uiNozzleInit(ld_scene_t* ptScene)
     ldButtonSetText(obj,"返回");
     connect(ID_BTN_RET,SIGNAL_RELEASE,slotJumpReady);
 
+    obj=ldImageInit(ID_IMG_1,ID_BG,20,60,42,30,IMAGE_NOZZLEICON1_BMP,NULL,false);
+    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,60,80,30,FONT_SIMHEI_20);
+    ldLabelSetText(obj,"喷头温度");
+    ldLabelSetTransparent(obj,true);
+    ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
+
+
+    obj=ldImageInit(ID_IMG_2,ID_BG,20,168,42,30,IMAGE_NOZZLEICON2_BMP,NULL,false);
+    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,168,40,30,FONT_SIMHEI_20);
+    ldLabelSetText(obj,"进料");
+    ldLabelSetTransparent(obj,true);
+    ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
+    obj=ldLineEditInit(ID_LINE_EDIT_2,ID_BG,300,168,50,30,FONT_SIMHEI_20,4);
+    ldLineEditSetKeyboard(obj,ID_KB);
+//    ldLineEditSetType(obj,typeInt);
+    obj=ldLabelInit(ID_LABEL_4,ID_BG,400,168,40,30,FONT_SIMHEI_20);
+    ldLabelSetText(obj,"MM");
+    ldLabelSetTransparent(obj,true);
+    ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
+
+    obj=ldImageInit(ID_IMG_3,ID_BG,20,223,42,30,IMAGE_NOZZLEICON3_BMP,NULL,false);
+    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,223,40,30,FONT_SIMHEI_20);
+    ldLabelSetText(obj,"出料");
+    ldLabelSetTransparent(obj,true);
+    ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
+    obj=ldLineEditInit(ID_LINE_EDIT_3,ID_BG,300,223,50,30,FONT_SIMHEI_20,4);
+    ldLineEditSetKeyboard(obj,ID_KB);
+//    ldLineEditSetType(obj,typeInt);
+    obj=ldLabelInit(ID_LABEL_5,ID_BG,400,223,40,30,FONT_SIMHEI_20);
+    ldLabelSetText(obj,"MM");
+    ldLabelSetTransparent(obj,true);
+    ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
+
+
+
+    obj=ldSliderInit(ID_SLIDER,ID_BG,40,91,400,30);
+
+    obj=ldLabelInit(ID_LABEL_TEMP,ID_BG,220,120,60,30,FONT_SIMHEI_20);
+    ldLabelSetText(obj,"100℃");
+    ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
+    ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+    ldLabelSetTransparent(obj,true);
+
+//    ldTextSetTextColor(obj,GLCD_COLOR_WHITE);
+
+    ldKeyboardInit(ID_KB,ID_BG,FONT_SIMSUN_16);
 }
 
 void uiNozzleLoop(ld_scene_t* ptScene)
