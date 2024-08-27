@@ -53,6 +53,7 @@ struct ldLineEdit_t
 //            ld_scene_t *ptScene;
 //    )
     arm_2d_font_t *ptFont;
+    arm_2d_align_t tAlign;
     uint16_t kbNameId;
     ldColor textColor;
     uint8_t *pText;
@@ -72,6 +73,7 @@ void ldLineEdit_show(ld_scene_t *pScene, ldLineEdit_t *ptWidget, const arm_2d_ti
 void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *pText);
 void ldLineEditSetKeyboard(ldLineEdit_t* ptWidget,uint16_t kbNameId);
 void ldLineEditSetType(ldLineEdit_t* ptWidget,ldEditType_t editType);
+void ldLineEditSetAlign(ldLineEdit_t *ptWidget,arm_2d_align_t tAlign);
 
 #define ldLineEditInit(nameId,parentNameId,x,y,width,height,ptFont,textMax) \
         ldLineEdit_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont,textMax)

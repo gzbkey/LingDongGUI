@@ -439,16 +439,16 @@ static void _inputAsciiProcess(ldKeyboard_t *ptWidget,uint8_t ascii)
     {
         switch (ascii)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
         {
             _addAscii(ptWidget,textLen,ascii,true);
             break;
@@ -676,16 +676,11 @@ void ldKeyboard_on_frame_start( ldKeyboard_t *ptWidget)
     
 }
 
-static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget,arm_2d_tile_t *parentTile,arm_2d_region_t *pBtnRegion,uint8_t *pStr,ldColor btnColor,ldColor charColor,bool bIsNewFrame)
+static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget,arm_2d_tile_t *parentTile,arm_2d_region_t *ptBtnRegion,uint8_t *pStr,ldColor btnColor,ldColor charColor,bool bIsNewFrame)
 {
-//    arm_2d_tile_t btnTile;
-    draw_round_corner_box(parentTile,pBtnRegion,btnColor,255,bIsNewFrame);
-//    arm_2d_tile_generate_child(parentTile,pBtnRegion,&btnTile,false);
-//    LOG_REGION("",btnTile.tRegion);
-//    LOG_REGION("",*pBtnRegion);
-//    ldBaseLineText(&btnTile,&ptWidget->resource,pStr,ptWidget->pFontDict,LD_ALIGN_CENTER,charColor,0,255);
+    draw_round_corner_box(parentTile,ptBtnRegion,btnColor,255,bIsNewFrame);
     ldBaseLabel(parentTile,
-                pBtnRegion,
+                ptBtnRegion,
                 pStr,
                 ptWidget->ptFont,
                 ARM_2D_ALIGN_CENTRE,

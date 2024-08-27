@@ -88,6 +88,7 @@ typedef enum{
 
 #define SIGNAL_CLICKED_ITEM             12                  // value = item num
 #define SIGNAL_FINISHED                 13
+#define SIGNAL_VALUE_CHANGED            14
 
 #define GET_SIGNAL_OFFSET_X(dat)        ((dat>>48)&0xFFFF)
 #define GET_SIGNAL_OFFSET_Y(dat)        ((dat>>32)&0xFFFF)

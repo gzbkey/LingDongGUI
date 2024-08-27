@@ -141,6 +141,7 @@ ldLineEdit_t* ldLineEdit_init( ld_scene_t *ptScene,ldLineEdit_t *ptWidget, uint1
     ptWidget->ptFont=ptFont;
     ptWidget->textColor=GLCD_COLOR_BLACK;
     ptWidget->editType=typeString;
+    ptWidget->tAlign=ARM_2D_ALIGN_LEFT;
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotLineEditProcess);
     ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotEditEnd);
@@ -244,7 +245,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
             arm_2d_size_t strSize=arm_lcd_text_get_box(ptWidget->pText, ptWidget->ptFont);
             if(ptWidget->pText!=NULL)
             {
-                arm_2d_align_t tAlign=ARM_2D_ALIGN_LEFT;
+                arm_2d_align_t tAlign=ptWidget->tAlign;
                 if(strSize.iWidth>tempRegion.tSize.iWidth)
                 {
                     tAlign=ARM_2D_ALIGN_RIGHT;
@@ -261,11 +262,18 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
 
             if(cursorBlinkFlag&&ptWidget->isEditing)
             {
+                arm_2d_region_t cursorRegion={
+                    tempRegion.tLocation.iX+strSize.iWidth,
+                    ((tTarget_canvas.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)>>1)+2,
+                    CURSOR_WIDTH,
+                    ptWidget->ptFont->tCharSize.iHeight
+                };
+                if(ptWidget->tAlign==ARM_2D_ALIGN_RIGHT)
+                {
+                    cursorRegion.tLocation.iX=tempRegion.tLocation.iX+tempRegion.tSize.iWidth;
+                }
                 arm_2d_draw_box(&tTarget,
-                                &((arm_2d_region_t){tempRegion.tLocation.iX+strSize.iWidth,
-                                                    ((tTarget_canvas.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)>>1)+2,
-                                                    CURSOR_WIDTH,
-                                                    ptWidget->ptFont->tCharSize.iHeight}),
+                                &cursorRegion,
                                 1,
                                 0,
                                 ptWidget->use_as__ldBase_t.opacity);
@@ -317,6 +325,16 @@ void ldLineEditSetType(ldLineEdit_t* ptWidget,ldEditType_t editType)
     }
 
     ptWidget->editType=editType;
+}
+
+void ldLineEditSetAlign(ldLineEdit_t *ptWidget,arm_2d_align_t tAlign)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->tAlign=tAlign;
 }
 
 #if defined(__clang__)

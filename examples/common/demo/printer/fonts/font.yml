@@ -15,12 +15,12 @@ simsun.ttc:
     string: '返回打印闹钟方块兔巧克力蛋糕福娃奶牛盒马克杯小房间进度0123456789%注意是否停止'
   - pixelSize: 16
     fontBitWidth: 8
-    string: '0123456789 -:±.'
+    string: '0123456789 <-:.EnterABC' # ±
 
 simhei.ttf:
   - pixelSize: 20
     fontBitWidth: 8
-    string: '0123456789%M℃.XYZ:喷头温度进出料'
+    string: '0123456789-%M℃.XYZ:喷头温度进出料'
   - pixelSize: 18
     fontBitWidth: 8
     string: '灵动GUI DEMO屏幕尺寸480x272'

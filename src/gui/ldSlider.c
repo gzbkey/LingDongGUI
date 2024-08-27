@@ -95,6 +95,7 @@ static bool slotSliderMove(ld_scene_t *ptScene,ldMsg_t msg)
 
         ptWidget->permille = 1000 - ((uint32_t)tClickLocal.iY * 1000) / (ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight - ptWidget->indicWidth);
     }
+    ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_VALUE_CHANGED,ptWidget->permille);
 
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 

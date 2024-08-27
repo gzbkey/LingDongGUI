@@ -345,7 +345,10 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
 
     tLabelRegion.tSize.iWidth+=1;//强制加宽，防止自动换行
     arm_lcd_text_set_draw_region(&tLabelRegion);
-    arm_lcd_puts((char*)pStr);
+    if(pStr!=NULL)
+    {
+        arm_lcd_puts((char*)pStr);
+    }
     arm_lcd_text_set_draw_region(ptRegion);
 }
 

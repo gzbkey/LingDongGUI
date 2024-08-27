@@ -22,6 +22,16 @@ static bool slotJumpReady(ld_scene_t *ptScene,ldMsg_t msg)
     return false;
 }
 
+static bool slotChangeValue(ld_scene_t *ptScene,ldMsg_t msg)
+{
+    uint8_t buf[10]={0};
+    ldLabel_t* ptWidget= ldBaseGetWidgetById(ID_LABEL_TEMP);
+
+    sprintf(buf,"%d℃",msg.value*18/100);
+    ldLabelSetText(ptWidget,buf);
+    return false;
+}
+
 void uiNozzleInit(ld_scene_t* ptScene)
 {
     void *obj,*win;
@@ -52,7 +62,9 @@ void uiNozzleInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
     obj=ldLineEditInit(ID_LINE_EDIT_2,ID_BG,300,168,50,30,FONT_SIMHEI_20,4);
     ldLineEditSetKeyboard(obj,ID_KB);
-//    ldLineEditSetType(obj,typeInt);
+    ldLineEditSetType(obj,typeInt);
+    ldLineEditSetText(obj,"0");
+    ldLineEditSetAlign(obj,ARM_2D_ALIGN_RIGHT);
     obj=ldLabelInit(ID_LABEL_4,ID_BG,400,168,40,30,FONT_SIMHEI_20);
     ldLabelSetText(obj,"MM");
     ldLabelSetTransparent(obj,true);
@@ -67,7 +79,9 @@ void uiNozzleInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
     obj=ldLineEditInit(ID_LINE_EDIT_3,ID_BG,300,223,50,30,FONT_SIMHEI_20,4);
     ldLineEditSetKeyboard(obj,ID_KB);
-//    ldLineEditSetType(obj,typeInt);
+    ldLineEditSetType(obj,typeInt);
+    ldLineEditSetText(obj,"0");
+    ldLineEditSetAlign(obj,ARM_2D_ALIGN_RIGHT);
     obj=ldLabelInit(ID_LABEL_5,ID_BG,400,223,40,30,FONT_SIMHEI_20);
     ldLabelSetText(obj,"MM");
     ldLabelSetTransparent(obj,true);
@@ -77,14 +91,14 @@ void uiNozzleInit(ld_scene_t* ptScene)
 
 
     obj=ldSliderInit(ID_SLIDER,ID_BG,40,91,400,30);
+    connect(ID_SLIDER,SIGNAL_VALUE_CHANGED,slotChangeValue);
 
     obj=ldLabelInit(ID_LABEL_TEMP,ID_BG,220,120,60,30,FONT_SIMHEI_20);
-    ldLabelSetText(obj,"100℃");
+    ldLabelSetText(obj,"0℃");
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetTransparent(obj,true);
 
-//    ldTextSetTextColor(obj,GLCD_COLOR_WHITE);
 
     ldKeyboardInit(ID_KB,ID_BG,FONT_SIMSUN_16);
 }
