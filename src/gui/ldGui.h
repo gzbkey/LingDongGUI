@@ -80,6 +80,9 @@ void __ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *
 #define ldGuiJumpPage(pageFuncGroupName,mode,ms)           ({extern const ldPageFuncGroup_t pageFuncGroupName; \
                                                             __ldGuiJumpPage((ldPageFuncGroup_t *)&pageFuncGroupName,&mode,ms);})
 
+#define ldGuiJumpPageFast(pageFuncGroupName)           ({extern const ldPageFuncGroup_t pageFuncGroupName; \
+                                                            __ldGuiJumpPage((ldPageFuncGroup_t *)&pageFuncGroupName,&ARM_2D_SCENE_SWITCH_MODE_NONE,0);})
+
 void ldGuiUpdateScene(void);
 
 #ifdef __cplusplus

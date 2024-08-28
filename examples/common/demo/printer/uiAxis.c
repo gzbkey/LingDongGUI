@@ -17,7 +17,7 @@ const ldPageFuncGroup_t uiAxisFunc={
 
 static bool slotJumpReady(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiReadyFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiReadyFunc);
     return false;
 }
 

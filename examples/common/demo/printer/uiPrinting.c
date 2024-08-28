@@ -28,7 +28,7 @@ static uint8_t percent=0;
 
 static bool slotJumpPrint(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiPrintFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiPrintFunc);
     return false;
 }
 
@@ -36,7 +36,7 @@ static void _msgBoxCallback(ld_scene_t *ptScene,ldMessageBox_t *ptWidget)
 {
     if(ptWidget->clickNum==0)
     {
-        ldGuiJumpPage(uiPrintFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+        ldGuiJumpPageFast(uiPrintFunc);
     }
     else
     {

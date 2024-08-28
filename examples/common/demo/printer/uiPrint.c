@@ -23,7 +23,7 @@ static uint8_t *pListName[]={"闹钟","方块兔","巧克力蛋糕","福娃","�
 
 static bool slotJumpMain(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiMainFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiMainFunc);
     return false;
 }
 
@@ -38,7 +38,7 @@ static bool slotJumpPrinting(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldList_t* ptWidget = ldBaseGetWidgetById(ID_LIST);
     gPrintImgNum=ldListGetSelectItem(ptWidget);
-    ldGuiJumpPage(uiPrintingFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiPrintingFunc);
     return false;
 }
 

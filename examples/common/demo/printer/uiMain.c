@@ -17,19 +17,19 @@ const ldPageFuncGroup_t uiMainFunc={
 
 static bool slotJumpPrint(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiPrintFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiPrintFunc);
     return false;
 }
 
 static bool slotJumpReady(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiReadyFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiReadyFunc);
     return false;
 }
 
 static bool slotJumpSet(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiSetFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiSetFunc);
     return false;
 }
 

@@ -17,25 +17,25 @@ const ldPageFuncGroup_t uiReadyFunc={
 
 static bool slotJumpMain(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiMainFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiMainFunc);
     return false;
 }
 
 static bool slotJumpAxis(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiAxisFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiAxisFunc);
     return false;
 }
 
 static bool slotJumpNozzle(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiNozzleFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiNozzleFunc);
     return false;
 }
 
 static bool slotJumpAbout(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldGuiJumpPage(uiAboutFunc,ARM_2D_SCENE_SWITCH_MODE_NONE,0);
+    ldGuiJumpPageFast(uiAboutFunc);
     return false;
 }
 
