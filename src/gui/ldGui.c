@@ -45,16 +45,28 @@ bool isFullWidgetUpdate=false;
 
 void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
-    ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+    // draw ldgui background
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+    }
 
+    // draw arm 2d code
     if(ptScene->ldGuiFuncGroup->draw!=NULL)
     {
         ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
     }
 
-    ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
-    arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
-        ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+    // draw ldgui code
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
+        if(child!=NULL)
+        {
+            arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
+                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+            }
+        }
     }
 }
 
