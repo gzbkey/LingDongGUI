@@ -159,21 +159,7 @@ static bool slotCheckBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
     ldCheckBox_t *ptWidget=msg.ptSender;
     if(msg.signal==SIGNAL_PRESS)
     {
-        if(!ptWidget->isRadioButton)
-        {
-            ptWidget->isChecked=!ptWidget->isChecked;
-            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-        }
-        else
-        {
-            if(ptWidget->isChecked==false)
-            {
-                ptWidget->isChecked=true;
-                radioButtonValue.group=ptWidget->radioButtonGroup;
-                radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
-                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            }
-        }
+        ldCheckBoxSetChecked(ptWidget,!ptWidget->isChecked);
     }
     return false;
 }
@@ -304,7 +290,7 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
             arm_2d_tile_t tChildTile;
             arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
 
-            if ((ptWidget->ptCheckedImgTile==NULL)&&(ptWidget->ptUncheckedImgTile==NULL))//color
+            if ((ptWidget->ptCheckedImgTile==NULL)&&(ptWidget->ptUncheckedImgTile==NULL)&&(ptWidget->ptCheckedMaskTile==NULL)&&(ptWidget->ptUncheckedMaskTile==NULL))//color
             {
 
                     if((ptWidget->isCorner)&&(!ptWidget->isRadioButton))
@@ -339,6 +325,7 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                                         ptWidget->fgColor,
                                         ptWidget->use_as__ldBase_t.opacity);
                     }
+                    arm_2d_op_wait_async(NULL);
 
                     if(ptWidget->isChecked)
                     {
@@ -364,7 +351,7 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                                         ptWidget->fgColor,
                                         ptWidget->use_as__ldBase_t.opacity);
                         }
-
+                        arm_2d_op_wait_async(NULL);
                     }
 
                     if(ptWidget->pStr!=NULL)
@@ -392,22 +379,42 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                     if(ptWidget->isChecked)
                     {
                         ldBaseImage(&tTarget,
-                                    &tChildTile.tRegion,
+                                    NULL,//&tChildTile.tRegion,
                                     ptWidget->ptCheckedImgTile,
-                                    NULL,
+                                    ptWidget->ptCheckedMaskTile,
                                     0,
                                     ptWidget->use_as__ldBase_t.opacity);
                     }
                     else
                     {
                         ldBaseImage(&tTarget,
-                                    &tChildTile.tRegion,
+                                    NULL,//&tChildTile.tRegion,
                                     ptWidget->ptUncheckedImgTile,
-                                    NULL,
+                                    ptWidget->ptUncheckedMaskTile,
                                     0,
                                     ptWidget->use_as__ldBase_t.opacity);
                     }
+                    arm_2d_op_wait_async(NULL);
                 }while(0);
+
+                if(ptWidget->pStr!=NULL)
+                {
+                    tBoxRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+                    tBoxRegion.tLocation.iX=ptWidget->boxWidth;
+                    tBoxRegion.tLocation.iY=0;
+                    tBoxRegion.tSize.iWidth-=tBoxRegion.tLocation.iX;
+
+                    arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+
+                    ldBaseLabel(&tTarget,
+                                &tChildTile.tRegion,
+                                ptWidget->pStr,
+                                ptWidget->ptFont,
+                                ARM_2D_ALIGN_LEFT,
+                                ptWidget->charColor,
+                                ptWidget->use_as__ldBase_t.opacity);
+                    arm_2d_op_wait_async(NULL);
+                }
             }
             arm_2d_op_wait_async(NULL);
 
@@ -428,12 +435,14 @@ void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor)
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->bgColor=bgColor;
     ptWidget->fgColor=fgColor;
-    ptWidget->ptCheckedImgTile=NULL;
     ptWidget->ptUncheckedImgTile=NULL;
+    ptWidget->ptUncheckedMaskTile=NULL;
+    ptWidget->ptCheckedImgTile=NULL;
+    ptWidget->ptCheckedMaskTile=NULL;
     ptWidget->boxWidth=CHECK_BOX_SIZE;
 }
 
-void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask)
+void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,arm_2d_tile_t* ptUncheckedImgTile,arm_2d_tile_t* ptUncheckedMaskTile,arm_2d_tile_t* ptCheckedImgTile,arm_2d_tile_t* ptCheckedMaskTile)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -441,15 +450,15 @@ void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,uint16_t boxWidth,uintptr_t unche
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->ptUncheckedImgTile=uncheckedImgAddr;
-    ptWidget->ptCheckedImgTile=checkedImgAddr;
-    ptWidget->isWithUncheckedMask=isUncheckedMask;
-    ptWidget->isWithCheckedMask=isCheckedMask;
-    ptWidget->boxWidth=boxWidth;
+    ptWidget->ptUncheckedImgTile=ptUncheckedImgTile;
+    ptWidget->ptUncheckedMaskTile=ptUncheckedMaskTile;
+    ptWidget->ptCheckedImgTile=ptCheckedImgTile;
+    ptWidget->ptCheckedMaskTile=ptCheckedMaskTile;
 }
 
 void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -466,6 +475,7 @@ void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pSt
 
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -476,6 +486,7 @@ void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num)
 
 void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -486,12 +497,49 @@ void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner)
 
 void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->charColor=charColor;
+}
+
+void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+
+    if(!ptWidget->isRadioButton)
+    {
+        ptWidget->isChecked=isChecked;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    }
+    else
+    {
+        if(ptWidget->isChecked==false)
+        {
+            ptWidget->isChecked=true;
+            radioButtonValue.group=ptWidget->radioButtonGroup;
+            radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        }
+    }
+}
+
+void ldCheckBoxSetStringLeftSpace(ldCheckBox_t* ptWidget,uint16_t space)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->boxWidth=space;
 }
 
 #if defined(__clang__)

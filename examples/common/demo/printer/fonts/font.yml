@@ -9,7 +9,7 @@ simsun.ttc:
     string: '灵动GUI'
   - pixelSize: 24
     fontBitWidth: 8
-    string: '打印准备设置停止暂停'
+    string: '打印准备设置停止暂停配系统关于'
   - pixelSize: 18
     fontBitWidth: 8
     string: '返回打印闹钟方块兔巧克力蛋糕福娃奶牛盒马克杯小房间进度0123456789%注意是否停止'

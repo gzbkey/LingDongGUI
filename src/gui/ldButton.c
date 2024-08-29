@@ -430,6 +430,15 @@ void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable)
     ptWidget->isCheckable=isCheckable;
 }
 
+void ldButtonSetKeyValue(ldButton_t *ptWidget,uint32_t value)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->keyValue=value;
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

@@ -47,22 +47,19 @@ typedef struct ldCheckBox_t ldCheckBox_t;
 struct ldCheckBox_t
 {
     implement(ldBase_t);
-//    ARM_PRIVATE(
-//            ld_scene_t *ptScene;
-//    )
     ldColor bgColor;
     ldColor fgColor;
     ldColor charColor;
     arm_2d_tile_t* ptUncheckedImgTile;
+    arm_2d_tile_t* ptUncheckedMaskTile;
     arm_2d_tile_t* ptCheckedImgTile;
+    arm_2d_tile_t* ptCheckedMaskTile;
     arm_2d_font_t *ptFont;
     uint8_t* pStr;
     uint16_t boxWidth;
     uint8_t radioButtonGroup;
     bool isChecked:1;
     bool isCorner:1;
-    bool isWithUncheckedMask:1;
-    bool isWithCheckedMask:1;
     bool isRadioButton:1;
 };
 
@@ -73,11 +70,13 @@ void ldCheckBox_on_frame_start( ldCheckBox_t *ptWidget);
 void ldCheckBox_show(ld_scene_t *pScene, ldCheckBox_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor);
-void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask);
+void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,arm_2d_tile_t* ptUncheckedImgTile,arm_2d_tile_t* ptUncheckedMaskTile,arm_2d_tile_t* ptCheckedImgTile,arm_2d_tile_t* ptCheckedMaskTile);
 void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr);
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num);
 void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner);
 void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor);
+void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked);
+void ldCheckBoxSetStringLeftSpace(ldCheckBox_t* ptWidget,uint16_t space);//only for image mode
 
 #define ldCheckBoxInit(nameId,parentNameId,x,y,width,height) \
         ldCheckBox_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)

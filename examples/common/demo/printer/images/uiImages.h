@@ -8,6 +8,18 @@ extern "C" {
 #include "arm_2d.h"
 #include "ldConfig.h"
 
+// abs.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_abs_bmp_GRAY8;
+#define IMAGE_ABS_BMP          (arm_2d_tile_t*)&c_tile_abs_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_abs_bmp_RGB565;
+#define IMAGE_ABS_BMP          (arm_2d_tile_t*)&c_tile_abs_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_abs_bmp_CCCN888;
+#define IMAGE_ABS_BMP          (arm_2d_tile_t*)&c_tile_abs_bmp_CCCN888
+#endif
+
 // alarmClock.png < 200x180 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_alarmClock_png_GRAY8;
@@ -48,6 +60,18 @@ extern const arm_2d_tile_t c_tile_alarmClock_s_png_A4Mask;
 extern const arm_2d_tile_t c_tile_alarmClock_s_png_Mask;
 #define IMAGE_ALARMCLOCK_S_PNG_Mask     (arm_2d_tile_t*)&c_tile_alarmClock_s_png_Mask
 
+// balance.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_balance_bmp_GRAY8;
+#define IMAGE_BALANCE_BMP          (arm_2d_tile_t*)&c_tile_balance_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_balance_bmp_RGB565;
+#define IMAGE_BALANCE_BMP          (arm_2d_tile_t*)&c_tile_balance_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_balance_bmp_CCCN888;
+#define IMAGE_BALANCE_BMP          (arm_2d_tile_t*)&c_tile_balance_bmp_CCCN888
+#endif
+
 // blockRabbit.png < 200x180 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_blockRabbit_png_GRAY8;
@@ -87,6 +111,18 @@ extern const arm_2d_tile_t c_tile_blockRabbit_s_png_A4Mask;
 #define IMAGE_BLOCKRABBIT_S_PNG_A4Mask   (arm_2d_tile_t*)&c_tile_blockRabbit_s_png_A4Mask
 extern const arm_2d_tile_t c_tile_blockRabbit_s_png_Mask;
 #define IMAGE_BLOCKRABBIT_S_PNG_Mask     (arm_2d_tile_t*)&c_tile_blockRabbit_s_png_Mask
+
+// brightness.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_brightness_bmp_GRAY8;
+#define IMAGE_BRIGHTNESS_BMP          (arm_2d_tile_t*)&c_tile_brightness_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_brightness_bmp_RGB565;
+#define IMAGE_BRIGHTNESS_BMP          (arm_2d_tile_t*)&c_tile_brightness_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_brightness_bmp_CCCN888;
+#define IMAGE_BRIGHTNESS_BMP          (arm_2d_tile_t*)&c_tile_brightness_bmp_CCCN888
+#endif
 
 // cake.png < 200x180 >
 #if LD_CFG_COLOR_DEPTH == 8
@@ -178,6 +214,18 @@ extern const arm_2d_tile_t c_tile_height_bmp_RGB565;
 #else
 extern const arm_2d_tile_t c_tile_height_bmp_CCCN888;
 #define IMAGE_HEIGHT_BMP          (arm_2d_tile_t*)&c_tile_height_bmp_CCCN888
+#endif
+
+// light.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_light_bmp_GRAY8;
+#define IMAGE_LIGHT_BMP          (arm_2d_tile_t*)&c_tile_light_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_light_bmp_RGB565;
+#define IMAGE_LIGHT_BMP          (arm_2d_tile_t*)&c_tile_light_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_light_bmp_CCCN888;
+#define IMAGE_LIGHT_BMP          (arm_2d_tile_t*)&c_tile_light_bmp_CCCN888
 #endif
 
 // milk.png < 200x180 >
@@ -308,6 +356,18 @@ extern const arm_2d_tile_t c_tile_percent_bmp_CCCN888;
 #define IMAGE_PERCENT_BMP          (arm_2d_tile_t*)&c_tile_percent_bmp_CCCN888
 #endif
 
+// pla.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_pla_bmp_GRAY8;
+#define IMAGE_PLA_BMP          (arm_2d_tile_t*)&c_tile_pla_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_pla_bmp_RGB565;
+#define IMAGE_PLA_BMP          (arm_2d_tile_t*)&c_tile_pla_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_pla_bmp_CCCN888;
+#define IMAGE_PLA_BMP          (arm_2d_tile_t*)&c_tile_pla_bmp_CCCN888
+#endif
+
 // readyBtn1.bmp < 220x60 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_readyBtn1_bmp_GRAY8;
@@ -432,6 +492,30 @@ extern const arm_2d_tile_t c_tile_smallRoom_s_png_A4Mask;
 extern const arm_2d_tile_t c_tile_smallRoom_s_png_Mask;
 #define IMAGE_SMALLROOM_S_PNG_Mask     (arm_2d_tile_t*)&c_tile_smallRoom_s_png_Mask
 
+// tabBtnPress.bmp < 100x74 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_tabBtnPress_bmp_GRAY8;
+#define IMAGE_TABBTNPRESS_BMP          (arm_2d_tile_t*)&c_tile_tabBtnPress_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_tabBtnPress_bmp_RGB565;
+#define IMAGE_TABBTNPRESS_BMP          (arm_2d_tile_t*)&c_tile_tabBtnPress_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_tabBtnPress_bmp_CCCN888;
+#define IMAGE_TABBTNPRESS_BMP          (arm_2d_tile_t*)&c_tile_tabBtnPress_bmp_CCCN888
+#endif
+
+// tabBtnRelease.bmp < 100x74 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_tabBtnRelease_bmp_GRAY8;
+#define IMAGE_TABBTNRELEASE_BMP          (arm_2d_tile_t*)&c_tile_tabBtnRelease_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_tabBtnRelease_bmp_RGB565;
+#define IMAGE_TABBTNRELEASE_BMP          (arm_2d_tile_t*)&c_tile_tabBtnRelease_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_tabBtnRelease_bmp_CCCN888;
+#define IMAGE_TABBTNRELEASE_BMP          (arm_2d_tile_t*)&c_tile_tabBtnRelease_bmp_CCCN888
+#endif
+
 // temp1.bmp < 40x33 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_temp1_bmp_GRAY8;
@@ -454,6 +538,18 @@ extern const arm_2d_tile_t c_tile_temp2_bmp_RGB565;
 #else
 extern const arm_2d_tile_t c_tile_temp2_bmp_CCCN888;
 #define IMAGE_TEMP2_BMP          (arm_2d_tile_t*)&c_tile_temp2_bmp_CCCN888
+#endif
+
+// voice.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_voice_bmp_GRAY8;
+#define IMAGE_VOICE_BMP          (arm_2d_tile_t*)&c_tile_voice_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_voice_bmp_RGB565;
+#define IMAGE_VOICE_BMP          (arm_2d_tile_t*)&c_tile_voice_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_voice_bmp_CCCN888;
+#define IMAGE_VOICE_BMP          (arm_2d_tile_t*)&c_tile_voice_bmp_CCCN888
 #endif
 
 #ifdef __cplusplus
