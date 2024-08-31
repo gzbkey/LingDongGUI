@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +16,17 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldTable.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   表格控件
- */
-#include "ldTable.h"
+#define __LD_TABLE_IMPLEMENT__
+
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldGui.h"
+#include "ldTable.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -39,171 +45,102 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-void ldTableDel(ldTable_t *pWidget);
-void ldTableFrameUpdate(ldTable_t* pWidget);
-void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldTableCommonFunc={
-    (ldDelFunc_t)ldTableDel,
-    (ldLoopFunc_t)ldTableLoop,
-    (ldUpdateFunc_t)ldTableFrameUpdate,
+const ldBaseWidgetFunc_t ldTableFunc = {
+    .depose = (ldDeposeFunc_t)ldTable_depose,
+    .load = (ldLoadFunc_t)ldTable_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldTable_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldTable_show,
 };
 
-static bool _tableDel(xListNode *pEachInfo, void *pTarget)
+
+void _ldTableSelectItem(ldTable_t *ptWidget,ldTableItem_t *item)
 {
-    if (pEachInfo->info == pTarget)
+    for(uint8_t y=0;y<ptWidget->rowCount;y++)
     {
-        ldTable_t * target=pTarget;
-        int count=target->columnCount*target->rowCount;
-        for(int i=0;i<count;i++)
+        for(uint8_t x=0;x<ptWidget->columnCount;x++)
         {
-            if(target->pItemInfo[i].isStaticText==false)
-            {
-                ldFree(target->pItemInfo[i].pText);
-            }
-        }
-        ldFree(target->pItemInfo);
-        ldFree(target->pRowHeight);
-        ldFree(target->pColumnWidth);
-
-        ldFree(target);
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
-
-void ldTableDel(ldTable_t *pWidget)
-{
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeTable)
-    {
-        return;
-    }
-
-    LOG_INFO("[table] del,id:%d",pWidget->nameId);
-
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _tableDel);
-    }
-}
-
-void _ldTableSelectItem(ldTable_t *pWidget,ldTableItem_t *item)
-{
-    for(uint8_t y=0;y<pWidget->rowCount;y++)
-    {
-        for(uint8_t x=0;x<pWidget->columnCount;x++)
-        {
-            if(&pWidget->pItemInfo[y*pWidget->columnCount+x]==item)
+            if(&ptWidget->ptItemInfo[y*ptWidget->columnCount+x]==item)
             {
                 item->isSelect=true;
-                pWidget->currentRow=y;
-                pWidget->currentColumn=x;
+                ptWidget->currentRow=y;
+                ptWidget->currentColumn=x;
             }
             else
             {
-                pWidget->pItemInfo[y*pWidget->columnCount+x].isSelect=false;
+                ptWidget->ptItemInfo[y*ptWidget->columnCount+x].isSelect=false;
             }
         }
     }
 }
 
-/**
- * @brief   获取选中列的编号
- * 
- * @param   pWidget         目标控件指针
- * @return  uint8_t         列号
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-uint8_t ldTableCurrentColumn(ldTable_t *pWidget)
+uint8_t ldTableCurrentColumn(ldTable_t *ptWidget)
 {
-    return pWidget->currentColumn;
+    return ptWidget->currentColumn;
 }
 
-/**
- * @brief   获取选中行的编号
- * 
- * @param   pWidget         目标控件指针
- * @return  uint8_t         行号
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-uint8_t ldTableCurrentRow(ldTable_t *pWidget)
+uint8_t ldTableCurrentRow(ldTable_t *ptWidget)
 {
-    return pWidget->currentRow;
+    return ptWidget->currentRow;
 }
 
-/**
- * @brief   获取选中行的项目
- * 
- * @param   pWidget         目标控件指针
- * @return  ldTableItem_t*  返回目标item指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget)
+ldTableItem_t *ldTableItem(ldTable_t *ptWidget,uint8_t row, uint8_t column)
 {
-    return ldTableItem(pWidget,pWidget->currentRow,pWidget->currentColumn);
+    return &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
 }
 
-
-ldPoint_t _ldTableGetItemPos(ldTable_t *pWidget,uint8_t row, uint8_t column)
+ldTableItem_t *ldTableCurrentItem(ldTable_t *ptWidget)
 {
-    ldPoint_t offset={0,0};
+    return ldTableItem(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
+}
 
-    for(uint8_t x=0;x<pWidget->columnCount;x++)
+arm_2d_location_t _ldTableGetItemPos(ldTable_t *ptWidget,uint8_t row, uint8_t column)
+{
+    arm_2d_location_t offset={0,0};
+
+    for(uint8_t x=0;x<ptWidget->columnCount;x++)
     {
         if(x<column)
         {
-            offset.x+=pWidget->itemSpace;
-            offset.x+=pWidget->pColumnWidth[x];
+            offset.iX+=ptWidget->itemSpace;
+            offset.iX+=ptWidget->pColumnWidth[x];
         }
     }
-    offset.x+=pWidget->itemSpace+pWidget->scrollOffsetX;
+    offset.iX+=ptWidget->itemSpace+ptWidget->scrollOffsetX;
 
-    for(uint8_t y=0;y<pWidget->rowCount;y++)
+    for(uint8_t y=0;y<ptWidget->rowCount;y++)
     {
         if(y<row)
         {
-            offset.y+=pWidget->itemSpace;
-            offset.y+=pWidget->pRowHeight[y];
+            offset.iY+=ptWidget->itemSpace;
+            offset.iY+=ptWidget->pRowHeight[y];
         }
     }
-    offset.y+=pWidget->itemSpace+pWidget->scrollOffsetY;
+    offset.iY+=ptWidget->itemSpace+ptWidget->scrollOffsetY;
     return offset;
 }
 
-arm_2d_region_t _ldTableGetItemRegion(ldTable_t *pWidget,uint8_t row, uint8_t column)
+arm_2d_region_t _ldTableGetItemRegion(ldTable_t *ptWidget,uint8_t row, uint8_t column)
 {
-    ldPoint_t targetItemPos=_ldTableGetItemPos(pWidget,row,column);
+    arm_2d_location_t targetItemPos=_ldTableGetItemPos(ptWidget,row,column);
     arm_2d_region_t itemRegion;
-    itemRegion.tLocation.iX=targetItemPos.x;
-    itemRegion.tLocation.iY=targetItemPos.y;
-    itemRegion.tSize.iWidth=pWidget->pColumnWidth[column];
-    itemRegion.tSize.iHeight=pWidget->pRowHeight[row];
+    itemRegion.tLocation.iX=targetItemPos.iX;
+    itemRegion.tLocation.iY=targetItemPos.iY;
+    itemRegion.tSize.iWidth=ptWidget->pColumnWidth[column];
+    itemRegion.tSize.iHeight=ptWidget->pRowHeight[row];
     return itemRegion;
 }
 
-arm_2d_region_t _ldTableGetItemCellGlobalRegion(ldTable_t *pWidget,uint8_t row, uint8_t column)
+arm_2d_region_t _ldTableGetItemCellGlobalRegion(ldTable_t *ptWidget,uint8_t row, uint8_t column)
 {
-    ldTableItem_t *targetItem=ldTableItem(pWidget,row,column);
+    ldTableItem_t *targetItem=ldTableItem(ptWidget,row,column);
 
-    ldPoint_t targetItemPos=_ldTableGetItemPos(pWidget,row,column);
+    arm_2d_location_t targetItemPos=_ldTableGetItemPos(ptWidget,row,column);
 
-    int16_t targetItemWidth=pWidget->pColumnWidth[column];
+    int16_t targetItemWidth=ptWidget->pColumnWidth[column];
 
-    int16_t targetItemHeight=pWidget->pRowHeight[row];
+    int16_t targetItemHeight=ptWidget->pRowHeight[row];
 
     arm_2d_region_t itemRegion={
         .tLocation={
@@ -216,57 +153,40 @@ arm_2d_region_t _ldTableGetItemCellGlobalRegion(ldTable_t *pWidget,uint8_t row, 
         },
     };
 
-    arm_2d_region_t outRegion;
+    arm_2d_region_t outRegion,tempRegion={0};
+    tempRegion.tLocation=targetItem->tLocation;
+    if(targetItem->ptReleaseImgTile!=NULL)
+    {
+        tempRegion.tSize=targetItem->ptReleaseImgTile->tRegion.tSize;
+    }
+    else if(targetItem->ptReleaseMaskTile!=NULL)
+    {
+        tempRegion.tSize=targetItem->ptReleaseMaskTile->tRegion.tSize;
+    }
+    arm_2d_region_intersect(&itemRegion,&tempRegion,&outRegion);
 
-    arm_2d_region_intersect(&itemRegion,&targetItem->imgRegion,&outRegion);
-
-    outRegion.tLocation.iX=targetItem->imgRegion.tLocation.iX+targetItemPos.x+((arm_2d_tile_t *)(arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iX;
-    outRegion.tLocation.iY=targetItem->imgRegion.tLocation.iY+targetItemPos.y+((arm_2d_tile_t *)(arm_2d_tile_t*)&pWidget->resource)->tRegion.tLocation.iY;
+    outRegion.tLocation.iX=targetItem->tLocation.iX+targetItemPos.iX+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+    outRegion.tLocation.iY=targetItem->tLocation.iY+targetItemPos.iY+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
 
     return outRegion;
 }
 
-/**
- * @brief   获取指定的项目
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行号
- * @param   column          列号
- * @return  ldTableItem_t*  返回目标item指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column)
-{
-    return &pWidget->pItemInfo[row*pWidget->columnCount+column];
-}
-
-/**
- * @brief   获取指定坐标的项目
- * 
- * @param   pWidget         目标控件指针
- * @param   x               全局坐标x轴
- * @param   y               全局坐标y轴
- * @return  ldTableItem_t*  返回目标item指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y)
+ldTableItem_t *ldTableItemAt(ldTable_t *ptWidget,int16_t x,int16_t y)
 {
     uint8_t itemX,itemY;
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-    x-=pResTile->tRegion.tLocation.iX;
-    y-=pResTile->tRegion.tLocation.iY;
+
+//    x-=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+//    y-=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
 
     itemX=0;
     itemY=0;
-    int16_t tempOffset=pWidget->scrollOffsetX-x;
-    for(uint8_t i=0;i<pWidget->columnCount;i++)
+    int16_t tempOffset=ptWidget->scrollOffsetX-x;
+    for(uint8_t i=0;i<ptWidget->columnCount;i++)
     {
-        if(tempOffset<-pWidget->pColumnWidth[i])
+        if(tempOffset<-ptWidget->pColumnWidth[i])
         {
-            tempOffset+=pWidget->pColumnWidth[i];
-            tempOffset+=pWidget->itemSpace;
+            tempOffset+=ptWidget->pColumnWidth[i];
+            tempOffset+=ptWidget->itemSpace;
             itemX++;
         }
         else
@@ -275,13 +195,13 @@ ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y)
         }
     }
 
-    tempOffset=pWidget->scrollOffsetY-y;
-    for(uint8_t i=0;i<pWidget->rowCount;i++)
+    tempOffset=ptWidget->scrollOffsetY-y;
+    for(uint8_t i=0;i<ptWidget->rowCount;i++)
     {
-        if(tempOffset<-pWidget->pRowHeight[i])
+        if(tempOffset<-ptWidget->pRowHeight[i])
         {
-            tempOffset+=pWidget->pRowHeight[i];
-            tempOffset+=pWidget->itemSpace;
+            tempOffset+=ptWidget->pRowHeight[i];
+            tempOffset+=ptWidget->itemSpace;
             itemY++;
         }
         else
@@ -290,68 +210,68 @@ ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y)
         }
     }
 
-    if(itemX>=pWidget->columnCount)
+    if(itemX>=ptWidget->columnCount)
     {
-        itemX=pWidget->columnCount-1;
+        itemX=ptWidget->columnCount-1;
     }
-    if(itemY>=pWidget->rowCount)
+    if(itemY>=ptWidget->rowCount)
     {
-        itemY=pWidget->rowCount-1;
+        itemY=ptWidget->rowCount-1;
     }
 
-    return &pWidget->pItemInfo[itemY*pWidget->columnCount+itemX];
+    return &ptWidget->ptItemInfo[itemY*ptWidget->columnCount+itemX];
 }
 
 static int16_t _scrollOffsetX,_scrollOffsetY;
 static int16_t _totalItemWidth,_totalItemHeight;
 static bool _isStopMove;
-static bool slotTableProcess(xConnectInfo_t info)
+static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldTable_t *pWidget;
+    ldTable_t *ptWidget;
     int16_t x,y;
     int16_t offsetX,offsetY;
-    arm_2d_tile_t *pResTile;
     ldTableItem_t *currentItem;
     int64_t tempTimer;
-    ldCommonKB_t *kb;
+    ldKeyboard_t *kb;
 
-    pWidget=ldBaseGetWidgetById(info.receiverId);
+    ptWidget=msg.ptSender;;
 
-    pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
-    switch (info.signalType)
+    switch (msg.signal)
     {
     case SIGNAL_PRESS:
     {
-        ldPoint_t parentPos=ldBaseGetGlobalPos(pWidget->parentWidget);
-        x=(int16_t)GET_SIGNAL_VALUE_X(info.value)-parentPos.x;
-        y=(int16_t)GET_SIGNAL_VALUE_Y(info.value)-parentPos.y;
+        arm_2d_location_t tLocation={0};
+        tLocation=ldBaseGetAbsoluteLocation(ptWidget,tLocation);
+        x=(int16_t)GET_SIGNAL_VALUE_X(msg.value)-tLocation.iX;
+        y=(int16_t)GET_SIGNAL_VALUE_Y(msg.value)-tLocation.iY;
 
-        currentItem=ldTableItemAt(pWidget,x,y);
+        currentItem=ldTableItemAt(ptWidget,x,y);
 
-        _ldTableSelectItem(pWidget,currentItem);
+        _ldTableSelectItem(ptWidget,currentItem);
 
-        _scrollOffsetX=pWidget->scrollOffsetX;
-        _scrollOffsetY=pWidget->scrollOffsetY;
+        _scrollOffsetX=ptWidget->scrollOffsetX;
+        _scrollOffsetY=ptWidget->scrollOffsetY;
 
         _totalItemWidth=0;
-        for(uint8_t i=0;i<pWidget->columnCount;i++)
+        for(uint8_t i=0;i<ptWidget->columnCount;i++)
         {
-            _totalItemWidth+=pWidget->itemSpace;
-            _totalItemWidth+=pWidget->pColumnWidth[i];
+            _totalItemWidth+=ptWidget->itemSpace;
+            _totalItemWidth+=ptWidget->pColumnWidth[i];
         }
-        _totalItemWidth+=pWidget->itemSpace;
+        _totalItemWidth+=ptWidget->itemSpace;
 
         _totalItemHeight=0;
-        for(uint8_t i=0;i<pWidget->rowCount;i++)
+        for(uint8_t i=0;i<ptWidget->rowCount;i++)
         {
-            _totalItemHeight+=pWidget->itemSpace;
-            _totalItemHeight+=pWidget->pRowHeight[i];
+            _totalItemHeight+=ptWidget->itemSpace;
+            _totalItemHeight+=ptWidget->pRowHeight[i];
         }
+        _totalItemHeight+=ptWidget->itemSpace;
 
         if(currentItem->isButton)
         {
-            arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
+            arm_2d_region_t cellRegion= _ldTableGetItemCellGlobalRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
 
             if((x>=cellRegion.tLocation.iX)&&(y>=cellRegion.tLocation.iY)&&
                     (x<(cellRegion.tLocation.iX+cellRegion.tSize.iWidth))&&
@@ -366,39 +286,39 @@ static bool slotTableProcess(xConnectInfo_t info)
         {
             tempTimer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
 
-            if((tempTimer-pWidget->timer)<500)
+            if((tempTimer-ptWidget->timer)<500)
             {
                 currentItem->isEditing=true;
-                if(pWidget->kbNameId)
+                if(ptWidget->kbNameId)
                 {
-                    kb=ldBaseGetWidgetById(pWidget->kbNameId);
+                    kb=ldBaseGetWidgetById(ptWidget->kbNameId);
                     if(kb!=NULL)
                     {
                         kb->editType=currentItem->editType;
                         kb->ppStr=&currentItem->pText;
                         kb->strMax=currentItem->textMax;
-                        kb->editorId=pWidget->nameId;
+                        kb->editorId=ptWidget->use_as__ldBase_t.nameId;
                         cursorBlinkFlag=true;
                         cursorBlinkCount=0;
-                        ldBaseSetHidden((ldCommon_t*)kb,false);
+                        ldKeyboardSetHidden(kb,false);
 
-                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
+                        arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
 
-                        if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+pResTile->tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT/2))
+                        if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY)>(LD_CFG_SCEEN_HEIGHT>>1))
                         {
-                            ldBaseMove((ldCommon_t*)kb,0,LD_CFG_SCEEN_HEIGHT/2);
-                            ldBaseBgMove(LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT/2));
+                            ldKeyboardMove(kb,0,LD_CFG_SCEEN_HEIGHT>>1);
+                            ldBaseBgMove(ptScene,LD_CFG_SCEEN_WIDTH,LD_CFG_SCEEN_HEIGHT,0,-(LD_CFG_SCEEN_HEIGHT>>1));
                         }
                         else
                         {
-                            ldBaseMove((ldCommon_t*)kb,0,0);
+                            ldKeyboardMove(kb,0,0);
                         }
                     }
                 }
             }
-            pWidget->timer=tempTimer;
+            ptWidget->timer=tempTimer;
         }
-        pWidget->dirtyRegionState=waitChange;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     case SIGNAL_HOLD_DOWN:
@@ -407,8 +327,8 @@ static bool slotTableProcess(xConnectInfo_t info)
         {
             break;
         }
-        offsetX=(int16_t)GET_SIGNAL_OFFSET_X(info.value);
-        offsetY=(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
+        offsetX=(int16_t)GET_SIGNAL_OFFSET_X(msg.value);
+        offsetY=(int16_t)GET_SIGNAL_OFFSET_Y(msg.value);
 
 
         offsetX=abs(offsetX);
@@ -416,55 +336,99 @@ static bool slotTableProcess(xConnectInfo_t info)
 
         if(offsetX>=offsetY)
         {
-            pWidget->scrollOffsetX=_scrollOffsetX+(int16_t)GET_SIGNAL_OFFSET_X(info.value);
-            if(pWidget->scrollOffsetX>0)
+            ptWidget->scrollOffsetX=_scrollOffsetX+(int16_t)GET_SIGNAL_OFFSET_X(msg.value);
+            if(ptWidget->scrollOffsetX>0)
             {
-                pWidget->scrollOffsetX=0;
+                ptWidget->scrollOffsetX=0;
             }
             else
             {
-                if((_totalItemWidth+pWidget->scrollOffsetX)<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth)
+                if((_totalItemWidth+ptWidget->scrollOffsetX)<ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)
                 {
-                    pWidget->scrollOffsetX=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth-_totalItemWidth;
+                    ptWidget->scrollOffsetX=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-_totalItemWidth;
                 }
 
-                if(_totalItemWidth<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iWidth)
+                if(_totalItemWidth<ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)
                 {
-                    pWidget->scrollOffsetX=0;
+                    ptWidget->scrollOffsetX=0;
                 }
             }
         }
         else
         {
-            pWidget->scrollOffsetY=_scrollOffsetY+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
-            if(pWidget->scrollOffsetY>0)
+            ptWidget->scrollOffsetY=_scrollOffsetY+(int16_t)GET_SIGNAL_OFFSET_Y(msg.value);
+            if(ptWidget->scrollOffsetY>0)
             {
-                pWidget->scrollOffsetY=0;
+                ptWidget->scrollOffsetY=0;
             }
             else
             {
-                if((_totalItemHeight+pWidget->scrollOffsetY)<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
+                if((_totalItemHeight+ptWidget->scrollOffsetY)<ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
                 {
-                    pWidget->scrollOffsetY=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight-_totalItemHeight;
+                    ptWidget->scrollOffsetY=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-_totalItemHeight;
                 }
 
-                if(_totalItemHeight<((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
+                if(_totalItemHeight<ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
                 {
-                    pWidget->scrollOffsetY=0;
+                    ptWidget->scrollOffsetY=0;
                 }
             }
         }
-        pWidget->dirtyRegionState=waitChange;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     case SIGNAL_RELEASE:
     {
-        currentItem=ldTableCurrentItem(pWidget);
+        currentItem=ldTableCurrentItem(ptWidget);
         _isStopMove=false;
         if((!currentItem->isCheckable)&&(currentItem->isButton))
         {
             currentItem->isChecked=false;
-            pWidget->dirtyRegionState=waitChange;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        }
+
+        //auto align grid
+        if(ptWidget->isAlignGrid)
+        {
+            int16_t offsetTemp;
+            uint8_t row;
+            uint8_t column;
+
+            offsetTemp=ptWidget->scrollOffsetY;
+            for(row=0;row<ptWidget->rowCount;row++)
+            {
+                offsetTemp+=ptWidget->pRowHeight[row]+ptWidget->itemSpace;
+                if(offsetTemp>0)
+                {
+                    break;
+                }
+            }
+            if(offsetTemp<(ptWidget->pRowHeight[row]>>1))
+            {
+                ptWidget->scrollOffsetY-=offsetTemp;
+            }
+            else
+            {
+                ptWidget->scrollOffsetY+=ptWidget->pRowHeight[row]-offsetTemp+ptWidget->itemSpace;
+            }
+
+            offsetTemp=ptWidget->scrollOffsetX;
+            for(column=0;column<ptWidget->columnCount;column++)
+            {
+                offsetTemp+=ptWidget->pColumnWidth[column]+ptWidget->itemSpace;
+                if(offsetTemp>0)
+                {
+                    break;
+                }
+            }
+            if(offsetTemp<(ptWidget->pColumnWidth[column]>>1))
+            {
+                ptWidget->scrollOffsetX-=offsetTemp;
+            }
+            else
+            {
+                ptWidget->scrollOffsetX+=ptWidget->pColumnWidth[column]-offsetTemp+ptWidget->itemSpace;
+            }
         }
 
         break;
@@ -476,552 +440,455 @@ static bool slotTableProcess(xConnectInfo_t info)
     return false;
 }
 
-static bool slotEditEnd(xConnectInfo_t info)
+static bool slotEditEnd(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldTable_t *pWidget=ldBaseGetWidgetById(info.receiverId);
-    ldTableItem_t *currentItem=ldTableCurrentItem(pWidget);
+    ldTableItem_t *currentItem=ldTableCurrentItem(msg.ptSender);
     currentItem->isEditing=false;
     return false;
 }
 
-/**
- * @brief   表格初始化
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @param   rowCount        行数
- * @param   columnCount     列数
- * @param   itemSpace       间隔
- * @return  ldTable_t*      新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t* pFontDict)
+ldTable_t* ldTable_init( ld_scene_t *ptScene,ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, arm_2d_font_t* ptFont)
 {
-    ldTable_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
     int16_t *widthBuf;
     int16_t *heightBuf;
-    ldTableItem_t *pItemInfoBuf;
+    ldTableItem_t *ptItemInfoBuf;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldTable_t);
-    widthBuf = ldCalloc(sizeof (int16_t)*columnCount);
-    heightBuf = ldCalloc(sizeof (int16_t)*rowCount);
-    pItemInfoBuf = ldCalloc(sizeof (ldTableItem_t)*columnCount*rowCount);
-
-    if ((pNewWidget != NULL)&&(widthBuf!=NULL)&&(heightBuf!=NULL)&&(pItemInfoBuf!=NULL))
+    if (NULL == ptWidget)
     {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldTable_t));
+        widthBuf = ldCalloc(1,sizeof (int16_t)*columnCount);
+        heightBuf = ldCalloc(1,sizeof (int16_t)*rowCount);
+        ptItemInfoBuf = ldCalloc(1,sizeof (ldTableItem_t)*columnCount*rowCount);
+        if (NULL == ptWidget)
         {
-            pNewWidget->isParentHidden=true;
+            ldFree(ptWidget);
+            ldFree(widthBuf);
+            ldFree(heightBuf);
+            ldFree(ptItemInfoBuf);
+            LOG_ERROR("[init failed][table] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeTable;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->rowCount= rowCount;
-        pNewWidget->columnCount=columnCount;
-        pNewWidget->itemSpace=itemSpace;
-        pNewWidget->pColumnWidth=widthBuf;
-        pNewWidget->pRowHeight=heightBuf;
-        pNewWidget->pItemInfo=pItemInfoBuf;
-        memset(pItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
-        pNewWidget->isBgTransparent=false;
-        pNewWidget->bgColor=LD_COLOR_WHITE_SMOKE;
-        pNewWidget->selectColor=__RGB(65,143,31);
-        int16_t w=(width-itemSpace)/columnCount-itemSpace;
-        for(uint8_t i=0;i<columnCount;i++)
-        {
-            pNewWidget->pColumnWidth[i]=w;
-        }
-        int16_t h=(height-itemSpace)/rowCount-itemSpace;
-        for(uint8_t i=0;i<rowCount;i++)
-        {
-            pNewWidget->pRowHeight[i]=h;
-        }
-        for(uint16_t i=0;i<(columnCount*rowCount);i++)
-        {
-            pNewWidget->pItemInfo[i].textColor=0;
-            pNewWidget->pItemInfo[i].itemBgColor=__RGB( 255, 255, 255);
-            pNewWidget->pItemInfo[i].isStaticText=false;
-            pNewWidget->pItemInfo[i].pText=NULL;
-            pNewWidget->pItemInfo[i].align=LD_ALIGN_CENTER;
-            pNewWidget->pItemInfo[i].releaseImgAddr=LD_ADDR_NONE;
-            pNewWidget->pItemInfo[i].isReleaseImgMask=false;
-            pNewWidget->pItemInfo[i].isReleaseImgWithMask=false;
-            pNewWidget->pItemInfo[i].pressImgAddr=LD_ADDR_NONE;
-            pNewWidget->pItemInfo[i].isButton=false;
-            pNewWidget->pItemInfo[i].isCheckable=false;
-            pNewWidget->pItemInfo[i].isChecked=false;
-            pNewWidget->pItemInfo[i].isSelectShow=true;
-            pNewWidget->pItemInfo[i].isSelect=false;
-            pNewWidget->pItemInfo[i].editType=typeString;
-            pNewWidget->pItemInfo[i].textMax=0;
-            pNewWidget->pItemInfo[i].pFontDict=pFontDict;
-            pNewWidget->pItemInfo[i].isEditable=true;
-        }
-        pNewWidget->pFunc=&ldTableCommonFunc;
-        pNewWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
-        pNewWidget->kbNameId=0;
-
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-        xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotTableProcess);
-        xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotTableProcess);
-        xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotTableProcess);
-        xConnect(0,SIGNAL_EDITING_FINISHED,nameId,slotEditEnd);
-
-        LOG_INFO("[table] init,id:%d",nameId);
-
-    }
-    else
-    {
-        ldFree(pItemInfoBuf);
-        ldFree(widthBuf);
-        ldFree(heightBuf);
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[table] init failed,id:%d",nameId);
     }
 
-    return pNewWidget;
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeTable;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldTableFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    ptWidget->rowCount= rowCount;
+    ptWidget->columnCount=columnCount;
+    ptWidget->itemSpace=itemSpace;
+    ptWidget->pColumnWidth=widthBuf;
+    ptWidget->pRowHeight=heightBuf;
+    ptWidget->ptItemInfo=ptItemInfoBuf;
+    memset(ptItemInfoBuf,0,sizeof (ldTableItem_t)*columnCount*rowCount);
+    ptWidget->isBgTransparent=false;
+    ptWidget->bgColor=__RGB(245, 245, 245);
+    ptWidget->selectColor=__RGB(65,143,31);
+    int16_t w=(width-itemSpace)/columnCount-itemSpace;
+    for(uint8_t i=0;i<columnCount;i++)
+    {
+        ptWidget->pColumnWidth[i]=w;
+    }
+    int16_t h=(height-itemSpace)/rowCount-itemSpace;
+    for(uint8_t i=0;i<rowCount;i++)
+    {
+        ptWidget->pRowHeight[i]=h;
+    }
+    for(uint16_t i=0;i<(columnCount*rowCount);i++)
+    {
+        ptWidget->ptItemInfo[i].textColor=0;
+        ptWidget->ptItemInfo[i].itemBgColor=__RGB( 255, 255, 255);
+        ptWidget->ptItemInfo[i].isStaticText=false;
+        ptWidget->ptItemInfo[i].pText=NULL;
+        ptWidget->ptItemInfo[i].tAlign=ARM_2D_ALIGN_CENTRE;
+        ptWidget->ptItemInfo[i].isButton=false;
+        ptWidget->ptItemInfo[i].isCheckable=false;
+        ptWidget->ptItemInfo[i].isChecked=false;
+        ptWidget->ptItemInfo[i].isSelectShow=true;
+        ptWidget->ptItemInfo[i].isSelect=false;
+        ptWidget->ptItemInfo[i].editType=typeString;
+        ptWidget->ptItemInfo[i].textMax=0;
+        ptWidget->ptItemInfo[i].ptFont=ptFont;
+        ptWidget->ptItemInfo[i].isEditable=false;
+    }
+    ptWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+
+    ldMsgConnect(ptWidget,SIGNAL_PRESS,slotTableProcess);
+    ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotTableProcess);
+    ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotTableProcess);
+    ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotEditEnd);
+
+    LOG_INFO("[init][table] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
 }
 
-void ldTableFrameUpdate(ldTable_t* pWidget)
+void ldTable_depose( ldTable_t *ptWidget)
 {
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeTable)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][table] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    for(uint16_t i=0;i<(ptWidget->columnCount*ptWidget->rowCount);i++)
+    {
+        if(!ptWidget->ptItemInfo[i].isStaticText)
+        {
+            ldFree(ptWidget->ptItemInfo[i].pText);
+        }
+    }
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+    ldFree(ptWidget->pColumnWidth);
+    ldFree(ptWidget->pRowHeight);
+    ldFree(ptWidget->ptItemInfo);
+    ldFree(ptWidget);
 }
 
-void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldTable_on_load( ldTable_t *ptWidget)
 {
+    assert(NULL != ptWidget);
+    
+}
+
+void ldTable_on_frame_start( ldTable_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+
     arm_2d_region_t tBoxRegion;
     arm_2d_tile_t tItemTile,tImgTile;
 
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+#if 0
+    if (bIsNewFrame) {
 
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes = *pResTile;
-#else
-    arm_2d_vres_t tempRes = *((arm_2d_vres_t*)pResTile);
+    }
 #endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    if (pWidget == NULL)
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
+
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        return;
-    }
-
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
-    {
-        return;
-    }
-
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
-
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            pWidget->dirtyRegionState=none;
-        }
-
-        if(!pWidget->isBgTransparent)
-        {
-            ldBaseColor(&tTarget,pWidget->bgColor,255);
-        }
-
-        tBoxRegion.tLocation.iY=pWidget->scrollOffsetY;
-        for(uint8_t y=0;y<pWidget->rowCount;y++)
-        {
-            if(y>0)
+            if(ptWidget->use_as__ldBase_t.isHidden)
             {
-                tBoxRegion.tLocation.iY+=pWidget->pRowHeight[y-1];
+                break;
             }
-            tBoxRegion.tLocation.iY+=pWidget->itemSpace;
 
-            tBoxRegion.tLocation.iX=pWidget->scrollOffsetX;
-            for(uint8_t x=0;x<pWidget->columnCount;x++)
+            if(!ptWidget->isBgTransparent)
             {
-                if(x>0)
+                ldBaseColor(&tTarget,NULL,ptWidget->bgColor,255);
+            }
+
+            tBoxRegion.tLocation.iY=ptWidget->scrollOffsetY;
+            for(uint8_t y=0;y<ptWidget->rowCount;y++)
+            {
+                if(y>0)
                 {
-                    tBoxRegion.tLocation.iX+=pWidget->pColumnWidth[x-1];
+                    tBoxRegion.tLocation.iY+=ptWidget->pRowHeight[y-1];
                 }
-                tBoxRegion.tLocation.iX+=pWidget->itemSpace;
-                tBoxRegion.tSize.iWidth=pWidget->pColumnWidth[x];
-                tBoxRegion.tSize.iHeight=pWidget->pRowHeight[y];
+                tBoxRegion.tLocation.iY+=ptWidget->itemSpace;
 
-                arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tItemTile, false);
-                ldTableItem_t *item= &pWidget->pItemInfo[y*pWidget->columnCount+x];
-                ldBaseColor(&tItemTile,item->itemBgColor,255);
-
-                if(((item->pText!=NULL)||(item->isEditing))&&(!item->isStaticText))
+                tBoxRegion.tLocation.iX=ptWidget->scrollOffsetX;
+                for(uint8_t x=0;x<ptWidget->columnCount;x++)
                 {
-                    //预留光标位置
-                    tItemTile.tRegion.tSize.iWidth-=CURSOR_WIDTH;
-
-
-                    arm_2d_region_t showRegion=ldBaseLineText(&tItemTile,pResTile,item->pText,item->pFontDict,item->align,item->textColor,0,255);
-
-                    if((cursorBlinkCount>CURSOR_BLINK_TIMEOUT)&&bIsNewFrame&&item->isEditing)
+                    if(x>0)
                     {
-                        cursorBlinkCount=0;
-                        cursorBlinkFlag=!cursorBlinkFlag;
+                        tBoxRegion.tLocation.iX+=ptWidget->pColumnWidth[x-1];
                     }
+                    tBoxRegion.tLocation.iX+=ptWidget->itemSpace;
+                    tBoxRegion.tSize.iWidth=ptWidget->pColumnWidth[x];
+                    tBoxRegion.tSize.iHeight=ptWidget->pRowHeight[y];
 
-                    if(item->isEditing)
+                    arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tItemTile, false);
+                    ldTableItem_t *item= &ptWidget->ptItemInfo[y*ptWidget->columnCount+x];
+                    ldBaseColor(&tItemTile,NULL,item->itemBgColor,ptWidget->use_as__ldBase_t.opacity);
+
+                    if(((item->pText!=NULL)||(item->isEditing))&&(!item->isStaticText))
                     {
-                        pWidget->dirtyRegionState=waitChange;
-                        if(cursorBlinkFlag)
+                        //预留光标位置
+                        tItemTile.tRegion.tSize.iWidth-=CURSOR_WIDTH;
+                        if(item->pText!=NULL)
                         {
-                            arm_2d_region_t itemRegion= _ldTableGetItemRegion(pWidget,pWidget->currentRow,pWidget->currentColumn);
-                            itemRegion.tLocation.iX+=showRegion.tLocation.iX+showRegion.tSize.iWidth+2;
-                            itemRegion.tLocation.iY+=showRegion.tLocation.iY;
-                            itemRegion.tSize.iWidth=CURSOR_WIDTH;
-                            itemRegion.tSize.iHeight=item->pFontDict->lineStrHeight;
-                            arm_2d_draw_box(&tTarget,&itemRegion,1,0,255);
+                            ldBaseLabel(&tItemTile,
+                                        &((arm_2d_region_t){0,
+                                                            0,
+                                                            tItemTile.tRegion.tSize.iWidth,
+                                                            tItemTile.tRegion.tSize.iHeight}),
+                                        item->pText,
+                                        item->ptFont,
+                                        item->tAlign,
+                                        item->textColor,
+                                        ptWidget->use_as__ldBase_t.opacity);
+                        }
+
+                        if(item->isEditing)
+                        {
+                            if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
+                            {
+                                cursorBlinkCount=0;
+                                cursorBlinkFlag=!cursorBlinkFlag;
+                            }
+                            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                        }
+
+                        if(cursorBlinkFlag&&item->isEditing)
+                        {
+                            arm_2d_size_t strSize=arm_lcd_text_get_box(item->pText, item->ptFont);
+                            arm_2d_region_t srtRegion={
+                                .tLocation={0,0},
+                                .tSize=strSize,
+                            };
+                               srtRegion=ldBaseGetAlignRegion(tItemTile.tRegion,srtRegion,item->tAlign);
+                                arm_2d_draw_box(&tItemTile,
+                                                &((arm_2d_region_t){srtRegion.tLocation.iX+srtRegion.tSize.iWidth,
+                                                                    srtRegion.tLocation.iY,
+                                                                    CURSOR_WIDTH,
+                                                                    item->ptFont->tCharSize.iHeight}),
+                                                1,
+                                                0,
+                                                ptWidget->use_as__ldBase_t.opacity);
+                        }
+
+                        tItemTile.tRegion.tSize.iWidth+=CURSOR_WIDTH;
+                    }
+                    else
+                    {
+                        if((item->pText!=NULL)&&(item->isStaticText))
+                        {
+                            ldBaseLabel(&tItemTile,
+                                        &((arm_2d_region_t){0,
+                                                            0,
+                                                            tItemTile.tRegion.tSize.iWidth,
+                                                            tItemTile.tRegion.tSize.iHeight}),
+                                        item->pText,
+                                        item->ptFont,
+                                        item->tAlign,
+                                        item->textColor,
+                                        ptWidget->use_as__ldBase_t.opacity);
                         }
                     }
 
-                    tItemTile.tRegion.tSize.iWidth+=CURSOR_WIDTH;
-
-                }
-                else
-                {
-                    if((item->pText!=NULL)&&(item->isStaticText))
-                    {
-                        ldBaseLineText(&tItemTile,pResTile,item->pText,item->pFontDict,item->align,item->textColor,0,255);
-                    }
-                }
-
-                if((item->releaseImgAddr!=LD_ADDR_NONE)||(item->pressImgAddr!=LD_ADDR_NONE))
-                {
-                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tSize=item->imgRegion.tSize;
-
-                    arm_2d_tile_generate_child(&tItemTile, &item->imgRegion, &tImgTile, false);
-
-                    if(item->releaseImgAddr!=LD_ADDR_NONE)
+                    if((item->ptReleaseImgTile!=NULL)||(item->ptReleaseMaskTile!=NULL))
                     {
                         if((!item->isButton)||((item->isButton)&&(item->isChecked==false)))
                         {
-                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)item->releaseImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                            tempRes.pTarget=item->releaseImgAddr;
-#endif
-                            if(item->isReleaseImgMask)
-                            {
-                                ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
-                                ldBaseMaskImage(&tImgTile,(arm_2d_tile_t*)&tempRes,item->releaseImgMaskColor,255);
-                            }
-                            else
-                            {
-                                ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,item->isReleaseImgWithMask,255);
-                            }
-
+                            arm_2d_region_t tempRegion={
+                                .tLocation=item->tLocation,
+                                .tSize=item->ptReleaseImgTile->tRegion.tSize,
+                            };
+                            ldBaseImage(&tImgTile,&tempRegion,item->ptReleaseImgTile,item->ptReleaseMaskTile,item->releaseImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
                         }
                     }
 
-                    if(item->pressImgAddr!=LD_ADDR_NONE)
+                    if((item->ptPressImgTile!=NULL)||(item->ptPressMaskTile!=NULL))
                     {
                         if((item->isButton)&&(item->isChecked==true))
                         {
-                            ((arm_2d_tile_t*)&tempRes)->pchBuffer=(uint8_t *)item->pressImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                            tempRes.pTarget=item->pressImgAddr;
-#endif
-                            ldBaseImage(&tImgTile,(arm_2d_tile_t*)&tempRes,false,255);
+                            arm_2d_region_t tempRegion={
+                                .tLocation=item->tLocation,
+                                .tSize=item->ptPressImgTile->tRegion.tSize,
+                            };
+                            ldBaseImage(&tImgTile,&tempRegion,item->ptPressImgTile,item->ptPressMaskTile,item->pressImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
                         }
                     }
+
+                    if((item->isSelect)&&(item->isSelectShow))
+                    {
+                        arm_2d_draw_box(&tTarget,&tItemTile.tRegion,2,ptWidget->selectColor,255);
+                    }
+
+                    arm_2d_op_wait_async(NULL);
                 }
-
-                if((item->isSelect)&&(item->isSelectShow))
-                {
-                    arm_2d_draw_box(&tTarget,&tItemTile.tRegion,2,pWidget->selectColor,255);
-                }
-
-
-#if LD_DEBUG == 1
-                arm_2d_draw_box(&tTarget,&tItemTile.tRegion,1,0,255);
-#endif
-                arm_2d_op_wait_async(NULL);
             }
         }
-#if LD_DEBUG == 1
-        arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
-#endif
-        arm_2d_op_wait_async(NULL);
     }
+
+    arm_2d_op_wait_async(NULL);
 }
 
-/**
- * @brief   设置指定列的宽度
- * 
- * @param   pWidget         目标控件指针
- * @param   column          列
- * @param   width           宽度
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width)
+void ldTableSetItemWidth(ldTable_t *ptWidget,uint8_t column,int16_t width)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
-    if(column<pWidget->columnCount)
+    if(column<ptWidget->columnCount)
     {
-        pWidget->pColumnWidth[column]=width;
+        ptWidget->pColumnWidth[column]=width;
     }
 }
 
-/**
- * @brief   设置指定行的高度
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行
- * @param   height          高度
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height)
+void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
-    if(row<pWidget->rowCount)
+    if(row<ptWidget->rowCount)
     {
-        pWidget->pRowHeight[row]=height;
+        ptWidget->pRowHeight[row]=height;
     }
 }
 
-/**
- * @brief   设置项目的文本
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行
- * @param   column          列
- * @param   pText           文本内容
- * @param   pFontDict       字体
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict)
+void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont)
 {
-    if (pWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
     {
-        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
-        if(item->isStaticText==false)
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
+        uint8_t textLen=strlen((char*)pText)+1;
+
+        if((item->isStaticText==false)&&(textLen>0))
         {
-            ldFree(item->pText);
-            item->pText=LD_CALLOC_STRING(pText);
+            if(textLen>item->textMax)
+            {
+                ldFree(item->pText);
+                item->pText=ldCalloc(1,strlen((char*)pText)+1);
+                item->textMax=textLen;
+            }
             strcpy((char*)item->pText,(char*)pText);
-            item->pFontDict=pFontDict;
+            item->ptFont=ptFont;
         }
     }
 }
 
-/**
- * @brief   设置项目的静态文本，不可变更的文本内容，不消耗内存
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行
- * @param   column          列
- * @param   pText           文本内容
- * @param   pFontDict       字体
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict)
+void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
 
-    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
     {
-        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
         if(item->isStaticText==false)
         {
             ldFree(item->pText);
         }
         item->isStaticText=true;
         item->pText=pText;
-        item->pFontDict=pFontDict;
+        item->ptFont=ptFont;
         item->isEditable=false;
     }
 }
 
-/**
- * @brief   设置项目颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行
- * @param   column          列
- * @param   textColor       文字颜色
- * @param   bgColor         文字背景颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor)
+void ldTableSetItemColor(ldTable_t *ptWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
-    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
     {
-        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
         item->textColor=textColor;
         item->itemBgColor=bgColor;
     }
 }
 
-/**
- * @brief   设置表格底色
- * 
- * @param   pWidget         目标控件指针
- * @param   bgColor         底色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-16
- */
-void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor)
+void ldTableSetBgColor(ldTable_t *ptWidget,ldColor bgColor)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
-    pWidget->bgColor=bgColor;
+    ptWidget->bgColor=bgColor;
 }
 
-/**
- * @brief   设置指定项目文本对齐方式
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行号
- * @param   column          列号
- * @param   align           对齐方式
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-void ldTableSetItemAlign(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t align)
+void ldTableSetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_align_t tAlign)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
     {
-        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
-        item->align=align;
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
+        item->tAlign=tAlign;
     }
 }
 
-/**
- * @brief   设置项目图片
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行号
- * @param   column          列号
- * @param   x               图片在项目中的x轴坐标
- * @param   y               图片在项目中的y轴坐标
- * @param   width           图片宽度
- * @param   height          图片高度
- * @param   imgAddr         图片地址
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-void ldTableSetItemImage(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uintptr_t imgAddr,bool isWithMask,ldColor maskColor,bool isMask)
+void ldTableSetItemImage(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t* ptImgTile,arm_2d_tile_t *ptMaskTile,ldColor maskColor)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
     {
-        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
-        item->imgRegion.tLocation.iX=x;
-        item->imgRegion.tLocation.iY=y;
-        item->imgRegion.tSize.iWidth=width;
-        item->imgRegion.tSize.iHeight=height;
-        item->releaseImgAddr=imgAddr;
-        item->isReleaseImgWithMask=isWithMask;
-        item->isReleaseImgMask=isMask;
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
+        item->tLocation.iX=x;
+        item->tLocation.iY=y;
+        item->ptPressImgTile=ptImgTile;
+        item->ptPressMaskTile=ptMaskTile;
         item->releaseImgMaskColor=maskColor;
-        item->pressImgAddr=LD_ADDR_NONE;
+        item->ptReleaseImgTile=NULL;
+        item->ptReleaseMaskTile=NULL;
         item->isButton=false;
         item->isSelectShow=false;
         item->isEditable=false;
     }
 }
 
-/**
- * @brief   设置项目按键图片
- * 
- * @param   pWidget         目标控件指针
- * @param   row             行号
- * @param   column          列号
- * @param   x               图片在项目中的x轴坐标
- * @param   y               图片在项目中的y轴坐标
- * @param   width           图片宽度
- * @param   height          图片高度
- * @param   releaseImgAddr  释放的图片地址
- * @param   pressImgAddr    按下的图片地址
- * @param   isCheckable     是否为开关型按键
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-21
- */
-void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uintptr_t releaseImgAddr,uintptr_t pressImgAddr,bool isCheckable)
+void ldTableSetItemButton(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t *ptReleaseImgTile,arm_2d_tile_t *ptReleaseMaskTile,ldColor releaseImgMaskColor,arm_2d_tile_t *ptPressImgTile,arm_2d_tile_t *ptPressMaskTile,ldColor pressImgMaskColor,bool isCheckable)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    if((row<pWidget->rowCount)&&(column<pWidget->columnCount))
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
     {
-        ldTableItem_t *item= &pWidget->pItemInfo[row*pWidget->columnCount+column];
-        item->imgRegion.tLocation.iX=x;
-        item->imgRegion.tLocation.iY=y;
-        item->imgRegion.tSize.iWidth=width;
-        item->imgRegion.tSize.iHeight=height;
-        item->releaseImgAddr=releaseImgAddr;
-        item->pressImgAddr=pressImgAddr;
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
+        item->tLocation.iX=x;
+        item->tLocation.iY=y;
+        item->ptReleaseImgTile=ptReleaseImgTile;
+        item->ptReleaseMaskTile=ptReleaseMaskTile;
+        item->releaseImgMaskColor=releaseImgMaskColor;
+        item->ptPressImgTile=ptPressImgTile;
+        item->ptPressMaskTile=ptPressMaskTile;
+        item->pressImgMaskColor=pressImgMaskColor;
         item->isButton=true;
         item->isCheckable=isCheckable;
         item->isSelectShow=false;
@@ -1029,101 +896,97 @@ void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t 
     }
 }
 
-/**
- * @brief   excel风格
- *
- * @param   pWidget         目标控件指针
- * @param   pFontDict       字体指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-01-17
- */
-void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict)
+void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId)
 {
-    uint8_t i;
-    uint8_t strBuf[2]={0};
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
+    ptWidget->kbNameId=kbNameId;
+}
 
-    ldTableSetEditable(pWidget,0,0,false);
+void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax)
+{
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->ptItemInfo[row*ptWidget->columnCount+column].isEditable=isEditable;
+    if((isEditable)&&(textMax>ptWidget->ptItemInfo[row*ptWidget->columnCount+column].textMax))
+    {
+        ldFree(ptWidget->ptItemInfo[row*ptWidget->columnCount+column].pText);
+        ptWidget->ptItemInfo[row*ptWidget->columnCount+column].pText=ldCalloc(1,sizeof (uint8_t)*textMax+1);
+        ptWidget->ptItemInfo[row*ptWidget->columnCount+column].textMax=textMax;
+    }
+}
 
-    ldTableSetBgColor(pWidget,__RGB(219,219,219));
+void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
+{
+    uint8_t strBuf[2]={0};
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+    ldTableSetEditable(ptWidget,0,0,false,0);
+
+    ldTableSetBgColor(ptWidget,__RGB(219,219,219));
     strBuf[0]='1';
-    for(i=0;i<pWidget->rowCount;i++)
+    for(uint8_t i=0;i<ptWidget->rowCount;i++)
     {
         if(i==0)
         {
-            ldTableSetItemHeight(pWidget,0,22);
+            ldTableSetItemHeight(ptWidget,0,22);
         }
         else
         {
-            ldTableSetItemHeight(pWidget,i,18);
-            if(pFontDict!=NULL)
+            ldTableSetItemHeight(ptWidget,i,18);
+            if(ptFont!=NULL)
             {
-                ldTableSetItemText(pWidget,i,0,strBuf,pFontDict);
-                ldTableSetEditable(pWidget,i,0,false);
+                ldTableSetItemText(ptWidget,i,0,strBuf,ptFont);
+                ldTableSetEditable(ptWidget,i,0,false,0);
                 strBuf[0]++;
             }
         }
-        ldTableSetItemColor(pWidget,i,0,LD_COLOR_BLACK,__RGB(238,238,238));
+        ldTableSetItemColor(ptWidget,i,0,GLCD_COLOR_BLACK,__RGB(238,238,238));
     }
     strBuf[0]='A';
-    for(i=1;i<pWidget->columnCount;i++)
+    for(uint8_t i=0;i<ptWidget->columnCount;i++)
     {
         if(i==0)
         {
-            ldTableSetItemWidth(pWidget,0,35);
+            ldTableSetItemWidth(ptWidget,0,35);
         }
         else
         {
-            ldTableSetItemWidth(pWidget,i,71);
-            if(pFontDict!=NULL)
+            ldTableSetItemWidth(ptWidget,i,71);
+            if(ptFont!=NULL)
             {
-                ldTableSetItemText(pWidget,0,i,strBuf,pFontDict);
-                ldTableSetEditable(pWidget,0,i,false);
+                ldTableSetItemText(ptWidget,0,i,strBuf,ptFont);
+                ldTableSetEditable(ptWidget,0,i,false,0);
                 strBuf[0]++;
             }
         }
-        ldTableSetItemColor(pWidget,0,i,LD_COLOR_BLACK,__RGB(238,238,238));
+        ldTableSetItemColor(ptWidget,0,i,GLCD_COLOR_BLACK,__RGB(238,238,238));
     }
+    for(uint8_t row=1;row<ptWidget->rowCount;row++)
+    {
+        for(uint8_t column=1;column<ptWidget->columnCount;column++)
+        {
+            ldTableSetEditable(ptWidget,row,column,true,10);
+        }
+    }
+    ldTableSetAlignGrid(ptWidget,true);
 }
 
-/**
- * @brief   关联键盘
- *
- * @param   pWidget         目标控件指针
- * @param   kbNameId        目标键盘id
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-01-17
- */
-void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId)
+void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->kbNameId=kbNameId;
-}
-
-/**
- * @brief   关联键盘
- *
- * @param   pWidget         目标控件指针
- * @param   row             行
- * @param   column          列
- * @param   isEditable      true=可编辑 false=不可编辑
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-03-19
- */
-void ldTableSetEditable(ldTable_t* pWidget,uint8_t row,uint8_t column,bool isEditable)
-{
-    if(pWidget==NULL)
-    {
-        return;
-    }
-    pWidget->pItemInfo[row*pWidget->columnCount+column].isEditable=isEditable;
+    ptWidget->isAlignGrid=isAlignGrid;
 }
 
 #if defined(__clang__)

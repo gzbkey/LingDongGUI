@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +16,16 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldQRCode.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   qr code widget
- */
+#define __LD_QR_CODE_IMPLEMENT__
+
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldQRCode.h"
-#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -39,258 +44,187 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-void ldQRCodeDel(ldQRCode_t *pWidget);
-void ldQRCodeFrameUpdate(ldQRCode_t* pWidget);
-void ldQRCodeLoop(arm_2d_scene_t *pScene,ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldQRCodeCommonFunc={
-    (ldDelFunc_t)ldQRCodeDel,
-    (ldLoopFunc_t)ldQRCodeLoop,
-    (ldUpdateFunc_t)ldQRCodeFrameUpdate,
+const ldBaseWidgetFunc_t ldQRCodeFunc = {
+    .depose = (ldDeposeFunc_t)ldQRCode_depose,
+    .load = (ldLoadFunc_t)ldQRCode_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldQRCode_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldQRCode_show,
 };
 
-static bool _QRCodeDel(xListNode *pEachInfo, void *pTarget)
+ldQRCode_t* ldQRCode_init(ld_scene_t *ptScene, ldQRCode_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* pStr, ldColor qrColor, ldColor bgColor, uint8_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom)
 {
-    if (pEachInfo->info == pTarget)
-    {
-        ldFree(((ldQRCode_t *)pTarget)->qrText);
-        ldFree(((ldQRCode_t *)pTarget));
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
-
-void ldQRCodeDel(ldQRCode_t *pWidget)
-{
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeQRCode)
-    {
-        return;
-    }
-
-    LOG_INFO("[qRCode] del,id:%d",pWidget->nameId);
-
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _QRCodeDel);
-    }
-}
-
-/**
- * @brief   二维码初始化函数
- *
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @param   qrText          二维码的内容文本
- * @param   qrColor         二维码颜色
- * @param   bgColor         底色
- * @param   qrEcc           eccLow 容忍错误7%
- *                          eccMedium 容忍错误15%
- *                          eccQuartile 容忍错误25%
- *                          eccHigh 容忍错误30%
- * @param   qrMaxVersion    二维码版本，0-40，版本越高，尺寸越大
- * @param   qrZoom          放大二维码倍数，1-255
- * @return  ldQRCode_t*     新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-14
- */
-ldQRCode_t *ldQRCodeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t* qrText, ldColor qrColor, ldColor bgColor, ldQRCodeEcc_t qrEcc, uint8_t qrMaxVersion, uint8_t qrZoom)
-{
-    ldQRCode_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
     uint8_t *pText = NULL;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldQRCode_t);
-    pText = LD_CALLOC_STRING(qrText);
-
-    if ((pNewWidget != NULL)&&(pText!=NULL))
+    if (NULL == ptWidget)
     {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldQRCode_t));
+        pText = ldCalloc(1,strlen((char*)pStr)+1);
+        if ((NULL == ptWidget) || (NULL == pText))
         {
-            pNewWidget->isParentHidden=true;
+            ldFree(ptWidget);
+            ldFree(pText);
+            LOG_ERROR("[init failed][QRCode] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeQRCode;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
+    }
+
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeQRCode;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldQRCodeFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    strcpy((char*)pText,(char*)pStr);
+    ptWidget->pStr=pText;
+    ptWidget->qrEcc=qrEcc;
+    qrMaxVersion=(qrMaxVersion==0)?1:qrMaxVersion;
+    ptWidget->qrMaxVersion=qrMaxVersion;
+    ptWidget->qrZoom=qrZoom;
+    ptWidget->qrColor=qrColor;
+    ptWidget->bgColor=bgColor;
+
+    LOG_INFO("[init][QRCode] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
+}
+
+void ldQRCode_depose( ldQRCode_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeQRCode)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][QRCode] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+
+    ldFree(ptWidget);
+}
+
+void ldQRCode_on_load( ldQRCode_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldQRCode_on_frame_start( ldQRCode_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldQRCode_show(ld_scene_t *ptScene, ldQRCode_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+
+#if 0
+    if (bIsNewFrame) {
+        
+    }
 #endif
-        strcpy((char *)pText,(const char *)qrText);
-        pNewWidget->qrText=pText;
-        pNewWidget->qrEcc=qrEcc;
-        qrMaxVersion=(qrMaxVersion==0)?1:qrMaxVersion;
-        pNewWidget->qrMaxVersion=qrMaxVersion;
-        pNewWidget->qrZoom=qrZoom;
-        pNewWidget->qrColor=qrColor;
-        pNewWidget->bgColor=bgColor;
-        pNewWidget->pFunc=&ldQRCodeCommonFunc;
 
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
-        LOG_INFO("[qRCode] init,id:%d",nameId);
-    }
-    else
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        ldFree(pNewWidget->qrText);
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[qRCode] init failed,id:%d",nameId);
-    }
-
-    return pNewWidget;
-}
-
-void ldQRCodeFrameUpdate(ldQRCode_t* pWidget)
-{
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-}
-
-void ldQRCodeLoop(arm_2d_scene_t *pScene,ldQRCode_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
-{
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
-    {
-        return;
-    }
-//#if USE_VIRTUAL_RESOURCE == 0
-//    arm_2d_tile_t tempRes=*pResTile;
-//#else
-//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-//#endif
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
-
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            pWidget->dirtyRegionState=none;
-        }
-
-        uint8_t *qr0;
-        uint8_t *tempBuffer;
-        uint32_t qrSize;
-        bool ret;
-        ldColor tempColor;
-
-        qr0=ldCalloc(qrcodegen_BUFFER_LEN_FOR_VERSION(pWidget->qrMaxVersion));
-        tempBuffer=ldCalloc(qrcodegen_BUFFER_LEN_FOR_VERSION(pWidget->qrMaxVersion));
-
-        if((qr0!=NULL)&&(tempBuffer!=NULL))
-        {
-            ret = qrcodegen_encodeText((const char*)pWidget->qrText,tempBuffer, qr0, (enum qrcodegen_Ecc)pWidget->qrEcc,pWidget->qrMaxVersion, pWidget->qrMaxVersion,qrcodegen_Mask_AUTO,true);
-
-            if (ret)
+            if(ptWidget->use_as__ldBase_t.isHidden)
             {
-                qrSize = qrcodegen_getSize(qr0);
+                break;
+            }
 
-                for (uint32_t y = 0; y < qrSize; y++)
+            uint8_t *qr0;
+            uint8_t *tempBuffer;
+            uint32_t qrSize;
+            bool ret;
+            ldColor tempColor;
+
+            qr0=ldCalloc(1,qrcodegen_BUFFER_LEN_FOR_VERSION(ptWidget->qrMaxVersion));
+            tempBuffer=ldCalloc(1,qrcodegen_BUFFER_LEN_FOR_VERSION(ptWidget->qrMaxVersion));
+
+            if((qr0!=NULL)&&(tempBuffer!=NULL))
+            {
+                ret = qrcodegen_encodeText((const char*)ptWidget->pStr,tempBuffer, qr0, (enum qrcodegen_Ecc)ptWidget->qrEcc,ptWidget->qrMaxVersion, ptWidget->qrMaxVersion,qrcodegen_Mask_AUTO,true);
+
+                if (ret)
                 {
-                    for (uint32_t x = 0; x < qrSize; x++)
+                    qrSize = qrcodegen_getSize(qr0);
+
+                    for (uint32_t y = 0; y < qrSize; y++)
                     {
-                        if(qrcodegen_getModule(qr0, x, y))
+                        for (uint32_t x = 0; x < qrSize; x++)
                         {
-                            tempColor=pWidget->qrColor;
-                        }
-                        else
-                        {
-                            tempColor=pWidget->bgColor;
-                        }
-
-                        arm_2d_region_t tBoxRegion = {
-                            .tLocation = {
-                                .iX = x*pWidget->qrZoom,
-                                .iY = y*pWidget->qrZoom,
-                            },
-                            .tSize = {
-                                .iWidth=pWidget->qrZoom,
-                                .iHeight=pWidget->qrZoom,
+                            if(qrcodegen_getModule(qr0, x, y))
+                            {
+                                tempColor=ptWidget->qrColor;
                             }
-                        };
-                        arm_2d_tile_t tChildTile;
-                        arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
-
-                        ldBaseColor(&tChildTile,tempColor,255);
+                            else
+                            {
+                                tempColor=ptWidget->bgColor;
+                            }
+                            arm_2d_region_t tBoxRegion = {
+                                .tLocation = {
+                                    .iX = x*ptWidget->qrZoom,
+                                    .iY = y*ptWidget->qrZoom,
+                                },
+                                .tSize = {
+                                    .iWidth=ptWidget->qrZoom,
+                                    .iHeight=ptWidget->qrZoom,
+                                }
+                            };
+                            arm_2d_tile_t tChildTile;
+                            arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+                            ldBaseColor(&tChildTile,NULL,tempColor,ptWidget->use_as__ldBase_t.opacity);
+                        }
                     }
                 }
             }
+            ldFree(qr0);
+            ldFree(tempBuffer);
         }
-
-#if LD_DEBUG == 1
-        arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
-#endif
-
-        ldFree(qr0);
-        ldFree(tempBuffer);
-
-        arm_2d_op_wait_async(NULL);
     }
+    arm_2d_op_wait_async(NULL);
 }
 
-/**
- * @brief   设置二维码文本
- *
- * @param   pWidget         目标控件指针
- * @param   pNewText        文本指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldQRCodeSetText(ldQRCode_t *pWidget, uint8_t *pNewText)
+void ldQRCodeSetText(ldQRCode_t *ptWidget, uint8_t *pStr)
 {
-    uint8_t *pText;
-
-    if (pWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    ldFree(pWidget->qrText);
-    pText=LD_CALLOC_STRING(pNewText);
-    strcpy((char *)pText,(const char *)pNewText);
-    pWidget->qrText=pText;
-    pWidget->dirtyRegionState=waitChange;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ldFree(ptWidget->pStr);
+    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    if(ptWidget->pStr!=NULL)
+    {
+        strcpy((char*)ptWidget->pStr,(char*)pStr);
+    }
 }
 
 #if defined(__clang__)

@@ -5,12 +5,13 @@
 #include "arm_2d.h"
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
+#include "ldScene1.h"
 #include "xLog.h"
-#include "xBtnAction.h"
-#include "stdbool.h"
-#include "uiWatch.h"
-#include "uiWidget.h"
-#include "uiDemo.h"
+//#include "xBtnAction.h"
+#include LD_DEMO_GUI_INCLUDE
+#include "freeRtosHeap4.h"
+
+#include "ldGui.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -33,47 +34,8 @@
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-void scene0_loader(void)
-{
-    arm_2d_scene0_init(&DISP0_ADAPTER);
-}
-
-typedef void scene_loader_t(void);
-
-static scene_loader_t * const c_SceneLoaders[] = {
-    scene0_loader,
-//    scene1_loader,
-};
-
-/* load scene one by one */
-void before_scene_switching_handler(void *pTarget,
-                                    arm_2d_scene_player_t *ptPlayer,
-                                    arm_2d_scene_t *ptScene)
-{
-    static uint_fast8_t s_chIndex = 0;
-
-    if (s_chIndex >= dimof(c_SceneLoaders)) {
-        s_chIndex = 0;
-    }
-
-    /* call loader */
-    c_SceneLoaders[s_chIndex]();
-    s_chIndex++;
-}
-
 int app_2d_main_thread (void *argument)
 {
-#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-    arm_2d_scene_player_register_before_switching_event_handler(
-            &DISP0_ADAPTER,
-            before_scene_switching_handler);
-
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
-
-    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
-#endif
     while(1) {
         if (arm_fsm_rt_cpl == disp_adapter0_task()) {
             vtSdlFlush(1);
@@ -104,25 +66,26 @@ int main (void)
     LOG_NORMAL("====================\n");
     vtInit();
 
-    xBtnInit(KEY_NUM_UP,vtGetKeyState);
-    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
-    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
-    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
-    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
-    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
-
-#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-#if LD_PAGE_STATIC == 0
-    ldGuiSetPageMax(1);
-#endif
-    LD_ADD_PAGE_DEMO;
-#endif
+//    xBtnInit(KEY_NUM_UP,vtGetKeyState);
+//    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
+//    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
+//    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
+//    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
+//    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
 
     arm_irq_safe {
         arm_2d_init();
     }
 
     disp_adapter0_init();
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
+#if USE_DEMO == 0
+    //user gui page init
+
+#else
+    ldGuiInit(LD_DEMO_GUI_FUNC);
+#endif
+#endif
 
     SDL_CreateThread(app_2d_main_thread, "arm-2d thread", NULL);
 

@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +16,16 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldProgressBar.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   progress bar widget
- */
+#define __LD_PROGRESS_BAR_IMPLEMENT__
+
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldProgressBar.h"
-#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -39,340 +44,326 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-void ldProgressBarDel(ldProgressBar_t *pWidget);
-void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget);
-void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldProgressBarCommonFunc={
-    (ldDelFunc_t)ldProgressBarDel,
-    (ldLoopFunc_t)ldProgressBarLoop,
-    (ldUpdateFunc_t)ldProgressBarFrameUpdate,
+const ldBaseWidgetFunc_t ldProgressBarFunc = {
+    .depose = (ldDeposeFunc_t)ldProgressBar_depose,
+    .load = (ldLoadFunc_t)ldProgressBar_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldProgressBar_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldProgressBar_show,
 };
 
-static bool _progressBarDel(xListNode *pEachInfo, void *pTarget)
+ldProgressBar_t* ldProgressBar_init( ld_scene_t *ptScene,ldProgressBar_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
-    if (pEachInfo->info == pTarget)
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
+
+    if (NULL == ptWidget)
     {
-        //del user object
-
-        ldFree(((ldProgressBar_t *)pTarget));
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
-
-void ldProgressBarDel(ldProgressBar_t *pWidget)
-{
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeProgressBar)
-    {
-        return;
-    }
-
-    LOG_INFO("[progressBar] del,id:%d",pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _progressBarDel);
-    }
-}
-
-/**
- * @brief   进度条初始化
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @return  ldProgressBar_t* 新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-ldProgressBar_t *ldProgressBarInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
-{
-    ldProgressBar_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
-
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldProgressBar_t);
-    if (pNewWidget != NULL)
-    {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldProgressBar_t));
+        if (NULL == ptWidget)
         {
-            pNewWidget->isParentHidden=true;
+            LOG_ERROR("[init failed][progressBar] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeProgressBar;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->bgAddr=LD_ADDR_NONE;
-        pNewWidget->fgAddr=LD_ADDR_NONE;
-        pNewWidget->frameAddr=LD_ADDR_NONE;
-        pNewWidget->bgOffset=0;
-        pNewWidget->fgOffset=0;
-        pNewWidget->bgColor=LD_COLOR_WHITE;
-        pNewWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
-        pNewWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
-        pNewWidget->permille=0;
-        pNewWidget->timer = arm_2d_helper_get_system_timestamp();
-        pNewWidget->pFunc=&ldProgressBarCommonFunc;
-
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-        LOG_INFO("[progressBar] init,id:%d",nameId);
-    }
-    else
-    {
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[progressBar] init failed,id:%d",nameId);
     }
 
-    return pNewWidget;
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeProgressBar;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldProgressBarFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    ptWidget->bgColor=GLCD_COLOR_WHITE;
+    ptWidget->fgColor=__RGB(0x94, 0xd2, 0x52);
+    ptWidget->frameColor=__RGB(0xa5, 0xc6, 0xef);
+    ptWidget->isHorizontal=true;
+    ptWidget->timer=0;
+
+    LOG_INFO("[init][progressBar] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
 }
 
-static void _progressBarColorShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarget)
+void ldProgressBar_depose( ldProgressBar_t *ptWidget)
 {
-    arm_2d_region_t tBarRegion = {
-        .tLocation = {
-           .iX = 0,
-           .iY = 0,
-        },
-        .tSize = ((arm_2d_tile_t*) &pWidget->resource)->tRegion.tSize,//ptTarget->tRegion.tSize,
-    };
-
-    arm_2d_fill_colour( ptTarget,
-                        &tBarRegion,
-                        pWidget->frameColor);
-
-    arm_2d_op_wait_async(NULL);
-
-    tBarRegion.tSize.iHeight-=2;
-    tBarRegion.tSize.iWidth-=2;
-    tBarRegion.tLocation.iX += 1;
-    tBarRegion.tLocation.iY += 1;
-
-    arm_2d_fill_colour(ptTarget, &tBarRegion, pWidget->bgColor);
-
-    arm_2d_op_wait_async(NULL);
-
-    if (pWidget->permille > 0)
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
     {
-        tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * pWidget->permille / 1000;
-        arm_2d_fill_colour( ptTarget,
-                            &tBarRegion,
-                            pWidget->fgColor
-                            );
-        arm_2d_op_wait_async(NULL);
+        return;
     }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeProgressBar)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][progressBar] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+
+    ldFree(ptWidget);
 }
 
-static void _progressBarImageShow(ldProgressBar_t *pWidget,arm_2d_tile_t *ptTarget,bool bIsNewFrame)
+void ldProgressBar_on_load( ldProgressBar_t *ptWidget)
 {
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tResTile=pWidget->resource;
-#else
-    arm_2d_vres_t tResTile=*((arm_2d_vres_t*)(&pWidget->resource));
-#endif
-    ((arm_2d_tile_t*)&tResTile)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tResTile)->tRegion.tLocation.iY=0;
+    assert(NULL != ptWidget);
+    
+}
 
-    arm_2d_region_t tBarRegion = {
-        .tLocation = {
-           .iX = 0,
-           .iY = 0,
-        },
-        .tSize = ((arm_2d_tile_t*) &pWidget->resource)->tRegion.tSize,
-    };
+void ldProgressBar_on_frame_start( ldProgressBar_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
 
-    do {
+static void _progressBarColorShow(ldProgressBar_t *ptWidget,arm_2d_tile_t *ptTarget)
+{
+    ldBaseColor(ptTarget, NULL, ptWidget->bgColor,ptWidget->use_as__ldBase_t.opacity);
 
-        //bg image
-        ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=pWidget->bgWidth;
-        ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)pWidget->bgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile.pTarget=pWidget->bgAddr;
-#endif
-        arm_2d_region_t tInnerRegion = {
-            .tSize = {
-                .iWidth = tBarRegion.tSize.iWidth + ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth,
-                .iHeight = tBarRegion.tSize.iHeight,
-            },
+    if (ptWidget->permille > 0)
+    {
+        arm_2d_region_t tBarRegion = {
             .tLocation = {
-                .iX = -pWidget->bgWidth + pWidget->bgOffset,
+                .iX = 1,
+                .iY = 1,
+            },
+            .tSize = {
+                .iWidth=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-2,
+                .iHeight=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-2,
             },
         };
-        arm_2d_tile_t tileInnerSlot;
-        arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
-        arm_2d_tile_fill_only( (arm_2d_tile_t*)&tResTile,
-                            &tileInnerSlot,
-                            &tInnerRegion);
-        arm_2d_op_wait_async(NULL);
-    } while(0);
 
-    if (pWidget->permille > 0)
-    {
-        do {
-            //fg image
-            ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=pWidget->fgWidth;
-            ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)pWidget->fgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-            tResTile.pTarget=pWidget->fgAddr;
-#endif
-            arm_2d_region_t tInnerRegion = {
-                .tSize = {
-                    .iWidth = tBarRegion.tSize.iWidth + ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth,
-                    .iHeight = tBarRegion.tSize.iHeight,
-                },
-                .tLocation = {
-                    .iX = -pWidget->fgWidth + pWidget->fgOffset,
-                },
-            };
-            tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * pWidget->permille / 1000;
-
-            arm_2d_tile_t tileInnerSlot;
-            arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
-            arm_2d_tile_fill_only( (arm_2d_tile_t*)&tResTile,
-                                &tileInnerSlot,
-                                &tInnerRegion);
-            arm_2d_op_wait_async(NULL);
-        } while(0);
-    }
-
-    if(pWidget->frameAddr!=LD_ADDR_NONE)
-    {
-        do {
-            //frame image png
-            ((arm_2d_tile_t*)&tResTile)->tRegion.tSize.iWidth=pWidget->frameWidth;
-            ((arm_2d_tile_t*)&tResTile)->pchBuffer=(uint8_t*)pWidget->frameAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-            tResTile.pTarget=pWidget->frameAddr;
-#endif
-            ldBaseImage(ptTarget,&tResTile,true,255);
-            arm_2d_op_wait_async(NULL);
-        } while (0);
-    }
-
-    //! update offset
-    if (bIsNewFrame) {
-        if (arm_2d_helper_is_time_out(PROGRESS_BAR_SPEED, &pWidget->timer))
+        if(ptWidget->isHorizontal)
         {
-            if(pWidget->isBgMove)
-            {
-                pWidget->bgOffset++;
-                if (pWidget->bgOffset >= pWidget->bgWidth)
-                {
-                    pWidget->bgOffset = 0;
-                }
-            }
-            if(pWidget->isFgMove)
-            {
-                pWidget->fgOffset++;
-                if (pWidget->fgOffset >= pWidget->fgWidth)
-                {
-                    pWidget->fgOffset = 0;
-                }
-            }
-        }
-    }
-}
-
-void ldProgressBarFrameUpdate(ldProgressBar_t* pWidget)
-{
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-//    ldBaseDirtyRegionAutoUpdate((ldCommon_t*)pWidget,((arm_2d_tile_t*)&(pWidget->resource))->tRegion,pWidget->isDirtyRegionAutoIgnore);
-}
-
-void ldProgressBarLoop(arm_2d_scene_t *pScene,ldProgressBar_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
-{
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
-    {
-        return;
-    }
-
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
-
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
-        {
-            pWidget->dirtyRegionState=none;
-        }
-
-        if(pWidget->bgAddr==LD_ADDR_NONE&&pWidget->fgAddr==LD_ADDR_NONE)//color
-        {
-            _progressBarColorShow(pWidget,&tTarget);
+            tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * ptWidget->permille / 1000;
         }
         else
         {
-            _progressBarImageShow(pWidget,&tTarget,bIsNewFrame);
-            pWidget->dirtyRegionState=waitChange;
+            int16_t temp=tBarRegion.tSize.iHeight*(1000 - ptWidget->permille) / 1000;;
+            tBarRegion.tLocation.iY += temp;
+            tBarRegion.tSize.iHeight -= temp;
         }
-        arm_2d_op_wait_async(NULL);
+        ldBaseColor( ptTarget,&tBarRegion,ptWidget->fgColor,ptWidget->use_as__ldBase_t.opacity);
+    }
+
+    arm_2d_draw_box(ptTarget,NULL,1,ptWidget->frameColor,ptWidget->use_as__ldBase_t.opacity);
+}
+
+static void _progressBarImageShow(ldProgressBar_t *ptWidget,arm_2d_tile_t *ptTarget,bool bIsNewFrame)
+{
+    arm_2d_region_t tBarRegion = {
+        .tLocation = {
+            .iX = 0,
+            .iY = 0,
+        },
+        .tSize = ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize,
+    };
+
+    // bg image
+    if(ptWidget->isHorizontal)
+    {
+        do{
+            arm_2d_region_t tInnerRegion = {
+                .tSize = {
+                    .iWidth = tBarRegion.tSize.iWidth + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
+                    .iHeight = tBarRegion.tSize.iHeight,
+                },
+                .tLocation = {
+                    .iX = -ptWidget->ptBgImgTile->tRegion.tSize.iWidth + ptWidget->bgOffset,
+                },
+            };
+            arm_2d_tile_t tileInnerSlot;
+            arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+            arm_2d_tile_fill_only(ptWidget->ptBgImgTile,&tileInnerSlot,&tInnerRegion);
+        }while(0);
+    }
+    else
+    {
+        do{
+            arm_2d_region_t tInnerRegion = {
+                .tSize = {
+                    .iWidth = tBarRegion.tSize.iWidth,
+                    .iHeight = tBarRegion.tSize.iHeight + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight,
+                },
+                .tLocation = {
+                    .iY = -ptWidget->ptBgImgTile->tRegion.tSize.iHeight - ptWidget->bgOffset,
+                },
+            };
+            arm_2d_tile_t tileInnerSlot;
+            arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+            arm_2d_tile_fill_only(ptWidget->ptBgImgTile,&tileInnerSlot,&tInnerRegion);
+        }while(0);
+    }
+
+
+    if (ptWidget->permille > 0)
+    {
+        // fg image
+        if(ptWidget->isHorizontal)
+        {
+            do{
+                arm_2d_region_t tInnerRegion = {
+                    .tSize = {
+                        .iWidth = tBarRegion.tSize.iWidth + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
+                        .iHeight = tBarRegion.tSize.iHeight,
+                    },
+                    .tLocation = {
+                        .iX = -ptWidget->ptFgImgTile->tRegion.tSize.iWidth + ptWidget->fgOffset,
+                    },
+                };
+                tBarRegion.tSize.iWidth = tBarRegion.tSize.iWidth * ptWidget->permille / 1000;
+
+                arm_2d_tile_t tileInnerSlot;
+                arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+                arm_2d_tile_fill_only(ptWidget->ptFgImgTile,&tileInnerSlot,&tInnerRegion);
+            }while(0);
+        }
+        else
+        {
+            do{
+                arm_2d_region_t tInnerRegion = {
+                    .tSize = {
+                        .iWidth = tBarRegion.tSize.iWidth,
+                        .iHeight = tBarRegion.tSize.iHeight + ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight,
+                    },
+                    .tLocation = {
+                        .iY = -ptWidget->ptFgImgTile->tRegion.tSize.iHeight - ptWidget->fgOffset,
+                    },
+                };
+                int16_t temp=tBarRegion.tSize.iHeight*(1000 - ptWidget->permille) / 1000;;
+                tBarRegion.tLocation.iY += temp;
+                tBarRegion.tSize.iHeight -= temp;
+
+                arm_2d_tile_t tileInnerSlot;
+                arm_2d_tile_generate_child(ptTarget, &tBarRegion, &tileInnerSlot, false);
+                arm_2d_tile_fill_only(ptWidget->ptFgImgTile,&tileInnerSlot,&tInnerRegion);
+            }while(0);
+        }
+    }
+
+    if(ptWidget->ptFrameImgTile!=NULL)
+    {
+        // frame image
+        ldBaseImage(ptTarget,
+                    NULL,
+                    ptWidget->ptFrameImgTile,
+                    NULL,
+                    0,
+                    ptWidget->use_as__ldBase_t.opacity);
+    }
+
+    if (bIsNewFrame)
+    {
+        if(ldTimeOut(PROGRESS_BAR_SPEED,true,&ptWidget->timer))
+        {
+            if(ptWidget->isHorizontal)
+            {
+                if(ptWidget->ptBgImgTile->tRegion.tSize.iWidth!=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)
+                {
+                    ptWidget->bgOffset++;
+                    if (ptWidget->bgOffset >= ptWidget->ptBgImgTile->tRegion.tSize.iWidth)
+                    {
+                        ptWidget->bgOffset = 0;
+                    }
+                }
+
+                if(ptWidget->ptFgImgTile->tRegion.tSize.iWidth!=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)
+                {
+                    ptWidget->fgOffset++;
+                    if (ptWidget->fgOffset >= ptWidget->ptFgImgTile->tRegion.tSize.iWidth)
+                    {
+                        ptWidget->fgOffset = 0;
+                    }
+                }
+            }
+            else
+            {
+                if(ptWidget->ptBgImgTile->tRegion.tSize.iHeight!=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
+                {
+                    ptWidget->bgOffset++;
+                    if (ptWidget->bgOffset >= ptWidget->ptBgImgTile->tRegion.tSize.iHeight)
+                    {
+                        ptWidget->bgOffset = 0;
+                    }
+                }
+
+                if(ptWidget->ptFgImgTile->tRegion.tSize.iHeight!=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
+                {
+                    ptWidget->fgOffset++;
+                    if (ptWidget->fgOffset >= ptWidget->ptFgImgTile->tRegion.tSize.iHeight)
+                    {
+                        ptWidget->fgOffset = 0;
+                    }
+                }
+            }
+        }
     }
 }
 
-/**
- * @brief   设置百分比
- * 
- * @param   pWidget         目标控件指针
- * @param   percent         百分比
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
+void ldProgressBar_show(ld_scene_t *ptScene, ldProgressBar_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
+
+#if 0
+    if (bIsNewFrame) {
+        
+    }
+#endif
+
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
+
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
+    {
+        arm_2d_container(ptTile, tTarget, &globalRegion)
+        {
+            if(ptWidget->use_as__ldBase_t.isHidden)
+            {
+                break;
+            }
+
+            if(ptWidget->ptBgImgTile==NULL&&ptWidget->ptFgImgTile==NULL)//color
+            {
+                _progressBarColorShow(ptWidget,&tTarget);
+            }
+            else
+            {
+                _progressBarImageShow(ptWidget,&tTarget,bIsNewFrame);
+                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            }
+        }
+    }
+    arm_2d_op_wait_async(NULL);
+}
+
+void ldProgressBarSetPercent(ldProgressBar_t *ptWidget,float percent)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     if(percent>=0)
     {
         if(percent>100)
         {
             percent=100;
         }
-        pWidget->permille=percent*10;
+        ptWidget->permille=percent*10;
     }
     else
     {
@@ -380,96 +371,57 @@ void ldProgressBarSetPercent(ldProgressBar_t *pWidget,float percent)
         {
             percent=-100;
         }
-        pWidget->permille=1000+percent*10;
+        ptWidget->permille=1000+percent*10;
     }
 }
 
-/**
- * @brief   设置背景图片
- * 
- * @param   pWidget         目标控件指针
- * @param   bgAddr          图片地址
- * @param   bgWidth         图片宽度
- * @param   isMove          图片是否滚动
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldProgressBarSetBgImage(ldProgressBar_t *pWidget,uintptr_t bgAddr,uint16_t bgWidth,bool isMove)
+void ldProgressBarSetImage(ldProgressBar_t *ptWidget,arm_2d_tile_t *ptBgImgTile,arm_2d_tile_t *ptFgImgTile)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->bgAddr=bgAddr;
-    pWidget->bgWidth=bgWidth;
-    pWidget->isBgMove=isMove;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptBgImgTile=ptBgImgTile;
+    ptWidget->ptFgImgTile=ptFgImgTile;
 }
 
-/**
- * @brief   设置前景图片
- * 
- * @param   pWidget         目标控件指针
- * @param   fgAddr          图片地址
- * @param   fgWidth         图片宽度
- * @param   isMove          图片是否滚动
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldProgressBarSetFgImage(ldProgressBar_t *pWidget,uintptr_t fgAddr,uint16_t fgWidth,bool isMove)
+void ldProgressBarSetFrameImage(ldProgressBar_t *ptWidget, arm_2d_tile_t *ptFrameImgTile)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->fgAddr=fgAddr;
-    pWidget->fgWidth=fgWidth;
-    pWidget->isFgMove=isMove;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptFrameImgTile=ptFrameImgTile;
 }
 
-/**
- * @brief   设置边框图片，计为最前边的遮挡图片
- * 
- * @param   pWidget         目标控件指针
- * @param   frameAddr       图片地址
- * @param   frameWidth      图片宽度
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldProgressBarSetFrameImage(ldProgressBar_t *pWidget, uintptr_t frameAddr, uint16_t frameWidth)
+void ldProgressBarSetColor(ldProgressBar_t *ptWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->frameAddr=frameAddr;
-    pWidget->frameWidth=frameWidth;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptBgImgTile=NULL;
+    ptWidget->ptFgImgTile=NULL;
+    ptWidget->ptFrameImgTile=NULL;
+    ptWidget->bgColor=bgColor;
+    ptWidget->fgColor=fgColor;
+    ptWidget->frameColor=frameColor;
 }
 
-/**
- * @brief   设置颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   bgColor         背景颜色
- * @param   fgColor         前景颜色
- * @param   frameColor      边框颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldProgressBarSetColor(ldProgressBar_t *pWidget,ldColor bgColor,ldColor fgColor,ldColor frameColor)
+void ldProgressBarSetHorizontal(ldProgressBar_t *ptWidget,bool isHorizontal)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->bgAddr=LD_ADDR_NONE;
-    pWidget->fgAddr=LD_ADDR_NONE;
-    pWidget->bgColor=bgColor;
-    pWidget->fgColor=fgColor;
-    pWidget->frameColor=frameColor;
+    ptWidget->isHorizontal=isHorizontal;
 }
 
 #if defined(__clang__)

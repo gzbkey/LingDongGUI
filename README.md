@@ -14,15 +14,15 @@
 
 2. **简单易用**
     * 对ARM-2D进行二次封装，极大降低ARM-2D的使用难度
-    * 使用类似Qt的信号槽模式，轻松实现多对多触发
+    * 事件触发使用信号槽模式，轻松实现多对多触发
     * 界面代码和功能代码分离，逻辑清晰
 
 3. **支持原生API**
-    * 可使用ARM-2D原生API进行开发，无缝对接
+    * 可使用ARM-2D原生API进行开发
+    * LDGUI和ARM-2D混合编程，灵活性高
 
 4. **动态自动裁剪**
     * 无需宏定义裁剪，自适应最小化体积
-    * 未使用的控件，不会编译到程序中
 
 5. **自由扩展控件**
     * 使用脚本自动生成新控件框架，专注实现显示效果
@@ -62,8 +62,9 @@ widget demo sdl
 | ✅ | check box + radio button| 复选框 + 单选功能，支持自定义图片和文字显示 |
 | ✅ | radia menu | 旋转菜单 |
 | ✅ | label | 简单文本显示 |
+| ✅ | slider | 滑动条 |
 | ✅ | scroll selecter | 滚动选择器 |
-| ✅ | date time | 日期和时间 |
+| ✅ | date time | 日期和时间，数字时钟 |
 | ✅ | icon slider | 滑动图标 |
 | ✅ | gauge | 仪表盘 |
 | ✅ | qr code | 二维码 |
@@ -73,7 +74,13 @@ widget demo sdl
 | ✅ | graph | 波形图 |
 | ✅ | combo box | 下拉框 |
 | ✅ | arc bar | 圆环进度条 |
-| 🔲 | slider | 滑动条 |
+| ✅ | animation | gif动画 |
+| 🔲 | calendar | 日历 |
+| ✅ | message box | 消息框 |
+| 🔲 | clock | 模拟时钟 |
+| ✅ | list | 列表，可嵌入其他类型控件 |
+| 🔲 | time picker | 时间选择器 |
+| 🔲 | date picker | 日期选择器 |
 
 ## 文件结构
 |名称|类型|说明|
@@ -82,8 +89,6 @@ widget demo sdl
 |examples|文件夹|例子项目所在文件夹|
 |src|文件夹|源码文件|
 |tools|文件夹|配套使用的相关工具|
-|README|.md|项目简介文档|
-|LICENSE|License|Apache 2.0开源协议文件|
 
 ## 教程
 

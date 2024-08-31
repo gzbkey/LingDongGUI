@@ -7,7 +7,6 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
-#include "Virtual_TFT_Port.h"
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 
@@ -22,11 +21,11 @@ extern "C" {
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
-#define LD_CFG_SCEEN_WIDTH                        (VT_WIDTH)
+#define LD_CFG_SCEEN_WIDTH                        (320)
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
-#define LD_CFG_SCEEN_HEIGHT                       (VT_HEIGHT)
+#define LD_CFG_SCEEN_HEIGHT                       (240)
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size
@@ -48,27 +47,19 @@ extern "C" {
 // <i> The size of memory allocated to the ldgui
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 
-// <o>LingDongGui signal emit buffer size
-// <i> The size of signal emit buffer to the ldgui
-#define LD_EMIT_SIZE                              (8)
-
-// <o>Number of project pages
-// <i> Maximum number of pages
-#define LD_PAGE_MAX                               (1)
-
 // <q>External NOR support
 // <i> Read external nor, please enable this option
 #define USE_VIRTUAL_RESOURCE                      (0)
 
 // widget config
 
-// <q>Opacity support
-// <i> There is no need to adjust the opacity of the widget. Please turn off this option
-#define USE_OPACITY                               (0)
-
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
-#define USE_RADIA_MENU_SCALE                      (0)
+#define USE_RADIA_MENU_SCALE                      (1)
+
+// <q>scene switcing support
+// <i> 1:More effects 0:Less ram
+#define USE_SCENE_SWITCHING                       (1)
 
 // debug config
 
@@ -85,13 +76,56 @@ extern "C" {
 // <q>Use Color Log
 // <i> Use Color Log
 #define USE_LOG_COLOR                             (1)
+
+// <o> Log new line type
+//     <0=>    LF \n
+//     <1=>    CR \r
+//     <2=>    CRLF \r\n
+// <i> default select \n
+#define LOG_NEW_LINE_TYPE                         (0)
 #endif
 
 #define LD_DEBUG                                  (0)
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (1)
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
-// default = 1
-#define LD_PAGE_STATIC                            (1)
+
+#ifndef USE_DEMO
+// <o> choose demo to test
+//     <0=> None
+//     <1=> Show all widget
+//     <2=> Printer
+#define USE_DEMO                                  (2)
+#endif
+
+#if USE_DEMO == 1
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (1024)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (600)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
+#define LD_DEMO_GUI_FUNC                          &uiWidgetFunc
+#endif
+
+#if USE_DEMO == 2
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (480)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (272)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
+#define LD_DEMO_GUI_FUNC                          &uiLogoFunc
+#endif
 
 // <<< end of configuration section >>>
 

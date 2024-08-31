@@ -1,12 +1,12 @@
-## 移植
+# 移植
 
 本文档以单片机为标准，说明移植过程
 
-## 基于Keil的移植
+# 基于Keil的移植
 
 安装好MDK-ARM，这里使用的版本是5.39。建议使用最新版本
 
-### 移植前的准备
+#### 移植前的准备
 
 cmsis-5 和 cmsis-6 二选一
 
@@ -45,11 +45,11 @@ cmsis-5 和 cmsis-6 二选一
 |:----|
 |推荐使用Watt Toolkit加速|
 
-### 注意事项
+#### 注意事项
 1. 使用cmsis-6，出现error: no member named 'IP' in 'NVIC_Type'
     在keil的option选项，C/C++页面，Define项，加入宏定义IP=IPR(如有其他定义，注意使用英文逗号隔开)
 
-### 使用源码安装pack
+#### 使用源码安装pack(推荐)
 1. 没有最新pack的情况下，git方式下载源码
 
 2. pack install配置界面中，选择manage local repositories(建议使用MDK-ARM最新版本，部分版本用此方法安装无效)
@@ -60,7 +60,7 @@ cmsis-5 和 cmsis-6 二选一
 
     ![localRepositories](./images/03/local%20repositories.png)
 
-### 配置keil pack
+#### 配置keil pack
 
 1. 在lcd_project中加入arm-2d、perf_counter、DSP、CMSIS、ldgui
     keil中选择Project -> Manage -> Run-Time Environment
@@ -71,7 +71,7 @@ cmsis-5 和 cmsis-6 二选一
 
     ![ac6Setting](./images/03/ac6%20setting.png)
 
-3. 如果使用ac5编译器，则需要选择c99和gnu支持，但是不建议使用ac5
+3. 如果使用ac5编译器，则需要选择c99和gnu支持(不建议使用ac5)
 
     ![ac5Setting](./images/03/ac5%20setting.png)
 
@@ -91,7 +91,25 @@ cmsis-5 和 cmsis-6 二选一
 
         ![configGui](./images/03/config%20gui.png)
 
-8. 测试arm-2d的demo
+# 基于RISCV的移植
+
+#### 移植前的准备
+1. 下载ldgui的源码(包含ARM-2D源码)
+2. 准备系统定时器，riscv一般会提供52位计时器
+
+#### 移植过程
+1. 添加ldgui到工程中，并新建用户文件夹user。
+2. 复制[src/porting](../../src/porting/)中的ldConfig.c、ldConfig.h、arm_2d_disp_adapter_0.c、arm_2d_disp_adapter_0.h、arm_2d_user_arch_port.h、arm_2d_cfg.h到user文件夹中。
+3. 添加[arm-2d](../../examples/common/Arm-2D/)到项目中。
+4. 添加[math](../../examples/common/math/)到项目中。
+5. 设定全局define，ARM_SECTION(x)= ,__va_list=va_list,RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0,__ARM_2D_USER_APP_CFG_H__="ldConfig.h"
+6. 设定编译器参数，-std=gnu11 -MMD -g -ffunction-sections -fdata-sections -fno-ms-extensions -Wno-macro-redefined -Ofast -flto
+7. 修改arm_2d_user_arch_port.h，参照该文件arm内核的代码，补充完整或加入对应的头文件。
+8. 修改ldConfig.c
+
+# 代码测试
+
+1. 测试arm-2d的demo
 
     将ldConfig.h中的 DISP0_CFG_DISABLE_DEFAULT_SCENE 设置为0
 
@@ -126,39 +144,32 @@ cmsis-5 和 cmsis-6 二选一
     }
     ```
 
-9. 运行效果
+2. 运行效果
 
     ![arm2d-demo](./images/03/arm2d%20demo.gif)
 
-|ℹ️ 出现Undefined symbol错误，请勿勾选microLib|
+|ℹ️ keil出现Undefined symbol错误，请勿勾选microLib|
 |:----|
 |如果硬要勾选microLib，编译后，提示找不到__aeabi_h2f 、__aeabi_f2h，请升级编译器(安装新版本keil)|
 
-10. 假设用户文件目录为user，则将[createUiFile.py](../../tools/createUiFile.py)复制到user目录
-
-    pack文件也带该脚本，在keil安装目录下，参考路径：Keil_v5\Packs\gzbkey\LingDongGUI\版本号\tools
-
-11. 运行createUiFile.py(自动生成)，输入需要生成的页面名称。如果需要同时生成多个页面，则直接编辑pageList.txt，在运行脚本，输入回车即可自动生成
-12. 将文件导入项目中，main.c中添加页面文件的头文件
-13. 在main函数中使用宏定义LD_ADD_PAGE，设置页面列表
+3. 进入目录[src/template](../../src/template)，运行脚本[uiPageCreate.py](../../src/template/uiPageCreate.py)，输入需要生成的页面名称。如果需要同时生成多个页面，反复运输入多个页面名称。
+4. 运行uiPageCreate.py后，会自动生成uiPageOutput文件夹，复制里边的文件到项目中。
+5. 将文件导入项目中，main.c中添加页面文件的头文件
+6. 在main函数中使用ldGuiInit，设置启动页面
     ~~~c
     #include "uiHome.h"
-    #include "uiZigbee.h"
-    #include "uiWifi.h"
 
     int main(void)
     {
         sysInit();
-
-        LD_ADD_PAGE(uiHome);//Home页面序号为0
-        LD_ADD_PAGE(uiZigbee);//Zigbee页面序号为1
-        LD_ADD_PAGE(uiWifi);//Wifi页面序号为2
 
         arm_irq_safe {
             arm_2d_init();
         }
 
         disp_adapter0_init();
+        
+        ldGuiInit(uiHome);
 
         arm_2d_scene0_init(&DISP0_ADAPTER);
 
@@ -169,12 +180,14 @@ cmsis-5 和 cmsis-6 二选一
     }
     ~~~
 
-### 使用外部NOR
+#### 使用外部NOR
 1. ldConfig.h中USE_VIRTUAL_RESOURCE = 1
 2. ldConfig.c中__disp_adapter0_vres_read_memory添加读取nor的函数
 
-### 关于程序体积
+#### 关于程序体积
 
-* 请善用keil的优化等级
+* 请注意修改编译器的优化等级
 
     ![](./images/03/keil%20optimization.png)
+
+* gcc编译器也有对应的选项，或直接使用命令选项，如上述命令中出现的-Ofast -flto

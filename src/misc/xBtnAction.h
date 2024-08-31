@@ -1,5 +1,7 @@
 /*
- * Copyright 2021-2023 Ou Jianbo 59935554@qq.com
+ * Copyright (c) 2021-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 #ifndef _X_BTN_ACTION_H_
 #define _X_BTN_ACTION_H_
@@ -23,24 +25,24 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include "stdlib.h"
-#include "ldCommon.h"
+#include "ldMem.h"
 
-#define BTN_NO_OPERATION         0 //检测按键无按下信号
-#define BTN_PRESS                1 //检测按键按下信号
-#define BTN_HOLD_DOWN            2 //检测按键按住不放信号
-#define BTN_RELEASE              3 //检测按键释放信号
-#define BTN_DOUBLE_CLICK         4 //检测按键双击信号
-#define BTN_REPEAT_COUNT         5 //获取连击次数
-#define BTN_HOLD_TIME            6 //获取按键按住不放的时间
-#define BTN_LONG_START           7 //检测按键长按触发一次的信号
-#define BTN_LONG_SHOOT           8 //检测按键长按触发一次和连续触发的信号
-
-#ifndef XCALLOC
-#define XCALLOC                  ldCalloc
+#ifndef XMALLOC
+#define XMALLOC                         ldMalloc
 #endif
 #ifndef XFREE
-#define XFREE                    ldFree
+#define XFREE                           ldFree
 #endif
+
+#define BTN_NO_OPERATION                0 //检测按键无按下信号
+#define BTN_PRESS                       1 //检测按键按下信号
+#define BTN_HOLD_DOWN                   2 //检测按键按住不放信号
+#define BTN_RELEASE                     3 //检测按键释放信号
+#define BTN_DOUBLE_CLICK                4 //检测按键双击信号
+#define BTN_REPEAT_COUNT                5 //获取连击次数
+#define BTN_HOLD_TIME                   6 //获取按键按住不放的时间
+#define BTN_LONG_START                  7 //检测按键长按触发一次的信号
+#define BTN_LONG_SHOOT                  8 //检测按键长按触发一次和连续触发的信号
 
 typedef struct {
     uint8_t FSM_State;

@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +16,15 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldDateTime.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   date time widget
- */
+#define __LD_DATE_TIME_IMPLEMENT__
+
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldDateTime.h"
 
 #if defined(__clang__)
@@ -38,414 +44,264 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-void ldDateTimeDel(ldDateTime_t *pWidget);
-void ldDateTimeFrameUpdate(ldDateTime_t* pWidget);
-void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldDateTimeCommonFunc={
-    (ldDelFunc_t)ldDateTimeDel,
-    (ldLoopFunc_t)ldDateTimeLoop,
-    (ldUpdateFunc_t)ldDateTimeFrameUpdate,
+const ldBaseWidgetFunc_t ldDateTimeFunc = {
+    .depose = (ldDeposeFunc_t)ldDateTime_depose,
+    .load = (ldLoadFunc_t)ldDateTime_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldDateTime_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldDateTime_show,
 };
 
-static bool _dateTimeDel(xListNode *pEachInfo, void *pTarget)
-{
-    if (pEachInfo->info == pTarget)
-    {
-        //del user object
+static uint8_t defaultFormat[]="yyyy-mm-dd hh:nn:ss";
 
-        ldFree(((ldDateTime_t *)pTarget));
-        xListInfoDel(pEachInfo);
+ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont)
+{
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
+
+    if (NULL == ptWidget)
+    {
+        ptWidget = ldCalloc(1, sizeof(ldDateTime_t));
+        if (NULL == ptWidget)
+        {
+            LOG_ERROR("[init failed][dateTime] id:%d", nameId);
+            return NULL;
+        }
     }
-    return false;
+
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeDateTime;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldDateTimeFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    ptWidget->ptFont=ptFont;
+    ptWidget->tAlign=ARM_2D_ALIGN_CENTRE;
+    ptWidget->isTransparent=true;
+    ptWidget->year=2024;
+    ptWidget->month=1;
+    ptWidget->day=1;
+    ptWidget->hour=12;
+    ptWidget->minute=0;
+    ptWidget->second=0;
+    ptWidget->pFormatStr=defaultFormat;
+    ptWidget->formatStrTemp[0]=0;
+
+    LOG_INFO("[init][dateTime] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
 }
 
-void ldDateTimeDel(ldDateTime_t *pWidget)
+void ldDateTime_depose( ldDateTime_t *ptWidget)
 {
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeDateTime)
     {
         return;
     }
 
-    if(pWidget->widgetType!=widgetTypeDateTime)
+    LOG_INFO("[depose][dateTime] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+
+    ldFree(ptWidget);
+}
+
+void ldDateTime_on_load( ldDateTime_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldDateTime_on_frame_start( ldDateTime_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldDateTime_show(ld_scene_t *ptScene, ldDateTime_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
 
-    LOG_INFO("[dateTime] del,id:%d",pWidget->nameId);
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        xListInfoPrevTraverse(listInfo, pWidget, _dateTimeDel);
-    }
-}
-
-/**
- * @brief   日期时间控件初始化
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @param   pFontDict       字体指针
- * @return  ldDateTime_t*   新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-ldDateTime_t *ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,ldFontDict_t* pFontDict)
-{
-    ldDateTime_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
-
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldDateTime_t);
-    if (pNewWidget != NULL)
-    {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            pNewWidget->isParentHidden=true;
-        }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeDateTime;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->pFontDict=pFontDict;
-        pNewWidget->align=LD_ALIGN_CENTER;
-        pNewWidget->isTransparent=true;
-        pNewWidget->charColor=0;
-        pNewWidget->year=2023;
-        pNewWidget->month=1;
-        pNewWidget->day=1;
-        pNewWidget->hour=12;
-        pNewWidget->minute=0;
-        pNewWidget->second=0;
-        strcpy((char*)pNewWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
-        pNewWidget->formatStrTemp[0]=0;
-        pNewWidget->pFunc=&ldDateTimeCommonFunc;
-
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-        LOG_INFO("[dateTime] init,id:%d",nameId);
-    }
-    else
-    {
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[dateTime] init failed,id:%d",nameId);
-    }
-
-    return pNewWidget;
-}
-
-void ldDateTimeFrameUpdate(ldDateTime_t* pWidget)
-{
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-}
-
-void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
-{
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
-    {
-        return;
-    }
-
-//#if USE_VIRTUAL_RESOURCE == 0
-//    arm_2d_tile_t tempRes=*pResTile;
-//#else
-//    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-//#endif
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-//    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-
-    if(bIsNewFrame)
-    {
-        char *addr;
-        int ret;
-        char strTemp[5];
-
-        strcpy((char *)pWidget->formatStrTemp,(char *)pWidget->formatStr);
-
-        addr=strstr((char *)pWidget->formatStrTemp,"yyyy");
-        if(addr)
-        {
-            ret=snprintf(strTemp,5,"%04d",pWidget->year);
-            if(ret > 0)
+            if(ptWidget->use_as__ldBase_t.isHidden)
             {
-                memcpy(addr,strTemp,4);
+                break;
             }
-        }
-        addr=strstr((char *)pWidget->formatStrTemp,"mm");
-        if(addr)
-        {
-            ret=snprintf(strTemp,3,"%02d",pWidget->month);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
-        }
-        addr=strstr((char *)pWidget->formatStrTemp,"dd");
-        if(addr)
-        {
-            ret=snprintf(strTemp,3,"%02d",pWidget->day);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
-        }
-        addr=strstr((char *)pWidget->formatStrTemp,"hh");
-        if(addr)
-        {
-            ret=snprintf(strTemp,3,"%02d",pWidget->hour);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
-        }
-        addr=strstr((char *)pWidget->formatStrTemp,"nn");
-        if(addr)
-        {
-            ret=snprintf(strTemp,3,"%02d",pWidget->minute);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
-        }
-        addr=strstr((char *)pWidget->formatStrTemp,"ss");
-        if(addr)
-        {
-            ret=snprintf(strTemp,3,"%02d",pWidget->second);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
-        }
-    }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+            if(bIsNewFrame)
+            {
+                char *addr;
+                int ret;
+                char strTemp[5];
 
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
-        {
-            pWidget->dirtyRegionState=none;
-        }
+                strcpy((char *)ptWidget->formatStrTemp,(char *)ptWidget->pFormatStr);
 
-        if(!pWidget->isTransparent)
-        {
-#if USE_OPACITY == 1
-            ldBaseColor(&tTarget,pWidget->bgColor,pWidget->opacity);
-#else
-            ldBaseColor(&tTarget,pWidget->bgColor,255);
-#endif
+                addr=strstr((char *)ptWidget->formatStrTemp,"yyyy");
+                if(addr)
+                {
+                    ret=snprintf(strTemp,5,"%04d",ptWidget->year);
+                    if(ret > 0)
+                    {
+                        memcpy(addr,strTemp,4);
+                    }
+                }
+                addr=strstr((char *)ptWidget->formatStrTemp,"mm");
+                if(addr)
+                {
+                    ret=snprintf(strTemp,3,"%02d",ptWidget->month);
+                    if(ret > 0)
+                    {
+                        memcpy(addr,strTemp,2);
+                    }
+                }
+                addr=strstr((char *)ptWidget->formatStrTemp,"dd");
+                if(addr)
+                {
+                    ret=snprintf(strTemp,3,"%02d",ptWidget->day);
+                    if(ret > 0)
+                    {
+                        memcpy(addr,strTemp,2);
+                    }
+                }
+                addr=strstr((char *)ptWidget->formatStrTemp,"hh");
+                if(addr)
+                {
+                    ret=snprintf(strTemp,3,"%02d",ptWidget->hour);
+                    if(ret > 0)
+                    {
+                        memcpy(addr,strTemp,2);
+                    }
+                }
+                addr=strstr((char *)ptWidget->formatStrTemp,"nn");
+                if(addr)
+                {
+                    ret=snprintf(strTemp,3,"%02d",ptWidget->minute);
+                    if(ret > 0)
+                    {
+                        memcpy(addr,strTemp,2);
+                    }
+                }
+                addr=strstr((char *)ptWidget->formatStrTemp,"ss");
+                if(addr)
+                {
+                    ret=snprintf(strTemp,3,"%02d",ptWidget->second);
+                    if(ret > 0)
+                    {
+                        memcpy(addr,strTemp,2);
+                    }
+                }
+            }
+
+            if(!ptWidget->isTransparent)
+            {
+                ldBaseColor(&tTarget,NULL,ptWidget->bgColor,ptWidget->use_as__ldBase_t.opacity);
+                arm_2d_op_wait_async(NULL);
+            }
+            ldBaseLabel(&tTarget,&tTarget_canvas,ptWidget->formatStrTemp,ptWidget->ptFont,ptWidget->tAlign,ptWidget->textColor,ptWidget->use_as__ldBase_t.opacity);
             arm_2d_op_wait_async(NULL);
         }
-
-            pResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
-#if USE_OPACITY == 1
-            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->formatStrTemp,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,pWidget->opacity);
-#else
-            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->formatStrTemp,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
-#endif
-            arm_2d_op_wait_async(NULL);
     }
+    arm_2d_op_wait_async(NULL);
 }
 
-/**
- * @brief   控件设置透明
- * 
- * @param   pWidget         目标控件指针
- * @param   isTransparent   true=透明 false=不透明
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent)
+void ldDateTimeSetTransparent(ldDateTime_t* ptWidget,bool isTransparent)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isTransparent=isTransparent;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isTransparent=isTransparent;
 }
 
-/**
- * @brief   设置时间日期格式
- * 
- * @param   pWidget         目标控件指针
- * @param   pStr            年:yyyy 月:mm 日:dd 时:hh 分:nn 秒:ss
- *                          例子1: yyyy-mm-dd hh:nn:ss
- *                          例子2: yyyy年mm月dd日 hh时nn分ss秒
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr)
+void ldDateTimeSetFormat(ldDateTime_t* ptWidget,const uint8_t *pStr)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-
-    strcpy((char*)pWidget->formatStr,(char*)pStr);
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->pFormatStr=pStr;
 }
 
-/**
- * @brief   设置文本颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   charColor       文本颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor)
+void ldDateTimeSetTextColor(ldDateTime_t* ptWidget,ldColor textColor)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->charColor=charColor;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->textColor=textColor;
 }
 
-/**
- * @brief   文本的对齐方式
- * 
- * @param   pWidget         目标控件指针
- * @param   align           LD_ALIGN_CENTER
- *                          LD_ALIGN_TOP
- *                          LD_ALIGN_BOTTOM
- *                          LD_ALIGN_LEFT
- *                          LD_ALIGN_RIGHT
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align)
+void ldDateTimeSetAlign(ldDateTime_t *ptWidget,arm_2d_align_t tAlign)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->align=align;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->tAlign=tAlign;
 }
 
-/**
- * @brief   设置底色
- * 
- * @param   pWidget         目标控件指针
- * @param   bgColor         底色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor)
+void ldDateTimeSetBgColor(ldDateTime_t *ptWidget, ldColor bgColor)
 {
-    if(pWidget==NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->bgColor=bgColor;
-    pWidget->isTransparent=false;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->bgColor=bgColor;
+    ptWidget->isTransparent=false;
 }
 
-/**
- * @brief   设置不透明度
- * 
- * @param   pWidget         目标控件指针
- * @param   opacity         0(透明)-255(不透明)
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity)
+void ldDateTimeSetDate(ldDateTime_t *ptWidget, uint16_t year, uint8_t month, uint8_t day)
 {
-    if (pWidget == NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-#if USE_OPACITY == 1
-    pWidget->opacity=opacity;
-#endif
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->year=year;
+    ptWidget->month=month;
+    ptWidget->day=day;
 }
 
-/**
- * @brief   设置日期
- * 
- * @param   pWidget         目标控件指针
- * @param   year            年
- * @param   month           月
- * @param   day             日
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint8_t day)
+void ldDateTimeSetTime(ldDateTime_t *ptWidget, uint8_t hour, uint8_t minute, uint8_t second)
 {
-    if (pWidget == NULL)
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->year=year;
-    pWidget->month=month;
-    pWidget->day=day;
-    pWidget->dirtyRegionState=waitChange;
-}
-
-/**
- * @brief   设置时间
- * 
- * @param   pWidget         目标控件指针
- * @param   hour            时
- * @param   minute          分
- * @param   second          秒
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-06
- */
-void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint8_t second)
-{
-    if (pWidget == NULL)
-    {
-        return;
-    }
-    pWidget->hour=hour;
-    pWidget->minute=minute;
-    pWidget->second=second;
-    pWidget->dirtyRegionState=waitChange;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->hour=hour;
+    ptWidget->minute=minute;
+    ptWidget->second=second;
 }
 
 #if defined(__clang__)

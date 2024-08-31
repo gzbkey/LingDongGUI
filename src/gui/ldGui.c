@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,109 +16,64 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldGui.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   ldgui的主文件
- */
+#define __ARM_2D_IMPL__
+#define __ARM_2D_INHERIT__
+#include "arm_2d.h"
 #include "ldGui.h"
-#include "ldImage.h"
-#include "ldButton.h"
-#include "ldText.h"
-#include "ldWindow.h"
-#include "ldProgressBar.h"
-#include "ldRadialMenu.h"
-#include "ldCheckBox.h"
-#include "ldLabel.h"
-#include "ldScrollSelecter.h"
-#include "ldDateTime.h"
-#include "ldIconSlider.h"
-#include "ldGauge.h"
-#include "ldQRCode.h"
-#include "ldTable.h"
-#include "ldKeyboard.h"
-#include "ldLineEdit.h"
-#include "ldGraph.h"
-#include "ldComboBox.h"
-#include "ldArc.h"
-/*============================ auto add include ==============================*/
+#include "ldScene0.h"
+#include "ldScene1.h"
 
-uint8_t pageNumNow=0;
-uint8_t pageTarget=0;
-int64_t sysTimer=0;
+static volatile arm_2d_location_t pressLocation;
+static volatile int16_t deltaMoveTime;
+static volatile arm_2d_location_t prevLocation;
+static void *prevWidget;
+static uint8_t pageNumNow=0;
 uint8_t cursorBlinkCount=0;
 bool cursorBlinkFlag=false;
-#define TOUCH_NO_CLICK           0
-#define TOUCH_CLICK              1
+
+#if USE_SCENE_SWITCHING == 1
+bool isGuiSwthcnScene=false;
+static uint8_t sysSceneNum=0;
+#endif
+static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 #ifndef LD_EMIT_SIZE
-#define LD_EMIT_SIZE             8
+#define LD_EMIT_SIZE                    8
 #endif
 
 bool isFullWidgetUpdate=false;
 
-static volatile ldPoint_t pressPoint;
-static volatile int16_t deltaMoveTime;
-static volatile int16_t prevX,prevY;
-static void *prevWidget;
-
-#if LD_PAGE_STATIC == 1
-void (*ldPageInitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
-void (*ldPageLoopFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
-void (*ldPageQuitFunc[LD_PAGE_MAX])(arm_2d_scene_t*,uint8_t)={0};
-
-#if LD_PAGE_MAX > 1
-static uint8_t pageCount=0;
-#endif
-
-void ldGuiAddPage(ldGuiFunc_t init,ldGuiFunc_t loop,ldGuiFunc_t quit)
+void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
-#if LD_PAGE_MAX > 1
-    if(pageCount<LD_PAGE_MAX)
+    // draw ldgui background
+    if(ptScene->ptNodeRoot!=NULL)
     {
-        ldPageInitFunc[pageCount]=init;
-        ldPageLoopFunc[pageCount]=loop;
-        ldPageQuitFunc[pageCount]=quit;
-        pageCount++;
+        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,(arm_2d_tile_t *)ptTile,bIsNewFrame);
     }
-#else
-    ldPageInitFunc[0]=init;
-    ldPageLoopFunc[0]=loop;
-    ldPageQuitFunc[0]=quit;
-#endif
-}
-#else
-ldGuiFunc_t *ldPageInitFunc = NULL;
-ldGuiFunc_t *ldPageLoopFunc = NULL;
-ldGuiFunc_t *ldPageQuitFunc = NULL;
 
-static uint8_t pageCount=0;
-static uint8_t pageMax=0;
-
-void ldGuiSetPageMax(uint8_t pageMaxValue)
-{
-    pageMax=pageMaxValue;
-    ldPageInitFunc=(ldGuiFunc_t *)ldCalloc(sizeof (ldGuiFunc_t)*pageMaxValue);
-    ldPageLoopFunc=(ldGuiFunc_t *)ldCalloc(sizeof (ldGuiFunc_t)*pageMaxValue);
-    ldPageQuitFunc=(ldGuiFunc_t *)ldCalloc(sizeof (ldGuiFunc_t)*pageMaxValue);
-}
-
-void ldGuiAddPage(ldGuiFunc_t init,ldGuiFunc_t loop,ldGuiFunc_t quit)
-{
-    if(pageCount<pageMax)
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->draw!=NULL)
     {
-        ldPageInitFunc[pageCount]=init;
-        ldPageLoopFunc[pageCount]=loop;
-        ldPageQuitFunc[pageCount]=quit;
-        pageCount++;
+        ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
+    }
+
+    // draw ldgui code
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
+        if(child!=NULL)
+        {
+            arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
+                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+            }
+        }
     }
 }
-#endif
 
-void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
+
+void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
-    ldCommon_t *pWidget;
-    xListNode *pNode;
+    ldBase_t *ptWidget;
     uint64_t u64Temp=0;
 
     switch(touchSignal)
@@ -127,76 +84,79 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
     }
     case SIGNAL_PRESS:
     {
-        pWidget=NULL;
-        if(pWidget==NULL)
+        ptWidget=(ldBase_t*)arm_2d_helper_control_find_node_with_location(ptScene->ptNodeRoot,tLocation);
+
+        while(ptWidget->isHidden)
         {
-            pNode=ldBaseGetWidgetInfoByPos(x,y);
-            if(pNode!=NULL)
-            {
-                pWidget=pNode->info;
-                LOG_DEBUG("click widget id:%d",pWidget->nameId);
-            }
+            LOG_DEBUG("widget id:%d, is hidden.",ptWidget->nameId);
+            ptWidget=ldBaseGetParent(ptWidget);
+            LOG_DEBUG("find parent widget id:%d",ptWidget->nameId);
         }
-        prevX=x;
-        prevY=y;
-        prevWidget=pWidget;//准备数据,释放时候使用
-        pressPoint.x=x;
-        pressPoint.y=y;
+
+#if (USE_LOG_LEVEL>=LOG_LEVEL_DEBUG)
+        if(ptWidget!=NULL)
+        {
+            LOG_DEBUG("click widget id:%d",ptWidget->nameId);
+        }
+#endif
+
+        prevLocation=tLocation;
+        prevWidget=ptWidget;//准备数据,释放时候使用
+        pressLocation=tLocation;
         deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
 
-        if(pWidget!=NULL)
+        if(ptWidget!=NULL)
         {
-            u64Temp=x;
+            u64Temp=tLocation.iX;
             u64Temp<<=16;
-            u64Temp+=y;
-            xEmit(pWidget->nameId,touchSignal,u64Temp);
+            u64Temp+=tLocation.iY;
+            emit(ptWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
     case SIGNAL_HOLD_DOWN:
     {
-        if((prevX!=x)||(prevY!=y))
+        if((prevLocation.iX!=tLocation.iX)||(prevLocation.iY!=tLocation.iY))
         {
-            pWidget=prevWidget;//不可以把static变量作为函数变量调用
-            if(pWidget!=NULL)
+            ptWidget=prevWidget;//不可以把static变量作为函数变量调用
+            if(ptWidget!=NULL)
             {
-                u64Temp=x-pressPoint.x;
+                u64Temp=tLocation.iX-pressLocation.iX;
                 u64Temp<<=16;
-                u64Temp+=y-pressPoint.y;
+                u64Temp+=tLocation.iY-pressLocation.iY;
                 u64Temp<<=16;
-                u64Temp+=x;
+                u64Temp+=tLocation.iX;
                 u64Temp<<=16;
-                u64Temp+=y;
+                u64Temp+=tLocation.iY;
 
-                xEmit(pWidget->nameId,touchSignal,u64Temp);
+                emit(ptWidget->nameId,touchSignal,u64Temp);
             }
-            prevX=x;
-            prevY=y;
+            prevLocation=tLocation;
         }
         break;
     }
     case SIGNAL_RELEASE:
     {
-        pWidget=prevWidget;
-        if(pWidget!=NULL)
+        ptWidget=prevWidget;
+        if(ptWidget!=NULL)
         {
             //cal speed
             deltaMoveTime=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp())-deltaMoveTime;
-            pressPoint.x=(prevX-pressPoint.x);
-            pressPoint.y=(prevY-pressPoint.y);
-            pressPoint.x=(pressPoint.x*100)/deltaMoveTime;
-            pressPoint.y=(pressPoint.y*100)/deltaMoveTime;
+            pressLocation.iX=(prevLocation.iX-pressLocation.iX);
+            pressLocation.iY=(prevLocation.iY-pressLocation.iY);
+            pressLocation.iX=(pressLocation.iX*100)/deltaMoveTime;
+            pressLocation.iY=(pressLocation.iY*100)/deltaMoveTime;
 
             // x speed,y speed,x,y
-            u64Temp=pressPoint.x;
+            u64Temp=pressLocation.iX;
             u64Temp<<=16;
-            u64Temp+=pressPoint.y;
+            u64Temp+=pressLocation.iY;
             u64Temp<<=16;
-            u64Temp+=prevX;
+            u64Temp+=prevLocation.iX;
             u64Temp<<=16;
-            u64Temp+=prevY;
+            u64Temp+=prevLocation.iY;
 
-            xEmit(pWidget->nameId,touchSignal,u64Temp);
+            emit(ptWidget->nameId,touchSignal,u64Temp);
         }
         break;
     }
@@ -205,15 +165,17 @@ void ldGuiClickedAction(uint8_t touchSignal,int16_t x,int16_t y)
     }
 }
 
-void ldGuiTouchProcess(void)
+#define TOUCH_NO_CLICK           0
+#define TOUCH_CLICK              1
+
+void ldGuiTouchProcess(ld_scene_t *ptScene)
 {
-    int16_t x;
-    int16_t y;
+    arm_2d_location_t clickLocation;
     bool nowState;
     static bool prevState=TOUCH_NO_CLICK;
     uint8_t touchSignal=SIGNAL_NO_OPERATION;
 
-    nowState = ldCfgTouchGetPoint(&x,&y);
+    nowState = ldCfgTouchGetPoint(&clickLocation.iX,&clickLocation.iY);
 
     if(nowState==TOUCH_CLICK)
     {
@@ -239,76 +201,21 @@ void ldGuiTouchProcess(void)
     }
     prevState=nowState;
 
-    ldGuiClickedAction(touchSignal,x,y);
+    ldGuiClickedAction(ptScene,touchSignal,clickLocation);
 }
 
-static void _ldGuiLoop(arm_2d_scene_t *pScene,xListNode* pLink,arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldGuiSceneInit(ld_scene_t *ptScene)
 {
-    xListNode *tempPos,*safePos;
+    ldMsgInit(&ptScene->ptMsgQueue,LD_EMIT_SIZE);
 
-    list_for_each_safe(tempPos,safePos, pLink)
+    if(ptScene->ldGuiFuncGroup!=NULL)
     {
-        if(tempPos->info!=NULL)
-        {
-            (((ldCommon_t *)tempPos->info)->pFunc)->loop(pScene,tempPos->info,ptParent,bIsNewFrame);
-            
-            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
-            {
-                _ldGuiLoop(pScene,((ldCommon_t *)tempPos->info)->childList,ptParent,bIsNewFrame);
-            }
-        }
+        ptScene->ldGuiFuncGroup->init(ptScene);
     }
-}
-
-/**
- * @brief   ldgui的初始化函数
- * 
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-05-16
- */
-void ldGuiInit(arm_2d_scene_t *pScene)
-{
-    xEmitInit(LD_EMIT_SIZE);
-#if LD_PAGE_STATIC == 1
-#if LD_PAGE_MAX > 1
-    if(ldPageInitFunc[pageNumNow])
-    {
-        ldPageInitFunc[pageNumNow](pScene,pageNumNow);
-    }
-#else
-    if(ldPageInitFunc[0])
-    {
-        ldPageInitFunc[0](pScene,pageNumNow);
-    }
+#if USE_SCENE_SWITCHING == 1
+    isGuiSwthcnScene=false;
 #endif
-#else
-    if(ldPageInitFunc!=NULL)
-    {
-        if(ldPageInitFunc[pageNumNow])
-        {
-            ldPageInitFunc[pageNumNow](pScene,pageNumNow);
-        }
-    }
-#endif
-    LOG_INFO("[sys] page %d init",pageNumNow);
-}
-
-static void _ldGuiFrameUpdate(xListNode* pLink)
-{
-    xListNode *tempPos,*safePos;
-
-    list_for_each_safe(tempPos,safePos, pLink)
-    {
-        if(tempPos->info!=NULL)
-        {
-            (((ldCommon_t *)tempPos->info)->pFunc)->update(tempPos->info);
-
-            if(((ldCommon_t *)tempPos->info)->childList!=NULL)
-            {
-                _ldGuiFrameUpdate(((ldCommon_t *)tempPos->info)->childList);
-            }
-        }
-    }
+    LOG_INFO("[sys] page %s init",ptScene->ldGuiFuncGroup->pageName);
 }
 
 void ldGuiUpdateScene(void)
@@ -316,117 +223,160 @@ void ldGuiUpdateScene(void)
     isFullWidgetUpdate=true;
 }
 
-void ldGuiFrameStart(arm_2d_scene_t *ptScene)
+void ldGuiFrameStart(ld_scene_t *ptScene)
 {
     if(isFullWidgetUpdate==true)
     {
-        arm_2d_scene_player_update_scene_background(ptScene->ptPlayer);
+        arm_2d_scene_player_update_scene_background(ptScene->use_as__arm_2d_scene_t.ptPlayer);
         isFullWidgetUpdate=false;
     }
-
-    _ldGuiFrameUpdate(&ldWidgetLink);
-
-    //检查按键
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,&sysTimer,true))
+	
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
-        xBtnTick(SYS_TICK_CYCLE_MS);
+        if(((ldBase_t*)ptItem)->deleteLaterCount>0)
+        {
+            ((ldBase_t*)ptItem)->deleteLaterCount--;
+            if(((ldBase_t*)ptItem)->deleteLaterCount==0)
+            {
+                ((ldBase_t*)ptItem)->ptGuiFunc->depose(ptItem);
+            }
+        }
+#ifdef FRAME_START
+        if(((ldBase_t*)ptItem)->ptGuiFunc->frameStart!=NULL)
+        {
+            ((ldBase_t*)ptItem)->ptGuiFunc->frameStart(ptScene);
+        }
+#endif
+    }
+
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true))
+    {
+//        xBtnTick(SYS_TICK_CYCLE_MS);
         cursorBlinkCount++;
     }
-
-    //检查触摸
-    ldGuiTouchProcess();
-
-    xConnectProcess();
 }
 
-/**
- * @brief   ldgui的逻辑处理函数
- * 
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-05-16
- */
-void ldGuiLogicLoop(arm_2d_scene_t *pScene)
+void ldGuiLoad(ld_scene_t *ptScene)
 {
-#if LD_PAGE_STATIC == 1
-#if LD_PAGE_MAX > 1
-    if(ldPageLoopFunc[pageNumNow])
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
-        ldPageLoopFunc[pageNumNow](pScene,pageNumNow);
-    }
-#else
-    if(ldPageLoopFunc[0])
-    {
-        ldPageLoopFunc[0](pScene,pageNumNow);
-    }
-#endif
-#else
-    if(ldPageLoopFunc!=NULL)
-    {
-        if(ldPageLoopFunc[pageNumNow])
+        if(((ldBase_t*)ptItem)->ptGuiFunc->load!=NULL)
         {
-            ldPageLoopFunc[pageNumNow](pScene,pageNumNow);
+            ((ldBase_t*)ptItem)->ptGuiFunc->load(ptScene);
         }
     }
-#endif
 }
 
-/**
- * @brief   ldgui的界面处理函数
- * 
- * @param   ptParent        arm2d的tile对象
- * @param   bIsNewFrame     新的一帧开始标志
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-07
- */
-void ldGuiLoop(arm_2d_scene_t *pScene,arm_2d_tile_t *ptParent,bool bIsNewFrame)
+void ldGuiLogicLoop(ld_scene_t *ptScene)
 {
-    (void*)pScene;
-    //遍历控件
-    _ldGuiLoop(pScene,&ldWidgetLink,ptParent,bIsNewFrame);
-}
-
-/**
- * @brief   ldgui的页面退出函数
- * 
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-05-16
- */
-void ldGuiQuit(arm_2d_scene_t *pScene)
-{
-    #if LD_PAGE_STATIC == 1
-#if LD_PAGE_MAX > 1
-    if(ldPageQuitFunc[pageNumNow])
+    if(ptScene->ldGuiFuncGroup!=NULL)
     {
-        ldPageQuitFunc[pageNumNow](pScene,pageNumNow);
-    }
-#else
-    if(ldPageQuitFunc[0])
-    {
-        ldPageQuitFunc[0](pScene,pageNumNow);
-    }
-#endif
-#else
-    if(ldPageQuitFunc!=NULL)
-    {
-        if(ldPageQuitFunc[pageNumNow])
+        if(ptScene->ldGuiFuncGroup->loop)
         {
-            ldPageQuitFunc[pageNumNow](pScene,pageNumNow);
+            ptScene->ldGuiFuncGroup->loop(ptScene);
         }
     }
-#endif
-    pScene->ptDirtyRegion=NULL;
-    ldWindowDel(ldBaseGetWidgetById(0));
-    LOG_INFO("[sys] page %d quit",pageNumNow);
 }
 
-/**
- * @brief   ldgui页面跳转函数
- * 
- * @param   pageNum         目标页面序号
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-07
- */
-void ldGuiJumpPage(uint8_t pageNum)
+void ldGuiQuit(ld_scene_t *ptScene)
 {
-    pageTarget=pageNum;
+    if(ptScene->ldGuiFuncGroup!=NULL)
+    {
+        if(ptScene->ldGuiFuncGroup->quit)
+        {
+            ptScene->ldGuiFuncGroup->quit(ptScene);
+        }
+    }
+
+    arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
+    {
+        if(((ldBase_t *)ptItem))
+        {
+            ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptItem);
+        }
+    }
+
+    LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
+}
+
+void ldGuiFrameComplete(ld_scene_t *ptScene)
+{
+#if USE_SCENE_SWITCHING == 1
+    if(isGuiSwthcnScene)
+    {
+        isGuiSwthcnScene=false;
+        arm_2d_scene_player_switch_to_next_scene(ptScene->use_as__arm_2d_scene_t.ptPlayer);
+    }
+#else
+    if(ptSysGuiFuncGroup[0]!=ptSysGuiFuncGroup[1])
+    {
+        ldGuiQuit(ptScene);
+        ptSysGuiFuncGroup[0]=ptSysGuiFuncGroup[1];
+        ptScene->ldGuiFuncGroup=ptSysGuiFuncGroup[0];
+        arm_2d_scene_player_update_scene_background(ptScene->use_as__arm_2d_scene_t.ptPlayer);
+        ldGuiSceneInit(ptScene);
+    }
+#endif
+}
+
+
+void __ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs)
+{
+#if USE_SCENE_SWITCHING == 1
+
+    if (sysSceneNum ==0)
+    {
+        sysSceneNum = 1;
+    }
+    else
+    {
+        sysSceneNum = 0;
+    }
+
+    ptSysGuiFuncGroup[sysSceneNum]=ptFuncGroup;
+
+    __arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,ptMode,0);
+    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, switchTimeMs);
+    isGuiSwthcnScene=true;
+#else
+    ptSysGuiFuncGroup[1]=ptFuncGroup;
+#endif
+}
+
+#if USE_SCENE_SWITCHING == 1
+void scene0_loader(void)
+{
+    __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
+}
+
+void scene1_loader(void)
+{
+    __arm_2d_scene1_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[1]);
+}
+
+typedef void scene_loader_t(void);
+
+static scene_loader_t * const c_SceneLoaders[] = {
+    scene0_loader,
+    scene1_loader,
+};
+
+void before_scene_switching_handler(void *pTarget,arm_2d_scene_player_t *ptPlayer,arm_2d_scene_t *ptScene)
+{
+    c_SceneLoaders[sysSceneNum]();
+}
+#endif
+
+void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
+{
+    ptSysGuiFuncGroup[0]=ptFuncGroup;
+    ptSysGuiFuncGroup[1]=ptFuncGroup;
+#if USE_SCENE_SWITCHING == 1
+    arm_2d_scene_player_register_before_switching_event_handler(&DISP0_ADAPTER,before_scene_switching_handler);
+    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,ARM_2D_SCENE_SWITCH_MODE_NONE);
+    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 0);
+    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
+#else
+    __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
+#endif
 }

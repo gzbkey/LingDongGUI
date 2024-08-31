@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +16,33 @@
  * limitations under the License.
  */
 
-#ifndef _LD_TABLE_H_
-#define _LD_TABLE_H_
+#ifndef __LD_TABLE_H__
+#define __LD_TABLE_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-#include "ldCommon.h"
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
+#pragma clang diagnostic ignored "-Wpadded"
+#endif
+
+
+
+/* OOC header, please DO NOT modify  */
+#ifdef __LD_TABLE_IMPLEMENT__
+#undef __LD_TABLE_IMPLEMENT__
+#define __ARM_2D_IMPL__
+#elif defined(__LD_TABLE_INHERIT__)
+#undef __LD_TABLE_INHERIT__
+#define __ARM_2D_INHERIT__
+#endif
+#include "arm_2d_utils.h"
+#include "ldBase.h"
 
 typedef struct{
     bool isButton:1;
@@ -30,26 +51,33 @@ typedef struct{
     bool isStaticText:1;
     bool isSelectShow:1;
     bool isSelect:1;
-    uint8_t align:4;
     bool isEditable:1;
     bool isEditing:1;
     ldEditType_t editType:2;
-    bool isReleaseImgWithMask:1;
-    bool isReleaseImgMask:1;
     uint8_t *pText;
+    arm_2d_tile_t *ptReleaseImgTile;
+    arm_2d_tile_t *ptReleaseMaskTile;
+    arm_2d_tile_t *ptPressImgTile;
+    arm_2d_tile_t *ptPressMaskTile;
+    arm_2d_font_t *ptFont;
+    arm_2d_location_t tLocation;
+    arm_2d_align_t tAlign;
     ldColor textColor;
     ldColor itemBgColor;
     ldColor releaseImgMaskColor;
-    uintptr_t releaseImgAddr;
-    uintptr_t pressImgAddr;
-    arm_2d_region_t imgRegion;
-    ldFontDict_t* pFontDict;
+    ldColor pressImgMaskColor;
     uint8_t textMax;
 }ldTableItem_t;
 
-typedef struct {
-    LD_COMMON_ATTRIBUTES;
-    bool isBgTransparent:1;
+typedef struct ldTable_t ldTable_t;
+
+struct ldTable_t
+{
+    implement(ldBase_t);
+//ARM_PRIVATE(
+//    ld_scene_t *ptScene;
+//)
+
     uint8_t rowCount;
     uint8_t columnCount;
     uint8_t itemSpace;//item 间隔
@@ -57,44 +85,50 @@ typedef struct {
     int16_t *pRowHeight;
     ldColor bgColor;
     ldColor selectColor;
-    ldTableItem_t *pItemInfo;
+    ldTableItem_t *ptItemInfo;
     int16_t scrollOffsetX;
     int16_t scrollOffsetY;
     uint8_t currentRow;
     uint8_t currentColumn;
     int64_t timer;
     uint16_t kbNameId;
-}ldTable_t;
+    bool isBgTransparent:1;
+    bool isAlignGrid:1;
+};
 
-ldTable_t *ldTableInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, ldFontDict_t *pFontDict);
-void ldTableFrameUpdate(ldTable_t* pWidget);
-void ldTableLoop(arm_2d_scene_t *pScene,ldTable_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-void ldTableDel(ldTable_t *pWidget);
-void ldTableSetBgColor(ldTable_t *pWidget,ldColor bgColor);
-void ldTableSetItemWidth(ldTable_t *pWidget,uint8_t column,int16_t width);
-void ldTableSetItemHeight(ldTable_t *pWidget,uint8_t row,int16_t height);
+ldTable_t* ldTable_init(ld_scene_t *ptScene, ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, arm_2d_font_t *ptFont);
+void ldTable_depose( ldTable_t *ptWidget);
+void ldTable_on_load( ldTable_t *ptWidget);
+void ldTable_on_frame_start( ldTable_t *ptWidget);
+void ldTable_show(ld_scene_t *pScene, ldTable_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-void ldTableSetItemText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
-void ldTableSetItemStaticText(ldTable_t *pWidget,uint8_t row,uint8_t column,uint8_t *pText,ldFontDict_t* pFontDict);
-void ldTableSetItemColor(ldTable_t *pWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
-void ldTableSetItemAlign(ldTable_t *pWidget, uint8_t row, uint8_t column, uint8_t align);
-void ldTableSetItemImage(ldTable_t *pWidget, uint8_t row, uint8_t column, int16_t x, int16_t y, int16_t width, int16_t height, uintptr_t imgAddr, bool isWithMask,ldColor maskColor,bool isMask);
-void ldTableSetItemButton(ldTable_t *pWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,int16_t width,int16_t height,uintptr_t releaseImgAddr,uintptr_t pressImgAddr,bool isCheckable);
+void ldTableSetItemWidth(ldTable_t *ptWidget,uint8_t column,int16_t width);
+void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height);
+void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont);
+void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont);
+void ldTableSetItemColor(ldTable_t *ptWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
+void ldTableSetBgColor(ldTable_t *ptWidget,ldColor bgColor);
+void ldTableSetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_align_t tAlign);
+void ldTableSetItemImage(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t* ptImgTile,arm_2d_tile_t *ptMaskTile,ldColor maskColor);
+void ldTableSetItemButton(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t *ptReleaseImgTile,arm_2d_tile_t *ptReleaseMaskTile,ldColor releaseImgMaskColor,arm_2d_tile_t *ptPressImgTile,arm_2d_tile_t *ptPressMaskTile,ldColor pressImgMaskColor,bool isCheckable);
+void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId);
+void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax);
+void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont);
+void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid);
 
-uint8_t ldTableCurrentColumn(ldTable_t *pWidget);
-uint8_t ldTableCurrentRow(ldTable_t *pWidget);
-ldTableItem_t *ldTableCurrentItem(ldTable_t *pWidget);
-ldTableItem_t *ldTableItem(ldTable_t *pWidget,uint8_t row, uint8_t column);
-ldTableItem_t *ldTableItemAt(ldTable_t *pWidget,int16_t x,int16_t y);
-void ldTableSetExcelType(ldTable_t *pWidget,ldFontDict_t* pFontDict);
-void ldTableSetKeyboard(ldTable_t* pWidget,uint16_t kbNameId);
-void ldTableSetEditable(ldTable_t* pWidget,uint8_t row,uint8_t column,bool isEditable);
+#define ldTableInit(nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace,ptFont) \
+        ldTable_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace,ptFont)
 
-#define ldTableSetHidden          ldBaseSetHidden
-#define ldTableMove               ldBaseMove
+#define ldTableSetHidden                ldBaseSetHidden
+#define ldTableMove                     ldBaseMove
+#define ldTableSetOpacity               ldBaseSetOpacity
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_LD_TABLE_H_
+#endif

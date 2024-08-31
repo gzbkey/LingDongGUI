@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +16,16 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldGraph.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   曲线图控件
- */
+#define __LD_GRAPH_IMPLEMENT__
+
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
 
 #include "ldGraph.h"
-#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -49,471 +53,356 @@ const static uint8_t graphDefalutDot_png[]={
     0x00, 0x63, 0x7F, 0x63, 0x00
 };
 
-void ldGraphDel(ldGraph_t *pWidget);
-void ldGraphFrameUpdate(ldGraph_t* pWidget);
-void ldGraphLoop(arm_2d_scene_t *pScene,ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldGraphCommonFunc={
-    (ldDelFunc_t)ldGraphDel,
-    (ldLoopFunc_t)ldGraphLoop,
-    (ldUpdateFunc_t)ldGraphFrameUpdate,
+const arm_2d_tile_t c_tile_graphDefalutDot_Mask = {
+    .tRegion = {
+        .tSize = {
+            .iWidth = 5,
+            .iHeight = 5,
+        },
+    },
+    .tInfo = {
+        .bIsRoot = true,
+        .bHasEnforcedColour = true,
+        .tColourInfo = {
+            .chScheme = ARM_2D_COLOUR_8BIT,
+        },
+    },
+    .pchBuffer = (uint8_t *)graphDefalutDot_png,
 };
 
-static bool _graphDel(xListNode *pEachInfo, void *pTarget)
+const ldBaseWidgetFunc_t ldGraphFunc = {
+    .depose = (ldDeposeFunc_t)ldGraph_depose,
+    .load = (ldLoadFunc_t)ldGraph_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldGraph_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldGraph_show,
+};
+
+ldGraph_t* ldGraph_init( ld_scene_t *ptScene,ldGraph_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height ,uint8_t seriesMax)
 {
-    if (pEachInfo->info == pTarget)
-    {
-        ldGraph_t * pWidget=(ldGraph_t *)pTarget;
-        for(uint8_t i=0;i<pWidget->seriesCount;i++)
-        {
-            ldFree(pWidget->pSeries[i].pValueList);
-        }
-        ldFree(pWidget->pSeries);
-
-        ldFree(((ldGraph_t *)pTarget));
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
-
-void ldGraphDel(ldGraph_t *pWidget)
-{
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeGraph)
-    {
-        return;
-    }
-
-    LOG_INFO("[graph] del,id:%d",pWidget->nameId);
-
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _graphDel);
-    }
-}
-
-/**
- * @brief   曲线图初始化
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @param   seriesMax       曲线数量最大值
- * @return  ldGraph_t*      新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-ldGraph_t *ldGraphInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height ,uint8_t seriesMax)
-{
-    ldGraph_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
     ldGraphSeries_t *pSeries = NULL;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldGraph_t);
-    pSeries = ldCalloc(sizeof (ldGraphSeries_t)*seriesMax);
-    if ((pNewWidget != NULL)&&(pSeries != NULL))
+    if (NULL == ptWidget)
     {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldGraph_t));
+        pSeries = ldCalloc(1,sizeof (ldGraphSeries_t)*seriesMax);
+        if ((NULL == ptWidget)&&(NULL == pSeries))
         {
-            pNewWidget->isParentHidden=true;
+            ldFree(ptWidget);
+            ldFree(pSeries);
+            LOG_ERROR("[init failed][graph] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeGraph;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->pointImgAddr=(uintptr_t)graphDefalutDot_png;
-        pNewWidget->pointImgWidth=5;
-        pNewWidget->isCorner=true;
-        pNewWidget->isFrame=true;
-        pNewWidget->frameSpace=10;
-        pNewWidget->seriesMax=seriesMax;
-        pNewWidget->seriesCount=0;
-        pNewWidget->pSeries=pSeries;
-        pNewWidget->pFunc=&ldGraphCommonFunc;
-
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-        ldGraphSetAxis(pNewWidget,width-pNewWidget->frameSpace*2,height-pNewWidget->frameSpace*2,5);
-        ldGraphSetGridOffset(pNewWidget,5);
-
-        LOG_INFO("[graph] init,id:%d",nameId);
     }
-    else
+
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeGraph;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldGraphFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    ptWidget->ptPointMaskTile=&c_tile_graphDefalutDot_Mask;
+    ptWidget->isCorner=true;
+    ptWidget->isFrame=true;
+    ptWidget->frameSpace=10;
+    ptWidget->seriesMax=seriesMax;
+    ptWidget->seriesCount=0;
+    ptWidget->pSeries=pSeries;
+
+    ldGraphSetAxis(ptWidget,width-ptWidget->frameSpace*2,height-ptWidget->frameSpace*2,5);
+    ldGraphSetGridOffset(ptWidget,5);
+
+    LOG_INFO("[init][graph] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
+}
+
+void ldGraph_depose( ldGraph_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
     {
-        ldFree(pSeries);
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[graph] init failed,id:%d",nameId);
+        return;
     }
-    return pNewWidget;
-}
-
-void ldGraphFrameUpdate(ldGraph_t* pWidget)
-{
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-}
-
-void ldGraphLoop(arm_2d_scene_t *pScene,ldGraph_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
-{
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
-    if (pWidget == NULL)
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeGraph)
     {
         return;
     }
 
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
+    LOG_INFO("[depose][graph] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+    ldFree(ptWidget->pSeries);
+    ldFree(ptWidget);
+}
+
+void ldGraph_on_load( ldGraph_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldGraph_on_frame_start( ldGraph_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldGraph_show(ld_scene_t *ptScene, ldGraph_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
 
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+#if 0
+    if (bIsNewFrame) {
+        
+    }
 #endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
-    arm_2d_container(pParentTile,tTarget , &newRegion)
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            pWidget->dirtyRegionState=none;
-        }
-
-        // draw frame
-        if(pWidget->isFrame)
-        {
-            if(pWidget->isCorner)
+            if(ptWidget->use_as__ldBase_t.isHidden)
             {
-                draw_round_corner_box(&tTarget,&tTarget_canvas,LD_COLOR_WHITE,255,bIsNewFrame);
-                draw_round_corner_border(&tTarget,&tTarget_canvas,LD_COLOR_LIGHT_GREY,(arm_2d_border_opacity_t){255,255,255,255},(arm_2d_corner_opacity_t){255,255,255,255});
+                break;
+            }
+
+            // draw frame
+            if(ptWidget->isFrame)
+            {
+                if(ptWidget->isCorner)
+                {
+                    draw_round_corner_box(&tTarget,&tTarget_canvas,GLCD_COLOR_WHITE,255,bIsNewFrame);
+                    draw_round_corner_border(&tTarget,&tTarget_canvas,GLCD_COLOR_LIGHT_GREY,(arm_2d_border_opacity_t){255,255,255,255},(arm_2d_corner_opacity_t){255,255,255,255});
+                }
+                else
+                {
+                    ldBaseColor(&tTarget,NULL,GLCD_COLOR_WHITE,255);
+                    arm_2d_draw_box(&tTarget,&tTarget_canvas,1,GLCD_COLOR_LIGHT_GREY,255);
+                }
             }
             else
             {
-                ldBaseColor(&tTarget,LD_COLOR_WHITE,255);
-                arm_2d_draw_box(&tTarget,&tTarget_canvas,1,LD_COLOR_LIGHT_GREY,255);
+                ldBaseColor(&tTarget,NULL,GLCD_COLOR_WHITE,255);
             }
-        }
-        else
-        {
-            ldBaseColor(&tTarget,LD_COLOR_WHITE,255);
-        }
-        arm_2d_op_wait_async(NULL);
+            arm_2d_op_wait_async(NULL);
 
-        // draw grid
-        uint16_t xCount,yCount;
-        arm_2d_location_t gridLocal;
+            // draw grid
+            uint16_t xCount,yCount;
+            arm_2d_location_t gridLocal;
 
-        xCount=pWidget->xAxisMax/(pWidget->xScale*pWidget->gridOffset);
-        yCount=pWidget->yAxisMax/(pWidget->yScale*pWidget->gridOffset*5);
+            xCount=ptWidget->xAxisMax/(ptWidget->xScale*ptWidget->gridOffset);
+            yCount=ptWidget->yAxisMax/(ptWidget->yScale*ptWidget->gridOffset*5);
 
-        for(uint16_t j=0;j<=yCount;j++)
-        {
-            for(uint16_t i=0;i<=xCount;i++)
+            for(uint16_t j=0;j<=yCount;j++)
             {
-                gridLocal.iX=pWidget->frameSpace+(pWidget->xScale*pWidget->gridOffset)*i;
-                gridLocal.iY=pWidget->frameSpace+(pWidget->yScale*pWidget->gridOffset*5)*j;
-                arm_2d_draw_point(&tTarget,gridLocal,LD_COLOR_GRAY,128);
-            }
-        }
-
-        xCount=pWidget->xAxisMax/(pWidget->xScale*pWidget->gridOffset*5);
-        yCount=pWidget->yAxisMax/(pWidget->yScale*pWidget->gridOffset);
-
-        for(uint16_t j=0;j<=yCount;j++)
-        {
-            for(uint16_t i=0;i<=xCount;i++)
-            {
-                gridLocal.iX=pWidget->frameSpace+(pWidget->xScale*pWidget->gridOffset*5)*i;
-                gridLocal.iY=pWidget->frameSpace+(pWidget->yScale*pWidget->gridOffset)*j;
-                arm_2d_draw_point(&tTarget,gridLocal,LD_COLOR_GRAY,128);
-            }
-        }
-        arm_2d_op_wait_async(NULL);
-
-
-        if(pWidget->seriesCount>0)
-        {
-            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=0;
-            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=0;
-            ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iWidth=pWidget->pointImgWidth;
-            ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iHeight=pWidget->pointImgWidth;
-            ((arm_2d_tile_t*)(&tempRes))->pchBuffer = (uint8_t *)pWidget->pointImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-            ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->pointImgAddr;
-#endif
-            ((arm_2d_tile_t*)(&tempRes))->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_MASK_A8;
-            
-            if(pWidget->pointImgAddr==(uintptr_t)graphDefalutDot_png)
-            {
-                ((arm_2d_tile_t*)(&tempRes))->bVirtualResource=false;
-            }
-            
-            int16_t x=0,y=0,xPrev,yPrev;
-            
-            xCount=pWidget->xAxisMax/(pWidget->xAxisOffset*pWidget->xScale);
-
-            for(uint16_t i=0;i<xCount;i++)
-            {
-                xPrev=x;
-                x=pWidget->frameSpace+(pWidget->xAxisOffset*pWidget->xScale)*i-(pWidget->pointImgWidth/2);
-
-                for(uint8_t k=0;k<pWidget->seriesCount;k++)
+                for(uint16_t i=0;i<=xCount;i++)
                 {
-                    if(i<pWidget->pSeries[k].valueCountMax)
-                    {
-                        y=tTarget_canvas.tSize.iHeight-pWidget->frameSpace-(pWidget->pointImgWidth/2)-(pWidget->pSeries[k].pValueList[i]*pWidget->yScale);
+                    gridLocal.iX=ptWidget->frameSpace+(ptWidget->xScale*ptWidget->gridOffset)*i;
+                    gridLocal.iY=ptWidget->frameSpace+(ptWidget->yScale*ptWidget->gridOffset*5)*j;
+                    arm_2d_draw_point(&tTarget,gridLocal,GLCD_COLOR_LIGHT_GREY,128);
+                }
+            }
 
-                        if(pWidget->pointImgAddr!=LD_ADDR_NONE)
-                        {
-                            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=x;
-                            ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=y;
-                            ldBaseMaskImage(&tTarget,&tempRes,pWidget->pSeries[k].seriesColor,255);
-                        }
+            xCount=ptWidget->xAxisMax/(ptWidget->xScale*ptWidget->gridOffset*5);
+            yCount=ptWidget->yAxisMax/(ptWidget->yScale*ptWidget->gridOffset);
 
-                        if((i>0)&&(pWidget->pSeries[k].lineSize>0))
-                        {
-                            yPrev=tTarget_canvas.tSize.iHeight-pWidget->frameSpace-(pWidget->pointImgWidth/2)-(pWidget->pSeries[k].pValueList[i-1]*pWidget->yScale);
-                            ldBaseDrawLine(&tTarget,xPrev+(pWidget->pointImgWidth/2),yPrev+pWidget->pointImgWidth/2,x+(pWidget->pointImgWidth/2),y+pWidget->pointImgWidth/2,pWidget->pSeries[k].lineSize,pWidget->pSeries[k].seriesColor,255,64);
-                        }
-                    }
+            for(uint16_t j=0;j<=yCount;j++)
+            {
+                for(uint16_t i=0;i<=xCount;i++)
+                {
+                    gridLocal.iX=ptWidget->frameSpace+(ptWidget->xScale*ptWidget->gridOffset*5)*i;
+                    gridLocal.iY=ptWidget->frameSpace+(ptWidget->yScale*ptWidget->gridOffset)*j;
+                    arm_2d_draw_point(&tTarget,gridLocal,GLCD_COLOR_LIGHT_GREY,128);
                 }
             }
             arm_2d_op_wait_async(NULL);
+
+
+            if(ptWidget->seriesCount>0)
+            {
+                int16_t x=0,y=0,xPrev,yPrev;
+
+                xCount=ptWidget->xAxisMax/(ptWidget->xAxisOffset*ptWidget->xScale);
+
+                for(uint16_t i=0;i<xCount;i++)
+                {
+                    xPrev=x;
+                    x=ptWidget->frameSpace+(ptWidget->xAxisOffset*ptWidget->xScale)*i-(ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2);
+
+                    for(uint8_t k=0;k<ptWidget->seriesCount;k++)
+                    {
+                        if(i<ptWidget->pSeries[k].valueCountMax)
+                        {
+                            y=tTarget_canvas.tSize.iHeight-ptWidget->frameSpace-(ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2)-(ptWidget->pSeries[k].pValueList[i]*ptWidget->yScale);
+
+                            ldBaseImage(&tTarget,
+                                        &((arm_2d_region_t){x,
+                                                            y,
+                                                            ptWidget->ptPointMaskTile->tRegion.tSize.iWidth,
+                                                            ptWidget->ptPointMaskTile->tRegion.tSize.iHeight}),
+                                        NULL,
+                                        ptWidget->ptPointMaskTile,
+                                        ptWidget->pSeries[k].seriesColor,
+                                        ptWidget->use_as__ldBase_t.opacity);
+
+                            if((i>0)&&(ptWidget->pSeries[k].lineSize>0))
+                            {
+                                yPrev=tTarget_canvas.tSize.iHeight-ptWidget->frameSpace-(ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2)-(ptWidget->pSeries[k].pValueList[i-1]*ptWidget->yScale);
+                                ldBaseDrawLine(&tTarget,
+                                               xPrev+(ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2),
+                                               yPrev+ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2,
+                                               x+(ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2),
+                                               y+ptWidget->ptPointMaskTile->tRegion.tSize.iWidth/2,
+                                               ptWidget->pSeries[k].lineSize,
+                                               ptWidget->pSeries[k].seriesColor,
+                                               ptWidget->use_as__ldBase_t.opacity,ptWidget->use_as__ldBase_t.opacity>>1);
+                            }
+                        }
+                    }
+                }
+                arm_2d_op_wait_async(NULL);
+            }
         }
-        
-#if LD_DEBUG == 1
-        arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
-#endif
-        arm_2d_op_wait_async(NULL);
     }
+
+    arm_2d_op_wait_async(NULL);
 }
 
-/**
- * @brief   设置圆点mask图片
- * 
- * @param   pWidget         目标控件指针
- * @param   addr            mask图片地址
- * @param   width           图片宽度
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldGraphSetPointImageMask(ldGraph_t *pWidget, uintptr_t addr, int16_t width)
+void ldGraphSetPointImageMask(ldGraph_t *ptWidget, arm_2d_tile_t *ptPointMaskTile)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
-    pWidget->pointImgAddr=addr;
-    pWidget->pointImgWidth=width;
-    if(pWidget->frameSpace<width)
+    ptWidget->ptPointMaskTile=ptPointMaskTile;
+    if(ptWidget->frameSpace<ptPointMaskTile->tRegion.tSize.iWidth)
     {
-        pWidget->frameSpace=width;
+        ptWidget->frameSpace=ptPointMaskTile->tRegion.tSize.iWidth;
     }
 }
 
-/**
- * @brief   添加曲线缓存
- * 
- * @param   pWidget         目标控件指针
- * @param   seriesColor     曲线颜色
- * @param   lineSize        线条大小：0=无线条，1-255
- * @param   valueCountMax   储存数据数量，一般为:x轴最大值/x轴间隔
- * @return  int8_t
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-14
- */
-int8_t ldGraphAddSeries(ldGraph_t *pWidget,ldColor seriesColor,uint8_t lineSize,uint16_t valueCountMax)
+int8_t ldGraphAddSeries(ldGraph_t *ptWidget,ldColor seriesColor,uint8_t lineSize,uint16_t valueCountMax)
 {
     uint16_t *pBuf;
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return -1;
     }
-    if(pWidget->seriesCount<pWidget->seriesMax)
+    if(ptWidget->seriesCount<ptWidget->seriesMax)
     {
-        pBuf=ldCalloc(sizeof (uint16_t)*valueCountMax);
+        pBuf=ldCalloc(1,sizeof (uint16_t)*valueCountMax);
         if(pBuf!=NULL)
         {
-            pWidget->pSeries[pWidget->seriesCount].pValueList=pBuf;
-            pWidget->pSeries[pWidget->seriesCount].valueCountMax=valueCountMax;
-            pWidget->pSeries[pWidget->seriesCount].seriesColor=seriesColor;
-            pWidget->pSeries[pWidget->seriesCount].lineSize=lineSize;
-            pWidget->seriesCount++;
-            return (pWidget->seriesCount-1);
+            ptWidget->pSeries[ptWidget->seriesCount].pValueList=pBuf;
+            ptWidget->pSeries[ptWidget->seriesCount].valueCountMax=valueCountMax;
+            ptWidget->pSeries[ptWidget->seriesCount].seriesColor=seriesColor;
+            ptWidget->pSeries[ptWidget->seriesCount].lineSize=lineSize;
+            ptWidget->seriesCount++;
+            return (ptWidget->seriesCount-1);
         }
     }
     return -1;
 }
 
-/**
- * @brief   设置曲线数据
- * 
- * @param   pWidget         目标控件指针
- * @param   seriesNum       曲线序号
- * @param   valueNum        数据序号
- * @param   value           数据值
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldGraphSetValue(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value)
+void ldGraphSetValue(ldGraph_t *ptWidget,uint8_t seriesNum,uint16_t valueNum,uint16_t value)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return ;
     }
 
-    if(valueNum<pWidget->pSeries[seriesNum].valueCountMax)
+    if(valueNum<ptWidget->pSeries[seriesNum].valueCountMax)
     {
-        pWidget->pSeries[seriesNum].pValueList[valueNum]=value;
-        pWidget->dirtyRegionState=waitChange;
+        ptWidget->pSeries[seriesNum].pValueList[valueNum]=value;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     }
 }
 
-/**
- * @brief   设置波形参考线
- * 
- * @param   pWidget         目标控件指针
- * @param   xAxis           x轴数据最大值
- * @param   yAxis           y轴数据最大值
- * @param   xAxisOffset     x轴数据间隔
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-14
- */
-void ldGraphSetAxis(ldGraph_t *pWidget,uint16_t xAxis,uint16_t yAxis,uint16_t xAxisOffset)
+void ldGraphSetAxis(ldGraph_t *ptWidget,uint16_t xAxis,uint16_t yAxis,uint16_t xAxisOffset)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return ;
     }
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
 
     float scale;
-    scale=(float)(pResTile->tRegion.tSize.iWidth-pWidget->frameSpace*2)/xAxis;
-    pWidget->xAxisMax=xAxis*scale;
-    pWidget->xScale=scale;
-    pWidget->xAxisOffset=xAxisOffset*scale;
+    scale=(float)(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->frameSpace*2)/xAxis;
+    ptWidget->xAxisMax=xAxis*scale;
+    ptWidget->xScale=scale;
+    ptWidget->xAxisOffset=xAxisOffset*scale;
 
-    scale=(float)(pResTile->tRegion.tSize.iHeight-pWidget->frameSpace*2)/yAxis;
-    pWidget->yAxisMax=yAxis*scale;
-    pWidget->yScale=scale;
+    scale=(float)(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->frameSpace*2)/yAxis;
+    ptWidget->yAxisMax=yAxis*scale;
+    ptWidget->yScale=scale;
 }
 
-void ldGraphSetAxisOffset(ldGraph_t *pWidget,uint16_t xAxisOffset)
+void ldGraphSetAxisOffset(ldGraph_t *ptWidget,uint16_t xAxisOffset)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return ;
     }
-    pWidget->xAxisOffset=xAxisOffset;
+    ptWidget->xAxisOffset=xAxisOffset;
 }
 
-/**
- * @brief   设置边框间距
- * 
- * @param   pWidget         目标控件指针
- * @param   frameSpace      间距值
- * @param   isCorner        是否圆角
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldGraphSetFrameSpace(ldGraph_t *pWidget,uint8_t frameSpace,bool isCorner)
+void ldGraphSetFrameSpace(ldGraph_t *ptWidget,uint8_t frameSpace,bool isCorner)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return ;
     }
 
-    pWidget->isFrame=(frameSpace>0)?true:false;
+    ptWidget->isFrame=(frameSpace>0)?true:false;
 
-    pWidget->isCorner=isCorner;
-    pWidget->frameSpace=frameSpace;
+    ptWidget->isCorner=isCorner;
+    ptWidget->frameSpace=frameSpace;
 }
 
-/**
- * @brief   设置栅格间隔
- * 
- * @param   pWidget         目标控件指针
- * @param   gridOffset      栅格间距
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-14
- */
-void ldGraphSetGridOffset(ldGraph_t *pWidget,uint8_t gridOffset)
+void ldGraphSetGridOffset(ldGraph_t *ptWidget,uint8_t gridOffset)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return ;
     }
 
-    pWidget->gridOffset=gridOffset;
+    ptWidget->gridOffset=gridOffset;
 }
 
-/**
- * @brief   将最新数据放到最后，
- *          数据达到最大值后，自动向后移动数据，自动丢弃最前边的数据
- *          实现波形自动刷新
- * 
- * @param   pWidget         目标控件指针
- * @param   seriesNum       曲线号码
- * @param   newValue        数据值
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldGraphMoveAdd(ldGraph_t *pWidget,uint8_t seriesNum,uint16_t newValue)
+void ldGraphMoveAdd(ldGraph_t *ptWidget,uint8_t seriesNum,uint16_t newValue)
 {
-    if (pWidget == NULL)
+    if (ptWidget == NULL)
     {
         return ;
     }
 
-    uint16_t *p=pWidget->pSeries[seriesNum].pValueList;
+    uint16_t *p=ptWidget->pSeries[seriesNum].pValueList;
 
-    for(int i =0;i < pWidget->pSeries[seriesNum].valueCountMax-1;i++)
+    for(int i =0;i < ptWidget->pSeries[seriesNum].valueCountMax-1;i++)
     {
         p[i] = p[i+1];
     }
-    p[pWidget->pSeries[seriesNum].valueCountMax-1] = newValue;
-    pWidget->dirtyRegionState=waitChange;
+    p[ptWidget->pSeries[seriesNum].valueCountMax-1] = newValue;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
 
 #if defined(__clang__)

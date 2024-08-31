@@ -1,39 +1,13 @@
 TEMPLATE = app
-#CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+#//     <0=> None
+#//     <1=> Show all widget
+#//     <2=> Printer
+USE_DEMO=2
+
 SOURCES += \
-    ../../src/gui/ldArc.c \
-    ../../src/gui/ldButton.c \
-    ../../src/gui/ldCheckBox.c \
-    ../../src/gui/ldComboBox.c \
-    ../../src/gui/ldCommon.c \
-    ../../src/gui/ldDateTime.c \
-    ../../src/gui/ldGauge.c \
-    ../../src/gui/ldGraph.c \
-    ../../src/gui/ldGui.c \
-    ../../src/gui/ldIconSlider.c \
-    ../../src/gui/ldImage.c \
-    ../../src/gui/ldKeyboard.c \
-    ../../src/gui/ldLabel.c \
-    ../../src/gui/ldLineEdit.c \
-    ../../src/gui/ldQRCode.c \
-    ../../src/gui/ldRadialMenu.c \
-    ../../src/gui/ldProgressBar.c \
-    ../../src/gui/ldScene0.c \
-    ../../src/gui/ldScrollSelecter.c \
-    ../../src/gui/ldTable.c \
-    ../../src/gui/ldText.c \
-    ../../src/gui/ldWindow.c \
-    ../../src/misc/freeRtosHeap4.c \
-    ../../src/misc/qrcodegen.c \
-    ../../src/misc/tlsf.c \
-    ../../src/misc/xBtnAction.c \
-    ../../src/misc/xConnect.c \
-    ../../src/misc/xList.c \
-    ../../src/misc/xQueue.c \
-    ../../src/misc/xString.c \
     virtualNor/virtualNor.c \
     user/ldConfig.c \
     user/main.c \
@@ -41,37 +15,6 @@ SOURCES += \
     user/arm_2d_disp_adapter_0.c
 
 HEADERS += \
-    ../../src/gui/ldArc.h \
-    ../../src/gui/ldButton.h \
-    ../../src/gui/ldCheckBox.h \
-    ../../src/gui/ldComboBox.h \
-    ../../src/gui/ldCommon.h \
-    ../../src/gui/ldDateTime.h \
-    ../../src/gui/ldGauge.h \
-    ../../src/gui/ldGraph.h \
-    ../../src/gui/ldGui.h \
-    ../../src/gui/ldIconSlider.h \
-    ../../src/gui/ldImage.h \
-    ../../src/gui/ldKeyboard.h \
-    ../../src/gui/ldLabel.h \
-    ../../src/gui/ldLineEdit.h \
-    ../../src/gui/ldQRCode.h \
-    ../../src/gui/ldRadialMenu.h \
-    ../../src/gui/ldProgressBar.h \
-    ../../src/gui/ldScene0.h \
-    ../../src/gui/ldScrollSelecter.h \
-    ../../src/gui/ldTable.h \
-    ../../src/gui/ldText.h \
-    ../../src/gui/ldWindow.h \
-    ../../src/misc/freeRtosHeap4.h \
-    ../../src/misc/qrcodegen.h \
-    ../../src/misc/tlsf.h \
-    ../../src/misc/xBtnAction.h \
-    ../../src/misc/xConnect.h \
-    ../../src/misc/xList.h \
-    ../../src/misc/xLog.h \
-    ../../src/misc/xQueue.h \
-    ../../src/misc/xString.h \
     virtualNor/virtualNor.h \
     user/Virtual_TFT_Port.h \
     user/arm_2d_cfg.h \
@@ -79,18 +22,38 @@ HEADERS += \
     user/arm_2d_user_arch_port.h \
     user/ldConfig.h
 
-HEADERS += $$files(../common/demo/*.h, true) \
-           $$files(../common/Arm-2D/examples/common/controls/*.h) \
+HEADERS += $$files(../common/Arm-2D/examples/common/controls/*.h) \
            $$files(../common/Arm-2D/Library/Source/*.inc) \
            $$files(../common/Arm-2D/Library/Include/*.h) \
-           $$files(../common/Arm-2D/Helper/Include/*.h)
+           $$files(../common/Arm-2D/Helper/Include/*.h) \
+           $$files(../common/math/*.h) \
+           $$files(../../src/gui/*.h) \
+           $$files(../../src/misc/*.h)
 
-SOURCES += $$files(../common/demo/*.c, true) \
-           $$files(../common/Arm-2D/examples/common/controls/*.c) \
+SOURCES += $$files(../common/Arm-2D/examples/common/controls/*.c) \
            $$files(../common/Arm-2D/examples/common/asset/*.c) \
            $$files(../common/Arm-2D/Library/Source/*.c) \
            $$files(../common/Arm-2D/Helper/Source/*.c) \
-           $$files(../common/math/*.c, true)
+           $$files(../common/math/*.c, true) \
+           $$files(../../src/gui/*.c) \
+           $$files(../../src/misc/*.c)
+
+contains(USE_DEMO, 1){
+message(demo: Show all widget)
+DEFINES += USE_DEMO=1
+HEADERS += $$files(../common/demo/widget/*.h, true)
+SOURCES += $$files(../common/demo/widget/*.c, true)
+INCLUDEPATH += $$PWD/../common/demo/widget
+}
+
+contains(USE_DEMO, 2){
+message(demo: Printer)
+DEFINES += USE_DEMO=2
+HEADERS += $$files(../common/demo/printer/*.h, true)
+SOURCES += $$files(../common/demo/printer/*.c, true)
+INCLUDEPATH += $$PWD/../common/demo/printer
+}
+
 
 INCLUDEPATH += $$PWD/../common/Arm-2D
 INCLUDEPATH += $$PWD/../common/Arm-2D/Helper/Include
@@ -100,8 +63,6 @@ INCLUDEPATH += $$PWD/../common/Arm-2D/examples/common/controls
 INCLUDEPATH += $$PWD/user
 INCLUDEPATH += $$PWD/virtualNor
 INCLUDEPATH += $$PWD/../common/math
-INCLUDEPATH += $$PWD/../common/demo
-INCLUDEPATH += $$files(../common/demo/*, true)
 
 INCLUDEPATH += $$PWD/../../src/gui
 INCLUDEPATH += $$PWD/../../src/misc

@@ -1,0 +1,6 @@
+arial.ttf:
+  - pixelSize: 12
+    fontBitWidth: 8
+    string: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+  - pixelSize: 16
+    string: '0123456789'

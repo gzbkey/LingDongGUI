@@ -12,14 +12,18 @@
 	],
 	"settings": {
 		"files.associations": {
-			"ldcheckbox.h": "c",
-			"ldgui.h": "c",
-			"uiwatch.h": "c",
-			"virtual_tft_port.h": "c",
-			"xlog.h": "c",
-			"demo.h": "c",
-			"uidemo.h": "c",
-			"memory_resource": "c"
-		}
+            "ldcheckbox.h": "c",
+            "ldgui.h": "c",
+            "uiwatch.h": "c",
+            "virtual_tft_port.h": "c",
+            "xlog.h": "c",
+            "demo.h": "c",
+            "uidemo.h": "c",
+            "memory_resource": "c",
+            "type_traits": "c",
+            "ldbase.h": "c",
+            "stdbool.h": "c",
+            "stdint.h": "c"
+        }
 	}
 }

@@ -1,53 +1,101 @@
-#ifndef _LD_DATETIME_H_
-#define _LD_DATETIME_H_
+/*
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef __LD_DATE_TIME_H__
+#define __LD_DATE_TIME_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-#include "ldCommon.h"
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
+#pragma clang diagnostic ignored "-Wpadded"
+#endif
+
+
+
+/* OOC header, please DO NOT modify  */
+#ifdef __LD_DATE_TIME_IMPLEMENT__
+#undef __LD_DATE_TIME_IMPLEMENT__
+#define __ARM_2D_IMPL__
+#elif defined(__LD_DATE_TIME_INHERIT__)
+#undef __LD_DATE_TIME_INHERIT__
+#define __ARM_2D_INHERIT__
+#endif
+#include "arm_2d_utils.h"
+#include "ldBase.h"
 
 #define DATE_TIME_BUFFER_SIZE   32
 
-typedef struct {
-    LD_COMMON_ATTRIBUTES;
-    bool isTransparent:1;
-    uint8_t align:4;
+typedef struct ldDateTime_t ldDateTime_t;
+
+struct ldDateTime_t
+{
+    implement(ldBase_t);
+//ARM_PRIVATE(
+//    ld_scene_t *ptScene;
+//)
+    arm_2d_align_t tAlign;
     uint8_t month;
     uint8_t day;
     uint8_t hour;
     uint8_t minute;
     uint8_t second;
     uint16_t year;
-    uint8_t formatStr[DATE_TIME_BUFFER_SIZE];
+    const uint8_t *pFormatStr;
     uint8_t formatStrTemp[DATE_TIME_BUFFER_SIZE];
     ldColor bgColor;
-    ldColor charColor;
-    ldFontDict_t* pFontDict;
-#if USE_OPACITY == 1
-    uint8_t opacity;
+    ldColor textColor;
+    arm_2d_font_t *ptFont;
+    bool isTransparent:1;
+};
+
+ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);
+void ldDateTime_depose( ldDateTime_t *ptWidget);
+void ldDateTime_on_load( ldDateTime_t *ptWidget);
+void ldDateTime_on_frame_start( ldDateTime_t *ptWidget);
+void ldDateTime_show(ld_scene_t *pScene, ldDateTime_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
+
+void ldDateTimeSetTransparent(ldDateTime_t* ptWidget,bool isTransparent);
+void ldDateTimeSetFormat(ldDateTime_t* ptWidget,const uint8_t *pStr);
+void ldDateTimeSetTextColor(ldDateTime_t* ptWidget,ldColor textColor);
+void ldDateTimeSetAlign(ldDateTime_t *ptWidget,arm_2d_align_t tAlign);
+void ldDateTimeSetBgColor(ldDateTime_t *ptWidget, ldColor bgColor);
+void ldDateTimeSetDate(ldDateTime_t *ptWidget, uint16_t year, uint8_t month, uint8_t day);
+void ldDateTimeSetTime(ldDateTime_t *ptWidget, uint8_t hour, uint8_t minute, uint8_t second);
+
+#define ldDateTimeInit(nameId,parentNameId,x,y,width,height,ptFont) \
+        ldDateTime_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)
+
+#define ldDateTimeSetHidden                ldBaseSetHidden
+#define ldDateTimeMove                     ldBaseMove
+#define ldDateTimeSetOpacity               ldBaseSetOpacity
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
 #endif
-}ldDateTime_t;
-
-ldDateTime_t* ldDateTimeInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict);
-void ldDateTimeFrameUpdate(ldDateTime_t* pWidget);
-void ldDateTimeLoop(arm_2d_scene_t *pScene,ldDateTime_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-void ldDateTimeDel(ldDateTime_t *pWidget);
-
-void ldDateTimeSetTransparent(ldDateTime_t* pWidget,bool isTransparent);
-void ldDateTimeSetFormat(ldDateTime_t* pWidget,uint8_t *pStr);
-void ldDateTimeSetTextColor(ldDateTime_t* pWidget,ldColor charColor);
-void ldDateTimeSetAlign(ldDateTime_t *pWidget,uint8_t align);
-void ldDateTimeSetBgColor(ldDateTime_t *pWidget, ldColor bgColor);
-void ldDateTimeSetOpacity(ldDateTime_t *pWidget, uint8_t opacity);
-void ldDateTimeSetDate(ldDateTime_t *pWidget, uint16_t year, uint8_t month, uint8_t day);
-void ldDateTimeSetTime(ldDateTime_t *pWidget, uint8_t hour, uint8_t minute, uint8_t second);
-
-#define ldDateTimeSetHidden          ldBaseSetHidden
-#define ldDateTimeMove               ldBaseMove
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_LD_DATETIME_H_
+#endif

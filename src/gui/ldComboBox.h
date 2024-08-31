@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,47 +16,77 @@
  * limitations under the License.
  */
 
-#ifndef _LD_COMBOBOX_H_
-#define _LD_COMBOBOX_H_
+#ifndef __LD_COMBO_BOX_H__
+#define __LD_COMBO_BOX_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-#include "ldCommon.h"
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
+#pragma clang diagnostic ignored "-Wpadded"
+#endif
 
-typedef struct {
-    LD_COMMON_ATTRIBUTES;
-    bool isExpand:1;
-    bool isCorner:1;
-    uintptr_t dropdownImgAddr;
-    uint8_t dropdownImgWidth;
-    uint8_t dropdownImgHeight;
+
+
+/* OOC header, please DO NOT modify  */
+#ifdef __LD_COMBO_BOX_IMPLEMENT__
+#undef __LD_COMBO_BOX_IMPLEMENT__
+#define __ARM_2D_IMPL__
+#elif defined(__LD_COMBO_BOX_INHERIT__)
+#undef __LD_COMBO_BOX_INHERIT__
+#define __ARM_2D_INHERIT__
+#endif
+#include "arm_2d_utils.h"
+#include "ldBase.h"
+
+typedef struct ldComboBox_t ldComboBox_t;
+
+struct ldComboBox_t
+{
+    implement(ldBase_t);
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
+    arm_2d_tile_t *ptDropdownImgTile;
+    arm_2d_tile_t *ptDropdownMaskTile;
     uint8_t itemMax;
     uint8_t itemCount;
     uint8_t itemSelect;
     uint8_t itemPreSelect;
     int16_t itemHeight;
-    ldFontDict_t* pFontDict;
-    void **ppItemStrGroup;
-    ldColor charColor;
+    arm_2d_font_t *ptFont;
+    const uint8_t **ppItemStrGroup;
+    ldColor textColor;
+    bool isExpand:1;
+    bool isCorner:1;
+};
 
-}ldComboBox_t;
+ldComboBox_t* ldComboBox_init(ld_scene_t *ptScene, ldComboBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);
+void ldComboBox_depose( ldComboBox_t *ptWidget);
+void ldComboBox_on_load( ldComboBox_t *ptWidget);
+void ldComboBox_on_frame_start( ldComboBox_t *ptWidget);
+void ldComboBox_show(ld_scene_t *pScene, ldComboBox_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-ldComboBox_t* ldComboBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax);
-void ldComboBoxFrameUpdate(ldComboBox_t* pWidget);
-void ldComboBoxLoop(arm_2d_scene_t *pScene,ldComboBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-void ldComboBoxDel(ldComboBox_t *pWidget);
+void ldComboBoxSetItems(ldComboBox_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize);
 
-void ldComboBoxAddItem(ldComboBox_t* pWidget,uint8_t *pStr);
-void ldComboBoxSetCorner(ldComboBox_t* pWidget,bool isCorner);
-void ldComboBoxSetDropdownMask(ldComboBox_t* pWidget, uintptr_t maskAddr, uint8_t width, uint8_t height);
+#define ldComboBoxInit(nameId,parentNameId,x,y,width,height,ptFont) \
+        ldComboBox_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)
 
-#define ldComboBoxSetHidden          ldBaseSetHidden
-#define ldComboBoxMove               ldBaseMove
+#define ldComboBoxSetHidden                ldBaseSetHidden
+#define ldComboBoxMove                     ldBaseMove
+#define ldComboBoxSetOpacity               ldBaseSetOpacity
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_LD_COMBOBOX_H_
+#endif

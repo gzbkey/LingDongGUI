@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,108 +16,70 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldButton.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   button widget
- * @signal  SIGNAL_PRESS
- *          SIGNAL_RELEASE
- */
+#define __LD_BUTTON_IMPLEMENT__
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldButton.h"
-#include "ldGui.h"
 
 #if defined(__clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wunknown-warning-option"
-#   pragma clang diagnostic ignored "-Wreserved-identifier"
-#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
-#   pragma clang diagnostic ignored "-Wsign-conversion"
-#   pragma clang diagnostic ignored "-Wpadded"
-#   pragma clang diagnostic ignored "-Wcast-qual"
-#   pragma clang diagnostic ignored "-Wcast-align"
-#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#   pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#   pragma clang diagnostic ignored "-Wmissing-braces"
-#   pragma clang diagnostic ignored "-Wunused-const-variable"
-#   pragma clang diagnostic ignored "-Wmissing-declarations"
-#   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Wunused-const-variable"
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-void ldButtonDel(ldButton_t *pWidget);
-void ldButtonFrameUpdate(ldButton_t* pWidget);
-void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldButtonCommonFunc={
-    (ldDelFunc_t)ldButtonDel,
-    (ldLoopFunc_t)ldButtonLoop,
-    (ldUpdateFunc_t)ldButtonFrameUpdate,
+const ldBaseWidgetFunc_t ldButtonFunc = {
+    .depose = (ldDeposeFunc_t)ldButton_depose,
+    .load = (ldLoadFunc_t)ldButton_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldButton_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldButton_show,
 };
 
-static bool _buttonDel(xListNode *pEachInfo, void *pTarget)
+static bool slotButtonToggle(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    if (pEachInfo->info == pTarget)
-    {
-        ldFree(((ldButton_t*)pTarget)->pStr);
-        ldFree(((ldButton_t*)pTarget));
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
+    ldButton_t *ptWidget;
 
-void ldButtonDel(ldButton_t *pWidget)
-{
-    xListNode *listInfo;
+    ptWidget = msg.ptSender;
 
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeButton)
-    {
-        return;
-    }
-
-    LOG_INFO("[button] del,id:%d",pWidget->nameId);
-
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _buttonDel);
-    }
-}
-
-static bool slotButtonToggle(xConnectInfo_t info)
-{
-    ldButton_t *pWidget;
-
-    pWidget=ldBaseGetWidgetById(info.receiverId);
-
-    switch (info.signalType)
+    switch (msg.signal)
     {
     case SIGNAL_PRESS:
     {
-        if(pWidget->isCheckable)
+        if (ptWidget->isCheckable)
         {
-            pWidget->isPressed=!pWidget->isPressed;
+            ptWidget->isPressed = !ptWidget->isPressed;
         }
         else
         {
-            pWidget->isPressed=true;
+            ptWidget->isPressed = true;
         }
-        pWidget->dirtyRegionState=waitChange;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     case SIGNAL_RELEASE:
     {
-        if(!pWidget->isCheckable)
+        if (!ptWidget->isCheckable)
         {
-            pWidget->isPressed=false;
+            ptWidget->isPressed = false;
         }
-        pWidget->dirtyRegionState=waitChange;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     default:
@@ -125,492 +89,357 @@ static bool slotButtonToggle(xConnectInfo_t info)
     return false;
 }
 
-/**
- * @brief   button初始化函数
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @return  ldButton_t*     新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-ldButton_t* ldButtonInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height)
+ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
-    ldButton_t * pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList;
-    arm_2d_tile_t *tResTile;
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldButton_t);
-    if (pNewWidget != NULL)
+    if (NULL == ptWidget)
     {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldButton_t));
+        if (NULL == ptWidget)
         {
-            pNewWidget->isParentHidden=true;
+            LOG_ERROR("[init failed][button] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeButton;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isCheckable=false;
-        pNewWidget->isChecked=false;
-        pNewWidget->isPressed=false;
-        pNewWidget->isSelected=false;
-        pNewWidget->releaseColor = __RGB(217,225,244);
-        pNewWidget->pressColor = __RGB(255,243,202);
-        pNewWidget->selectColor = __RGB(255,0,0);
-        pNewWidget->keyValue=0;
-        pNewWidget->releaseImgAddr=LD_ADDR_NONE;
-        pNewWidget->pressImgAddr=LD_ADDR_NONE;
-        pNewWidget->selectMaskAddr=LD_ADDR_NONE;
-        pNewWidget->isWithReleaseMask = false;
-        pNewWidget->isWithPressMask = false;
-        pNewWidget->isTransparent=false;
-        pNewWidget->isHidden = false;
-        pNewWidget->pStr = NULL;
-        pNewWidget->pFontDict = NULL;
-        pNewWidget->align = 0;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->dirtyRegionState=none;
-        pNewWidget->pFunc=&ldButtonCommonFunc;
-
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-        xConnect(nameId,SIGNAL_PRESS,nameId,slotButtonToggle);
-        xConnect(nameId,SIGNAL_RELEASE,nameId,slotButtonToggle);
-
-        LOG_INFO("[button] init,id:%d",nameId);
     }
     else
     {
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[button] init failed,id:%d",nameId);
+        memset(ptWidget, 0, sizeof(ldButton_t));
     }
-    return pNewWidget;
+
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    assert(NULL != ptParent);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeButton;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldButtonFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity = 255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    ptWidget->releaseColor = __RGB(217, 225, 244);
+    ptWidget->pressColor = __RGB(255, 243, 202);
+    ptWidget->selectColor = __RGB(255, 0, 0);
+
+    ldMsgConnect(ptWidget, SIGNAL_PRESS, slotButtonToggle);
+    ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotButtonToggle);
+
+    LOG_INFO("[init][button] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
 }
 
-void ldButtonFrameUpdate(ldButton_t* pWidget)
+void ldButton_depose(ldButton_t *ptWidget)
 {
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeButton)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][button] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+    ldFree(ptWidget->pStr);
+    ldFree(ptWidget);
 }
 
-void ldButtonLoop(arm_2d_scene_t *pScene,ldButton_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldButton_on_load(ldButton_t *ptWidget)
 {
-    uint32_t btnColor;
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+}
 
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+void ldButton_on_frame_start(ldButton_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+}
+
+void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+
+#if 0
+    if (bIsNewFrame) {
+
+    }
 #endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    if (pWidget == NULL)
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
+
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        return;
-    }
-
-    if((pWidget->isParentHidden)||(pWidget->isHidden)||(pWidget->isTransparent))
-    {
-        return;
-    }
-
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
-
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(!pWidget->isTransparent)
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            if ((pWidget->releaseImgAddr==LD_ADDR_NONE)&&(pWidget->pressImgAddr==LD_ADDR_NONE))//color
+            if((ptWidget->use_as__ldBase_t.isHidden)||(ptWidget->isTransparent))
             {
-                if(pWidget->isPressed)
+                break;
+            }
+            if ((ptWidget->ptReleaseImgTile == NULL) &&
+                    (ptWidget->ptReleaseMaskTile == NULL) &&
+                    (ptWidget->ptPressImgTile == NULL) &&
+                    (ptWidget->ptPressMaskTile == NULL)) // color
+            {
+
+                if (ptWidget->isCorner)
                 {
-                    btnColor=pWidget->pressColor;
+                    if (ptWidget->isPressed)
+                    {
+                        draw_round_corner_box(&tTarget,
+                                              NULL,
+                                              ptWidget->pressColor,
+                                              ptWidget->use_as__ldBase_t.opacity,
+                                              bIsNewFrame);
+                    }
+                    else
+                    {
+                        draw_round_corner_box(&tTarget,
+                                              NULL,
+                                              ptWidget->releaseColor,
+                                              ptWidget->use_as__ldBase_t.opacity,
+                                              bIsNewFrame);
+                    }
                 }
                 else
                 {
-                    btnColor=pWidget->releaseColor;
-                }
-                if(pWidget->isCorner)
-                {
-                    draw_round_corner_box(&tTarget,
-                                                &((arm_2d_tile_t*)&tempRes)->tRegion,
-                                                btnColor,
-                                                255,
-                                                bIsNewFrame);
-                }
-                else
-                {
-                    ldBaseColor(&tTarget,btnColor,255);
+                    if (ptWidget->isPressed)
+                    {
+                        ldBaseColor(&tTarget,
+                                    NULL,
+                                    ptWidget->pressColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
+                    else
+                    {
+                        ldBaseColor(&tTarget,
+                                    NULL,
+                                    ptWidget->releaseColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
                 }
             }
             else
             {
-                if(pWidget->isPressed)
+                if (ptWidget->isCorner)
                 {
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->pressImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->pressImgAddr;
-#endif
-                    if(!pWidget->isCorner)
+                    if (ptWidget->isPressed)
                     {
-                        if(pWidget->isPressMaskOnly)
-                        {
-                            ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
-                            ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->pressColor,255);
-                        }
-                        else
-                        {
-                            ldBaseImage(&tTarget,&tempRes,pWidget->isWithPressMask,255);
-                        }
-                    }
-                }
-                else
-                {
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->releaseImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)(&tempRes))->pTarget=pWidget->releaseImgAddr;
-#endif
-                    if(!pWidget->isCorner)
-                    {
-                        if(pWidget->isReleaseMaskOnly)
-                        {
-                            ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ARM_2D_COLOUR_MASK_A8;
-                            ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->releaseColor,255);
-                        }
-                        else
-                        {
-                            ldBaseImage(&tTarget,&tempRes,pWidget->isWithReleaseMask,255);
-                        }
-                    }
-                }
-                if(pWidget->isCorner)
-                {
-                    draw_round_corner_image((arm_2d_tile_t*)&tempRes,
-                                            &tTarget,
-                                            &((arm_2d_tile_t*)&tempRes)->tRegion,
-                                            bIsNewFrame);
-                }
-            }
-            arm_2d_op_wait_async(NULL);
-
-            if(pWidget->pStr!=NULL)
-            {
-                ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
-                arm_2d_op_wait_async(NULL);
-            }
-
-            if(pWidget->isSelected)
-            {
-                if (pWidget->selectMaskAddr==LD_ADDR_NONE)
-                {
-                    if(pWidget->isCorner)
-                    {
-                        draw_round_corner_border(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,pWidget->selectColor,
-                                                 (arm_2d_border_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY},
-                                                 (arm_2d_corner_opacity_t){SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY,SELECT_COLOR_OPACITY});
+                        draw_round_corner_image(ptWidget->ptPressImgTile,
+                                                &tTarget,
+                                                NULL,
+                                                bIsNewFrame);
                     }
                     else
                     {
-                        arm_2d_draw_box(&tTarget,&((arm_2d_tile_t*)&tempRes)->tRegion,3,pWidget->selectColor,SELECT_COLOR_OPACITY);
+                        draw_round_corner_image(ptWidget->ptReleaseImgTile,
+                                                &tTarget,
+                                                NULL,
+                                                bIsNewFrame);
                     }
                 }
                 else
                 {
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->selectMaskAddr;
-                    ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme=ldBaseGetChScheme(pWidget->pFontDict->maskType);
-#if USE_VIRTUAL_RESOURCE == 1
-                    tempRes.pTarget=pWidget->selectMaskAddr;
-#endif
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-                    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-                    ldBaseMaskImage(&tTarget,(arm_2d_tile_t*)&tempRes,pWidget->selectColor,255);
+                    if (ptWidget->isPressed)
+                    {
+                        ldBaseImage(&tTarget,
+                                    NULL,
+                                    ptWidget->ptPressImgTile,
+                                    ptWidget->ptPressMaskTile,
+                                    ptWidget->pressColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
+                    else
+                    {
+                        ldBaseImage(&tTarget,
+                                    NULL,
+                                    ptWidget->ptReleaseImgTile,
+                                    ptWidget->ptReleaseMaskTile,
+                                    ptWidget->releaseColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
                 }
+            }
+
+            arm_2d_op_wait_async(NULL);
+
+            if(ptWidget->pStr!=NULL)
+            {
+                ldBaseLabel(&tTarget,
+                            &tTarget_canvas,
+                            ptWidget->pStr,
+                            ptWidget->ptFont,
+                            ARM_2D_ALIGN_CENTRE,
+                            ptWidget->charColor,
+                            ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             }
+
+            if(ptWidget->ptSelectMaskTile!=NULL)
+            {
+                ldBaseImage(&tTarget,
+                            NULL,
+                            NULL,
+                            ptWidget->ptSelectMaskTile,
+                            ptWidget->selectColor,
+                            ptWidget->use_as__ldBase_t.opacity);
+            }
         }
-
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
-        {
-            pWidget->dirtyRegionState=none;
-        }
     }
+    arm_2d_op_wait_async(NULL);
 }
 
-/**
- * @brief   设置按键显示文本
- * 
- * @param   pWidget         目标控件指针
- * @param   pStr            字符串指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetText(ldButton_t* pWidget,uint8_t *pStr)
+void ldButtonSetColor(ldButton_t* ptWidget, ldColor releaseColor, ldColor pressColor)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    ldFree(pWidget->pStr);
-    pWidget->pStr=LD_CALLOC_STRING(pStr);
-    strcpy((char*)pWidget->pStr,(char*)pStr);
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->releaseColor=releaseColor;
+    ptWidget->pressColor=pressColor;
 }
 
-/**
- * @brief   设置按键颜色，设置该函数后，图片设置无效
- * 
- * @param   pWidget         目标控件指针
- * @param   releaseColor    松开显示的颜色
- * @param   pressColor      按下显示的颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetColor(ldButton_t* pWidget,ldColor releaseColor,ldColor pressColor)
+void ldButtonSetImage(ldButton_t* ptWidget,arm_2d_tile_t* ptReleaseImgTile,arm_2d_tile_t* ptReleaseMaskTile,arm_2d_tile_t* ptPressImgTile,arm_2d_tile_t* ptPressMaskTile)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->releaseColor=releaseColor;
-    pWidget->pressColor=pressColor;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptReleaseImgTile=ptReleaseImgTile;
+    ptWidget->ptReleaseMaskTile=ptReleaseMaskTile;
+    ptWidget->ptPressImgTile=ptPressImgTile;
+    ptWidget->ptPressMaskTile=ptPressMaskTile;
 }
 
-/**
- * @brief   设置按键图片，设置该函数后，颜色设置无效
- * 
- * @param   pWidget         目标控件指针
- * @param   releaseImgAddr  松开显示的图片
- * @param   releaseMaskType 松开显示的图片蒙版类型
- * @param   pressImgAddr    按下显示的图片
- * @param   pressMaskType   按下显示的图片蒙版类型
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetImage(ldButton_t* pWidget,uintptr_t releaseImgAddr,ldImageType_t releaseMaskType,uintptr_t pressImgAddr,ldImageType_t pressMaskType)
+void ldButtonSetSelectImage(ldButton_t* ptWidget,arm_2d_tile_t* ptSelectMaskTile,ldColor selectColor)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->releaseImgAddr=releaseImgAddr;
-    pWidget->pressImgAddr=pressImgAddr;
-
-    switch (releaseMaskType)
-    {
-    case noMask:
-    case withMask:
-    {
-        pWidget->isWithReleaseMask=releaseMaskType;
-        break;
-    }
-    case onlyMask:
-    {
-        pWidget->isReleaseMaskOnly=true;
-        break;
-    }
-    default:
-        break;
-    }
-
-    switch (pressMaskType)
-    {
-    case noMask:
-    case withMask:
-    {
-        pWidget->isWithPressMask=releaseMaskType;
-        break;
-    }
-    case onlyMask:
-    {
-        pWidget->isPressMaskOnly=true;
-        break;
-    }
-    default:
-        break;
-    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptSelectMaskTile=ptSelectMaskTile;
+    ptWidget->selectColor=selectColor;
 }
 
-/**
- * @brief   选中按键的选中框(图片)
- * 
- * @param   pWidget         目标控件指针
- * @param   selectMaskAddr  选择效果显示的图片(蒙版)
- * @param   selectColor     显示的颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetSelectImage(ldButton_t* pWidget, uintptr_t selectMaskAddr, ldColor selectColor)
+void ldButtonSetTransparent(ldButton_t* ptWidget,bool isTransparent)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->selectMaskAddr=selectMaskAddr;
-    pWidget->selectColor=selectColor;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isTransparent=isTransparent;
 }
 
-/**
- * @brief   设置文字颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   charColor       文字颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetTextColor(ldButton_t* pWidget,ldColor charColor)
+void ldButtonSetRoundCorner(ldButton_t* ptWidget,bool isCorner)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->charColor=charColor;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isCorner=isCorner;
 }
 
-/**
- * @brief   按键设置为透明，则不显示，但按下有按键效果
- *          例如触摸某图片的左右两侧后，会切换图片，
- *          则可以使用功能两个透明按键放置图片顶层的两侧，
- *          即可实现该功能
- * @param   pWidget         目标控件指针
- * @param   isTransparent   true=透明 false=不透明
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetTransparent(ldButton_t* pWidget,bool isTransparent)
+void ldButtonSetSelect(ldButton_t* ptWidget,bool isSelected)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isTransparent=isTransparent;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isSelected=isSelected;
 }
 
-/**
- * @brief   按键实现圆角显示效果
- * 
- * @param   pWidget         目标控件指针
- * @param   isCorner        true=圆角 false=方角
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetRoundCorner(ldButton_t* pWidget,bool isCorner)
+void ldButtonSetFont(ldButton_t *ptWidget, arm_2d_font_t *ptFont)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isCorner=isCorner;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptFont=ptFont;
 }
 
-/**
- * @brief   选择按键，触发选中的显示效果
- * 
- * @param   pWidget         目标控件指针
- * @param   isSelected      true=选中 false=不选中
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetSelect(ldButton_t* pWidget,bool isSelected)
+void ldButtonSetText(ldButton_t* ptWidget,uint8_t *pStr)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isSelected=isSelected;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ldFree(ptWidget->pStr);
+    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    if(ptWidget->pStr!=NULL)
+    {
+        strcpy((char*)ptWidget->pStr,(char*)pStr);
+    }
 }
 
-/**
- * @brief   文本的对齐方式
- * 
- * @param   pWidget         目标控件指针
- * @param   align           LD_ALIGN_CENTER
- *                          LD_ALIGN_TOP
- *                          LD_ALIGN_BOTTOM
- *                          LD_ALIGN_LEFT
- *                          LD_ALIGN_RIGHT
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetAlign(ldButton_t *pWidget,uint8_t align)
+void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->align=align;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->charColor=charColor;
 }
 
-/**
- * @brief   设置字体
- * 
- * @param   pWidget         目标控件指针
- * @param   pFontDict       字体指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-09
- */
-void ldButtonSetFont(ldButton_t *pWidget,ldFontDict_t *pFontDict)
+void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->pFontDict=pFontDict;
+    ptWidget->isCheckable=isCheckable;
 }
 
-/**
- * @brief   实现自锁按键效果
- *
- * @param   pWidget         目标控件指针
- * @param   isCheckable     true=自锁按键 false=普通按键
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2024-03-19
- */
-void ldButtonSetCheckable(ldButton_t *pWidget,bool isCheckable)
+void ldButtonSetKeyValue(ldButton_t *ptWidget,uint32_t value)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    pWidget->isCheckable=isCheckable;
+    ptWidget->keyValue=value;
 }
 
 #if defined(__clang__)
-#   pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif

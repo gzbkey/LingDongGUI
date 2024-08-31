@@ -1,39 +1,83 @@
-#ifndef _LD_IMAGE_H_
-#define _LD_IMAGE_H_
+/*
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-#ifdef __cplusplus
+#ifndef __LD_IMAGE_H__
+#define __LD_IMAGE_H__
+
+#ifdef   __cplusplus
 extern "C" {
 #endif
 
-#include "ldCommon.h"
-
-typedef struct {
-    LD_COMMON_ATTRIBUTES;
-    bool isWithMask:1;
-    bool isTransparent:1;//window专用
-    bool isColor:1;
-    ldColor bgColor;
-    ldColor specialColor;//maskColor charColor
-#if USE_OPACITY == 1
-    uint8_t opacity;
+#if defined(__clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wmissing-declarations"
+#   pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
+#   pragma clang diagnostic ignored "-Wpadded"
 #endif
-}ldImage_t;
 
-ldImage_t* ldImageInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x,int16_t y,int16_t width,int16_t height,uintptr_t imageAddr,bool isWithMask);
-void ldImageFrameUpdate(ldImage_t* pWidget);
-void ldImageLoop(arm_2d_scene_t *pScene,ldImage_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-void ldImageDel(ldImage_t *pWidget);
+/* OOC header, please DO NOT modify  */
+#ifdef __LD_IMAGE_IMPLEMENT__
+#   undef   __LD_IMAGE_IMPLEMENT__
+#   define  __ARM_2D_IMPL__
+#elif defined(__LD_IMAGE_INHERIT__)
+#   undef   __LD_IMAGE_INHERIT__
+#   define __ARM_2D_INHERIT__
+#endif
 
-void ldImageSetBgColor(ldImage_t *pWidget,ldColor bgColor);
-void ldImageSetOpacity(ldImage_t *pWidget, uint8_t opacity);
-void ldImageSetImage(ldImage_t *pWidget, uintptr_t imageAddr, bool isWithMask);
-void ldImageSetGrayscale(ldImage_t *pWidget, uint8_t grayBit, ldColor writeColor);
+#include "arm_2d_utils.h"
+#include "ldBase.h"
 
-#define ldImageSetHidden          ldBaseSetHidden
-#define ldImageMove               ldBaseMove
+typedef struct ldImage_t ldImage_t;
 
-#ifdef __cplusplus
+struct ldImage_t {
+    implement(ldBase_t);
+//    ARM_PRIVATE(
+//            ld_scene_t *ptScene;
+//    )
+    ldColor bgColor;
+    ldColor fgColor;
+    arm_2d_tile_t* ptImgTile;
+    arm_2d_tile_t* ptMaskTile;
+    bool isTransparent:1;//window专用
+};
+
+ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, bool isWindow);
+void ldImage_depose( ldImage_t *ptWidget);
+void ldImage_on_load( ldImage_t *ptWidget);
+void ldImage_on_frame_start( ldImage_t *ptWidget);
+void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
+
+void ldImageSetBgColor(ldImage_t *ptWidget,ldColor bgColor);
+void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
+
+#define ldImageInit(nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile,isWindow) \
+        ldImage_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile,isWindow)
+
+#define ldImageSetHidden                ldBaseSetHidden
+#define ldImageMove                     ldBaseMove
+#define ldImageSetOpacity               ldBaseSetOpacity
+
+#if defined(__clang__)
+#   pragma clang diagnostic pop
+#endif
+
+#ifdef   __cplusplus
 }
 #endif
 
-#endif //_LD_IMAGE_H_
+#endif

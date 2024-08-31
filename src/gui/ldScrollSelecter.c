@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +16,16 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldScrollSelecter.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   scroll selecter widget
- */
+#define __LD_SCROLL_SELECTER_IMPLEMENT__
+
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldScrollSelecter.h"
-#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -39,64 +44,21 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-#define MOVE_SPEED_THRESHOLD_VALUE     (20)          //触摸移动速度超过此值，则产生惯性滑动效果
-#define SPEED_2_OFFSET(speed)          (speed*3)     //通过速度值，生成惯性滑动距离
+#define MOVE_SPEED_THRESHOLD_VALUE      (20)          //触摸移动速度超过此值，则产生惯性滑动效果
+#define SPEED_2_OFFSET(speed)           (speed*3)     //通过速度值，生成惯性滑动距离
 
-void ldScrollSelecterDel(ldScrollSelecter_t *pWidget);
-void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget);
-void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldScrollSelecterCommonFunc={
-    (ldDelFunc_t)ldScrollSelecterDel,
-    (ldLoopFunc_t)ldScrollSelecterLoop,
-    (ldUpdateFunc_t)ldScrollSelecterFrameUpdate,
+const ldBaseWidgetFunc_t ldScrollSelecterFunc = {
+    .depose = (ldDeposeFunc_t)ldScrollSelecter_depose,
+    .load = (ldLoadFunc_t)ldScrollSelecter_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldScrollSelecter_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldScrollSelecter_show,
 };
 
-static bool _scrollSelecterDel(xListNode *pEachInfo, void *pTarget)
+
+static uint8_t _ldScrollSelecterAutoItem(ldScrollSelecter_t *ptWidget,int16_t offset)
 {
-    if (pEachInfo->info == pTarget)
-    {
-        for(uint8_t i=0;i<((ldScrollSelecter_t *)pTarget)->itemCount;i++)
-        {
-            ldFree(((ldScrollSelecter_t *)pTarget)->ppItemStrGroup[i]);
-        }
-        ldFree(((ldScrollSelecter_t *)pTarget)->ppItemStrGroup);
-        ldFree(((ldScrollSelecter_t *)pTarget));
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
-
-void ldScrollSelecterDel(ldScrollSelecter_t *pWidget)
-{
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeScrollSelecter)
-    {
-        return;
-    }
-
-    LOG_INFO("[scrollSelecter] del,id:%d",pWidget->nameId);
-
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _scrollSelecterDel);
-    }
-}
-
-static uint8_t _ldScrollSelecterAutoItem(ldScrollSelecter_t *pWidget,int16_t offset)
-{
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
     if(offset>=0)
     {
         return 0;
@@ -105,16 +67,18 @@ static uint8_t _ldScrollSelecterAutoItem(ldScrollSelecter_t *pWidget,int16_t off
     offset=-offset;
     int16_t temp1,temp2;
 
-    temp1=offset%pResTile->tRegion.tSize.iHeight;
-    temp2=offset/pResTile->tRegion.tSize.iHeight;
-    if(temp1>=(pResTile->tRegion.tSize.iHeight/2))
+    uint16_t itemSpace=ptWidget->itemSpace+ptWidget->ptFont->tCharSize.iHeight;
+
+    temp1=offset%itemSpace;
+    temp2=offset/itemSpace;
+    if(temp1>=(itemSpace/2))
     {
         temp2++;
     }
 
-    if(temp2>=pWidget->itemCount)
+    if(temp2>=ptWidget->itemCount)
     {
-        temp2=pWidget->itemCount-1;
+        temp2=ptWidget->itemCount-1;
     }
 
     return temp2;
@@ -122,393 +86,329 @@ static uint8_t _ldScrollSelecterAutoItem(ldScrollSelecter_t *pWidget,int16_t off
 
 static int16_t _scrollOffset;
 
-static bool slotScrollSelecterScroll(xConnectInfo_t info)
+static bool slotScrollSelecterScroll(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    ldScrollSelecter_t *pWidget;
+    ldScrollSelecter_t *ptWidget=msg.ptSender;
 
-    pWidget=ldBaseGetWidgetById(info.receiverId);
-
-    switch (info.signalType)
+    switch (msg.signal)
     {
     case SIGNAL_PRESS:
     {
-        pWidget->isWaitMove=false;
-        pWidget->isAutoMove=false;
-        _scrollOffset=pWidget->scrollOffset;
-        pWidget->dirtyRegionState=waitChange;
+        ptWidget->isWaitMove=false;
+        ptWidget->isAutoMove=false;
+        _scrollOffset=ptWidget->scrollOffset;
         break;
     }
     case SIGNAL_HOLD_DOWN:
     {
-        pWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(info.value);
+        ptWidget->scrollOffset=_scrollOffset+(int16_t)GET_SIGNAL_OFFSET_Y(msg.value);
         break;
     }
     case SIGNAL_RELEASE:
     {
-        int16_t ySpeed=(int16_t)GET_SIGNAL_SPEED_Y(info.value);
+        int16_t ySpeed=(int16_t)GET_SIGNAL_SPEED_Y(msg.value);
 
         if((ySpeed>MOVE_SPEED_THRESHOLD_VALUE)||(ySpeed<-MOVE_SPEED_THRESHOLD_VALUE))
         {
-            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,_scrollOffset+SPEED_2_OFFSET(ySpeed));
-            pWidget->isAutoMove=true;
+            ptWidget->itemSelect=_ldScrollSelecterAutoItem(ptWidget,_scrollOffset+SPEED_2_OFFSET(ySpeed));
+            ptWidget->isAutoMove=true;
         }
-        if(!pWidget->isAutoMove)
+        if(!ptWidget->isAutoMove)
         {
-            pWidget->itemSelect=_ldScrollSelecterAutoItem(pWidget,pWidget->scrollOffset);
+            ptWidget->itemSelect=_ldScrollSelecterAutoItem(ptWidget,ptWidget->scrollOffset);
         }
-        pWidget->isWaitMove=true;
+        ptWidget->isWaitMove=true;
         break;
     }
     default:
         break;
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
     return false;
 }
 
-/**
- * @brief   滚动选择器初始化
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @param   pFontDict       字体指针
- * @param   itemMax         项目数量最大值
- * @return  ldScrollSelecter_t* 新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-ldScrollSelecter_t *ldScrollSelecterInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, ldFontDict_t *pFontDict, uint8_t itemMax)
+ldScrollSelecter_t* ldScrollSelecter_init( ld_scene_t *ptScene,ldScrollSelecter_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont)
 {
-    ldScrollSelecter_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
-    void **pNewStrGroup = NULL;
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldScrollSelecter_t);
-    pNewStrGroup=(void**)ldCalloc(sizeof (void*)*itemMax);
-
-    if ((pNewWidget != NULL)&&(pNewStrGroup != NULL))
+    if (NULL == ptWidget)
     {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldScrollSelecter_t));
+        if (NULL == ptWidget)
         {
-            pNewWidget->isParentHidden=true;
+            LOG_ERROR("[init failed][scrollSelecter] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeScrollSelecter;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pFontDict->maskType);
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->itemMax=itemMax;
-        pNewWidget->itemCount=0;
-        pNewWidget->ppItemStrGroup=pNewStrGroup;
-        for(uint8_t i=0;i<itemMax;i++)
-        {
-            pNewWidget->ppItemStrGroup[0]=NULL;
-        }
-#if USE_OPACITY == 1
-        pNewWidget->opacity=255;
-#endif
-        pNewWidget->charColor=0;
-        pNewWidget->pFontDict=pFontDict;
-        pNewWidget->isTransparent=true;
-        pNewWidget->bgColor=0;
-        pNewWidget->moveOffset=1;
-        pNewWidget->isAutoMove=false;
-        pNewWidget->isWaitMove=false;
-        pNewWidget->pFunc=&ldScrollSelecterCommonFunc;
-        pNewWidget->isWaitInit=true;
+    }
 
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
-        xConnect(pNewWidget->nameId,SIGNAL_PRESS,pNewWidget->nameId,slotScrollSelecterScroll);
-        xConnect(pNewWidget->nameId,SIGNAL_HOLD_DOWN,pNewWidget->nameId,slotScrollSelecterScroll);
-        xConnect(pNewWidget->nameId,SIGNAL_RELEASE,pNewWidget->nameId,slotScrollSelecterScroll);
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeScrollSelecter;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldScrollSelecterFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
-        LOG_INFO("[scrollSelecter] init,id:%d",nameId);
+    ptWidget->itemCount=0;
+    ptWidget->ppItemStrGroup=NULL;
+    ptWidget->charColor=0;
+    ptWidget->ptFont=ptFont;
+    ptWidget->isTransparent=true;
+    ptWidget->bgColor=0;
+    ptWidget->moveOffset=1;
+    ptWidget->indicatorColor=GLCD_COLOR_DARK_GREY;
+
+    ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight*3;
+
+    if(ptWidget->itemSpace>0)
+    {
+        ptWidget->itemSpace=ptWidget->itemSpace>>1;
+        ptWidget->is3Row=true;
+        LOG_INFO("[init auto][scrollSelecter] 3 row mode");
     }
     else
     {
-        ldFree(pNewWidget);
-        ldFree(pNewStrGroup);
+        ptWidget->is3Row=false;
+        ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight;
 
-        LOG_ERROR("[scrollSelecter] init failed,id:%d",nameId);
-    }
-
-    return pNewWidget;
-}
-
-void ldScrollSelecterFrameUpdate(ldScrollSelecter_t* pWidget)
-{
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
-}
-
-void ldScrollSelecterLoop(arm_2d_scene_t *pScene,ldScrollSelecter_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
-{
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
-
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
-#endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
-    {
-        return;
-    }
-
-    if((pWidget->isWaitMove)&&(bIsNewFrame))
-    {
-        int16_t targetOffset=-(pWidget->itemSelect*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight);
-
-        pWidget->dirtyRegionState=waitChange;
-        if(pWidget->scrollOffset==targetOffset)
+        LOG_INFO("[init auto][scrollSelecter] 1 row mode");
+        if(ptWidget->itemSpace>0)
         {
-            pWidget->isWaitMove=false;
-            pWidget->dirtyRegionState=none;
+            ptWidget->itemSpace=ptWidget->itemSpace>>1;
         }
         else
         {
-            if(pWidget->scrollOffset>targetOffset)
+            ptWidget->itemSpace=0;
+        }
+    }
+
+    ldMsgConnect(ptWidget,SIGNAL_PRESS,slotScrollSelecterScroll);
+    ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotScrollSelecterScroll);
+    ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotScrollSelecterScroll);
+
+    LOG_INFO("[init][scrollSelecter] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
+}
+
+void ldScrollSelecter_depose( ldScrollSelecter_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeScrollSelecter)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][scrollSelecter] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+
+    ldFree(ptWidget);
+}
+
+void ldScrollSelecter_on_load( ldScrollSelecter_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldScrollSelecter_on_frame_start( ldScrollSelecter_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+
+    if((ptWidget->isWaitMove)&&(bIsNewFrame))
+    {
+        int16_t targetOffset=(-ptWidget->itemSelect)*(ptWidget->itemSpace+ptWidget->ptFont->tCharSize.iHeight);
+
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        if(ptWidget->scrollOffset==targetOffset)
+        {
+            ptWidget->isWaitMove=false;
+        }
+        else
+        {
+            if(ptWidget->scrollOffset>targetOffset)
             {
-                pWidget->scrollOffset-=pWidget->moveOffset;
-                if(pWidget->scrollOffset<targetOffset)
+                ptWidget->scrollOffset-=ptWidget->moveOffset;
+                if(ptWidget->scrollOffset<targetOffset)
                 {
-                    pWidget->scrollOffset=targetOffset;
+                    ptWidget->scrollOffset=targetOffset;
                 }
             }
             else
             {
-                pWidget->scrollOffset+=pWidget->moveOffset;
-                if(pWidget->scrollOffset>targetOffset)
+                ptWidget->scrollOffset+=ptWidget->moveOffset;
+                if(ptWidget->scrollOffset>targetOffset)
                 {
-                    pWidget->scrollOffset=targetOffset;
+                    ptWidget->scrollOffset=targetOffset;
                 }
             }
         }
     }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
-    arm_2d_container(pParentTile,tTarget , &newRegion)
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            if(pWidget->isWaitInit)
+            if(ptWidget->use_as__ldBase_t.isHidden)
             {
-                pWidget->isWaitInit=false;
-                pWidget->dirtyRegionState=none;
+                break;
             }
-        }
 
-        if(!pWidget->isTransparent)
-        {
-            if(pResTile->pchBuffer==(uint8_t*)LD_ADDR_NONE)
+            if(!ptWidget->isTransparent)
             {
-
-#if USE_OPACITY == 1
-            ldBaseColor(&tTarget,pWidget->bgColor,pWidget->opacity);
-#else
-            ldBaseColor(&tTarget,pWidget->bgColor,255);
-#endif
+                if(ptWidget->ptImgTile==NULL)
+                {
+                    ldBaseColor(&tTarget,NULL,ptWidget->bgColor,ptWidget->use_as__ldBase_t.opacity);
+                }
+                else
+                {
+                    ldBaseImage(&tTarget,NULL,ptWidget->ptImgTile,NULL,0,ptWidget->use_as__ldBase_t.opacity);
+                }
+                arm_2d_op_wait_async(NULL);
             }
-            else
+
+            arm_2d_region_t itemsRegion={
+                .tLocation={
+                    .iX=0,
+                    .iY=0,
+                },
+                .tSize={
+                    .iWidth=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth,
+                    .iHeight=ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace,
+                }
+            };
+
+            for(uint8_t strGroupCount=0;strGroupCount<ptWidget->itemCount;strGroupCount++)
             {
-                ((arm_2d_tile_t*)&tempRes)->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-#if USE_OPACITY == 1
-            ldBaseImage(&tTarget,&tempRes,false,pWidget->opacity);
-#else
-            ldBaseImage(&tTarget,&tempRes,false,255);
-#endif
+                itemsRegion.tLocation.iY=(strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace))+ptWidget->scrollOffset;
+                if(ptWidget->is3Row)
+                {
+                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight;
+                }
+
+                ldBaseLabel(&tTarget,
+                            &itemsRegion,
+                            ptWidget->ppItemStrGroup[strGroupCount],
+                            ptWidget->ptFont,
+                            ARM_2D_ALIGN_BOTTOM,
+                            ptWidget->charColor,
+                            ptWidget->use_as__ldBase_t.opacity);
+            }
+
+            if(ptWidget->is3Row)
+            {
+                if(ptWidget->ptIndicatorTile==NULL)
+                {
+#define LINE_HEIGHT   2
+                    itemsRegion.tLocation.iY=ptWidget->ptFont->tCharSize.iHeight+((ptWidget->itemSpace+LINE_HEIGHT)>>1);
+                    itemsRegion.tSize.iHeight=LINE_HEIGHT;
+                    arm_2d_draw_box(&tTarget,&itemsRegion,1,ptWidget->indicatorColor,255);
+
+                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace;
+                    arm_2d_draw_box(&tTarget,&itemsRegion,1,ptWidget->indicatorColor,255);
+                }
+                else
+                {
+                    ldBaseImage(&tTarget,NULL,NULL,ptWidget->ptIndicatorTile,ptWidget->indicatorColor,ptWidget->use_as__ldBase_t.opacity);
+                }
             }
             arm_2d_op_wait_async(NULL);
         }
-
-        pResTile->tInfo.tColourInfo.chScheme = ldBaseGetChScheme(pWidget->pFontDict->maskType);
-        for(uint8_t strGroupCount=0;strGroupCount<pWidget->itemCount;strGroupCount++)
-        {
-            uint8_t *pStrGroup=pWidget->ppItemStrGroup[strGroupCount];
-            int16_t offset=(strGroupCount*((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)+pWidget->scrollOffset;
-#if USE_OPACITY == 1
-            ldBaseLineText(&tTarget,&pWidget->resource,pStrGroup,pWidget->pFontDict,pWidget->align,pWidget->charColor,offset,pWidget->opacity);
-#else
-            ldBaseLineText(&tTarget,&pWidget->resource,pStrGroup,pWidget->pFontDict,pWidget->align,pWidget->charColor,offset,255);
-#endif
-        }
-        arm_2d_op_wait_async(NULL);
     }
+
+    arm_2d_op_wait_async(NULL);
 }
 
-/**
- * @brief   添加项目内容
- * 
- * @param   pWidget         目标控件指针
- * @param   pStr            项目显示的字符串
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterAddItem(ldScrollSelecter_t* pWidget,uint8_t *pStr)
+void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-
-    if(pWidget->itemCount<pWidget->itemMax)
-    {
-        if(pWidget->ppItemStrGroup[pWidget->itemCount]==NULL)
-        {
-            pWidget->ppItemStrGroup[pWidget->itemCount]=LD_CALLOC_STRING(pStr);
-            strcpy(pWidget->ppItemStrGroup[pWidget->itemCount],(char*)pStr);
-            pWidget->itemCount++;
-        }
-    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ppItemStrGroup=pStrArray;
+    ptWidget->itemCount=arraySize;
 }
 
-/**
- * @brief   设置文本颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   charColor       文本颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetTextColor(ldScrollSelecter_t* pWidget,ldColor charColor)
+void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->charColor=charColor;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->charColor=charColor;
 }
 
-/**
- * @brief   设置背景颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   bgColor         背景颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetBgColor(ldScrollSelecter_t* pWidget,ldColor bgColor)
+void ldScrollSelecterSetBgColor(ldScrollSelecter_t* ptWidget,ldColor bgColor)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->bgColor=bgColor;
-    ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-    ((arm_2d_vres_t*)&pWidget->resource)->pTarget = LD_ADDR_NONE;
-#endif
-    pWidget->isTransparent=false;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->bgColor=bgColor;
+    ptWidget->ptImgTile=NULL;
+    ptWidget->isTransparent=false;
 }
 
-/**
- * @brief   设置背景图片
- * 
- * @param   pWidget         目标控件指针
- * @param   imgAddr         背景图片地址
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetBgImage(ldScrollSelecter_t* pWidget,uint32_t imgAddr)
+void ldScrollSelecterSetBgImage(ldScrollSelecter_t* ptWidget,arm_2d_tile_t *ptImgTile)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    ((arm_2d_tile_t*)&pWidget->resource)->pchBuffer = (uint8_t*)imgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-    ((arm_2d_vres_t*)&pWidget->resource)->pTarget = imgAddr;
-#endif
-    pWidget->isTransparent=false;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptImgTile=ptImgTile;
+    ptWidget->isTransparent=false;
 }
 
-/**
- * @brief   设置为背景透明
- * 
- * @param   pWidget         目标控件指针
- * @param   isTransparent   true=透明 false=不透明
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent)
+void ldScrollSelecterSetTransparent(ldScrollSelecter_t* ptWidget,bool isTransparent)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isTransparent=isTransparent;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isTransparent=isTransparent;
 }
 
-/**
- * @brief   设置不透明度
- * 
- * @param   pWidget         目标控件指针
- * @param   opacity         不透明度 0-255
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetOpacity(ldScrollSelecter_t *pWidget, uint8_t opacity)
+void ldScrollSelecterSetSpeed(ldScrollSelecter_t *ptWidget, uint8_t speed)
 {
-    if (pWidget == NULL)
-    {
-        return;
-    }
-#if USE_OPACITY == 1
-    pWidget->opacity=opacity;
-#endif
-}
-
-/**
- * @brief   设置移动速度
- * 
- * @param   pWidget         目标控件指针
- * @param   speed           速度值，最小值:1,最大值：控件高度
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
-{
-    if (pWidget == NULL)
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
     {
         return;
     }
@@ -516,55 +416,54 @@ void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed)
     {
         speed=1;
     }
-    if(speed>((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight)
+    if(speed>ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)
     {
-        speed=((arm_2d_tile_t*)&pWidget->resource)->tRegion.tSize.iHeight;
+        speed=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
     }
-    pWidget->moveOffset=speed;
+    ptWidget->moveOffset=speed;
 }
 
-/**
- * @brief   选中项目
- * 
- * @param   pWidget         目标控件指针
- * @param   itemNum         项目编号，0开始
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetItem(ldScrollSelecter_t *pWidget, uint8_t itemNum)
+void ldScrollSelecterSelectItem(ldScrollSelecter_t *ptWidget, uint8_t itemNum)
 {
-    if (pWidget == NULL)
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
     {
         return;
     }
-    if(itemNum>=pWidget->itemCount)
+    if(itemNum>=ptWidget->itemCount)
     {
-        itemNum=pWidget->itemCount-1;
+        itemNum=ptWidget->itemCount-1;
     }
-    pWidget->itemSelect=itemNum;
-    pWidget->isWaitMove=true;
+    ptWidget->itemSelect=itemNum;
+    ptWidget->isWaitMove=true;
 }
 
-/**
- * @brief   设置文字对齐方式
- * 
- * @param   pWidget         目标控件指针
- * @param   align           LD_ALIGN_CENTER
- *                          LD_ALIGN_TOP
- *                          LD_ALIGN_BOTTOM
- *                          LD_ALIGN_LEFT
- *                          LD_ALIGN_RIGHT
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldScrollSelecterSetAlign(ldScrollSelecter_t *pWidget,uint8_t align)
+void lldScrollSelecterSetOneRowMode(ldScrollSelecter_t *ptWidget, bool isOneRow)
 {
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->align=align;
+    ptWidget->is3Row=isOneRow;
+
+    if(ptWidget->is3Row)
+    {
+        ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight*3;
+    }
+    else
+    {
+        ptWidget->itemSpace=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight;
+    }
+
+    if(ptWidget->itemSpace>0)
+    {
+        ptWidget->itemSpace=ptWidget->itemSpace>>1;
+    }
+    else
+    {
+        ptWidget->itemSpace=0;
+    }
 }
 
 #if defined(__clang__)

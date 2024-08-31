@@ -1,5 +1,7 @@
 /*
- * Copyright 2021-2024 Ou Jianbo 59935554@qq.com
+ * Copyright (c) 2021-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 /**
  * @file    xQueue.c
@@ -40,7 +42,7 @@ xQueue_t* xQueueCreate(uint32_t length, uint32_t itemSize)
 
     Queue_Data_Buff_Size=length*itemSize;
     //申请队列总空间
-    pNewQueue=( xQueue_t * ) XCALLOC ( sizeof( xQueue_t ) + Queue_Data_Buff_Size ) ;
+    pNewQueue=( xQueue_t * ) XMALLOC ( sizeof( xQueue_t ) + Queue_Data_Buff_Size ) ;
 
     if(pNewQueue!=NULL)
     {
@@ -66,6 +68,10 @@ xQueue_t* xQueueCreate(uint32_t length, uint32_t itemSize)
 
 void xQueueClear(xQueue_t* queue)
 {
+    if(queue==NULL)
+    {
+        return;
+    }
     queue->head=queue->tail;
 }
 
@@ -89,6 +95,10 @@ bool xQueueIsEmpty(xQueue_t *queue)
 
 uint32_t xQueueGetLength(xQueue_t *queue)
 {
+    if(queue==NULL)
+    {
+        return false;
+    }
     if(xQueueIsEmpty(queue)==true)
     {
         return 0;
@@ -117,6 +127,10 @@ bool xQueueEnqueue(xQueue_t *queue,void * pInItem,uint32_t itemSize)
 {
     // 数据首地址 queue->pDataBase+uiItemSize*(queue->tail)
 
+    if(queue==NULL)
+    {
+        return false;
+    }
     //判断是否满
     if(xQueueIsFull(queue)==false)
     {
@@ -132,6 +146,10 @@ bool xQueueEnqueue(xQueue_t *queue,void * pInItem,uint32_t itemSize)
 
 bool xQueueDequeue(xQueue_t *queue,void * pOutItem,uint32_t itemSize)
 {
+    if(queue==NULL)
+    {
+        return false;
+    }
     //判断是否空
     if(xQueueIsEmpty(queue)==false)
     {

@@ -1,5 +1,7 @@
 /*
- * Copyright 2023-2024 Ou Jianbo (59935554@qq.com)
+ * Copyright (c) 2023-2024 Ou Jianbo (59935554@qq.com). All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +16,15 @@
  * limitations under the License.
  */
 
-/**
- * @file    ldCheckBox.c
- * @author  Ou Jianbo(59935554@qq.com)
- * @brief   复选框 + 单选功能，支持自定义图片和文字显示
- */
+#define __LD_CHECK_BOX_IMPLEMENT__
+#include "./arm_extra_controls.h"
+#include "./__common.h"
+#include "arm_2d.h"
+#include "arm_2d_helper.h"
+#include <assert.h>
+#include <string.h>
+
 #include "ldCheckBox.h"
-#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -136,437 +140,422 @@ const arm_2d_tile_t checkBoxCheckedMask = {
     .pchBuffer = (uint8_t *)checked_png,
 };
 
-struct {
+static struct {
     uint16_t nameId;
     uint8_t group;
 }radioButtonValue;
 
-void ldCheckBoxDel(ldCheckBox_t *pWidget);
-void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget);
-void ldCheckBoxLoop(arm_2d_scene_t *pScene,ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame);
-const ldGuiCommonFunc_t ldCheckBoxCommonFunc={
-    (ldDelFunc_t)ldCheckBoxDel,
-    (ldLoopFunc_t)ldCheckBoxLoop,
-    (ldUpdateFunc_t)ldCheckBoxFrameUpdate,
+const ldBaseWidgetFunc_t ldCheckBoxFunc = {
+    .depose = (ldDeposeFunc_t)ldCheckBox_depose,
+    .load = (ldLoadFunc_t)ldCheckBox_on_load,
+#ifdef FRAME_START
+    .frameStart = (ldFrameStartFunc_t)ldCheckBox_on_frame_start,
+#endif
+    .show = (ldShowFunc_t)ldCheckBox_show,
 };
 
-static bool _checkBoxDel(xListNode *pEachInfo, void *pTarget)
+static bool slotCheckBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    if (pEachInfo->info == pTarget)
+    ldCheckBox_t *ptWidget=msg.ptSender;
+    if(msg.signal==SIGNAL_PRESS)
     {
-        ldFree(((ldCheckBox_t*)pTarget)->pStr);
-        ldFree(((ldCheckBox_t *)pTarget));
-        xListInfoDel(pEachInfo);
-    }
-    return false;
-}
-
-void ldCheckBoxDel(ldCheckBox_t *pWidget)
-{
-    xListNode *listInfo;
-
-    if (pWidget == NULL)
-    {
-        return;
-    }
-
-    if(pWidget->widgetType!=widgetTypeCheckBox)
-    {
-        return;
-    }
-
-    LOG_INFO("[checkBox] del,id:%d",pWidget->nameId);
-
-    xDeleteConnect(pWidget->nameId);
-
-    listInfo = ldBaseGetWidgetInfoById(((ldCommon_t *)pWidget->parentWidget)->nameId);
-    listInfo = ((ldCommon_t *)listInfo->info)->childList;
-
-    if (listInfo != NULL)
-    {
-        xListInfoPrevTraverse(listInfo, pWidget, _checkBoxDel);
-    }
-}
-
-static bool slotCheckBoxToggle(xConnectInfo_t info)
-{
-    ldCheckBox_t *pWidget=ldBaseGetWidgetById(info.receiverId);
-    if(info.signalType==SIGNAL_PRESS)
-    {
-        if(!pWidget->isRadioButton)
+        if(!ptWidget->isRadioButton)
         {
-            pWidget->isChecked=!pWidget->isChecked;
-            pWidget->dirtyRegionState=waitChange;
+            ptWidget->isChecked=!ptWidget->isChecked;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_VALUE_CHANGED,ptWidget->isChecked);
         }
         else
         {
-            if(pWidget->isChecked==false)
+            if(ptWidget->isChecked==false)
             {
-                pWidget->isChecked=true;
-                radioButtonValue.group=pWidget->radioButtonGroup;
-                radioButtonValue.nameId=pWidget->nameId;
-                pWidget->dirtyRegionState=waitChange;
+                ptWidget->isChecked=true;
+                radioButtonValue.group=ptWidget->radioButtonGroup;
+                radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
+                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,(radioButtonValue.group<<16)&0xFFFF+radioButtonValue.nameId);
             }
         }
     }
     return false;
 }
 
-/**
- * @brief   check box初始化函数
- * 
- * @param   pScene          场景指针
- * @param   nameId          新控件id
- * @param   parentNameId    父控件id
- * @param   x               相对坐标x轴
- * @param   y               相对坐标y轴
- * @param   width           控件宽度
- * @param   height          控件高度
- * @return  ldCheckBox_t*   新控件指针
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-ldCheckBox_t *ldCheckBoxInit(arm_2d_scene_t *pScene,uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
-    ldCheckBox_t *pNewWidget = NULL;
-    xListNode *parentInfo;
-    xListNode *parentList = NULL;
-    arm_2d_tile_t *tResTile;
+    assert(NULL != ptScene);
+    ldBase_t *ptParent;
 
-    parentInfo = ldBaseGetWidgetInfoById(parentNameId);
-    pNewWidget = LD_CALLOC_WIDGET_INFO(ldCheckBox_t);
-    if (pNewWidget != NULL)
+    if (NULL == ptWidget)
     {
-        pNewWidget->isParentHidden=false;
-        parentList = ((ldCommon_t *)parentInfo->info)->childList;
-        if(((ldCommon_t *)parentInfo->info)->isHidden||((ldCommon_t *)parentInfo->info)->isParentHidden)
+        ptWidget = ldCalloc(1, sizeof(ldCheckBox_t));
+        if (NULL == ptWidget)
         {
-            pNewWidget->isParentHidden=true;
+            LOG_ERROR("[init failed][checkBox] id:%d", nameId);
+            return NULL;
         }
-        pNewWidget->nameId = nameId;
-        pNewWidget->childList = NULL;
-        pNewWidget->widgetType = widgetTypeCheckBox;
-        xListInfoAdd(parentList, pNewWidget);
-        pNewWidget->parentWidget = parentInfo->info;
-        pNewWidget->isHidden = false;
-        tResTile=(arm_2d_tile_t*)&pNewWidget->resource;
-        tResTile->tRegion.tLocation.iX=x;
-        tResTile->tRegion.tLocation.iY=y;
-        tResTile->tRegion.tSize.iWidth=width;
-        tResTile->tRegion.tSize.iHeight=height;
-        tResTile->tInfo.bIsRoot = true;
-        tResTile->tInfo.bHasEnforcedColour = true;
-        tResTile->tInfo.tColourInfo.chScheme = ARM_2D_COLOUR;
-        tResTile->pchBuffer = (uint8_t*)LD_ADDR_NONE;
-#if USE_VIRTUAL_RESOURCE == 1
-        tResTile->tInfo.bVirtualResource = true;
-        ((arm_2d_vres_t*)tResTile)->pTarget = LD_ADDR_NONE;
-        ((arm_2d_vres_t*)tResTile)->Load = &__disp_adapter0_vres_asset_loader;
-        ((arm_2d_vres_t*)tResTile)->Depose = &__disp_adapter0_vres_buffer_deposer;
-#endif
-        pNewWidget->isCorner=false;
-        pNewWidget->isChecked=false;
-        pNewWidget->bgColor=__RGB(255,255,255);
-        pNewWidget->fgColor=__RGB(0,0,0);
-        pNewWidget->charColor=__RGB(0,0,0);
-        pNewWidget->checkedImgAddr=LD_ADDR_NONE;
-        pNewWidget->uncheckedImgAddr=LD_ADDR_NONE;
-        pNewWidget->pStr = NULL;
-        pNewWidget->pFontDict = NULL;
-        pNewWidget->align = 0;
-        pNewWidget->boxWidth=CHECK_BOX_SIZE;
-        pNewWidget->isRadioButton=false;
-        pNewWidget->radioButtonGroup=0;
-        pNewWidget->pFunc=&ldCheckBoxCommonFunc;
-
-        arm_2d_scene_player_dynamic_dirty_region_init(&pNewWidget->dirtyRegionListItem,pScene);
-
-        xConnect(nameId,SIGNAL_PRESS,nameId,slotCheckBoxToggle);
-
-        LOG_INFO("[checkBox] init,id:%d",nameId);
     }
     else
     {
-        ldFree(pNewWidget);
-
-        LOG_ERROR("[checkBox] init failed,id:%d",nameId);
+        memset(ptWidget, 0, sizeof(ldCheckBox_t));
     }
 
-    return pNewWidget;
+    ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
+    ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
+
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = x;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = y;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
+    ptWidget->use_as__ldBase_t.nameId = nameId;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeCheckBox;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldCheckBoxFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.opacity=255;
+    ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+
+    ptWidget->bgColor=__RGB(255,255,255);
+    ptWidget->fgColor=__RGB(0,0,0);
+    ptWidget->textColor=__RGB(0,0,0);
+    ptWidget->boxWidth=CHECK_BOX_SIZE;
+
+    ldMsgConnect(ptWidget,SIGNAL_PRESS,slotCheckBoxToggle);
+
+    LOG_INFO("[init][checkBox] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    return ptWidget;
 }
 
-void ldCheckBoxFrameUpdate(ldCheckBox_t* pWidget)
+void ldCheckBox_depose( ldCheckBox_t *ptWidget)
 {
-    arm_2d_dynamic_dirty_region_on_frame_start(&pWidget->dirtyRegionListItem,waitChange);
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeCheckBox)
+    {
+        return;
+    }
+
+    LOG_INFO("[depose][checkBox] id:%d", ptWidget->use_as__ldBase_t.nameId);
+
+    ldMsgDelConnect(ptWidget);
+    ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
+    ldFree(ptWidget->pStr);
+    ldFree(ptWidget);
 }
 
-void ldCheckBoxLoop(arm_2d_scene_t *pScene,ldCheckBox_t *pWidget,const arm_2d_tile_t *pParentTile,bool bIsNewFrame)
+void ldCheckBox_on_load( ldCheckBox_t *ptWidget)
 {
-    arm_2d_tile_t *pResTile=(arm_2d_tile_t*)&pWidget->resource;
+    assert(NULL != ptWidget);
+    
+}
 
-#if USE_VIRTUAL_RESOURCE == 0
-    arm_2d_tile_t tempRes=*pResTile;
-#else
-    arm_2d_vres_t tempRes=*((arm_2d_vres_t*)pResTile);
+void ldCheckBox_on_frame_start( ldCheckBox_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    
+}
+
+void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+
+#if 0
+    if (bIsNewFrame) {
+        
+    }
 #endif
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iX=0;
-    ((arm_2d_tile_t*)&tempRes)->tRegion.tLocation.iY=0;
 
-    if (pWidget == NULL)
-    {
-        return;
-    }
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
-    if((pWidget->isParentHidden)||(pWidget->isHidden))
+    if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
     {
-        return;
-    }
-
-    //自动清除radioButton选中状态
-    if((pWidget->isChecked)&&(pWidget->isRadioButton))
-    {
-        if((pWidget->radioButtonGroup==radioButtonValue.group)&&(pWidget->nameId!=radioButtonValue.nameId))
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
-            pWidget->isChecked=false;
-            pWidget->dirtyRegionState=waitChange;
-        }
-    }
+            if(ptWidget->use_as__ldBase_t.isHidden)
+            {
+                break;
+            }
 
-    arm_2d_region_t newRegion=ldBaseGetGlobalRegion((ldCommon_t*)pWidget,&pResTile->tRegion);
-
-    arm_2d_container(pParentTile,tTarget , &newRegion)
-    {
-        if(ldBaseDirtyRegionUpdate((ldCommon_t*)pWidget,&tTarget_canvas,&pWidget->dirtyRegionListItem,pWidget->dirtyRegionState))
-        {
-            pWidget->dirtyRegionState=none;
-        }
-
-        if ((pWidget->checkedImgAddr==LD_ADDR_NONE)&&(pWidget->uncheckedImgAddr==LD_ADDR_NONE))//color
-        {
-            do{
-                arm_2d_region_t tBoxRegion = {
-                    .tLocation = {
-                        .iX = 0,
-                        .iY = (pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2,
-                    },
-                    .tSize = {
-                        .iWidth=pWidget->boxWidth,
-                        .iHeight=pWidget->boxWidth,
-                    }
-                };
-
-                arm_2d_tile_t tChildTile;
-                arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
-
-                if((pWidget->isCorner)&&(!pWidget->isRadioButton))
+            //自动清除radioButton选中状态
+            if((ptWidget->isChecked)&&(ptWidget->isRadioButton))
+            {
+                if((ptWidget->radioButtonGroup==radioButtonValue.group)&&(ptWidget->use_as__ldBase_t.nameId!=radioButtonValue.nameId))
                 {
-                    draw_round_corner_box(&tTarget,
-                                          &tChildTile.tRegion,
-                                          pWidget->fgColor,
-                                          255,
-                                          bIsNewFrame,
-                                          &checkBoxCircleMask);
-
-                    tChildTile.tRegion.tLocation.iX+=1;
-                    tChildTile.tRegion.tLocation.iY+=1;
-                    tChildTile.tRegion.tSize.iWidth-=2;
-                    tChildTile.tRegion.tSize.iHeight-=2;
-                    draw_round_corner_box(&tTarget,
-                                          &tChildTile.tRegion,
-                                          pWidget->bgColor,
-                                          255,
-                                          bIsNewFrame,
-                                          &checkBoxCircleSmallMask);
-
-                    tChildTile.tRegion.tLocation.iX+=1;
-                    tChildTile.tRegion.tLocation.iY+=1;
-                    tChildTile.tRegion.tSize.iWidth-=2;
-                    tChildTile.tRegion.tSize.iHeight-=2;
+                    ptWidget->isChecked=false;
+                    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
                 }
-                else
-                {
-                    ldBaseColor(&tChildTile,pWidget->bgColor,255);
-                    arm_2d_draw_box(&tTarget,&tChildTile.tRegion,1,pWidget->fgColor,255);
+            }
 
-                    tChildTile.tRegion.tLocation.iX+=2;
-                    tChildTile.tRegion.tLocation.iY+=2;
-                    tChildTile.tRegion.tSize.iWidth-=4;
-                    tChildTile.tRegion.tSize.iHeight-=4;
+            arm_2d_region_t tBoxRegion = {
+                .tLocation = {
+                    .iX = 0,
+                    .iY = (ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->boxWidth)/2,
+                },
+                .tSize = {
+                    .iWidth=ptWidget->boxWidth,
+                    .iHeight=ptWidget->boxWidth,
                 }
+            };
+            arm_2d_tile_t tChildTile;
+            arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
 
-                if(pWidget->isChecked)
-                {
-                    if(pWidget->isRadioButton)
+            if ((ptWidget->ptCheckedImgTile==NULL)&&(ptWidget->ptUncheckedImgTile==NULL)&&(ptWidget->ptCheckedMaskTile==NULL)&&(ptWidget->ptUncheckedMaskTile==NULL))//color
+            {
+
+                    if((ptWidget->isCorner)&&(!ptWidget->isRadioButton))
                     {
-                        arm_2d_draw_box(&tTarget,&tChildTile.tRegion,5,pWidget->fgColor,255);
+                        draw_round_corner_box(&tTarget,
+                                              &tChildTile.tRegion,
+                                              ptWidget->fgColor,
+                                              ptWidget->use_as__ldBase_t.opacity,
+                                              bIsNewFrame,
+                                              &checkBoxCircleMask);
+
+                        tChildTile.tRegion.tLocation.iX+=1;
+                        tChildTile.tRegion.tLocation.iY+=1;
+                        tChildTile.tRegion.tSize.iWidth-=2;
+                        tChildTile.tRegion.tSize.iHeight-=2;
+                        draw_round_corner_box(&tTarget,
+                                              &tChildTile.tRegion,
+                                              ptWidget->bgColor,
+                                              ptWidget->use_as__ldBase_t.opacity,
+                                              bIsNewFrame,
+                                              &checkBoxCircleSmallMask);
                     }
                     else
                     {
-                        ldBaseMaskImage(&tChildTile,(arm_2d_tile_t*)&checkBoxCheckedMask,pWidget->fgColor,255);
+                        ldBaseColor(&tChildTile,
+                                    NULL,
+                                    ptWidget->bgColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                        arm_2d_draw_box(&tTarget,
+                                        &tChildTile.tRegion,
+                                        1,
+                                        ptWidget->fgColor,
+                                        ptWidget->use_as__ldBase_t.opacity);
+                    }
+                    arm_2d_op_wait_async(NULL);
+
+                    if(ptWidget->isChecked)
+                    {
+                        tBoxRegion.tLocation.iX+=2;
+                        tBoxRegion.tLocation.iY+=2;
+                        tBoxRegion.tSize=checkBoxCheckedMask.tRegion.tSize;
+                        arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+
+                        if(ptWidget->isRadioButton)
+                        {
+                            arm_2d_draw_box(&tTarget,
+                                            &tChildTile.tRegion,
+                                            5,
+                                            ptWidget->fgColor,
+                                            ptWidget->use_as__ldBase_t.opacity);
+                        }
+                        else
+                        {
+                            ldBaseImage(&tTarget,
+                                        &tChildTile.tRegion,
+                                        NULL,
+                                        (arm_2d_tile_t*)&checkBoxCheckedMask,
+                                        ptWidget->fgColor,
+                                        ptWidget->use_as__ldBase_t.opacity);
+                        }
+                        arm_2d_op_wait_async(NULL);
                     }
 
-                }
-            }while(0);
-        }
-        else
-        {
-            do{
-                ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iWidth=pWidget->boxWidth;
-                ((arm_2d_tile_t*)(&tempRes))->tRegion.tSize.iHeight=pWidget->boxWidth;
+                    if(ptWidget->pStr!=NULL)
+                    {
+                        tBoxRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+                        tBoxRegion.tLocation.iX=ptWidget->boxWidth+2;
+                        tBoxRegion.tLocation.iY=0;
+                        tBoxRegion.tSize.iWidth-=tBoxRegion.tLocation.iX;
 
-                //借用srcTile生成新tile
-                ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iX=0;
-                ((arm_2d_tile_t*)(&tempRes))->tRegion.tLocation.iY=(pResTile->tRegion.tSize.iHeight-pWidget->boxWidth)/2;
+                        arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
 
-                if(pWidget->isChecked)
+                        ldBaseLabel(&tTarget,
+                                    &tChildTile.tRegion,
+                                    ptWidget->pStr,
+                                    ptWidget->ptFont,
+                                    ARM_2D_ALIGN_LEFT,
+                                    ptWidget->textColor,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                        arm_2d_op_wait_async(NULL);
+                    }
+            }
+            else
+            {
+                do{
+                    if(ptWidget->isChecked)
+                    {
+                        ldBaseImage(&tTarget,
+                                    NULL,//&tChildTile.tRegion,
+                                    ptWidget->ptCheckedImgTile,
+                                    ptWidget->ptCheckedMaskTile,
+                                    0,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
+                    else
+                    {
+                        ldBaseImage(&tTarget,
+                                    NULL,//&tChildTile.tRegion,
+                                    ptWidget->ptUncheckedImgTile,
+                                    ptWidget->ptUncheckedMaskTile,
+                                    0,
+                                    ptWidget->use_as__ldBase_t.opacity);
+                    }
+                    arm_2d_op_wait_async(NULL);
+                }while(0);
+
+                if(ptWidget->pStr!=NULL)
                 {
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->checkedImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->checkedImgAddr;
-#endif
-                    ldBaseImage(&tTarget,&tempRes,pWidget->isWithCheckedMask,255);
-                }
-                else
-                {
-                    ((arm_2d_tile_t*)&tempRes)->pchBuffer = (uint8_t *)pWidget->uncheckedImgAddr;
-#if USE_VIRTUAL_RESOURCE == 1
-                    ((arm_2d_vres_t*)&tempRes)->pTarget=pWidget->uncheckedImgAddr;
-#endif
-                    ldBaseImage(&tTarget,&tempRes,pWidget->isWithUncheckedMask,255);
-                }
-            }while(0);
-        }
-        arm_2d_op_wait_async(NULL);
+                    tBoxRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
+                    tBoxRegion.tLocation.iX=ptWidget->boxWidth;
+                    tBoxRegion.tLocation.iY=0;
+                    tBoxRegion.tSize.iWidth-=tBoxRegion.tLocation.iX;
 
-        if(pWidget->pStr!=NULL)
-        {
-            //最后使用，不再生产中间变量，直接修改tTarget
-            tTarget.tRegion.tLocation.iX+=pWidget->boxWidth+2;
-            tTarget.tRegion.tSize.iWidth-=pWidget->boxWidth+2;
-            ldBaseLineText(&tTarget,&pWidget->resource,pWidget->pStr,pWidget->pFontDict,pWidget->align,pWidget->charColor,0,255);
+                    arm_2d_tile_generate_child(&tTarget, &tBoxRegion, &tChildTile, false);
+
+                    ldBaseLabel(&tTarget,
+                                &tChildTile.tRegion,
+                                ptWidget->pStr,
+                                ptWidget->ptFont,
+                                ARM_2D_ALIGN_LEFT,
+                                ptWidget->textColor,
+                                ptWidget->use_as__ldBase_t.opacity);
+                    arm_2d_op_wait_async(NULL);
+                }
+            }
             arm_2d_op_wait_async(NULL);
+
+
+        }
+    }
+
+    arm_2d_op_wait_async(NULL);
+}
+
+void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->bgColor=bgColor;
+    ptWidget->fgColor=fgColor;
+    ptWidget->ptUncheckedImgTile=NULL;
+    ptWidget->ptUncheckedMaskTile=NULL;
+    ptWidget->ptCheckedImgTile=NULL;
+    ptWidget->ptCheckedMaskTile=NULL;
+    ptWidget->boxWidth=CHECK_BOX_SIZE;
+}
+
+void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,arm_2d_tile_t* ptUncheckedImgTile,arm_2d_tile_t* ptUncheckedMaskTile,arm_2d_tile_t* ptCheckedImgTile,arm_2d_tile_t* ptCheckedMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptUncheckedImgTile=ptUncheckedImgTile;
+    ptWidget->ptUncheckedMaskTile=ptUncheckedMaskTile;
+    ptWidget->ptCheckedImgTile=ptCheckedImgTile;
+    ptWidget->ptCheckedMaskTile=ptCheckedMaskTile;
+}
+
+void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ldFree(ptWidget->pStr);
+    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    if(ptWidget->pStr!=NULL)
+    {
+        strcpy((char*)ptWidget->pStr,(char*)pStr);
+    }
+    ptWidget->ptFont=ptFont;
+}
+
+void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->isRadioButton=true;
+    ptWidget->radioButtonGroup=num;
+}
+
+void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isCorner=isCorner;
+}
+
+void ldCheckBoxSetTextColor(ldCheckBox_t* ptWidget, ldColor textColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->textColor=textColor;
+}
+
+void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+
+    if(!ptWidget->isRadioButton)
+    {
+        ptWidget->isChecked=isChecked;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    }
+    else
+    {
+        if(ptWidget->isChecked==false)
+        {
+            ptWidget->isChecked=true;
+            radioButtonValue.group=ptWidget->radioButtonGroup;
+            radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
     }
 }
 
-/**
- * @brief   设定颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   bgColor         背景颜色
- * @param   fgColor         前景颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-void ldCheckBoxSetColor(ldCheckBox_t* pWidget,ldColor bgColor,ldColor fgColor)
+void ldCheckBoxSetStringLeftSpace(ldCheckBox_t* ptWidget,uint16_t space)
 {
-    pWidget->bgColor=bgColor;
-    pWidget->fgColor=fgColor;
-    pWidget->uncheckedImgAddr=LD_ADDR_NONE;
-    pWidget->checkedImgAddr=LD_ADDR_NONE;
-    pWidget->boxWidth=CHECK_BOX_SIZE;
-}
-
-/**
- * @brief   设定图片，只能设定方型图片
- * 
- * @param   pWidget          目标控件指针
- * @param   boxWidth         图片宽度
- * @param   uncheckedImgAddr 未选中的显示图片
- * @param   isUncheckedMask  未选中图片是否带透明度
- * @param   checkedImgAddr   选中的显示图片
- * @param   isCheckedMask    选中图片是否带透明度
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-void ldCheckBoxSetImage(ldCheckBox_t* pWidget,uint16_t boxWidth,uintptr_t uncheckedImgAddr,bool isUncheckedMask,uintptr_t checkedImgAddr,bool isCheckedMask)
-{
-    if(pWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
     {
         return;
     }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->uncheckedImgAddr=uncheckedImgAddr;
-    pWidget->checkedImgAddr=checkedImgAddr;
-    pWidget->isWithUncheckedMask=isUncheckedMask;
-    pWidget->isWithCheckedMask=isCheckedMask;
-    pWidget->boxWidth=boxWidth;
-}
-
-/**
- * @brief   设置显示文字
- * 
- * @param   pWidget         目标控件指针
- * @param   pStr            需要显示的字符串
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-void ldCheckBoxSetText(ldCheckBox_t* pWidget,ldFontDict_t *pFontDict,uint8_t *pStr)
-{
-    if(pWidget==NULL)
-    {
-        return;
-    }
-    pWidget->dirtyRegionState=waitChange;
-    ldFree(pWidget->pStr);
-    pWidget->pStr=LD_CALLOC_STRING(pStr);
-    strcpy((char*)pWidget->pStr,(char*)pStr);
-    pWidget->pFontDict=pFontDict;
-    pWidget->align=LD_ALIGN_LEFT;
-}
-
-/**
- * @brief   单选功能设定为同一组
- *          实现同一组的radio button自动单选
- * @param   pWidget         目标控件指针
- * @param   num             组号 0-255
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* pWidget,uint8_t num)
-{
-    if(pWidget==NULL)
-    {
-        return;
-    }
-    pWidget->isRadioButton=true;
-    pWidget->radioButtonGroup=num;
-}
-
-/**
- * @brief   实现圆角显示效果
- * 
- * @param   pWidget         目标控件指针
- * @param   isCorner        true=圆角 false=方角
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-11-10
- */
-void ldCheckBoxSetCorner(ldCheckBox_t* pWidget,bool isCorner)
-{
-    if(pWidget==NULL)
-    {
-        return;
-    }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->isCorner=isCorner;
-}
-
-/**
- * @brief   设置文本颜色
- * 
- * @param   pWidget         目标控件指针
- * @param   charColor       文本颜色
- * @author  Ou Jianbo(59935554@qq.com)
- * @date    2023-12-21
- */
-void ldCheckBoxSetCharColor(ldCheckBox_t* pWidget,ldColor charColor)
-{
-    if(pWidget==NULL)
-    {
-        return;
-    }
-    pWidget->dirtyRegionState=waitChange;
-    pWidget->charColor=charColor;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->boxWidth=space;
 }
 
 #if defined(__clang__)
