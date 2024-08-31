@@ -1,3 +1,4 @@
 [submodule "examples/common/Arm-2D"]
 	path = examples/common/Arm-2D
 	url = https://github.com/ARM-software/Arm-2D.git
+        branche = developing
