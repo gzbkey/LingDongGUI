@@ -9,10 +9,10 @@ simsun.ttc:
     string: '灵动GUI'
   - pixelSize: 24
     fontBitWidth: 8
-    string: '打印准备设置停止暂停配系统关于'
+    string: '打印准备设置停止暂停配系统关于WIFI速度 回零>一键调温备名称3DPrinter型号V0.8powbyldgu-_'
   - pixelSize: 18
     fontBitWidth: 8
-    string: '返回打印闹钟方块兔巧克力蛋糕福娃奶牛盒马克杯小房间进度0123456789%注意是否停止'
+    string: '返回打印闹钟方块兔巧克力蛋糕福娃奶牛盒马克杯小房间进度0123456789%注意是否停止PLABS温度设置℃调平灯光>声音亮度ONF '
   - pixelSize: 16
     fontBitWidth: 8
     string: '0123456789 <-:.EnterABC' # ±

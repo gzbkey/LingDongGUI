@@ -310,7 +310,7 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
 
             for(uint8_t i=0;i<ptWidget->itemCount;i++)
             {
-                itemRegion.tLocation.iY=i*ptWidget->itemHeight+ptWidget->offset;
+                itemRegion.tLocation.iY=i*ptWidget->itemHeight+ptWidget->offset+ptWidget->margin.top;
 
                 arm_2d_container(&tTarget,tItemTile , &itemRegion)
                 {
@@ -363,6 +363,7 @@ void ldList_show(ld_scene_t *ptScene, ldList_t *ptWidget, const arm_2d_tile_t *p
 
 void ldListSetItemHeight(ldList_t* ptWidget,uint8_t itemHeight)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -373,6 +374,7 @@ void ldListSetItemHeight(ldList_t* ptWidget,uint8_t itemHeight)
 
 void ldListSetText(ldList_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize, arm_2d_font_t *ptFont)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -385,6 +387,7 @@ void ldListSetText(ldList_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySi
 
 void ldListSetTextColor(ldList_t* ptWidget,ldColor textColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -395,6 +398,7 @@ void ldListSetTextColor(ldList_t* ptWidget,ldColor textColor)
 
 void ldListSetAlign(ldList_t *ptWidget,arm_2d_align_t tAlign)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -416,6 +420,7 @@ void ldListSetAlign(ldList_t *ptWidget,arm_2d_align_t tAlign)
 
 void ldListSetBgColor(ldList_t *ptWidget, ldColor bgColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -428,6 +433,7 @@ void ldListSetBgColor(ldList_t *ptWidget, ldColor bgColor)
 
 void ldListSetSelectColor(ldList_t* ptWidget,ldColor selectColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -438,6 +444,7 @@ void ldListSetSelectColor(ldList_t* ptWidget,ldColor selectColor)
 
 void ldListSetItemWidget(ldList_t* ptWidget,uint8_t itemNum,ldBase_t* childWidget)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -452,6 +459,7 @@ void ldListSetItemWidget(ldList_t* ptWidget,uint8_t itemNum,ldBase_t* childWidge
 
 int8_t ldListGetSelectItem(ldList_t* ptWidget)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return -1;
@@ -461,6 +469,7 @@ int8_t ldListGetSelectItem(ldList_t* ptWidget)
 
 void ldListSetSelectItem(ldList_t* ptWidget,int8_t itemNum)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -469,6 +478,31 @@ void ldListSetSelectItem(ldList_t* ptWidget,int8_t itemNum)
     ptWidget->selectItem=itemNum;
 }
 
+void ldListSetPadding(ldList_t* ptWidget,uint8_t top,uint8_t bottom,uint8_t left,uint8_t right)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->padding.top=top;
+    ptWidget->padding.bottom=bottom;
+    ptWidget->padding.left=left;
+    ptWidget->padding.right=right;
+}
+
+void ldListSetMargin(ldList_t* ptWidget,uint8_t top,uint8_t bottom,uint8_t left,uint8_t right)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->margin.top=top;
+    ptWidget->margin.bottom=bottom;
+    ptWidget->margin.left=left;
+    ptWidget->margin.right=right;
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

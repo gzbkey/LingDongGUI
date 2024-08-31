@@ -356,6 +356,18 @@ extern const arm_2d_tile_t c_tile_percent_bmp_CCCN888;
 #define IMAGE_PERCENT_BMP          (arm_2d_tile_t*)&c_tile_percent_bmp_CCCN888
 #endif
 
+// pid.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_pid_bmp_GRAY8;
+#define IMAGE_PID_BMP          (arm_2d_tile_t*)&c_tile_pid_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_pid_bmp_RGB565;
+#define IMAGE_PID_BMP          (arm_2d_tile_t*)&c_tile_pid_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_pid_bmp_CCCN888;
+#define IMAGE_PID_BMP          (arm_2d_tile_t*)&c_tile_pid_bmp_CCCN888
+#endif
+
 // pla.bmp < 30x30 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_pla_bmp_GRAY8;
@@ -492,6 +504,18 @@ extern const arm_2d_tile_t c_tile_smallRoom_s_png_A4Mask;
 extern const arm_2d_tile_t c_tile_smallRoom_s_png_Mask;
 #define IMAGE_SMALLROOM_S_PNG_Mask     (arm_2d_tile_t*)&c_tile_smallRoom_s_png_Mask
 
+// speed.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_speed_bmp_GRAY8;
+#define IMAGE_SPEED_BMP          (arm_2d_tile_t*)&c_tile_speed_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_speed_bmp_RGB565;
+#define IMAGE_SPEED_BMP          (arm_2d_tile_t*)&c_tile_speed_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_speed_bmp_CCCN888;
+#define IMAGE_SPEED_BMP          (arm_2d_tile_t*)&c_tile_speed_bmp_CCCN888
+#endif
+
 // tabBtnPress.bmp < 100x74 >
 #if LD_CFG_COLOR_DEPTH == 8
 extern const arm_2d_tile_t c_tile_tabBtnPress_bmp_GRAY8;
@@ -550,6 +574,30 @@ extern const arm_2d_tile_t c_tile_voice_bmp_RGB565;
 #else
 extern const arm_2d_tile_t c_tile_voice_bmp_CCCN888;
 #define IMAGE_VOICE_BMP          (arm_2d_tile_t*)&c_tile_voice_bmp_CCCN888
+#endif
+
+// wifi.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_wifi_bmp_GRAY8;
+#define IMAGE_WIFI_BMP          (arm_2d_tile_t*)&c_tile_wifi_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_wifi_bmp_RGB565;
+#define IMAGE_WIFI_BMP          (arm_2d_tile_t*)&c_tile_wifi_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_wifi_bmp_CCCN888;
+#define IMAGE_WIFI_BMP          (arm_2d_tile_t*)&c_tile_wifi_bmp_CCCN888
+#endif
+
+// zero.bmp < 30x30 >
+#if LD_CFG_COLOR_DEPTH == 8
+extern const arm_2d_tile_t c_tile_zero_bmp_GRAY8;
+#define IMAGE_ZERO_BMP          (arm_2d_tile_t*)&c_tile_zero_bmp_GRAY8
+#elif LD_CFG_COLOR_DEPTH == 16
+extern const arm_2d_tile_t c_tile_zero_bmp_RGB565;
+#define IMAGE_ZERO_BMP          (arm_2d_tile_t*)&c_tile_zero_bmp_RGB565
+#else
+extern const arm_2d_tile_t c_tile_zero_bmp_CCCN888;
+#define IMAGE_ZERO_BMP          (arm_2d_tile_t*)&c_tile_zero_bmp_CCCN888
 #endif
 
 #ifdef __cplusplus

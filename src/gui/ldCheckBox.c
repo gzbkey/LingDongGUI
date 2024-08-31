@@ -159,7 +159,23 @@ static bool slotCheckBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
     ldCheckBox_t *ptWidget=msg.ptSender;
     if(msg.signal==SIGNAL_PRESS)
     {
-        ldCheckBoxSetChecked(ptWidget,!ptWidget->isChecked);
+        if(!ptWidget->isRadioButton)
+        {
+            ptWidget->isChecked=!ptWidget->isChecked;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_VALUE_CHANGED,ptWidget->isChecked);
+        }
+        else
+        {
+            if(ptWidget->isChecked==false)
+            {
+                ptWidget->isChecked=true;
+                radioButtonValue.group=ptWidget->radioButtonGroup;
+                radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
+                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,(radioButtonValue.group<<16)&0xFFFF+radioButtonValue.nameId);
+            }
+        }
     }
     return false;
 }
@@ -200,7 +216,7 @@ ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint1
 
     ptWidget->bgColor=__RGB(255,255,255);
     ptWidget->fgColor=__RGB(0,0,0);
-    ptWidget->charColor=__RGB(0,0,0);
+    ptWidget->textColor=__RGB(0,0,0);
     ptWidget->boxWidth=CHECK_BOX_SIZE;
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotCheckBoxToggle);
@@ -368,7 +384,7 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                                     ptWidget->pStr,
                                     ptWidget->ptFont,
                                     ARM_2D_ALIGN_LEFT,
-                                    ptWidget->charColor,
+                                    ptWidget->textColor,
                                     ptWidget->use_as__ldBase_t.opacity);
                         arm_2d_op_wait_async(NULL);
                     }
@@ -411,7 +427,7 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
                                 ptWidget->pStr,
                                 ptWidget->ptFont,
                                 ARM_2D_ALIGN_LEFT,
-                                ptWidget->charColor,
+                                ptWidget->textColor,
                                 ptWidget->use_as__ldBase_t.opacity);
                     arm_2d_op_wait_async(NULL);
                 }
@@ -495,7 +511,7 @@ void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner)
     ptWidget->isCorner=isCorner;
 }
 
-void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor)
+void ldCheckBoxSetTextColor(ldCheckBox_t* ptWidget, ldColor textColor)
 {
     assert(NULL != ptWidget);
     if(ptWidget==NULL)
@@ -503,7 +519,7 @@ void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor)
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->charColor=charColor;
+    ptWidget->textColor=textColor;
 }
 
 void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked)

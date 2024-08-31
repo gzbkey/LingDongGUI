@@ -86,6 +86,8 @@ void ldListSetSelectColor(ldList_t* ptWidget,ldColor selectColor);
 void ldListSetItemWidget(ldList_t* ptWidget,uint8_t itemNum,ldBase_t* childWidget);
 int8_t ldListGetSelectItem(ldList_t* ptWidget);
 void ldListSetSelectItem(ldList_t* ptWidget,int8_t itemNum);
+void ldListSetPadding(ldList_t* ptWidget,uint8_t top,uint8_t bottom,uint8_t left,uint8_t right);
+void ldListSetMargin(ldList_t* ptWidget,uint8_t top,uint8_t bottom,uint8_t left,uint8_t right);
 
 #define ldListInit(nameId,parentNameId,x,y,width,height) \
         ldList_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)

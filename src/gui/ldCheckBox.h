@@ -49,7 +49,7 @@ struct ldCheckBox_t
     implement(ldBase_t);
     ldColor bgColor;
     ldColor fgColor;
-    ldColor charColor;
+    ldColor textColor;
     arm_2d_tile_t* ptUncheckedImgTile;
     arm_2d_tile_t* ptUncheckedMaskTile;
     arm_2d_tile_t* ptCheckedImgTile;
@@ -74,7 +74,7 @@ void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,arm_2d_tile_t* ptUncheckedImgTile
 void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr);
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num);
 void ldCheckBoxSetCorner(ldCheckBox_t* ptWidget,bool isCorner);
-void ldCheckBoxSetCharColor(ldCheckBox_t* ptWidget,ldColor charColor);
+void ldCheckBoxSetTextColor(ldCheckBox_t* ptWidget,ldColor textColor);
 void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked);
 void ldCheckBoxSetStringLeftSpace(ldCheckBox_t* ptWidget,uint16_t space);//only for image mode
 
