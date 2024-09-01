@@ -50,7 +50,7 @@ static void _msgBoxCallback(ld_scene_t *ptScene,ldMessageBox_t *ptWidget)
 
 static bool slotStopMsg(ld_scene_t *ptScene,ldMsg_t msg)
 {
-    void *obj=ldMessageBoxInit(ID_MSG_BOX,ID_BG,300,150,FONT_SIMSUN_18);
+    void *obj=ldMessageBoxInit(ID_MSG_BOX,ID_BG,300,150,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldMessageBoxSetTitle(obj,titleStr);
     ldMessageBoxSetMsg(obj,msgStr);
     ldMessageBoxSetBtn(obj,pBtnStr,2);
@@ -76,14 +76,14 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldWindowSetBgColor(obj,GLCD_COLOR_BLACK);
 
     obj=ldButtonInit(ID_BTN_RET,ID_BG,20,5,80,40);
-    ldButtonSetFont(obj,FONT_SIMSUN_18);
+    ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetColor(obj,__RGB(0x64,0x95,0xED),__RGB(0x41,0x69,0xE1));
     ldButtonSetRoundCorner(obj,true);
     ldButtonSetText(obj,"返回");
 
     connect(ID_BTN_RET,SIGNAL_RELEASE,slotJumpPrint);
 
-    obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,300,5,150,40,FONT_SIMSUN_16);
+    obj=ldDateTimeInit(ID_DATE_TIME,ID_BG,250,5,200,40,FONT_ALIBABAPUHUITI_3_55_REGULAR_16);
     ldDateTimeSetTextColor(obj,GLCD_COLOR_WHITE);
     ldDateTimeSetDate(obj,2024,8,17);
     ldDateTimeSetTime(obj,20,10,0);
@@ -91,7 +91,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     obj=ldImageInit(ID_IMG_VIEW,ID_BG,10,50,200,180,imgList[gPrintImgNum],NULL,false);
 
     obj=ldButtonInit(ID_BTN_STOP,ID_BG,220,180,120,50);
-    ldButtonSetFont(obj,FONT_SIMSUN_24);
+    ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_24);
     ldButtonSetColor(obj,__RGB(0xF4,0xA4,0x60),__RGB(0xD2,0x69,0x1E));
     ldButtonSetRoundCorner(obj,true);
     ldButtonSetText(obj,"停止");
@@ -99,7 +99,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     connect(ID_BTN_STOP,SIGNAL_RELEASE,slotStopMsg);
 
     obj=ldButtonInit(ID_BTN_PAUSE,ID_BG,350,180,120,50);
-    ldButtonSetFont(obj,FONT_SIMSUN_24);
+    ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_24);
     ldButtonSetColor(obj,__RGB(0xF4,0xA4,0x60),__RGB(0xD2,0x69,0x1E));
     ldButtonSetRoundCorner(obj,true);
     ldButtonSetCheckable(obj,true);
@@ -114,13 +114,13 @@ void uiPrintingInit(ld_scene_t* ptScene)
 
     obj=ldImageInit(ID_IMG_TEMP1,ID_BG,230,55,40,33,IMAGE_TEMP1_BMP,NULL,false);
 
-    obj=ldLabelInit(ID_LABEL_TEMP1,ID_BG,280,50,60,20,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_TEMP1,ID_BG,280,50,60,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"170");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
-    obj=ldLabelInit(ID_LABEL_TEMP2,ID_BG,280,70,60,20,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_TEMP2,ID_BG,280,70,60,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"200℃");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
@@ -128,13 +128,13 @@ void uiPrintingInit(ld_scene_t* ptScene)
 
     obj=ldImageInit(ID_IMG_TEMP2,ID_BG,230,120,40,33,IMAGE_TEMP2_BMP,NULL,false);
 
-    obj=ldLabelInit(ID_LABEL_TEMP3,ID_BG,280,110,60,20,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_TEMP3,ID_BG,280,110,60,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"60");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
-    obj=ldLabelInit(ID_LABEL_TEMP4,ID_BG,280,130,60,20,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_TEMP4,ID_BG,280,130,60,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"60℃");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
@@ -143,7 +143,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
 
     obj=ldImageInit(ID_IMG_PERCENT,ID_BG,360,55,40,33,IMAGE_PERCENT_BMP,NULL,false);
 
-    obj=ldLabelInit(ID_LABEL_PERCENT,ID_BG,410,60,80,20,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_PERCENT,ID_BG,410,60,80,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"60%");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
@@ -152,20 +152,20 @@ void uiPrintingInit(ld_scene_t* ptScene)
 
     obj=ldImageInit(ID_IMG_HEIGHT,ID_BG,360,120,40,33,IMAGE_HEIGHT_BMP,NULL,false);
 
-    obj=ldLabelInit(ID_LABEL_HEIGHT,ID_BG,410,130,80,20,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_HEIGHT,ID_BG,410,130,80,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"0.1MM");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
 
-    obj=ldLabelInit(ID_LABEL1,ID_BG,10,232,80,20,FONT_SIMSUN_18);
+    obj=ldLabelInit(ID_LABEL1,ID_BG,10,232,80,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldLabelSetText(obj,"打印进度");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
-    obj=ldLabelInit(ID_LABEL_PRINT_PERCENT,ID_BG,400,232,70,20,FONT_SIMSUN_18);
+    obj=ldLabelInit(ID_LABEL_PRINT_PERCENT,ID_BG,400,232,70,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldLabelSetText(obj,"0%");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);

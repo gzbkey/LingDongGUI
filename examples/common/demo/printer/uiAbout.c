@@ -30,13 +30,13 @@ void uiAboutInit(ld_scene_t* ptScene)
     ldWindowSetBgColor(obj,GLCD_COLOR_BLACK);
 
     obj=ldButtonInit(ID_BTN_RET,ID_BG,20,5,80,40);
-    ldButtonSetFont(obj,FONT_SIMSUN_18);
+    ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetColor(obj,__RGB(0x64,0x95,0xED),__RGB(0x41,0x69,0xE1));
     ldButtonSetRoundCorner(obj,true);
     ldButtonSetText(obj,"返回");
     connect(ID_BTN_RET,SIGNAL_RELEASE,slotJumpReady);
 
-    obj=ldTextInit(ID_TXT,ID_BG,20,50,440,200,FONT_SIMHEI_18,false);
+    obj=ldTextInit(ID_TXT,ID_BG,20,50,440,200,FONT_ALIBABAPUHUITI_3_55_REGULAR_18,false);
     ldTextSetText(obj,aboutText);
 }
 

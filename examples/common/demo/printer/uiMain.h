@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ldBase.h"
 #include "fonts/uiFonts.h"
-//#include "images/uiImages.h"
+#include "images/uiImages.h"
 
 extern const ldPageFuncGroup_t uiMainFunc;
 

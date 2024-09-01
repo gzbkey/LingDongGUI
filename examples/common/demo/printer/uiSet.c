@@ -70,7 +70,7 @@ void uiSetInit(ld_scene_t* ptScene)
     ldWindowSetBgColor(obj,GLCD_COLOR_BLACK);
 
     obj=ldButtonInit(ID_BTN_RET,ID_BG,20,5,80,40);
-    ldButtonSetFont(obj,FONT_SIMSUN_18);
+    ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetColor(obj,__RGB(0x64,0x95,0xED),__RGB(0x41,0x69,0xE1));
     ldButtonSetRoundCorner(obj,true);
     ldButtonSetText(obj,"返回");
@@ -81,7 +81,7 @@ void uiSetInit(ld_scene_t* ptScene)
     ldCheckBoxSetRadioButtonGroup(obj,0);
     ldCheckBoxSetChecked(obj,true);
     ldCheckBoxSetStringLeftSpace(obj,25);
-    ldCheckBoxSetText(obj,FONT_SIMSUN_24,"配置");
+    ldCheckBoxSetText(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_24,"配置");
     ldCheckBoxSetTextColor(obj,__RGB(244,139,0));
     connect(ID_CHECK_BOX_SET,SIGNAL_CLICKED_ITEM,slotTabChange);
 
@@ -89,7 +89,7 @@ void uiSetInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj,IMAGE_TABBTNRELEASE_BMP,NULL,IMAGE_TABBTNPRESS_BMP,NULL);
     ldCheckBoxSetRadioButtonGroup(obj,0);
     ldCheckBoxSetStringLeftSpace(obj,25);
-    ldCheckBoxSetText(obj,FONT_SIMSUN_24,"系统\n设置");
+    ldCheckBoxSetText(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_24,"系统\n设置");
     ldCheckBoxSetTextColor(obj,GLCD_COLOR_WHITE);
     connect(ID_CHECK_BOX_SYS,SIGNAL_CLICKED_ITEM,slotTabChange);
 
@@ -97,13 +97,13 @@ void uiSetInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj,IMAGE_TABBTNRELEASE_BMP,NULL,IMAGE_TABBTNPRESS_BMP,NULL);
     ldCheckBoxSetRadioButtonGroup(obj,0);
     ldCheckBoxSetStringLeftSpace(obj,25);
-    ldCheckBoxSetText(obj,FONT_SIMSUN_24,"关于");
+    ldCheckBoxSetText(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_24,"关于");
     ldCheckBoxSetTextColor(obj,GLCD_COLOR_WHITE);
     connect(ID_CHECK_BOX_ABOUT,SIGNAL_CLICKED_ITEM,slotTabChange);
 
     obj=ldListInit(ID_LIST,ID_BG,100,50,380,222);
     ldListSetItemHeight(obj,60);
-    ldListSetText(obj,listStr,8, FONT_SIMSUN_24);
+    ldListSetText(obj,listStr,8, FONT_ALIBABAPUHUITI_3_55_REGULAR_24);
     ldListSetAlign(obj,ARM_2D_ALIGN_LEFT);
     ldListSetMargin(obj,5,5,10,10);
     ldListSetSelectColor(obj,__RGB(244,139,0));
@@ -166,14 +166,14 @@ void uiSetDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_PLA_BMP,NULL,0,255);
             textRegion.tSize.iHeight=30;
-            ldBaseLabel(&boxTile,&textRegion,"PLA温度设置",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_GREEN,255);
+            ldBaseLabel(&boxTile,&textRegion,"PLA温度设置",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_GREEN,255);
             textRegion.tLocation.iY=30;
-            ldBaseLabel(&boxTile,&textRegion,"180℃",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"180℃",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
         else
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_WIFI_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"WIFI  >",FONT_SIMSUN_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"WIFI  >",FONT_ALIBABAPUHUITI_3_55_REGULAR_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
 
         boxTile.tRegion.tLocation.iX+=180;
@@ -182,14 +182,14 @@ void uiSetDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_ABS_BMP,NULL,0,255);
             textRegion.tLocation.iY=0;
-            ldBaseLabel(&boxTile,&textRegion,"ABS温度设置",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,__RGB(244,139,0),255);
+            ldBaseLabel(&boxTile,&textRegion,"ABS温度设置",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,__RGB(244,139,0),255);
             textRegion.tLocation.iY=30;
-            ldBaseLabel(&boxTile,&textRegion,"180℃",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"180℃",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
         else
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_SPEED_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"速度  >",FONT_SIMSUN_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"速度  >",FONT_ALIBABAPUHUITI_3_55_REGULAR_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
 
         boxTile.tRegion.tLocation.iX-=180;
@@ -200,12 +200,12 @@ void uiSetDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
             ldBaseImage(&boxTile,&iconRegion,IMAGE_BALANCE_BMP,NULL,0,255);
             textRegion.tLocation.iY=0;
             textRegion.tSize.iHeight=60;
-            ldBaseLabel(&boxTile,&textRegion,"调平   >",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"调平   >",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
         else
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_ZERO_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"回零  >",FONT_SIMSUN_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"回零  >",FONT_ALIBABAPUHUITI_3_55_REGULAR_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
 
         boxTile.tRegion.tLocation.iX+=180;
@@ -213,12 +213,12 @@ void uiSetDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
         if(itemNum==0)
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_LIGHT_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"灯光",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"灯光",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
         else
         {
             ldBaseImage(&boxTile,&iconRegion,IMAGE_PID_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"一键调温>",FONT_SIMSUN_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"一键调温>",FONT_ALIBABAPUHUITI_3_55_REGULAR_24,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
 
         if(itemNum==0)
@@ -227,12 +227,12 @@ void uiSetDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
             boxTile.tRegion.tLocation.iY+=72;
             draw_round_corner_box(&boxTile,NULL,__RGB(25,25,25),255,bIsNewFrame);
             ldBaseImage(&boxTile,&iconRegion,IMAGE_VOICE_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"声音",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"声音",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
 
             boxTile.tRegion.tLocation.iX+=180;
             draw_round_corner_box(&boxTile,NULL,__RGB(25,25,25),255,bIsNewFrame);
             ldBaseImage(&boxTile,&iconRegion,IMAGE_BRIGHTNESS_BMP,NULL,0,255);
-            ldBaseLabel(&boxTile,&textRegion,"亮度   >",FONT_SIMSUN_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
+            ldBaseLabel(&boxTile,&textRegion,"亮度   >",FONT_ALIBABAPUHUITI_3_55_REGULAR_18,ARM_2D_ALIGN_LEFT,GLCD_COLOR_WHITE,255);
         }
     }
 }

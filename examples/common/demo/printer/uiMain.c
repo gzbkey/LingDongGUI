@@ -40,20 +40,17 @@ void uiMainInit(ld_scene_t* ptScene)
     obj=ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
     ldWindowSetBgColor(obj,GLCD_COLOR_BLACK);
 
-    obj=ldButtonInit(ID_BTN_PRINT,ID_BG,27,67,125,155);
+    obj=ldButtonInit(ID_BTN_PRINT,ID_BG,27,67,124,158);
     ldButtonSetRoundCorner(obj,true);
-    ldButtonSetFont(obj,FONT_SIMSUN_24);
-    ldButtonSetText(obj,"打印");
+    ldButtonSetImage(obj,IMAGE_MAINBTNPRINT_BMP,NULL,IMAGE_MAINBTNPRINT_BMP,NULL);
 
-    obj=ldButtonInit(ID_BTN_WAIT,ID_BG,178,67,125,155);
+    obj=ldButtonInit(ID_BTN_WAIT,ID_BG,178,67,124,158);
     ldButtonSetRoundCorner(obj,true);
-    ldButtonSetFont(obj,FONT_SIMSUN_24);
-    ldButtonSetText(obj,"准备");
+    ldButtonSetImage(obj,IMAGE_MAINBTNREADY_BMP,NULL,IMAGE_MAINBTNREADY_BMP,NULL);
 
-    obj=ldButtonInit(ID_BTN_SET,ID_BG,329,67,125,155);
+    obj=ldButtonInit(ID_BTN_SET,ID_BG,329,67,124,158);
     ldButtonSetRoundCorner(obj,true);
-    ldButtonSetFont(obj,FONT_SIMSUN_24);
-    ldButtonSetText(obj,"设置");
+    ldButtonSetImage(obj,IMAGE_MAINBTNSET_BMP,NULL,IMAGE_MAINBTNSET_BMP,NULL);
 
     connect(ID_BTN_PRINT,SIGNAL_RELEASE,slotJumpPrint);
     connect(ID_BTN_WAIT,SIGNAL_RELEASE,slotJumpReady);

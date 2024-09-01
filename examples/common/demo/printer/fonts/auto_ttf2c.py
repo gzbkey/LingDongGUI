@@ -46,11 +46,18 @@ def generate_font_data_for_each_config(font_config, output_dir):
         ttf_path = f"{output_dir}/{font_name}"
         if os.name == 'nt':  # Windows
             ttf_path = f"C:/Windows/Fonts/{font_name}"
+            if not os.path.exists(ttf_path):
+                ttf_path = f"{Path.home()}/AppData/Local/Microsoft/Windows/Fonts/{font_name}"
+                if not os.path.exists(ttf_path):
+                    ttf_path = f"{output_dir}/{font_name}"
+
         print('['+font_name+']\n    '+ttf_path+'\n')
         for config in configs:
             pixel_size = config['pixelSize']
             font_bit_width = config.get('fontBitWidth', None)
             base_font_name = Path(font_name).stem
+            base_font_name = base_font_name.replace('-', '_')
+            base_font_name = base_font_name.replace(' ', '_')
             output_c = f"{output_dir}/{base_font_name}_{pixel_size}.c"
             print('    pixelSize:',pixel_size)
 

@@ -21,7 +21,8 @@ void uiLogoInit(ld_scene_t* ptScene)
 
     ldWindowInit(0, 0, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
 
-    obj=ldLabelInit(ID_LOGO,ID_BG,0,0,200,200,FONT_SIMSUN_48);
+    obj=ldLabelInit(ID_LOGO,ID_BG,0,0,270,270,FONT_ALIBABAPUHUITI_3_55_REGULAR_48);
+    ldLabelSetTransparent(obj,true);
     ldLabelSetText(obj,"灵动GUI");
     ldBaseSetCenter(obj);
 

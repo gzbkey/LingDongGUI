@@ -7,7 +7,7 @@ import sys
 def read_font_config(file_path):
     if not os.path.exists(file_path):
         create_default_font_config(file_path)
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
     return config
 
@@ -18,7 +18,7 @@ def create_default_font_config(file_path):
     string: " !\\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~±"
   - pixelSize: 16
     string: '012345678'"""
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding='utf-8') as file:
         file.write(default_config)
 
 header_content_start = f"""#ifndef __UI_FONTS_H__
@@ -46,11 +46,18 @@ def generate_font_data_for_each_config(font_config, output_dir):
         ttf_path = f"{output_dir}/{font_name}"
         if os.name == 'nt':  # Windows
             ttf_path = f"C:/Windows/Fonts/{font_name}"
+            if not os.path.exists(ttf_path):
+                ttf_path = f"{Path.home()}/AppData/Local/Microsoft/Windows/Fonts/{font_name}"
+                if not os.path.exists(ttf_path):
+                    ttf_path = f"{output_dir}/{font_name}"
+
         print('['+font_name+']\n    '+ttf_path+'\n')
         for config in configs:
             pixel_size = config['pixelSize']
             font_bit_width = config.get('fontBitWidth', None)
             base_font_name = Path(font_name).stem
+            base_font_name = base_font_name.replace('-', '_')
+            base_font_name = base_font_name.replace(' ', '_')
             output_c = f"{output_dir}/{base_font_name}_{pixel_size}.c"
             print('    pixelSize:',pixel_size)
 
@@ -58,10 +65,10 @@ def generate_font_data_for_each_config(font_config, output_dir):
             if font_bit_width is not None:
                 print('    fontBitWidth:',font_bit_width)
             print('')
-            with open(font_txt_path, 'w') as file:
+            with open(font_txt_path, 'w', encoding='utf-8') as file:
                 pass
 
-            with open(font_txt_path, 'a') as file:
+            with open(font_txt_path, 'a', encoding='utf-8') as file:
                 file.write(config['string'] + '\n')
             command_args = [
                'python', f"{output_dir}/ttf2c.py", '-i', ttf_path, '-t', font_txt_path, '-o', output_c,
@@ -95,7 +102,7 @@ struct {{
 
     
 
-    with open(f"{output_dir}/uiFonts.h", 'w') as file:
+    with open(f"{output_dir}/uiFonts.h", 'w', encoding='utf-8') as file:
         file.write(header_content_start)
         file.flush()
         file.write(header_content)
@@ -117,7 +124,7 @@ def main(argv):
 
     font_txt_path=f"{output_dir}/font.txt"
     if not os.path.exists(font_txt_path):
-        with open(font_txt_path, 'w') as file:
+        with open(font_txt_path, 'w', encoding='utf-8') as file:
             pass
 
     generate_font_data_for_each_config(font_config,output_dir)

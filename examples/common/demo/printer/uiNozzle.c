@@ -40,14 +40,14 @@ void uiNozzleInit(ld_scene_t* ptScene)
     ldWindowSetBgColor(obj,GLCD_COLOR_BLACK);
 
     obj=ldButtonInit(ID_BTN_RET,ID_BG,20,5,80,40);
-    ldButtonSetFont(obj,FONT_SIMSUN_18);
+    ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetColor(obj,__RGB(0x64,0x95,0xED),__RGB(0x41,0x69,0xE1));
     ldButtonSetRoundCorner(obj,true);
     ldButtonSetText(obj,"返回");
     connect(ID_BTN_RET,SIGNAL_RELEASE,slotJumpReady);
 
     obj=ldImageInit(ID_IMG_1,ID_BG,20,60,42,30,IMAGE_NOZZLEICON1_BMP,NULL,false);
-    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,60,80,30,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,60,80,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"喷头温度");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
@@ -55,34 +55,34 @@ void uiNozzleInit(ld_scene_t* ptScene)
 
 
     obj=ldImageInit(ID_IMG_2,ID_BG,20,168,42,30,IMAGE_NOZZLEICON2_BMP,NULL,false);
-    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,168,40,30,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,168,40,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"进料");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
-    obj=ldLineEditInit(ID_LINE_EDIT_2,ID_BG,300,168,50,30,FONT_SIMHEI_20,4);
+    obj=ldLineEditInit(ID_LINE_EDIT_2,ID_BG,300,168,50,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20,4);
     ldLineEditSetKeyboard(obj,ID_KB);
     ldLineEditSetType(obj,typeInt);
     ldLineEditSetText(obj,"0");
     ldLineEditSetAlign(obj,ARM_2D_ALIGN_RIGHT);
-    obj=ldLabelInit(ID_LABEL_4,ID_BG,400,168,40,30,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_4,ID_BG,400,168,40,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"MM");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
     obj=ldImageInit(ID_IMG_3,ID_BG,20,223,42,30,IMAGE_NOZZLEICON3_BMP,NULL,false);
-    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,223,40,30,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_1,ID_BG,65,223,40,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"出料");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
-    obj=ldLineEditInit(ID_LINE_EDIT_3,ID_BG,300,223,50,30,FONT_SIMHEI_20,4);
+    obj=ldLineEditInit(ID_LINE_EDIT_3,ID_BG,300,223,50,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20,4);
     ldLineEditSetKeyboard(obj,ID_KB);
     ldLineEditSetType(obj,typeInt);
     ldLineEditSetText(obj,"0");
     ldLineEditSetAlign(obj,ARM_2D_ALIGN_RIGHT);
-    obj=ldLabelInit(ID_LABEL_5,ID_BG,400,223,40,30,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_5,ID_BG,400,223,40,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"MM");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
@@ -93,14 +93,14 @@ void uiNozzleInit(ld_scene_t* ptScene)
     obj=ldSliderInit(ID_SLIDER,ID_BG,40,91,400,30);
     connect(ID_SLIDER,SIGNAL_VALUE_CHANGED,slotChangeValue);
 
-    obj=ldLabelInit(ID_LABEL_TEMP,ID_BG,220,120,60,30,FONT_SIMHEI_20);
+    obj=ldLabelInit(ID_LABEL_TEMP,ID_BG,220,120,60,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"0℃");
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetTransparent(obj,true);
 
 
-    ldKeyboardInit(ID_KB,ID_BG,FONT_SIMSUN_16);
+    ldKeyboardInit(ID_KB,ID_BG,FONT_ALIBABAPUHUITI_3_55_REGULAR_16);
 }
 
 void uiNozzleLoop(ld_scene_t* ptScene)
