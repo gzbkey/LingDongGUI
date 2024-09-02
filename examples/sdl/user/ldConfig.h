@@ -94,7 +94,7 @@ extern "C" {
 //     <0=> None
 //     <1=> Show all widget
 //     <2=> Printer
-#define USE_DEMO                                  (2)
+#define USE_DEMO                                  (0)
 #endif
 
 #if USE_DEMO == 1
@@ -109,7 +109,7 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
-#define LD_DEMO_GUI_FUNC                          &uiWidgetFunc
+#define LD_DEMO_GUI_FUNC                          (ldPageFuncGroup_t *)&uiWidgetFunc
 #endif
 
 #if USE_DEMO == 2
@@ -124,7 +124,7 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
-#define LD_DEMO_GUI_FUNC                          &uiLogoFunc
+#define LD_DEMO_GUI_FUNC                          (ldPageFuncGroup_t *)&uiLogoFunc
 #endif
 
 // <<< end of configuration section >>>

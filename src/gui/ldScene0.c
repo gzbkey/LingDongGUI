@@ -137,8 +137,10 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     ld_scene_t *ptThis = (ld_scene_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
-    arm_2d_helper_control_enum_depose(&ptThis->tEnum);
-
+    if(ptThis->ptNodeRoot!=NULL)
+    {
+        arm_2d_helper_control_enum_depose(&ptThis->tEnum);
+    }
     ldGuiFrameComplete(ptThis);
 }
 
@@ -159,16 +161,12 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
     ARM_2D_UNUSED(tScreenSize);
 
-    arm_2d_canvas(ptTile, __top_canvas)
-    {
-        ldGuiDraw(pTarget,ptTile,bIsNewFrame);
+    ldGuiDraw(pTarget,ptTile,bIsNewFrame);
 
+    if(ptThis->ptNodeRoot!=NULL)
+    {
         switch (arm_2d_dynamic_dirty_region_wait_next(&ptThis->tDirtyRegionItem))
         {
-//        case SCENE_DR_START:
-//        {
-//            break;
-//        }
         case SCENE_DR_UPDATE:
         {
             if(ptCurrentWidget==NULL)
@@ -337,6 +335,7 @@ ld_scene_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .bUserAllocated = bUserAllocated,
         .ldGuiFuncGroup=ptFunc,
         .ptMsgQueue=NULL,
+        .ptNodeRoot=NULL,
     };
 
     ldGuiSceneInit(ptThis);

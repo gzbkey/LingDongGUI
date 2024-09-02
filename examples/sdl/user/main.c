@@ -8,7 +8,11 @@
 #include "ldScene1.h"
 #include "xLog.h"
 //#include "xBtnAction.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
+#if USE_DEMO > 0
 #include LD_DEMO_GUI_INCLUDE
+#endif
+#endif
 #include "freeRtosHeap4.h"
 
 #include "ldGui.h"
