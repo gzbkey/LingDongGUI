@@ -4,12 +4,13 @@
 void uiAboutInit(ld_scene_t* ptScene);
 void uiAboutLoop(ld_scene_t* ptScene);
 void uiAboutQuit(ld_scene_t* ptScene);
-
+void uiAboutDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 const ldPageFuncGroup_t uiAboutFunc={
     .init=uiAboutInit,
     .loop=uiAboutLoop,
     .quit=uiAboutQuit,
+    .draw=uiAboutDraw,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     .pageName="uiAbout",
 #endif
@@ -38,6 +39,11 @@ void uiAboutInit(ld_scene_t* ptScene)
 
     obj=ldTextInit(ID_TXT,ID_BG,20,50,440,200,FONT_ALIBABAPUHUITI_3_55_REGULAR_18,false);
     ldTextSetText(obj,aboutText);
+}
+
+void uiAboutDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
+{
+
 }
 
 void uiAboutLoop(ld_scene_t* ptScene)

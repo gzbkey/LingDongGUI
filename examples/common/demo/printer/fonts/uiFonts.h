@@ -11,9 +11,9 @@ extern const
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_AlibabaPuHuiTi_3_55_Regular_48_A8;
+} ARM_2D_FONT_AlibabaPuHuiTi_3_55_Regular_55_A8;
 
-#define FONT_ALIBABAPUHUITI_3_55_REGULAR_48          (arm_2d_font_t*)&ARM_2D_FONT_AlibabaPuHuiTi_3_55_Regular_48_A8
+#define FONT_ALIBABAPUHUITI_3_55_REGULAR_55          (arm_2d_font_t*)&ARM_2D_FONT_AlibabaPuHuiTi_3_55_Regular_55_A8
 
 extern const
 struct {

@@ -4,12 +4,13 @@
 void uiPrintInit(ld_scene_t* ptScene);
 void uiPrintLoop(ld_scene_t* ptScene);
 void uiPrintQuit(ld_scene_t* ptScene);
-
+void uiPrintDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 const ldPageFuncGroup_t uiPrintFunc={
     .init=uiPrintInit,
     .loop=uiPrintLoop,
     .quit=uiPrintQuit,
+    .draw=uiPrintDraw,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     .pageName="uiPrint",
 #endif
@@ -86,6 +87,11 @@ void uiPrintInit(ld_scene_t* ptScene)
     ldDateTimeSetDate(obj,2024,8,17);
     ldDateTimeSetTime(obj,20,10,0);
 
+
+}
+
+void uiPrintDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
+{
 
 }
 

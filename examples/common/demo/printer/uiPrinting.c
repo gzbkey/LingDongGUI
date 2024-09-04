@@ -4,12 +4,13 @@
 void uiPrintingInit(ld_scene_t* ptScene);
 void uiPrintingLoop(ld_scene_t* ptScene);
 void uiPrintingQuit(ld_scene_t* ptScene);
-
+void uiPrintingDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 const ldPageFuncGroup_t uiPrintingFunc={
     .init=uiPrintingInit,
     .loop=uiPrintingLoop,
     .quit=uiPrintingQuit,
+    .draw=uiPrintingDraw,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     .pageName="uiPrinting",
 #endif
@@ -173,6 +174,11 @@ void uiPrintingInit(ld_scene_t* ptScene)
 
 
     percent=0;
+}
+
+void uiPrintingDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
+{
+
 }
 
 void uiPrintingLoop(ld_scene_t* ptScene)

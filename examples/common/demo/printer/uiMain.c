@@ -4,12 +4,13 @@
 void uiMainInit(ld_scene_t* ptScene);
 void uiMainLoop(ld_scene_t* ptScene);
 void uiMainQuit(ld_scene_t* ptScene);
-
+void uiMainDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 const ldPageFuncGroup_t uiMainFunc={
     .init=uiMainInit,
     .loop=uiMainLoop,
     .quit=uiMainQuit,
+    .draw=uiMainDraw,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     .pageName="uiMain",
 #endif
@@ -57,6 +58,11 @@ void uiMainInit(ld_scene_t* ptScene)
     connect(ID_BTN_SET,SIGNAL_RELEASE,slotJumpSet);
 
 
+
+}
+
+void uiMainDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
+{
 
 }
 

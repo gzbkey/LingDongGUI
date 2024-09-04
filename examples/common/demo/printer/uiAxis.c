@@ -4,12 +4,13 @@
 void uiAxisInit(ld_scene_t* ptScene);
 void uiAxisLoop(ld_scene_t* ptScene);
 void uiAxisQuit(ld_scene_t* ptScene);
-
+void uiAxisDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 const ldPageFuncGroup_t uiAxisFunc={
     .init=uiAxisInit,
     .loop=uiAxisLoop,
     .quit=uiAxisQuit,
+    .draw=uiAxisDraw,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     .pageName="uiAxis",
 #endif
@@ -101,6 +102,11 @@ void uiAxisInit(ld_scene_t* ptScene)
     ldLabelSetText(obj,"MM");
     ldLabelSetTransparent(obj,true);
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
+}
+
+void uiAxisDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
+{
+
 }
 
 void uiAxisLoop(ld_scene_t* ptScene)

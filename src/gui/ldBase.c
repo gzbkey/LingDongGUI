@@ -341,8 +341,6 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
 
     tLabelRegion= ldBaseGetAlignRegion(*ptRegion,tLabelRegion,tAlign);
 
-//    arm_lcd_text_puts(&tLabelRegion,ptFont,(char*)pStr,opacity);
-
     tLabelRegion.tSize.iWidth+=1;//强制加宽，防止自动换行
     arm_lcd_text_set_draw_region(&tLabelRegion);
     if(pStr!=NULL)
@@ -407,13 +405,40 @@ void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str
     }
 }
 
+
+static
+int16_t __arm_lcd_get_char_advance(const arm_2d_font_t *ptFont, arm_2d_char_descriptor_t *ptDescriptor, uint8_t *pchChar)
+{
+    int16_t iAdvance = ptFont->tCharSize.iWidth;
+
+    do {
+        if (NULL != ptDescriptor) {
+            iAdvance = ptDescriptor->iAdvance;
+            break;
+        } if (NULL == pchChar) {
+            break;
+        }
+
+        arm_2d_char_descriptor_t tDescriptor;
+        ptDescriptor = arm_2d_helper_get_char_descriptor(  ptFont,
+                                                        &tDescriptor,
+                                                        pchChar);
+        if (NULL == ptDescriptor){
+            break;
+        }
+        iAdvance = ptDescriptor->iAdvance;
+    } while(0);
+
+    return iAdvance;
+
+}
+
 arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont)
 {
     arm_2d_size_t tCharSize = ptFont->tCharSize;
     arm_2d_region_t tDrawBox = {
         .tSize.iHeight = tCharSize.iHeight,
     };
-    arm_2d_char_descriptor_t tCharDescriptor;
 
     if(str!=NULL)
     {
@@ -424,7 +449,7 @@ arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont)
                 tDrawBox.tLocation.iX = 0;
                 tDrawBox.tLocation.iY += tCharSize.iHeight;
 
-                tDrawBox.tSize.iHeight += tCharSize.iHeight;
+                tDrawBox.tSize.iHeight += MAX(tDrawBox.tSize.iHeight, tDrawBox.tLocation.iY);
             } else if (*str == '\t') {
                 tDrawBox.tLocation.iX += tCharSize.iWidth * 4;
                 tDrawBox.tLocation.iX -= tDrawBox.tLocation.iX
@@ -445,9 +470,17 @@ arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont)
                     chCodeLength = 1;
                 }
 
-                arm_2d_helper_get_char_descriptor(  ptFont,&tCharDescriptor,str);
+                arm_2d_char_descriptor_t tCharDescriptor, *ptDescriptor;
+                ptDescriptor = arm_2d_helper_get_char_descriptor(ptFont,
+                                                                 &tCharDescriptor,
+                                                                 (uint8_t *)str);
 
-                tDrawBox.tLocation.iX += tCharDescriptor.iAdvance;
+                if (NULL != ptDescriptor) {
+                    int16_t tCharNewHeight = (tCharSize.iHeight - tCharDescriptor.iBearingY) + tCharSize.iHeight;
+
+                    tDrawBox.tSize.iHeight = MAX(tDrawBox.tSize.iHeight, tCharNewHeight);
+                }
+                tDrawBox.tLocation.iX += __arm_lcd_get_char_advance(ptFont, ptDescriptor, (uint8_t *)str);
                 tDrawBox.tSize.iWidth = MAX(tDrawBox.tSize.iWidth, tDrawBox.tLocation.iX);
 
                 str += chCodeLength;

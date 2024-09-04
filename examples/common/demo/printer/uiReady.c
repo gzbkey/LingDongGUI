@@ -4,12 +4,13 @@
 void uiReadyInit(ld_scene_t* ptScene);
 void uiReadyLoop(ld_scene_t* ptScene);
 void uiReadyQuit(ld_scene_t* ptScene);
-
+void uiReadyDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 const ldPageFuncGroup_t uiReadyFunc={
     .init=uiReadyInit,
     .loop=uiReadyLoop,
     .quit=uiReadyQuit,
+    .draw=uiReadyDraw,
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     .pageName="uiReady",
 #endif
@@ -72,6 +73,11 @@ void uiReadyInit(ld_scene_t* ptScene)
     obj=ldButtonInit(ID_BTN_5,ID_BG,10,198,220,60);
     ldButtonSetImage(obj,IMAGE_READYBTN5_BMP,NULL,IMAGE_READYBTN5_BMP,NULL);
     connect(ID_BTN_5,SIGNAL_RELEASE,slotJumpAbout);
+
+}
+
+void uiReadyDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
+{
 
 }
 

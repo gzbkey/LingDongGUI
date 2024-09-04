@@ -21,7 +21,8 @@ typedef struct xHeapStats
 
 void * pvPortMalloc( size_t xWantedSize );
 void vPortFree( void * pv );
-void vPortGetHeapStats( HeapStats_t * pxHeapStats );
+size_t xPortGetFreeHeapSize( void );
+size_t xPortGetMinimumEverFreeHeapSize( void );
 void *pvPortRealloc( uint8_t *srcaddr,size_t xWantedSize );
 
 #ifdef __cplusplus
