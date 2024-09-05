@@ -1,4 +1,8 @@
 [submodule "examples/common/Arm-2D"]
 	path = examples/common/Arm-2D
 	url = https://github.com/ARM-software/Arm-2D.git
-        branche = developing
+    branche = developing
+[submodule "examples/common/perf_counter"]
+	path = examples/common/perf_counter
+	url = https://github.com/GorgonMeducer/perf_counter.git
+	branch = CMSIS-Pack

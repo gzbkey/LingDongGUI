@@ -98,7 +98,7 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
 
     arm_2d_location_t tLocation={0};
 
-    tLocation = ldBaseGetAbsoluteLocation(ptWidget,tLocation);
+    tLocation = ldBaseGetAbsoluteLocation((ldBase_t*)ptWidget,tLocation);
 
     int16_t tempOffset=y-tLocation.iY;
 

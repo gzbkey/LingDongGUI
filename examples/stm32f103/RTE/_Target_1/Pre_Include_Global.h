@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'mh2103c' 
+ * Project: 'stm32f103' 
  * Target:  'Target 1' 
  */
 

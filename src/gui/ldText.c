@@ -332,8 +332,8 @@ void ldTextSetStaticText(ldText_t* ptWidget,const uint8_t *pStr)
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->_isStatic=true;
-    ptWidget->pStr=pStr;
-    ptWidget->strHeight=arm_lcd_text_get_box(pStr,ptWidget->ptFont).iHeight;
+    ptWidget->pStr=(uint8_t*)pStr;
+    ptWidget->strHeight=arm_lcd_text_get_box((uint8_t*)pStr,ptWidget->ptFont).iHeight;
 }
 
 void ldTextSetTextColor(ldText_t* ptWidget,ldColor charColor)

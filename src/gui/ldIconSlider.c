@@ -220,7 +220,7 @@ static bool slotIconSliderScroll(ld_scene_t *ptScene,ldMsg_t msg)
                 uint8_t itemY=0;
 
                 arm_2d_location_t globalPos={0};
-                globalPos=ldBaseGetAbsoluteLocation(ptWidget,globalPos);
+                globalPos=ldBaseGetAbsoluteLocation((ldBase_t*)ptWidget,globalPos);
                 itemOffsetWidth=ptWidget->iconSpace+ptWidget->iconWidth;
                 itemOffsetHeight=ptWidget->iconSpace+ptWidget->iconWidth+ptWidget->ptFont->tCharSize.iHeight+IMG_FONT_SPACE;
 

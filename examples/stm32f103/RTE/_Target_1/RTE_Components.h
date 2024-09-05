@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'mh2103c' 
+ * Project: 'stm32f103' 
  * Target:  'Target 1' 
  */
 
@@ -14,7 +14,7 @@
 /*
  * Define the Device Header File: 
  */
-#define CMSIS_device_header "air32f10x.h"
+#define CMSIS_device_header "stm32f10x.h"
 
 /* ARM::Acceleration:Arm-2D Extras:Controls@1.8.3 */
 #define RTE_Acceleration_Arm_2D_Extra_Controls
@@ -33,6 +33,12 @@
 #define RTE_Acceleration_Arm_2D_Transform
 /* GorgonMeducer::Utilities:perf_counter:Core&Source@2.3.3 */
 #define __PERF_COUNTER__ 1
+/* Keil::Device:StdPeriph Drivers:Framework@3.6.0 */
+#define RTE_DEVICE_STDPERIPH_FRAMEWORK
+/* Keil::Device:StdPeriph Drivers:GPIO@3.6.0 */
+#define RTE_DEVICE_STDPERIPH_GPIO
+/* Keil::Device:StdPeriph Drivers:RCC@3.6.0 */
+#define RTE_DEVICE_STDPERIPH_RCC
 /* gzbkey::LingDongGui:ldgui@0.8.0 */
 #define __ARM_2D_USER_APP_CFG_H__ "ldConfig.h"
 #define RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0

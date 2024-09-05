@@ -45,7 +45,7 @@ extern "C" {
 
 // <o>LingDongGui memory size
 // <i> The size of memory allocated to the ldgui
-#define LD_MEM_SIZE                               (16*1024) //BYTE
+#define LD_MEM_SIZE                               (8*1024) //BYTE
 
 // <q>External NOR support
 // <i> Read external nor, please enable this option
@@ -92,12 +92,28 @@ extern "C" {
 #ifndef USE_DEMO
 // <o> choose demo to test
 //     <0=> None
-//     <1=> Show all widget
-//     <2=> Printer
+//     <1=> Startup
+//     <2=> Show all widget
+//     <3=> Printer
 #define USE_DEMO                                  (0)
 #endif
 
 #if USE_DEMO == 1
+#undef LD_CFG_COLOR_DEPTH
+#define LD_CFG_COLOR_DEPTH                        (16)
+#undef LD_CFG_SCEEN_WIDTH
+#define LD_CFG_SCEEN_WIDTH                        (320)
+#undef LD_CFG_SCEEN_HEIGHT
+#define LD_CFG_SCEEN_HEIGHT                       (240)
+#undef LD_CFG_PFB_WIDTH
+#define LD_CFG_PFB_WIDTH                          (LD_CFG_SCEEN_WIDTH/4)
+#undef LD_CFG_PFB_HEIGHT
+#define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
+#define LD_DEMO_GUI_INCLUDE                       "uiStartup.h"
+#define LD_DEMO_GUI_FUNC                          (ldPageFuncGroup_t *)&uiStartupFunc
+#endif
+
+#if USE_DEMO == 2
 #undef LD_CFG_COLOR_DEPTH
 #define LD_CFG_COLOR_DEPTH                        (16)
 #undef LD_CFG_SCEEN_WIDTH
@@ -109,10 +125,10 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
-#define LD_DEMO_GUI_FUNC                          &uiWidgetFunc
+#define LD_DEMO_GUI_FUNC                          (ldPageFuncGroup_t *)&uiWidgetFunc
 #endif
 
-#if USE_DEMO == 2
+#if USE_DEMO == 3
 #undef LD_CFG_COLOR_DEPTH
 #define LD_CFG_COLOR_DEPTH                        (16)
 #undef LD_CFG_SCEEN_WIDTH
@@ -124,7 +140,7 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCEEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
-#define LD_DEMO_GUI_FUNC                          &uiLogoFunc
+#define LD_DEMO_GUI_FUNC                          (ldPageFuncGroup_t *)&uiLogoFunc
 #endif
 
 // <<< end of configuration section >>>

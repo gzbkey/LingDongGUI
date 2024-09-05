@@ -43,12 +43,12 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 bool isFullWidgetUpdate=false;
 
-void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
+void ldGuiDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
     // draw ldgui background
     if(ptScene->ptNodeRoot!=NULL)
     {
-        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,ptTile,bIsNewFrame);
     }
 
     // draw arm 2d code
@@ -64,7 +64,7 @@ void ldGuiDraw(ld_scene_t *ptScene,const arm_2d_tile_t *ptTile,bool bIsNewFrame)
         if(child!=NULL)
         {
             arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
-                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,(arm_2d_tile_t *)ptTile,bIsNewFrame);
+                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
             }
         }
     }

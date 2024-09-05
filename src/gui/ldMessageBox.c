@@ -63,7 +63,7 @@ static bool slotMsgBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
     int8_t clickNum=-1;
 
     arm_2d_location_t tLocation={0};
-    tLocation=ldBaseGetAbsoluteLocation(ptWidget,tLocation);
+    tLocation=ldBaseGetAbsoluteLocation((ldBase_t*)ptWidget,tLocation);
     pos.iX=(int16_t)GET_SIGNAL_VALUE_X(msg.value)-tLocation.iX;
     pos.iY=(int16_t)GET_SIGNAL_VALUE_Y(msg.value)-tLocation.iY;
 
@@ -288,7 +288,7 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
                     },
                 };
 
-                ldBaseLabel(&tTarget,&region,ptWidget->pTitleStr,ptWidget->ptFont,ARM_2D_ALIGN_LEFT,ptWidget->titleStrColor,ptWidget->use_as__ldBase_t.opacity);
+                ldBaseLabel(&tTarget,&region,(uint8_t*)ptWidget->pTitleStr,ptWidget->ptFont,ARM_2D_ALIGN_LEFT,ptWidget->titleStrColor,ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             } while (false);
 
@@ -305,7 +305,7 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
                     },
                 };
 
-                ldBaseLabel(&tTarget,&region,ptWidget->pMsgStr,ptWidget->ptFont,ARM_2D_ALIGN_CENTRE,ptWidget->msgStrColor,ptWidget->use_as__ldBase_t.opacity);
+                ldBaseLabel(&tTarget,&region,(uint8_t*)ptWidget->pMsgStr,ptWidget->ptFont,ARM_2D_ALIGN_CENTRE,ptWidget->msgStrColor,ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             } while (false);
 
@@ -346,7 +346,7 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
 
                     if(ptWidget->ppBtnStrGroup!=NULL)
                     {
-                        ldBaseLabel(&tTarget,&btnRegion,ptWidget->ppBtnStrGroup[i],ptWidget->ptFont,ARM_2D_ALIGN_CENTRE,ptWidget->msgStrColor,ptWidget->use_as__ldBase_t.opacity);
+                        ldBaseLabel(&tTarget,&btnRegion,(uint8_t*)ptWidget->ppBtnStrGroup[i],ptWidget->ptFont,ARM_2D_ALIGN_CENTRE,ptWidget->msgStrColor,ptWidget->use_as__ldBase_t.opacity);
                     }
 
                     btnRegion.tLocation.iX+=btnRegion.tSize.iWidth+LD_MSG_BOX_SPACE;

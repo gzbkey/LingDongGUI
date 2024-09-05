@@ -1,7 +1,6 @@
 #include "ldConfig.h"
 #include "arm_2d_types.h"
 #include "ldMem.h"
-#include "st7789v16bit.h"
 
 /**
  * @brief   获取触摸坐标
@@ -79,7 +78,7 @@ void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,cons
     //参考2
     //函数原型 void lcd_colorFill(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint16_t *color)
     //填写 lcd_colorFill(x,y,width,height,(uint16_t *)bitmap);
-    st7789v_colorFill(x,y,x+width-1,y+height-1,(uint16_t *)bitmap);
+//    vtFillMultipleColors(x, y, x + width - 1, y + height - 1, (color_typedef *)bitmap);
 }
 
 #if 0

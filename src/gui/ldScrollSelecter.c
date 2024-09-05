@@ -315,7 +315,7 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
 
                 ldBaseLabel(&tTarget,
                             &itemsRegion,
-                            ptWidget->ppItemStrGroup[strGroupCount],
+                            (uint8_t*)ptWidget->ppItemStrGroup[strGroupCount],
                             ptWidget->ptFont,
                             ARM_2D_ALIGN_BOTTOM,
                             ptWidget->charColor,

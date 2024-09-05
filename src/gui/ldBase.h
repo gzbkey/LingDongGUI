@@ -210,8 +210,8 @@ void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color
 void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,bool bIsNewFrame);
 void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
-void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,char *str,uint8_t opacity);
-arm_2d_size_t arm_lcd_text_get_box(char *str, arm_2d_font_t *ptFont);
+void arm_lcd_text_puts(arm_2d_region_t* ptRegion,arm_2d_font_t *ptFont,uint8_t *pStr,uint8_t opacity);
+arm_2d_size_t arm_lcd_text_get_box(uint8_t *pStr, arm_2d_font_t *ptFont);
 void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
 void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);

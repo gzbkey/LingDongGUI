@@ -2,10 +2,12 @@ TEMPLATE = app
 CONFIG -= app_bundle
 CONFIG -= qt
 
+#// <o> choose demo to test
 #//     <0=> None
-#//     <1=> Show all widget
-#//     <2=> Printer
-USE_DEMO=2
+#//     <1=> Startup
+#//     <2=> Show all widget
+#//     <3=> Printer
+USE_DEMO=1
 
 SOURCES += \
     virtualNor/virtualNor.c \
@@ -39,16 +41,24 @@ SOURCES += $$files(../common/Arm-2D/examples/common/controls/*.c) \
            $$files(../../src/misc/*.c)
 
 contains(USE_DEMO, 1){
-message(demo: Show all widget)
+message(demo: Startup)
 DEFINES += USE_DEMO=1
+HEADERS += $$files(../common/demo/startup/*.h, true)
+SOURCES += $$files(../common/demo/startup/*.c, true)
+INCLUDEPATH += $$PWD/../common/demo/startup
+}
+
+contains(USE_DEMO, 2){
+message(demo: Show all widget)
+DEFINES += USE_DEMO=2
 HEADERS += $$files(../common/demo/widget/*.h, true)
 SOURCES += $$files(../common/demo/widget/*.c, true)
 INCLUDEPATH += $$PWD/../common/demo/widget
 }
 
-contains(USE_DEMO, 2){
+contains(USE_DEMO, 3){
 message(demo: Printer)
-DEFINES += USE_DEMO=2
+DEFINES += USE_DEMO=3
 HEADERS += $$files(../common/demo/printer/*.h, true)
 SOURCES += $$files(../common/demo/printer/*.c, true)
 INCLUDEPATH += $$PWD/../common/demo/printer

@@ -1,8 +1,5 @@
-#include "mh210x.h"
-#include "mh.h"
+#include "stm32f10x.h"                  // Device header
 #include "perf_counter.h"
-#include "st7789v16bit.h"
-#include "knob.h"
 #include "arm_2d.h"
 #include "arm_2d_disp_adapter_0.h"
 #include "ldScene0.h"
@@ -45,7 +42,7 @@ void rccInit(void)
 	while(RCC_GetFlagStatus(RCC_FLAG_HSERDY) == RESET);
 	
 	RCC_PLLCmd(DISABLE);
-	MH_RCC_PLLConfig(RCC_PLLSource_HSE_Div1,RCC_PLLMul_27,1);
+	RCC_PLLConfig(RCC_PLLSource_HSE_Div1,RCC_PLLMul_9);
 	
 	RCC_PLLCmd(ENABLE);
 	while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
@@ -64,80 +61,23 @@ void rccInit(void)
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET)
     {
     }
-    
-    SystemCoreClock=216000000;
 }
 
-void gpioDeInit(void)
-{
-#if 0
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable,ENABLE);
-#else
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
-#endif
-
-    PWR_BackupAccessCmd(ENABLE);
-    RCC_LSEConfig(RCC_LSE_OFF);
-    BKP_TamperPinCmd(DISABLE);
-    PWR_BackupAccessCmd(DISABLE);
-}
-
-#define BTN_ID_KNOB 0
-#define BTN_ID_POW  1
-
-bool getBtnState(uint16_t id)
-{
-    uint8_t value=knobKeyRead();
-    
-    switch(id)
-    {
-        case BTN_ID_KNOB:
-        {
-            return GETBIT(value,0);
-            break;
-        }
-        case BTN_ID_POW:
-        {
-            return GETBIT(value,1);
-            break;
-        }
-        default:
-            break;
-    }
-    return 0;
-}
-
-volatile int16_t encoderCount;
-
-int16_t add=0,sub=0;
 int main(void)
 {
-	RCC_ClocksTypeDef clocks;
-	
-	rccInit();
-	RCC_GetClocksFreq(&clocks);
-    
+    rccInit();
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
 
     SysTick_Config(SystemCoreClock/100);
     init_cycle_counter(true);
-
-    gpioDeInit();
     
-    st7789v_init();
-    
-    knobInit();
-
     arm_irq_safe {
         arm_2d_init();
     }
 
     disp_adapter0_init();
     
-    
-#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
+    #if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
 #if USE_DEMO == 0
     //user gui page init
 
@@ -149,27 +89,10 @@ int main(void)
     while(1)
     {
         disp_adapter0_task();
-
-//        encoderCount=knobGetEncoder();
-//        if(encoderCount>0)
-//        {
-//            add+=encoderCount;
-//        }
-//        else
-//        {
-//            sub+=encoderCount;
-//        }
     }
 }
 
-__attribute__((used))    //!< 避免下面的处理程序被编译器优化掉
+__attribute__((used))
 void SysTick_Handler(void)
 {
-    knobTick(10);
 }
-
-
-
-#if defined(__clang__)
-#   pragma clang diagnostic pop
-#endif

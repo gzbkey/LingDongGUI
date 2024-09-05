@@ -41,6 +41,18 @@ cmsis-5 和 cmsis-6 二选一
 
     🏠️镜像仓库: https://github.com/gzbkey/LingDongGUI
 
+* cmsis相关pack亦可在arm官方下载地址 https://www.keil.arm.com/packs/
+
+#### git方式下载ldgui
+```
+//gitee
+git clone --recursive https://gitee.com/gzbkey/LingDongGUI.git
+```
+```
+//github
+git clone --recursive https://github.com/gzbkey/LingDongGUI.git
+```
+
 |ℹ️ 关于github下载慢的问题|
 |:----|
 |推荐使用Watt Toolkit加速|
@@ -67,7 +79,7 @@ cmsis-5 和 cmsis-6 二选一
 
     ![keilPackSelect](./images/03/arm2d%20Manage%20Run-Time%20Environment.png)
 
-2. 选择ac6编译器，并且选择gnu11
+2. 选择ac6编译器，并且选择gnu11，警告选择ac5-like
 
     ![ac6Setting](./images/03/ac6%20setting.png)
 
@@ -79,11 +91,7 @@ cmsis-5 和 cmsis-6 二选一
 
     ![cmsisVersion](./images/03/cmsis%20version.png)
 
-5. 树目录中的Acceleration，找到arm_2d_cfg.h
-    
-    编辑器的左下角选择 Configuration Wizard，进入图形配置界面，配置Extra下的colour depth(默认为16位色，一般无需修改)
-
-7. ldConfig配置 (**重要**)
+5. ldConfig配置 (**重要**)
     * ldConfig.c中的ldCfgTouchGetPoint函数是触摸接口，需要根据用户实际触摸驱动进行对接
     * ldConfig.h可以使用keil的图形界面方式进行配置
     * 如果不使用打印功能，请务必将USE_LOG_LEVEL配置为LOG_LEVEL_NONE
