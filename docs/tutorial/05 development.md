@@ -1,33 +1,28 @@
 ## 添加UI页面文件
 
-1. 复制[tools/createUiFile.py](../../tools/createUiFile.py)到项目中UI页面文件的相同目录中，例如./user
-2. 运行脚本，按提示选择新增页面文件，输入页面名称，例如demo
-3. 按回车后，会自动生成uiDemo.c和uiDemo.h
-4. 将文件导入项目中，main.c中添加头文件uiDemo.h
-5. 在main函数中添加LD_ADD_PAGE(uiDemo);即可设置好页面
-6. 如果有多个页面，请按需要的顺序重复步骤5
+1. 运行脚本[src/template/uiPageCreate.py](../../src/template/uiPageCreate.py)。
+2. 按提示选择新增页面文件，输入页面名称，例如demo。
+3. 按回车后，在当前目录下生成文件夹uiPageOutput，里边包含所需要的文件uiDemo.c、uiDemo.h、uiDemoLogic.c、uiDemoLogic.h。
+4. 将文件导入项目中，main.c中添加头文件uiDemo.h。
+5. 在main函数中添加ldGuiInit(&uiDemoFunc);，进行设定启动页面。
     ~~~c
-    #include "uiHome.h"
-    #include "uiZigbee.h"
-    #include "uiWifi.h"
+    #include "uiDemo.h"
 
     int main(void)
     {
         sysInit();
 
-        LD_ADD_PAGE(uiHome);//Home页面序号为0
-        LD_ADD_PAGE(uiZigbee);//Zigbee页面序号为1
-        LD_ADD_PAGE(uiWifi);//Wifi页面序号为2
-
         arm_irq_safe {
             arm_2d_init();
         }
 
-        ...
+        disp_adapter0_init();
+
+        ldGuiInit(&uiDemoFunc);
 
         while(1)
         {
-            ...
+            disp_adapter0_task();
         }
     }
     ~~~
@@ -37,23 +32,6 @@
 tools文件夹中有工具生成数据
 
 📖 [使用说明](../../tools/README.md)
-
-## 添加自定义控件
-
-1. 运行python脚本，[src/gui/createWidget.py](../../src/gui/createWidget.py)，输入控件名称后，自动创建控件文件和自动修改代码，例如输入checkBox，则新建ldCheckBox.c、ldCheckBox.h
-2. 添加刚才新建的.c .h文件到项目中(新文件在./src/gui中)
-3. 修改新控件的.c .h文件
-
----
-自动处理：
-
-修改ldCommon.h中的控件类型,ldWidgetType
-
-ldGui.c中添加新控件的头文件
-
-修改ldGui.c中的函数，ldGuiDelWidget，_widgetLoop
-
----
 
 ## 功能库
 
@@ -75,23 +53,25 @@ ldGui.c中添加新控件的头文件
 |BTN_LONG_SHOOT|长按连续触发|
 
 ##### 函数列表
-* void xBtnInit(size_t addrOrNum,uint16_t nameId,bool (*getBtnStateFunc)(uint16_t));
+* void xBtnInit(uint16_t id,isBtnPressFunc pFunc);
+* ldButtonActionInit(nameId)
 * void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
-* void xBtnTick(uint8_t cycleMs);
+* void xBtnTick(uint8_t cycleMs,void* pUser);
 * uint16_t xBtnGetState(uint16_t id, uint8_t state);
-* void xBtnClean(void);
+* void xBtnReset(void);
+* void xBtnDestroy(void);
 
 ##### 函数说明
 <table>
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t));</code></pre>
+            <pre><code class="language-c">void xBtnInit(uint16_t id,isBtnPressFunc pFunc);</code></pre>
         </td>
     </tr>
     <tr>
         <td>说明</td>
-        <td colspan="2">button初始化函数</td>
+        <td colspan="2">按键动作初始化函数</td>
     </tr>
     <tr>
         <td rowspan="2">参数</td>
@@ -99,53 +79,40 @@ ldGui.c中添加新控件的头文件
         <td>按键id或实体按键自定义序号</td>
     </tr>
     <tr>
-        <td>getBtnStateFunc</td>
+        <td>pFunc</td>
         <td>获取按键状态的函数指针</td>
     </tr>
+    <tr>
+        <td>注意 ℹ️</td>
+        <td colspan="2">实体按键和ldgui触摸按键混合使用的时候，id不可冲突，建议将实体按键序号从1000开始命名</td>
+    </tr>
 </table>
+
+---
 
 <table>
     <tr>
-        <td>ℹ️ Note</td>
-    </tr>
-    <tr>
-        <td>实体按键和ldgui触摸按键混合使用的时候，id不可冲突，建议将实体按键序号从1000开始命名</td>
-    </tr>
-    <tr>
-        <td>
-        getBtnStateFunc参考代码如下
-        <pre><code class="language-c">
-// 实体按键
-bool vtGetKeyState(uint16_t value)
-{
-    switch (value)
-    {
-    case KEY_NUM_UP:
-    {
-        return keyUpState;
-        break;
-    }
-    case KEY_NUM_DOWN:
-    {
-        return keyDownState;
-        break;
-    }
-    default:
-        break;
-    }
-    return 0;
-}
-
-// ldgui触摸按键
-bool getKeyState(uint16_t value)
-{
-    ldButton_t * pBtn=ldBaseGetWidgetById(value);
-    return pBtn->isPressed;
-}
-        </code></pre>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">ldButtonActionInit(nameId)</code></pre>
         </td>
     </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">按键动作初始化函数，ldgui触摸按键专用</td>
+    </tr>
+    <tr>
+        <td>参数</td>
+        <td>nameId</td>
+        <td>按键id</td>
+    </tr>
+    <tr>
+        <td>注意 ℹ️</td>
+        <td colspan="2">已内置触摸按键检测函数，无需用户编写</td>
+    </tr>
 </table>
+
+---
 
 <table>
     <tr>
@@ -177,12 +144,13 @@ bool getKeyState(uint16_t value)
     </tr>
 </table>
 
+---
 
 <table>
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void xBtnTick(uint8_t cycleMs);</code></pre>
+            <pre><code class="language-c">void xBtnTick(uint8_t cycleMs,void* pUser);</code></pre>
         </td>
     </tr>
     <tr>
@@ -190,11 +158,17 @@ bool getKeyState(uint16_t value)
         <td colspan="2">指定时间间隔内定时执行的函数，ldgui内部已经集成</td>
     </tr>
     <tr>
-        <td>参数</td>
+        <td rowspan="2">参数</td>
         <td>cycleMs</td>
         <td>定时周期</td>
     </tr>
+    <tr>
+        <td>pUser</td>
+        <td>用户函数指针，不使用则填NULL</td>
+    </tr>
 </table>
+
+---
 
 <table>
     <tr>
@@ -222,47 +196,69 @@ bool getKeyState(uint16_t value)
     </tr>
 </table>
 
+---
+
 <table>
     <tr>
         <td>函数</td>
         <td colspan="2">
-            <pre><code class="language-c">void xBtnClean(void);</code></pre>
+            <pre><code class="language-c">void xBtnReset(void);</code></pre>
         </td>
     </tr>
     <tr>
         <td>说明</td>
-        <td colspan="2">清除按键检测的过程数据，一般切换页面的时候使用</td>
+        <td colspan="2">复位按键检测的过程数据，一般切换页面的时候使用</td>
     </tr>
 </table>
 
-##### 使用举例
+---
+
+<table>
+    <tr>
+        <td>函数</td>
+        <td colspan="2">
+            <pre><code class="language-c">void xBtnDestroy(void);</code></pre>
+        </td>
+    </tr>
+    <tr>
+        <td>说明</td>
+        <td colspan="2">销毁所有按键数据</td>
+    </tr>
+</table>
+
+---
+
+##### 实体按键使用举例
 ```c
 //自定义实体按键序号
 #define KEY_NUM_UP   1000
 
-//ldgui内部已经集成
-//void SysTick_Handler(void)
-//{
-//    xBtnTick(10);//10ms
-//}
+void SysTick_Handler(void)
+{
+   xBtnTick(10,0);//10ms
+}
 
 //根据按键序号，获取按键状态
-bool vtGetKeyState(uint16_t value)
+//按下返回true
+bool vtIsKeyPress(uint16_t value)
 {
     switch (value)
     {
     case KEY_NUM_UP:
     {
-        return keyUp;
+        if(keyIsPress==true)
+        {
+            return true;
+        }
     }
     default:
         break;
     }
-    return 0;
+    return false;
 }
 
 //初始化按键
-xBtnInit(KEY_NUM_UP,vtGetKeyState);
+xBtnInit(KEY_NUM_UP,vtIsKeyPress);
 
 //循环处理函数
 void loopFunc(void)
@@ -270,7 +266,36 @@ void loopFunc(void)
     //判断按键按下
     if(xBtnGetState(KEY_NUM_UP,BTN_PRESS))
     {
-        //按键按下的用户处理代码
+        //触发用户处理代码
+    }
+}
+```
+
+##### ldgui使用举例
+```c
+//自定义实体按键序号
+#define ID_BG                           0
+#define ID_BTN                          1
+
+void uiDemoInit(ld_scene_t* ptScene)
+{
+    void *obj,*win;
+
+    //新建背景
+    obj=ldWindowInit(ID_BG, ID_BG, 0, 0, LD_CFG_SCEEN_WIDTH, LD_CFG_SCEEN_HEIGHT);
+
+    //新建按键
+    obj=ldButtonInit(ID_BTN,ID_BG, 10,10,50,30);
+    //触摸按键的动作功能初始化
+    ldButtonActionInit(ID_BTN);
+}
+
+void uiDemoLoop(ld_scene_t* ptScene)
+{
+    //判断按键状态
+    if( xBtnGetState(ID_BTN, BTN_DOUBLE_CLICK))
+    {
+        //触发用户处理代码
     }
 }
 ```
@@ -378,7 +403,7 @@ text = xFloatToStr(fValue,2,text);
 基于arm2d的基础上衍生的软件定时器
 
 #### 函数接口
-* bool ldTimeOut(uint16_t ms, int64_t *pTimer,bool isReset)
+* bool ldTimeOut(uint16_t ms, bool isReset,...)
 ##### 使用举例
 ```c
 //计数变量
@@ -387,9 +412,16 @@ int64_t sysTimer=0;
 //循环处理函数
 void loopFunc(void)
 {
-    if(ldTimeOut(10,&sysTimer,true))
+    //使用自定义的计数变量
+    if(ldTimeOut(10,true,&sysTimer))
     {
         //10ms处理一次的用户代码
+    }
+
+    //使用自动生成的计数变量
+    if(ldTimeOut(100,true))
+    {
+        //100ms处理一次的用户代码
     }
 }
 

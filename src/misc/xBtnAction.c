@@ -45,14 +45,14 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
     btnClickTimeOut=clickTimeOutMs/btnDebounceMs;
 }
 
-void xBtnInit(uint16_t id,isBtnPressFunc getBtnStateFunc)
+void xBtnInit(uint16_t id, isBtnPressFunc pFunc)
 {
     xBtnInfo_t * link = (xBtnInfo_t *)XMALLOC(sizeof(xBtnInfo_t));
     if(link!=NULL)
     {
         memset(link, 0, sizeof (xBtnInfo_t));
         link->id=id;
-        link->getBtnStateFunc=getBtnStateFunc;
+        link->getBtnStateFunc=pFunc;
         link->btnNewState=~IS_PRESS_LEVEL;
         link->pNext=xBtnLink;
         xBtnLink=link;

@@ -65,7 +65,7 @@ typedef struct xBtnInfo{
     bool isShoot:1;
 }xBtnInfo_t;
 
-void xBtnInit(uint16_t id,isBtnPressFunc getBtnStateFunc);
+void xBtnInit(uint16_t id,isBtnPressFunc pFunc);
 void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
 void xBtnTick(uint8_t cycleMs,void* pUser);
 uint16_t xBtnGetState(uint16_t id, uint8_t state);
