@@ -440,6 +440,16 @@ void ldButtonSetKeyValue(ldButton_t *ptWidget,uint32_t value)
     ptWidget->keyValue=value;
 }
 
+bool ldButtonActionIsPressById(uint16_t nameId,ld_scene_t *ptScene)
+{
+    ldButton_t *ptWidget=ldBaseGetWidgetById(nameId);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->isPressed;
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

@@ -70,12 +70,12 @@ int main (void)
     LOG_NORMAL("====================\n");
     vtInit();
 
-    xBtnInit(KEY_NUM_UP,vtGetKeyState);
-    xBtnInit(KEY_NUM_DOWN,vtGetKeyState);
-    xBtnInit(KEY_NUM_LEFT,vtGetKeyState);
-    xBtnInit(KEY_NUM_RIGHT,vtGetKeyState);
-    xBtnInit(KEY_NUM_ENTER,vtGetKeyState);
-    xBtnInit(KEY_NUM_ESC,vtGetKeyState);
+    xBtnInit(KEY_NUM_UP,vtIsKeyPress);
+    xBtnInit(KEY_NUM_DOWN,vtIsKeyPress);
+    xBtnInit(KEY_NUM_LEFT,vtIsKeyPress);
+    xBtnInit(KEY_NUM_RIGHT,vtIsKeyPress);
+    xBtnInit(KEY_NUM_ENTER,vtIsKeyPress);
+    xBtnInit(KEY_NUM_ESC,vtIsKeyPress);
 
     arm_irq_safe {
         arm_2d_init();

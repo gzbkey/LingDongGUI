@@ -101,6 +101,10 @@ void ldButtonSetKeyValue(ldButton_t *ptWidget,uint32_t value);
 #define ldButtonMove                    ldBaseMove
 #define ldButtonSetOpacity              ldBaseSetOpacity
 
+// only for btn acion
+#define ldButtonActionInit(nameId)      xBtnInit(nameId,(isBtnPressFunc)ldButtonActionIsPressById)
+bool ldButtonActionIsPressById(uint16_t nameId,ld_scene_t *ptScene);
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

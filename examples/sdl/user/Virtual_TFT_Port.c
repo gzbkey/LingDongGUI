@@ -46,12 +46,12 @@ static bool left_button_is_down = false;
 static int16_t last_x = 0;
 static int16_t last_y = 0;
 
-bool keyUp = true;
-bool keyDown = true;
-bool keyLeft = true;
-bool keyRight = true;
-bool keyEnter = true;
-bool keyEsc = true;
+bool keyUp = false;
+bool keyDown = false;
+bool keyLeft = false;
+bool keyRight = false;
+bool keyEnter = false;
+bool keyEsc = false;
 
 int quit_filter(void *userdata, SDL_Event *event)
 {
@@ -170,32 +170,32 @@ void vtSdlRefreshTask(void)
             {
             case SDLK_UP:
             {
-                keyUp=0;
+                keyUp=true;
                 break;
             }
             case SDLK_DOWN:
             {
-                keyDown=0;
+                keyDown=true;
                 break;
             }
             case SDLK_LEFT:
             {
-                keyLeft=0;
+                keyLeft=true;
                 break;
             }
             case SDLK_RIGHT:
             {
-                keyRight=0;
+                keyRight=true;
                 break;
             }
             case SDLK_KP_ENTER:
             {
-                keyEnter=0;
+                keyEnter=true;
                 break;
             }
             case SDLK_ESCAPE:
             {
-                keyEsc=0;
+                keyEsc=true;
                 break;
             }
             default:
@@ -209,32 +209,32 @@ void vtSdlRefreshTask(void)
             {
             case SDLK_UP:
             {
-                keyUp=1;
+                keyUp=false;
                 break;
             }
             case SDLK_DOWN:
             {
-                keyDown=1;
+                keyDown=false;
                 break;
             }
             case SDLK_LEFT:
             {
-                keyLeft=1;
+                keyLeft=false;
                 break;
             }
             case SDLK_RIGHT:
             {
-                keyRight=1;
+                keyRight=false;
                 break;
             }
             case SDLK_KP_ENTER:
             {
-                keyEnter=1;
+                keyEnter=false;
                 break;
             }
             case SDLK_ESCAPE:
             {
-                keyEsc=1;
+                keyEsc=false;
                 break;
             }
             default:
@@ -397,8 +397,10 @@ bool vtMouseGetPoint(int16_t *x, int16_t *y)
     return left_button_is_down;
 }
 
-bool vtGetKeyState(uint16_t value)
+bool vtIsKeyPress(uint16_t value,void* pUser)
 {
+    (void)(pUser);
+
     switch (value)
     {
     case KEY_NUM_UP:

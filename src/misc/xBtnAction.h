@@ -27,8 +27,8 @@
 #include "stdlib.h"
 #include "ldMem.h"
 
-#ifndef XCALLOC
-#define XCALLOC                         ldCalloc
+#ifndef XMALLOC
+#define XMALLOC                         ldMalloc
 #endif
 #ifndef XFREE
 #define XFREE                           ldFree
@@ -44,15 +44,18 @@
 #define BTN_LONG_START                  7 //检测按键长按触发一次的信号
 #define BTN_LONG_SHOOT                  8 //检测按键长按触发一次和连续触发的信号
 
+typedef bool (*isBtnPressFunc)(uint16_t,void*);
+
 typedef struct xBtnInfo{
+    isBtnPressFunc getBtnStateFunc;
+    struct xBtnInfo * pNext;
+    uint16_t timeOutCount;
+    int16_t holdCount;
+    uint16_t shootCount;
+    uint16_t id;
     uint8_t FSM_State;
     uint8_t doubleClickCount;
     uint8_t repeatCount;
-    uint16_t repeatTimeOutCount;
-    uint16_t holdCount;
-    uint16_t shootCount;
-    uint16_t id;
-    bool (*getBtnStateFunc)(uint16_t);
     bool btnNewState:1;
     bool btnOldState:1;
     bool isPressed:1;
@@ -60,12 +63,11 @@ typedef struct xBtnInfo{
     bool isDoubleClicked:1;
     bool isRepeatEnd:1;
     bool isShoot:1;
-    struct xBtnInfo * pNext;
 }xBtnInfo_t;
 
-void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t));
+void xBtnInit(uint16_t id,isBtnPressFunc getBtnStateFunc);
 void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
-void xBtnTick(uint8_t cycleMs);
+void xBtnTick(uint8_t cycleMs,void* pUser);
 uint16_t xBtnGetState(uint16_t id, uint8_t state);
 void xBtnReset(void);
 void xBtnDestroy(void);

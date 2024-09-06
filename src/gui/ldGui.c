@@ -257,7 +257,7 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
 
     if(ldTimeOut(SYS_TICK_CYCLE_MS,true))
     {
-        xBtnTick(SYS_TICK_CYCLE_MS);
+        xBtnTick(SYS_TICK_CYCLE_MS,ptScene);
         cursorBlinkCount++;
     }
 }
