@@ -46,12 +46,12 @@ static bool left_button_is_down = false;
 static int16_t last_x = 0;
 static int16_t last_y = 0;
 
-bool keyUp = false;
-bool keyDown = false;
-bool keyLeft = false;
-bool keyRight = false;
-bool keyEnter = false;
-bool keyEsc = false;
+bool keyUp = true;
+bool keyDown = true;
+bool keyLeft = true;
+bool keyRight = true;
+bool keyEnter = true;
+bool keyEsc = true;
 
 int quit_filter(void *userdata, SDL_Event *event)
 {

@@ -24,16 +24,22 @@
  *          支持实体按键、触摸按键
  */
 #include "xBtnAction.h"
-#include "xList.h"
 #include "string.h"
+#include "xLog.h"
 
-//规定常规电平为高电平，按下电平为低电平，可在getBtnStateFunc匹配
+/**
+ * 规定
+ * 释放电平：高电平 1
+ * 按下电平：低电平 0
+ *
+ * 对接电路电平，需要在getBtnStateFunc匹配
+ */
 
 #define PRESS_LEVEL          0
 
-NEW_LIST(xBtnLink);
+static xBtnInfo_t *xBtnLink=NULL;
 
-static uint8_t btnCycle=10;
+static uint8_t btnCycle=0;
 
 static uint8_t btnDebounceMs    = 10;   //按键滤波时间
 static uint16_t btnLongPress    = 200;  //长按触发时间
@@ -50,45 +56,39 @@ void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uin
 
 void xBtnInit(uint16_t id,bool (*getBtnStateFunc)(uint16_t))
 {
-    xBtnInfo_t * link = (xBtnInfo_t *)XMALLOC(sizeof(xBtnInfo_t));
+    xBtnInfo_t * link = (xBtnInfo_t *)XCALLOC(1,sizeof(xBtnInfo_t));
     if(link!=NULL)
     {
-        memset(link,0,sizeof(xBtnInfo_t));
-
         link->id=id;
         link->getBtnStateFunc=getBtnStateFunc;
-        xListInfoAdd(&xBtnLink,link);
+        link->btnNewState=~PRESS_LEVEL;
+        link->pNext=xBtnLink;
+        xBtnLink=link;
     }
 }
 
 void xBtnProcess(xBtnInfo_t *btnInfo)
 {
-
     btnInfo->btnOldState=btnInfo->btnNewState;
     btnInfo->btnNewState=btnInfo->getBtnStateFunc(btnInfo->id);
 
-        switch(btnInfo->FSM_State)
+    switch(btnInfo->FSM_State)
+    {
+    case BTN_NO_OPERATION:
+    {
+        if((btnInfo->btnNewState==PRESS_LEVEL)&&(btnInfo->btnNewState==btnInfo->btnOldState))
         {
-        case BTN_NO_OPERATION:
-        {
-            if((btnInfo->btnNewState==PRESS_LEVEL)&&(btnInfo->btnNewState==btnInfo->btnOldState))
-            {
-                btnInfo->holdCount=0;
-                btnInfo->isPressed=true;
-                btnInfo->FSM_State=BTN_HOLD_DOWN;
-            }
-            break;
+            btnInfo->holdCount=0;
+            btnInfo->isPressed=true;
+            btnInfo->FSM_State=BTN_HOLD_DOWN;
         }
-//        case EBTN_PRESSED:
-//        {
-//
-//            break;
-//        }
-        case BTN_HOLD_DOWN:
-        {
-            btnInfo->holdCount++;
+        break;
+    }
+    case BTN_HOLD_DOWN:
+    {
+        btnInfo->holdCount++;
 
-            if((btnInfo->holdCount>btnLongPress)&&(btnInfo->shootCount==0))
+        if((btnInfo->holdCount>btnLongPress)&&(btnInfo->shootCount==0))
         {
             btnInfo->shootCount++;
             btnInfo->isShoot=true;
@@ -102,94 +102,85 @@ void xBtnProcess(xBtnInfo_t *btnInfo)
             }
         }
 
-        
-            if((btnInfo->btnNewState!=PRESS_LEVEL)&&(btnInfo->btnNewState==btnInfo->btnOldState))
-            {
-                            btnInfo->holdCount=0;
+        if((btnInfo->btnNewState!=PRESS_LEVEL)&&(btnInfo->btnNewState==btnInfo->btnOldState))
+        {
+            btnInfo->holdCount=0;
             btnInfo->shootCount=0;
             btnInfo->isShoot=false;
             btnInfo->isReleased=true;
-//            btnInfo->isClicked=true;
-
-                btnInfo->doubleClickCount++;//单击计数
-                if(btnInfo->doubleClickCount>=2)
-                {
-                    btnInfo->isDoubleClicked=true;
-                    btnInfo->doubleClickCount=0;
-                }
-
-                btnInfo->repeatCount++;
-                btnInfo->repeatTimeOutCount=0;//复位超时
-
-                btnInfo->FSM_State=BTN_NO_OPERATION;
-            }
-            break;
-        }
-//        case EBTN_RELEASED:
-//        {
-//
-//            break;
-//        }
-        default:
-            break;
-        }
-
-        //连击超时处理
-        if(btnInfo->repeatCount>0)//有点击才开始计算超时
-        {
-            btnInfo->repeatTimeOutCount++;
-            if(btnInfo->repeatTimeOutCount>=btnClickTimeOut)
+            btnInfo->doubleClickCount++;//单击计数
+            if(btnInfo->doubleClickCount>=2)
             {
-                btnInfo->repeatTimeOutCount=0;//复位超时
-                btnInfo->isRepeatEnd=true;
+                btnInfo->isDoubleClicked=true;
+                btnInfo->doubleClickCount=0;
             }
+            btnInfo->repeatCount++;
+            btnInfo->repeatTimeOutCount=0;//复位超时
+            btnInfo->FSM_State=BTN_NO_OPERATION;
         }
-}
+        break;
+    }
+    default:
+        break;
+    }
 
-static bool _btnLoop(xListNode_t* pEachInfo,void* pInfo)
-{
-    (void*)pInfo;
-    xBtnProcess((xBtnInfo_t *)pEachInfo->info);
-     
-    return false;
+    //连击超时处理
+    if(btnInfo->repeatCount>0)//有点击才开始计算超时
+    {
+        btnInfo->repeatTimeOutCount++;
+        if(btnInfo->repeatTimeOutCount>=btnClickTimeOut)
+        {
+            btnInfo->repeatTimeOutCount=0;//复位超时
+            btnInfo->isRepeatEnd=true;
+        }
+    }
 }
 
 void xBtnTick(uint8_t cycleMs)
 {
+    if(xBtnLink==NULL)
+    {
+        return;
+    }
+
+    xBtnInfo_t *ptNext=NULL;
+
     if(btnCycle==0)
     {
         btnCycle=cycleMs;
     }
-    
-    //循环检测所有btnEx
-    xListInfoPrevTraverse(&xBtnLink,NULL,_btnLoop);
+
+    ptNext=xBtnLink;
+
+    while (ptNext!=NULL)
+    {
+        xBtnProcess(ptNext);
+        ptNext=ptNext->pNext;
+    }
 }
-
-
 
 uint16_t xBtnGetState(uint16_t id,uint8_t state)
 {
     uint16_t ret=0;
     xBtnInfo_t *btnInfo=NULL;
-    xListNode_t *temp_pos,*safePos;
 
-    list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
+    btnInfo=xBtnLink;
+
+    while (btnInfo!=NULL)
     {
-        if(temp_pos->info!=NULL)
+        if(btnInfo->id==id)
         {
-            if(((xBtnInfo_t *)temp_pos->info)->id==id)
-            {
-                btnInfo=temp_pos->info;
-                break;
-            }
+            ret=1;
+            break;
         }
+        btnInfo=btnInfo->pNext;
     }
-    
-    if(btnInfo==NULL)
+
+    if(ret==0)
     {
         return 0;
     }
-    
+
     switch(state)
     {
     case BTN_NO_OPERATION:
@@ -279,14 +270,12 @@ uint16_t xBtnGetState(uint16_t id,uint8_t state)
         }
         else
         {
-
             if(((btnInfo->holdCount-btnLongPress)/btnLongShoot+1==btnInfo->shootCount)&&(btnInfo->shootCount>0))
             {
                 btnInfo->shootCount++;
                 ret=true;
             }
         }
-
         break;
     }
     default:
@@ -295,15 +284,41 @@ uint16_t xBtnGetState(uint16_t id,uint8_t state)
     return ret;
 }
 
-void xBtnClean(void)
+void xBtnReset(void)
 {
-    xListNode_t *temp_pos,*safePos;
+    xBtnInfo_t *ptNext=NULL;
 
-    list_for_each_prev_safe(temp_pos,safePos, &xBtnLink)
+    ptNext=xBtnLink;
+
+    while (ptNext!=NULL)
     {
-        if(temp_pos->info!=NULL)
-        {
-            XFREE(xListInfoDel(temp_pos));
-        }
+        ptNext->FSM_State=BTN_NO_OPERATION;
+        ptNext->doubleClickCount=0;
+        ptNext->repeatCount=0;
+        ptNext->repeatTimeOutCount=0;
+        ptNext->holdCount=0;
+        ptNext->shootCount=0;
+        ptNext->btnNewState=~PRESS_LEVEL;
+        ptNext->btnOldState=PRESS_LEVEL;
+        ptNext->isPressed=false;
+        ptNext->isReleased=false;
+        ptNext->isDoubleClicked=false;
+        ptNext->isRepeatEnd=false;
+        ptNext->isShoot=false;
+        ptNext=ptNext->pNext;
+    }
+}
+
+void xBtnDestroy(void)
+{
+    xBtnInfo_t *btnInfo=NULL,*ptNext=NULL;
+
+    ptNext=xBtnLink;
+
+    while (ptNext!=NULL)
+    {
+        btnInfo=ptNext;
+        ptNext=ptNext->pNext;
+        XFREE(btnInfo);
     }
 }
