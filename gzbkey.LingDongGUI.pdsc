@@ -78,7 +78,6 @@
         <file category="header"  name="src/porting/ldConfig.h" attr="config" version="1.3.7" />
         <file category="sourceC" name="src/porting/arm_2d_disp_adapter_0.c" attr="config" version="1.0.0" />
         <file category="header"  name="src/porting/arm_2d_disp_adapter_0.h" attr="config" version="1.0.0" />
-        <file category="sourceC" name="src/porting/Retarget.c" attr="config" version="1.0.1" />
       </files>
       <RTE_Components_h>
 #define __ARM_2D_USER_APP_CFG_H__ "ldConfig.h"
