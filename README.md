@@ -11,6 +11,7 @@
 
 1. **各种芯片通用**
     * 支持ARM单片机、RISC-V单片机
+    * 支持在PC上模拟运行(SDL)
 
 2. **简单易用**
     * 对ARM-2D进行二次封装，极大降低ARM-2D的使用难度
@@ -32,10 +33,6 @@
     * 多功能按键，支持实体按键和触摸按键
     * 队列
     * 彩色log打印
-
-|ℹ️ Note|
-|:----|
-|可以通过模拟器在PC上运行，解除了只能在Cortex-M系列单片机上运行的限制，理论上可以在任意支持C语言的平台运行。|
 
 ## 源码
 
@@ -92,14 +89,7 @@ widget demo sdl
 
 ## 教程
 
-📖 [详细教程(目录)](./docs/tutorial)
-
-* 🏷️[介绍](./docs/tutorial/01%20introduction.md)
-* 🚀[快速开始](./docs/tutorial/02%20get%20started.md)
-* ⚙️[移植指南](./docs/tutorial/03%20porting.md)
-* 🔗[API说明](./docs/tutorial/04%20api.md)
-* 🛠️[开发指引](./docs/tutorial/05%20development.md)
-* 🔨[参与贡献](./docs/tutorial/06%20git.md)
+📖 [中文教程](https://ldgui-doc-cn.readthedocs.io)
 
 ## 技术交流
 
