@@ -109,6 +109,7 @@ static bool slotListScroll(ld_scene_t *ptScene,ldMsg_t msg)
     default:
         break;
     }
+    return false;
 }
 
 ldList_t* ldList_init( ld_scene_t *ptScene,ldList_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
