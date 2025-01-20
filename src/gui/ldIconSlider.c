@@ -18,8 +18,7 @@
 
 #define __LD_ICON_SLIDER_IMPLEMENT__
 
-#include "./arm_extra_controls.h"
-#include "./__common.h"
+#include "__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
 #include <assert.h>

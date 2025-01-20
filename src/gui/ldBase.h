@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 #include "arm_2d.h"
-#include "arm_extra_controls.h"
 #include "arm_2d_helper_control.h"
 #include "xLog.h"
 #include "xBtnAction.h"

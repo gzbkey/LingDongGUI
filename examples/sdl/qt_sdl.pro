@@ -7,7 +7,7 @@ CONFIG -= qt
 #//     <1=> Startup
 #//     <2=> Show all widget
 #//     <3=> Printer
-USE_DEMO=1
+USE_DEMO=2
 
 SOURCES += \
     virtualNor/virtualNor.c \

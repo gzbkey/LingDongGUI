@@ -164,7 +164,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldGraphInit(19,0,830,10,100,100,2);
     ldGraphSetAxis(obj,80,80,5);
     ldGraphSetGridOffset(obj,4);
-    ldGraphAddSeries(obj,GLCD_COLOR_NIXIE_TUBE,2,16);
+    ldGraphAddSeries(obj,GLCD_COLOR_RED,2,16);
     srand(10);
     for (int i = 0; i < 16; i++)
     {
