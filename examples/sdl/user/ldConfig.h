@@ -171,7 +171,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiStartup.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          uiStartupFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 #if USE_DEMO == 2
@@ -186,7 +190,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          uiWidgetFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 #if USE_DEMO == 3
@@ -201,7 +209,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          uiLogoFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 #if USE_DEMO == 4
@@ -216,7 +228,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "home.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          homeFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 // <<< end of configuration section >>>

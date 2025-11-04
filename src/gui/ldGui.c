@@ -441,7 +441,7 @@ void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
     }
 
     disp_adapter0_init();
-
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
     LOG_DEBUG("[sys] free memory:%zu",ldGetFreeMemory());
     if(ptFuncGroup==NULL)
     {
@@ -456,6 +456,7 @@ void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 #elif USE_SCENE_SWITCHING == 1 || USE_SCENE_SWITCHING == 0
     __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
+#endif
 #endif
 }
 
