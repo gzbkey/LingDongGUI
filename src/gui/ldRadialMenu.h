@@ -56,7 +56,6 @@ typedef struct {
     arm_2d_tile_t *ptImgTile;
     arm_2d_tile_t *ptMaskTile;
     uint16_t angle;
-//    uint8_t count;
 #if USE_RADIA_MENU_SCALE == 1
     uint8_t scalePercent;
     arm_2d_op_trans_msk_opa_t op;
@@ -67,7 +66,6 @@ struct ldRadialMenu_t
 {
     implement(ldBase_t);
     ldRadialMenuItem_t *ptItemInfoList;
-//    uint8_t itemCount;
     uint8_t itemMax;
     uint16_t xAxis;
     uint16_t yAxis;
@@ -78,6 +76,7 @@ struct ldRadialMenu_t
     uint8_t selectItem;
     uint32_t timer;
     uint8_t *pShowList;
+    int8_t _itemOffset;
     bool isMove:1;
 };
 

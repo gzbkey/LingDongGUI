@@ -417,7 +417,7 @@ void ldGuiLcdTest(void)
         for(uint16_t c=0;c<BLOCK_COLUMNS;c++)
         {
             uint8_t idx = (r*BLOCK_COLUMNS + c) * 3;
-            uint16_t color = __RGB(rgb[idx],rgb[idx+1],rgb[idx+2]);
+            ldColor color = __RGB(rgb[idx],rgb[idx+1],rgb[idx+2]);
             uint16_t w=bw,h=bh;
             if(c==(BLOCK_COLUMNS-1))
             {

@@ -342,18 +342,17 @@ void ldRadialMenu_on_frame_start(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget)
 void ldRadialMenu_on_frame_complete(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget)
 {
     assert(NULL != ptWidget);
-}
 
-void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget->use_as__ldBase_t.itemCount)
     {
-        return;
-    }
+        if (ptWidget->offsetAngle == 0)//处理缓冲数据
+        {
+            if (ptWidget->_itemOffset != 0)
+            {
+                ldRadialMenuOffsetItem(ptWidget, ptWidget->_itemOffset);
+            }
+        }
 
-    if(ptWidget->use_as__ldBase_t.itemCount&&bIsNewFrame)
-    {
 #if MOVE_CYCLE_MS == 0
         if(ptWidget->offsetAngle!=0)
 #else
@@ -416,6 +415,15 @@ void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_
 
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
+    }
+}
+
+void ldRadialMenu_show(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
     }
 
     arm_2d_region_t globalRegion;
@@ -568,6 +576,13 @@ void ldRadialMenuOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset)
     {
         return;
     }
+
+    if(ptWidget->offsetAngle != 0)
+    {
+        ptWidget->_itemOffset+=offset;
+        return ;
+    }
+    ptWidget->_itemOffset=0;
 
     offset=offset%ptWidget->use_as__ldBase_t.itemCount;
     offset=ptWidget->selectItem+offset;
