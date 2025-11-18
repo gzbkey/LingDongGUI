@@ -87,8 +87,6 @@ ldGauge_t* ldGauge_init( ld_scene_t *ptScene,ldGauge_t *ptWidget, uint16_t nameI
     ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptItemRegion->tTempItemRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
-    ptItemRegion->tTempItemRegion.tLocation.iX=0;
-    ptItemRegion->tTempItemRegion.tLocation.iY=0;
     ptItemRegion->itemRegion=ptItemRegion->tTempItemRegion;
 
     ptWidget->use_as__ldBase_t.ptItemRegionList=ptItemRegion;
@@ -98,7 +96,7 @@ ldGauge_t* ldGauge_init( ld_scene_t *ptScene,ldGauge_t *ptWidget, uint16_t nameI
     ptWidget->ptBgMaskTile=ptBgMaskTile;
     ptWidget->centreOffsetX=centreOffsetX;
     ptWidget->centreOffsetY=centreOffsetY;
-
+    
     LOG_INFO("[init][gauge] id:%d, size:%llu", nameId,sizeof (*ptWidget));
     return ptWidget;
 }
@@ -138,7 +136,45 @@ void ldGauge_on_load(ld_scene_t *pScene, ldGauge_t *ptWidget)
 void ldGauge_on_frame_start(ld_scene_t *pScene, ldGauge_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+
+    if(ptWidget->isAutoMove && (ptWidget->_nowAngle_x10 != ptWidget->targetAngle_x10))
+    {
+        int16_t diff = ptWidget->targetAngle_x10 - ptWidget->_nowAngle_x10;
+
+        if(diff > 1800)
+        {
+            diff -= 3600;
+        }
+        else if(diff < -1800)
+        {
+            diff += 3600;
+        }
+        
+        // 每帧移动1度(可以根据需要调整速度)
+        if(diff > 10)
+        {
+            ptWidget->_nowAngle_x10 += 10;
+        }
+        else if(diff < -10)
+        {
+            ptWidget->_nowAngle_x10 -= 10;
+        }
+        else
+        {
+            ptWidget->_nowAngle_x10 = ptWidget->targetAngle_x10;
+        }
+
+        if(ptWidget->_nowAngle_x10 >= 3600)
+        {
+            ptWidget->_nowAngle_x10 -= 3600;
+        }
+        else if(ptWidget->_nowAngle_x10 < 0)
+        {
+            ptWidget->_nowAngle_x10 += 3600;
+        }
+
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    }
 }
 
 void ldGauge_on_frame_complete(ld_scene_t *pScene, ldGauge_t *ptWidget)
@@ -153,7 +189,6 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
     {
         return;
     }
-
 
     if (bIsNewFrame) {
         if((ptWidget->op.Target.ptRegion!=NULL)&&(ptWidget->use_as__ldBase_t.isDirtyRegionUpdate==false))
@@ -188,65 +223,106 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
             arm_2d_op_wait_async(NULL);
 
             do {
-                arm_2d_location_t pointerRotationCentre =
+
+                arm_2d_point_float_t pointerRotationCentre =
                 {
-                    .iX = ptWidget->pointerOriginOffsetX,
-                    .iY = ptWidget->pointerOriginOffsetY,
+                    .fX = ptWidget->pointerOriginOffsetX,
+                    .fY = ptWidget->pointerOriginOffsetY,
                 };
 
-                arm_2d_location_t bgRotationCentre=
+                arm_2d_point_float_t bgRotationCentre=
                 {
-                    .iX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX,
-                    .iY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
+                    .fX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX,
+                    .fY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
                 };
+
+                if((ptWidget->ptBgTrailMaskTile!=NULL)&&(ptWidget->ptPointerTrailMaskTile!=NULL))
+                {
+                    arm_2d_point_float_t maskPointerRotationCentre={
+                        .fX=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iWidth,
+                        .fY=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iHeight,
+                    };
+
+                    arm_2dp_fill_colour_with_transformed_mask_target_mask_and_opacity(&ptWidget->trailOp,
+                                                                                      ptWidget->ptPointerTrailMaskTile,
+                                                                                      &tTarget,
+                                                                                      ptWidget->ptBgTrailMaskTile,
+                                                                                      &tTarget_canvas,
+                                                                                      maskPointerRotationCentre,
+                                                                                      ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
+                                                                                      1.0,
+                                                                                      1.0,
+                                                                                      ptWidget->maskColor,
+                                                                                      ptWidget->use_as__ldBase_t.opacity,
+                                                                                      &bgRotationCentre);
+
+                    arm_2d_op_wait_async(NULL);
+                }
 
                 if((ptWidget->ptPointerImgTile!=NULL)&&(ptWidget->ptPointerMaskTile!=NULL))
                 {
-                    arm_2dp_tile_transform_with_src_mask_and_opacity(&ptWidget->op,
+                    arm_2dp_tile_transform_xy_with_src_mask_and_opacity(&ptWidget->op,
                                                                      ptWidget->ptPointerImgTile,
                                                                      ptWidget->ptPointerMaskTile,
                                                                      &tTarget,
                                                                      &tTarget_canvas,
                                                                      pointerRotationCentre,
-                                                                     ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),
+                                                                     ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
                                                                      1.0,
-                                                                     255,
+                                                                     1.0,
+                                                                     ptWidget->use_as__ldBase_t.opacity,
                                                                      &bgRotationCentre);
                 }
                 else if((ptWidget->ptPointerImgTile==NULL)&&(ptWidget->ptPointerMaskTile!=NULL))
                 {
-                    arm_2dp_fill_colour_with_mask_opacity_and_transform((arm_2d_op_trans_opa_t *)&ptWidget->op,
-                                                                        ptWidget->ptPointerMaskTile,
-                                                                        &tTarget,
-                                                                        &tTarget_canvas,
-                                                                        pointerRotationCentre,
-                                                                        ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),//ptWidget->helper.fAngle,
-                                                                        1.0,//ptWidget->helper.fScale,
-                                                                        ptWidget->keyingOrMaskColor,
-                                                                        255,
-                                                                        &bgRotationCentre);
+                    arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op,
+                                                                           ptWidget->ptPointerMaskTile,
+                                                                           &tTarget,
+                                                                           &tTarget_canvas,
+                                                                           pointerRotationCentre,
+                                                                           ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),//ptWidget->helper.fAngle,
+                                                                           1.0,
+                                                                           1.0,
+                                                                           ptWidget->maskColor,
+                                                                           ptWidget->use_as__ldBase_t.opacity,
+                                                                           &bgRotationCentre);
                 }
                 else if((ptWidget->ptPointerImgTile!=NULL)&&(ptWidget->ptPointerMaskTile==NULL))
                 {
-                    arm_2dp_tile_transform_only((arm_2d_op_trans_t *)&ptWidget->op,
-                                                ptWidget->ptPointerImgTile,
-                                                &tTarget,
-                                                &tTarget_canvas,
-                                                pointerRotationCentre,
-                                                ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                                                1.0,
-                                                &bgRotationCentre);
+                    arm_2dp_tile_transform_xy_with_opacity((arm_2d_op_trans_opa_t *)&ptWidget->op,
+                                                           ptWidget->ptPointerImgTile,
+                                                           &tTarget,
+                                                           &tTarget_canvas,
+                                                           pointerRotationCentre,
+                                                           ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
+                                                           1.0,
+                                                           1.0,
+                                                           ptWidget->maskColor,
+                                                           ptWidget->use_as__ldBase_t.opacity,
+                                                           &bgRotationCentre);
                 }
                 else if(ptWidget->isKeying)
                 {
-                    arm_2dp_tile_rotation_with_colour_keying((arm_2d_op_trans_t *)&ptWidget->op,
-                                                             ptWidget->ptPointerImgTile,
-                                                             &tTarget,
-                                                             &tTarget_canvas,
-                                                             pointerRotationCentre,
-                                                             ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                                                             __RGB(255,255,255),
-                                                             &bgRotationCentre);
+                    arm_2d_location_t pointerRotationCentre =
+                    {
+                        .iX = ptWidget->pointerOriginOffsetX,
+                        .iY = ptWidget->pointerOriginOffsetY,
+                    };
+
+                    arm_2d_location_t bgRotationCentre=
+                    {
+                        .iX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX,
+                        .iY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
+                    };
+                    arm_2dp_tile_transform_with_colour_keying((arm_2d_op_trans_t *)&ptWidget->op,
+                                                              ptWidget->ptPointerImgTile,
+                                                              &tTarget,
+                                                              &tTarget_canvas,
+                                                              pointerRotationCentre,
+                                                              ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
+                                                              1.0,
+                                                              __RGB(ptWidget->use_as__ldBase_t.opacity,ptWidget->use_as__ldBase_t.opacity,ptWidget->use_as__ldBase_t.opacity),
+                                                              &bgRotationCentre);
                     break;
                 }
                 arm_2d_op_wait_async(NULL);
@@ -279,7 +355,7 @@ void ldGaugeSetPointerColor(ldGauge_t *ptWidget,ldColor color)
     {
         return;
     }
-    ptWidget->keyingOrMaskColor=color;
+    ptWidget->maskColor=color;
 }
 
 void ldGaugeSetAngle(ldGauge_t *ptWidget, float angle)
@@ -289,10 +365,44 @@ void ldGaugeSetAngle(ldGauge_t *ptWidget, float angle)
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->angle_x10=(int16_t)(angle*10);
-    ptWidget->angle_x10%=3600;
+    ptWidget->targetAngle_x10 = (int16_t)(angle * 10);
+    ptWidget->targetAngle_x10 %= 3600;
+    if(!ptWidget->isAutoMove)
+    {
+        ptWidget->_nowAngle_x10=ptWidget->targetAngle_x10;
+    }
 }
 
+void ldGaugeSetTrail(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgTrailMaskTile,arm_2d_tile_t *ptPointerTrailMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->ptBgTrailMaskTile=ptBgTrailMaskTile;
+    ptWidget->ptPointerTrailMaskTile=ptPointerTrailMaskTile;
+}
+
+void ldGaugeSetAutoMove(ldGauge_t *ptWidget, bool enable)
+{
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    
+    ptWidget->isAutoMove = enable;
+
+    if(enable && ptWidget->_nowAngle_x10 == 0)
+    {
+        ptWidget->_nowAngle_x10 = ptWidget->targetAngle_x10;
+    }
+
+    if(enable)
+    {
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    }
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
