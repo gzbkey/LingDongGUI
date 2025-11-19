@@ -59,9 +59,11 @@ struct ldGauge_t
     int16_t centreOffsetY;//0 = centre
     int16_t pointerOriginOffsetX;
     int16_t pointerOriginOffsetY;
-    int16_t targetAngle_x10;
+    int16_t startAngle_x10;
     int16_t _nowAngle_x10;
+    int16_t endAngle_x10;
     ldColor maskColor;
+    uint8_t _trailOpacity;
     arm_2d_op_trans_msk_opa_t op;
     arm_2d_op_trans_msk_opa_t trailOp;
     arm_2d_region_t targetDirtyRegion;

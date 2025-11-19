@@ -137,44 +137,59 @@ void ldGauge_on_frame_start(ld_scene_t *pScene, ldGauge_t *ptWidget)
 {
     assert(NULL != ptWidget);
 
-    if(ptWidget->isAutoMove && (ptWidget->_nowAngle_x10 != ptWidget->targetAngle_x10))
+    if (!ptWidget->isAutoMove || ptWidget->_nowAngle_x10 == ptWidget->endAngle_x10)
     {
-        int16_t diff = ptWidget->targetAngle_x10 - ptWidget->_nowAngle_x10;
-
-        if(diff > 1800)
-        {
-            diff -= 3600;
-        }
-        else if(diff < -1800)
-        {
-            diff += 3600;
-        }
-        
-        // 每帧移动1度(可以根据需要调整速度)
-        if(diff > 10)
-        {
-            ptWidget->_nowAngle_x10 += 10;
-        }
-        else if(diff < -10)
-        {
-            ptWidget->_nowAngle_x10 -= 10;
-        }
-        else
-        {
-            ptWidget->_nowAngle_x10 = ptWidget->targetAngle_x10;
-        }
-
-        if(ptWidget->_nowAngle_x10 >= 3600)
-        {
-            ptWidget->_nowAngle_x10 -= 3600;
-        }
-        else if(ptWidget->_nowAngle_x10 < 0)
-        {
-            ptWidget->_nowAngle_x10 += 3600;
-        }
-
-        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        return;
     }
+
+    int16_t endDiff = ptWidget->endAngle_x10 - ptWidget->_nowAngle_x10;
+    if(endDiff > 1800)
+    {
+        endDiff -= 3600;
+    }
+    else if(endDiff < -1800)
+    {
+        endDiff += 3600;
+    }
+
+    int16_t startDiff = ptWidget->startAngle_x10 - ptWidget->_nowAngle_x10;
+    if (startDiff > 1800)
+    {
+        startDiff -= 3600;
+    }
+    else if (startDiff < -1800)
+    {
+        startDiff += 3600;
+    }
+
+    uint16_t dStart = (uint16_t)abs(startDiff);
+    dStart=(dStart > 1800)?(3600 - dStart):dStart;
+    uint16_t dEnd   = (uint16_t)abs(endDiff);
+    dEnd=(dEnd > 1800)?(3600 - dEnd):dEnd;
+    uint16_t fadeDist = (dStart < dEnd) ? dStart : dEnd;
+
+    ptWidget->_trailOpacity = (fadeDist > 510) ? 255 : (uint8_t)(fadeDist >>1);
+
+    if(endDiff > 10)
+    {
+        ptWidget->_nowAngle_x10 += 10;
+    }
+    else if(endDiff < -10)
+    {
+        ptWidget->_nowAngle_x10 -= 10;
+    }
+    else
+    {
+        ptWidget->_nowAngle_x10 = ptWidget->endAngle_x10;
+    }
+
+    ptWidget->_nowAngle_x10 %= 3600;
+    if (ptWidget->_nowAngle_x10 < 0)
+    {
+        ptWidget->_nowAngle_x10 += 3600;
+    }
+
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
 
 void ldGauge_on_frame_complete(ld_scene_t *pScene, ldGauge_t *ptWidget)
@@ -190,8 +205,9 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
         return;
     }
 
-    if (bIsNewFrame) {
-        if((ptWidget->op.Target.ptRegion!=NULL)&&(ptWidget->use_as__ldBase_t.isDirtyRegionUpdate==false))
+    if (bIsNewFrame)
+    {
+        if((ptWidget->op.Target.ptRegion!=NULL)&&(ptWidget->use_as__ldBase_t.isDirtyRegionUpdate==true))
         {
         ptWidget->use_as__ldBase_t.ptItemRegionList->itemRegion= *ptWidget->op.Target.ptRegion;
 
@@ -236,7 +252,7 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
                     .fY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
                 };
 
-                if((ptWidget->ptBgTrailMaskTile!=NULL)&&(ptWidget->ptPointerTrailMaskTile!=NULL))
+                if((ptWidget->isAutoMove)&&(ptWidget->ptBgTrailMaskTile!=NULL)&&(ptWidget->ptPointerTrailMaskTile!=NULL))
                 {
                     arm_2d_point_float_t maskPointerRotationCentre={
                         .fX=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iWidth,
@@ -253,7 +269,7 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
                                                                                       1.0,
                                                                                       1.0,
                                                                                       ptWidget->maskColor,
-                                                                                      ptWidget->use_as__ldBase_t.opacity,
+                                                                                      ptWidget->_trailOpacity,
                                                                                       &bgRotationCentre);
 
                     arm_2d_op_wait_async(NULL);
@@ -303,26 +319,21 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
                 }
                 else if(ptWidget->isKeying)
                 {
-                    arm_2d_location_t pointerRotationCentre =
+                    if (bIsNewFrame)
                     {
-                        .iX = ptWidget->pointerOriginOffsetX,
-                        .iY = ptWidget->pointerOriginOffsetY,
+                        arm_2dp_rgb565_tile_transform_xy_with_colour_keying_prepare((arm_2d_op_trans_t *)&ptWidget->op,
+                                                                                    ptWidget->ptPointerImgTile,
+                                                                                    pointerRotationCentre,
+                                                                                    ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
+                                                                                    1.0,
+                                                                                    1.0,
+                                                                                    ptWidget->maskColor);
                     };
+                    arm_2dp_tile_transform_xy((arm_2d_op_trans_t *)&ptWidget->op,
+                                              &tTarget,
+                                              &tTarget_canvas,
+                                              &bgRotationCentre);
 
-                    arm_2d_location_t bgRotationCentre=
-                    {
-                        .iX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX,
-                        .iY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
-                    };
-                    arm_2dp_tile_transform_with_colour_keying((arm_2d_op_trans_t *)&ptWidget->op,
-                                                              ptWidget->ptPointerImgTile,
-                                                              &tTarget,
-                                                              &tTarget_canvas,
-                                                              pointerRotationCentre,
-                                                              ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
-                                                              1.0,
-                                                              __RGB(ptWidget->use_as__ldBase_t.opacity,ptWidget->use_as__ldBase_t.opacity,ptWidget->use_as__ldBase_t.opacity),
-                                                              &bgRotationCentre);
                     break;
                 }
                 arm_2d_op_wait_async(NULL);
@@ -339,7 +350,8 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
 
 void ldGaugeSetPointerImage(ldGauge_t *ptWidget,arm_2d_tile_t *ptPointerImgTile,arm_2d_tile_t *ptPointerMaskTile,int16_t pointerOriginOffsetX,int16_t pointerOriginOffsetY)
 {
-    if (ptWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
@@ -351,7 +363,8 @@ void ldGaugeSetPointerImage(ldGauge_t *ptWidget,arm_2d_tile_t *ptPointerImgTile,
 
 void ldGaugeSetPointerColor(ldGauge_t *ptWidget,ldColor color)
 {
-    if (ptWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
@@ -360,16 +373,28 @@ void ldGaugeSetPointerColor(ldGauge_t *ptWidget,ldColor color)
 
 void ldGaugeSetAngle(ldGauge_t *ptWidget, float angle)
 {
-    if (ptWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->targetAngle_x10 = (int16_t)(angle * 10);
-    ptWidget->targetAngle_x10 %= 3600;
+    int16_t newEnd = ((int16_t)(angle * 10)) % 3600;
+    if(newEnd < 0)
+    {
+        newEnd += 3600;
+    }
+
+    if(ptWidget->_nowAngle_x10 == ptWidget->endAngle_x10)
+    {
+        ptWidget->startAngle_x10 = ptWidget->_nowAngle_x10;
+    }
+
+    ptWidget->endAngle_x10 = newEnd;
+
     if(!ptWidget->isAutoMove)
     {
-        ptWidget->_nowAngle_x10=ptWidget->targetAngle_x10;
+        ptWidget->_nowAngle_x10=ptWidget->endAngle_x10;
     }
 }
 
@@ -380,6 +405,7 @@ void ldGaugeSetTrail(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgTrailMaskTile,arm_2d
     {
         return;
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->ptBgTrailMaskTile=ptBgTrailMaskTile;
     ptWidget->ptPointerTrailMaskTile=ptPointerTrailMaskTile;
 }
@@ -390,17 +416,11 @@ void ldGaugeSetAutoMove(ldGauge_t *ptWidget, bool enable)
     {
         return;
     }
-    
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isAutoMove = enable;
-
     if(enable && ptWidget->_nowAngle_x10 == 0)
     {
-        ptWidget->_nowAngle_x10 = ptWidget->targetAngle_x10;
-    }
-
-    if(enable)
-    {
-        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        ptWidget->_nowAngle_x10 = ptWidget->endAngle_x10;
     }
 }
 
