@@ -259,6 +259,13 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
                         .fY=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iHeight,
                     };
 
+                    float scale=1.0;
+
+                    if((ptWidget->endAngle_x10-ptWidget->_nowAngle_x10)<0)
+                    {
+                        scale=-1.0;
+                    }
+
                     arm_2dp_fill_colour_with_transformed_mask_target_mask_and_opacity(&ptWidget->trailOp,
                                                                                       ptWidget->ptPointerTrailMaskTile,
                                                                                       &tTarget,
@@ -266,7 +273,7 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
                                                                                       &tTarget_canvas,
                                                                                       maskPointerRotationCentre,
                                                                                       ANGLE_2_RADIAN((ptWidget->_nowAngle_x10)/10.0+ANGLE_OFFSET),
-                                                                                      1.0,
+                                                                                      scale,
                                                                                       1.0,
                                                                                       ptWidget->maskColor,
                                                                                       ptWidget->_trailOpacity,
