@@ -69,6 +69,7 @@ struct ldGauge_t
     arm_2d_region_t targetDirtyRegion;
     bool isKeying:1;
     bool isAutoMove:1;
+    bool isProgressBar:1;
 };
 
 ldGauge_t* ldGauge_init(ld_scene_t *ptScene, ldGauge_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t *ptBgImgTile, arm_2d_tile_t *ptBgMaskTile, int16_t centreOffsetX, int16_t centreOffsetY);
@@ -82,6 +83,7 @@ void ldGaugeSetPointerImage(ldGauge_t *ptWidget,arm_2d_tile_t *ptPointerImgTile,
 void ldGaugeSetPointerColor(ldGauge_t *ptWidget,ldColor color);
 void ldGaugeSetAngle(ldGauge_t *ptWidget, float angle);
 void ldGaugeSetTrail(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgTrailMaskTile,arm_2d_tile_t *ptPointerTrailMaskTile);
+void ldGaugeSetProgressBar(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgProgressBarMaskTile,arm_2d_tile_t *ptPointerProgressBarMaskTile);
 void ldGaugeSetAutoMove(ldGauge_t *ptWidget, bool enable);
 
 #define ldGaugeInit(nameId,parentNameId,x,y,width,height,ptBgImgTile,ptBgMaskTile,centreOffsetX,centreOffsetY) \
