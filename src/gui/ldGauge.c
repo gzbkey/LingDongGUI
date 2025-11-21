@@ -271,8 +271,8 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
 
                 arm_2d_point_float_t bgRotationCentre=
                 {
-                    .fX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX,
-                    .fY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
+                    .fX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX-1,
+                    .fY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY-1,
                 };
 
                 float angle = (ptWidget->_nowAngle_x10 / 10.0f) + ANGLE_OFFSET;
@@ -280,8 +280,8 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
                 if((ptWidget->isAutoMove)&&(ptWidget->ptBgTrailMaskTile!=NULL)&&(ptWidget->ptPointerTrailMaskTile!=NULL))
                 {
                     arm_2d_point_float_t maskPointerRotationCentre={
-                        .fX=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iWidth,
-                        .fY=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iHeight,
+                        .fX=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iWidth-1,
+                        .fY=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iHeight-1,
                     };
 
 
