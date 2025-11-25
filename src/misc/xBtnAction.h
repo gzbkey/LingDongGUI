@@ -47,7 +47,7 @@
 typedef bool (*isBtnPressFunc)(uint16_t id,void* pUser);
 
 typedef struct xBtnInfo{
-    isBtnPressFunc getBtnStateFunc;
+    isBtnPressFunc getBtnPressFunc;
     struct xBtnInfo * pNext;
     uint16_t timeOutCount;
     int16_t holdCount;
@@ -56,8 +56,8 @@ typedef struct xBtnInfo{
     uint8_t FSM_State;
     uint8_t doubleClickCount;
     uint8_t repeatCount;
-    bool btnNewState:1;
-    bool btnOldState:1;
+    bool _isNewPress:1;
+    bool _isOldPress:1;
     bool isPressed:1;
     bool isReleased:1;
     bool isDoubleClicked:1;
@@ -65,8 +65,8 @@ typedef struct xBtnInfo{
     bool isShoot:1;
 }xBtnInfo_t;
 
-void __xBtnInit(uint16_t id, isBtnPressFunc pFunc, xBtnInfo_t *pBtnBuf);
-#define xBtnInit(id, pFunc, ...) (__xBtnInit(id, pFunc, (NULL,##__VA_ARGS__)))
+void _xBtnInit(uint16_t id, isBtnPressFunc pFunc, xBtnInfo_t *pBtnBuf);
+#define xBtnInit(id, pFunc, ...) (_xBtnInit(id, pFunc, (NULL,##__VA_ARGS__)))
 void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs);
 void xBtnTick(uint8_t cycleMs,void* pUser);
 uint16_t xBtnGetState(uint16_t id, uint8_t state);
