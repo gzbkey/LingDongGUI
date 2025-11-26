@@ -186,11 +186,11 @@ void ldGauge_on_frame_start(ld_scene_t *pScene, ldGauge_t *ptWidget)
         ptWidget->_trailOpacity=(uint8_t)((((uint16_t)(ptWidget->_trailOpacity) * (ptWidget->use_as__ldBase_t.opacity) * 0x8081U) >> 23) & 0xFFU);
     }
 
-#define STEP 10
+#define ANGLE_STEP (10)
 
     int16_t dir = ptWidget->startAngle_x10 - ptWidget->endAngle_x10;
 
-    if(abs(endDiff) <= STEP)
+    if(abs(endDiff) <= ANGLE_STEP)
     {
         ptWidget->_nowAngle_x10 = ptWidget->endAngle_x10;
     }
@@ -198,11 +198,11 @@ void ldGauge_on_frame_start(ld_scene_t *pScene, ldGauge_t *ptWidget)
     {
         if(dir < 0)
         {
-            ptWidget->_nowAngle_x10 += STEP;
+            ptWidget->_nowAngle_x10 += ANGLE_STEP;
         }
         else
         {
-            ptWidget->_nowAngle_x10 -= STEP;
+            ptWidget->_nowAngle_x10 -= ANGLE_STEP;
         }
     }
 
