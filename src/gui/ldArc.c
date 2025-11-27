@@ -288,8 +288,6 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                 break;
             }
 
-            arm_2d_draw_box(&tTarget,&tTarget_canvas,1,GLCD_COLOR_RED,255);
-
             arm_2d_point_float_t quarterMaskCenter={
                         .fX=ptWidget->ptImgTile->tRegion.tSize.iWidth-2,
                         .fY=ptWidget->ptImgTile->tRegion.tSize.iHeight-2,
