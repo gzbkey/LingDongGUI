@@ -209,7 +209,7 @@ ldComboBox_t* ldComboBox_init(ld_scene_t *ptScene,ldComboBox_t *ptWidget, uint16
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotComboBoxProcess);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotComboBoxProcess);
 
-    LOG_INFO("[init][comboBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][comboBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 

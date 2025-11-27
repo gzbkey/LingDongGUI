@@ -194,7 +194,7 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotMsgBoxToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotMsgBoxToggle);
 
-    LOG_INFO("[init][messageBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][messageBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 

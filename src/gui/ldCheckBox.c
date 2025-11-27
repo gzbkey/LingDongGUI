@@ -228,7 +228,7 @@ ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint1
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotCheckBoxToggle);
 
-    LOG_INFO("[init][checkBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][checkBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 

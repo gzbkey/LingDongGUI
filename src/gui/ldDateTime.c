@@ -93,7 +93,7 @@ ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint1
     strcpy((char*)ptWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
     memset(ptWidget->formatStrTemp,0,DATE_TIME_BUFFER_SIZE);
 
-    LOG_INFO("[init][dateTime] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][dateTime] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 

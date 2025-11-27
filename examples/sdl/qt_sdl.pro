@@ -8,7 +8,7 @@ CONFIG -= qt
 #//     <2=> Show all widget
 #//     <3=> Printer
 #//     <4=> Serial Tool
-USE_DEMO=4
+USE_DEMO=2
 
 SOURCES += \
     virtualNor/virtualNor.c \

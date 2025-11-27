@@ -97,7 +97,7 @@ ldArc_t* ldArc_init(ld_scene_t *ptScene,ldArc_t *ptWidget, uint16_t nameId, uint
     ptWidget->endAngle_x10[1]=1800;
     ptWidget->rotationAngle_x10=0;
 
-    LOG_INFO("[init][arc] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][arc] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -289,15 +289,14 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
             }
 
             arm_2d_point_float_t quarterMaskCenter={
-                        .fX=ptWidget->ptImgTile->tRegion.tSize.iWidth-2,
-                        .fY=ptWidget->ptImgTile->tRegion.tSize.iHeight-2,
-                    };
+                .fX=ptWidget->ptImgTile->tRegion.tSize.iWidth-2,
+                .fY=ptWidget->ptImgTile->tRegion.tSize.iHeight-2,
+            };
 
-            arm_2d_point_float_t bgCentre=
-                {
-                    .fX = (tTarget_canvas.tSize.iWidth>>1),
-                    .fY = (tTarget_canvas.tSize.iHeight>>1),
-                };
+            arm_2d_point_float_t bgCentre={
+                .fX = (tTarget_canvas.tSize.iWidth>>1),
+                .fY = (tTarget_canvas.tSize.iHeight>>1),
+            };
 
             for(uint8_t i=0;i<2;i++)
             {

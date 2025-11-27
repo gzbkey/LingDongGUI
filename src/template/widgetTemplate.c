@@ -85,7 +85,7 @@ ldTemplate_t* ldTemplate_init(ld_scene_t *ptScene,ldTemplate_t *ptWidget, uint16
     ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
     ptWidget->use_as__ldBase_t.opacity=255;
 
-    LOG_INFO("[init][template] id:%d, size:%d", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][template] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
