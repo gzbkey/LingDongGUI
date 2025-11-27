@@ -404,6 +404,27 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                                                                            ptWidget->parentColor,
                                                                            ptWidget->use_as__ldBase_t.opacity,
                                                                            &bgCentre);
+
+                            if((fEndAngle[0]-fStartAngle[0])>90)// 大于270度圆弧
+                            {
+                                tempAngle=fEndAngle[0];
+                                if(tempAngle>=360.0)
+                                {
+                                    tempAngle-=360.0;
+                                }
+                                arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op3,
+                                                                                       ptWidget->ptImgTile,
+                                                                                       &tTarget,
+                                                                                       &showRegion,
+                                                                                       quarterMaskCenter,
+                                                                                       ARM_2D_ANGLE(tempAngle),
+                                                                                       1.0,
+                                                                                       1.0,
+                                                                                       ptWidget->color[0],
+                                                                                       ptWidget->use_as__ldBase_t.opacity,
+                                                                                       &bgCentre
+                                                                                       );
+                            }
                         }
                     }
                 }

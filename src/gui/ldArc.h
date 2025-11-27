@@ -58,6 +58,7 @@ struct ldArc_t
     uint16_t rotationAngle_x10;
     arm_2d_op_trans_opa_t op[2];
     arm_2d_op_trans_opa_t op2[2];
+    arm_2d_op_trans_opa_t op3;
     bool isClockwise:1;
 };
 
