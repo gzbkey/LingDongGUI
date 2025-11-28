@@ -596,15 +596,9 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
     }
 
     arm_2d_region_t tBoxRegion;
-    arm_2d_tile_t tItemTile,tImgTile;
-
-#if 0
-    if (bIsNewFrame) {
-
-    }
-#endif
-
+    arm_2d_tile_t tItemTile;
     arm_2d_region_t globalRegion;
+
     arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
     if(arm_2d_helper_pfb_is_region_active(ptTile,&globalRegion,true))
@@ -718,19 +712,26 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
                                 .tLocation=item->tLocation,
                                 .tSize=item->ptReleaseImgTile->tRegion.tSize,
                             };
-                            ldBaseImage(&tImgTile,&tempRegion,item->ptReleaseImgTile,item->ptReleaseMaskTile,item->releaseImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
+                            ldBaseImage(&tItemTile,&tempRegion,item->ptReleaseImgTile,item->ptReleaseMaskTile,item->releaseImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
                         }
                     }
 
                     if((item->ptPressImgTile!=NULL)||(item->ptPressMaskTile!=NULL))
                     {
-                        if((item->isButton)&&(item->isChecked==true))
+                        arm_2d_region_t tempRegion={
+                            .tLocation=item->tLocation,
+                            .tSize=item->ptPressImgTile->tRegion.tSize,
+                        };
+                        if(item->isButton)
                         {
-                            arm_2d_region_t tempRegion={
-                                .tLocation=item->tLocation,
-                                .tSize=item->ptPressImgTile->tRegion.tSize,
-                            };
-                            ldBaseImage(&tImgTile,&tempRegion,item->ptPressImgTile,item->ptPressMaskTile,item->pressImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
+                            if(item->isChecked==true)
+                            {
+                                ldBaseImage(&tItemTile,&tempRegion,item->ptPressImgTile,item->ptPressMaskTile,item->pressImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
+                            }
+                        }
+                        else
+                        {
+                            ldBaseImage(&tItemTile,&tempRegion,item->ptPressImgTile,item->ptPressMaskTile,item->pressImgMaskColor,ptWidget->use_as__ldBase_t.opacity);
                         }
                     }
 
