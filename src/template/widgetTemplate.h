@@ -67,6 +67,9 @@ void ldTemplate_show(ld_scene_t *pScene, ldTemplate_t *ptWidget, const arm_2d_ti
 #define ldTemplateSetHidden                ldBaseSetHidden
 #define ldTemplateMove                     ldBaseMove
 #define ldTemplateSetOpacity               ldBaseSetOpacity
+#define ldTemplateSetSelectable            ldBaseSetSelectable
+#define ldTemplateSetSelect                ldBaseSetSelect
+#define ldTemplateSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

@@ -64,6 +64,7 @@
         <file category="sourceC" name="src/gui/ldSlider.c" />
         <file category="sourceC" name="src/gui/ldTable.c" />
         <file category="sourceC" name="src/gui/ldText.c" />
+        <file category="sourceC" name="src/gui/ldCalendar.c" />
 
         <file category="include" name="src/misc/" />
         <file category="sourceC" name="src/misc/freeRtosHeap4.c" />

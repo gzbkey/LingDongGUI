@@ -58,6 +58,7 @@ typedef enum{
     widgetTypeAnimation,
     widgetTypeList,
     widgetTypeMessageBox,
+    widgetTypeCalendar,
 }ldWidgetType_t;
 
 

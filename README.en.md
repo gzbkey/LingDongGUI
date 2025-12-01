@@ -83,7 +83,7 @@ widget demo sdl
 | ✅ | combo box | Drop-down list |
 | ✅ | arc bar | Circular progress ring |
 | ✅ | animation | GIF-style animation |
-| 🔲 | calendar | calendar |
+| ✅ | calendar | calendar |
 | ✅ | message box | Pop-up message |
 | 🔲 | clock | Analog clock |
 | ✅ | list | Scrollable list hosting any widget |

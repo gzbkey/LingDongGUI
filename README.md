@@ -84,7 +84,7 @@ widget demo sdl
 | ✅ | combo box | 下拉框 |
 | ✅ | arc bar | 圆环进度条 |
 | ✅ | animation | gif动画 |
-| 🔲 | calendar | 日历 |
+| ✅ | calendar | 日历 |
 | ✅ | message box | 消息框 |
 | 🔲 | clock | 模拟时钟 |
 | ✅ | list | 列表，可嵌入其他类型控件 |
