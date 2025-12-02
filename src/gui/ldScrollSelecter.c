@@ -346,10 +346,14 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
 
             for(uint8_t strGroupCount=0;strGroupCount<ptWidget->itemCount;strGroupCount++)
             {
-                itemsRegion.tLocation.iY=(strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace))+ptWidget->scrollOffset;
+                itemsRegion.tLocation.iY=strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace);
                 if(ptWidget->isEdit)
                 {
-                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight;
+                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset;
+                }
+                else
+                {
+                    itemsRegion.tLocation.iY-=ptWidget->itemSelect*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace);
                 }
 
                 ldBaseLabel(&tTarget,
