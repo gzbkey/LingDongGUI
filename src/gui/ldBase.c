@@ -1070,3 +1070,163 @@ void ldBaseSetCorner(ldBase_t* ptWidget,bool isCorner)
     ptWidget->isDirtyRegionUpdate = true;
     ptWidget->isCorner=isCorner;
 }
+
+void ldBaseResize(ldBase_t* ptWidget,arm_2d_size_t size)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize=size;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetX(ldBase_t* ptWidget,int16_t x)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetY(ldBase_t* ptWidget,int16_t y)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetWidth(ldBase_t* ptWidget,int16_t width)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetHeight(ldBase_t* ptWidget,int16_t height)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetRegion(ldBase_t* ptWidget,arm_2d_region_t region)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion=region;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+arm_2d_region_t ldBaseGetRegion(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return (arm_2d_region_t){0};
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion;
+}
+
+arm_2d_location_t ldBaseGetLocation(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return (arm_2d_location_t){0};
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation;
+}
+
+arm_2d_size_t ldBaseGetSize(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return (arm_2d_size_t){0};
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize;
+}
+
+int16_t ldBaseGetX(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+}
+
+int16_t ldBaseGetY(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+}
+
+int16_t ldBaseGetWidth(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth;
+}
+
+int16_t ldBaseGetHeight(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
+}

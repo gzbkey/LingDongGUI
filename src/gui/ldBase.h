@@ -238,12 +238,6 @@ void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color
 void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,uint8_t opacity,bool bIsNewFrame);
 void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
-void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
-void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
-void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
-void ldBaseSetSelectable(ldBase_t* ptWidget,bool isSelectable);
-void ldBaseSetSelect(ldBase_t* ptWidget,bool isSelect);
-void ldBaseSetCorner(ldBase_t* ptWidget,bool isCorner);
 ldWidgetType_t ldBaseGetWidgetType(ldBase_t *ptWidget);
 uint16_t ldBaseGetNameId(ldBase_t *ptWidget);
 uint16_t ldBaseGetOpacity(ldBase_t *ptWidget);
@@ -260,7 +254,29 @@ void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t 
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign);
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
 int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion, int16_t currentOffset, uint8_t itemCount, uint8_t itemHeight, uint8_t space);
+
 void ldBaseSetCenter(ldBase_t *ptWidget);
+void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
+void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
+void ldBaseSetSelectable(ldBase_t* ptWidget,bool isSelectable);
+void ldBaseSetSelect(ldBase_t* ptWidget,bool isSelect);
+void ldBaseSetCorner(ldBase_t* ptWidget,bool isCorner);
+
+void ldBaseSetRegion(ldBase_t* ptWidget,arm_2d_region_t region);
+void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
+void ldBaseResize(ldBase_t* ptWidget,arm_2d_size_t size);
+void ldBaseSetX(ldBase_t* ptWidget,int16_t x);
+void ldBaseSetY(ldBase_t* ptWidget,int16_t y);
+void ldBaseSetWidth(ldBase_t* ptWidget,int16_t width);
+void ldBaseSetHeight(ldBase_t* ptWidget,int16_t height);
+arm_2d_region_t ldBaseGetRegion(ldBase_t* ptWidget);
+arm_2d_location_t ldBaseGetLocation(ldBase_t* ptWidget);
+arm_2d_size_t ldBaseGetSize(ldBase_t* ptWidget);
+int16_t ldBaseGetX(ldBase_t* ptWidget);
+int16_t ldBaseGetY(ldBase_t* ptWidget);
+int16_t ldBaseGetWidth(ldBase_t* ptWidget);
+int16_t ldBaseGetHeight(ldBase_t* ptWidget);
+
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 
