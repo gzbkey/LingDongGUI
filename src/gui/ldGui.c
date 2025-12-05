@@ -43,6 +43,14 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 bool isFullWidgetUpdate=false;
 
+ldTimer_t sysTimer10ms=0;
+ldTimer_t sysTimer500ms=0;
+ldTimer_t sysTimer1min=0;
+
+ldBaseRTC_t sysRTC={
+    .isEnable=true
+};
+
 void ldGuiDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
     // draw ldgui background
@@ -170,6 +178,7 @@ void ldGuiTouchProcess(ld_scene_t *ptScene)
     bool nowState;
     static bool prevState=TOUCH_NO_CLICK;
     uint8_t touchSignal=SIGNAL_NO_OPERATION;
+    extern bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 
     nowState = ldCfgTouchGetPoint(&clickLocation.iX,&clickLocation.iY);
 
@@ -240,10 +249,28 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         }
     }
 
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,true))
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer10ms))
     {
         xBtnTick(SYS_TICK_CYCLE_MS,ptScene);
         cursorBlinkCount++;
+    }
+
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer500ms))
+    {
+        if(sysRTC.isEnable)
+        {
+            extern void ldCfgGetRtc(ldBaseRTC_t *dateTime);
+            ldCfgGetRtc(&sysRTC);
+            sysRTC.week=ldBaseZeller(sysRTC.year,sysRTC.mon,sysRTC.day);
+        }
+    }
+    
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer1min))
+    {
+        if(sysRTC.isEnable)
+        {
+            sysRTC.week=ldBaseZeller(sysRTC.year,sysRTC.mon,sysRTC.day);
+        }
     }
 
     if(ptScene->ldGuiFuncGroup!=NULL)
@@ -463,4 +490,9 @@ void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
 void ldGuiLoop(void)
 {
     disp_adapter0_task();
+}
+
+void ldGuiSetRTC(bool isEnable)
+{
+    sysRTC.isEnable=isEnable;
 }

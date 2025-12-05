@@ -485,7 +485,45 @@ void ldScrollSelecterSelectItem(ldScrollSelecter_t *ptWidget, int8_t itemNum)
         itemNum=ptWidget->itemCount-1;
     }
     ptWidget->itemSelect=itemNum;
-    ptWidget->isWaitMove=true;
+    if(ptWidget->isEdit)
+    {
+        ptWidget->isWaitMove=true;
+    }
+}
+
+void ldScrollSelecterSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(text==NULL)
+    {
+        return;
+    }
+    for(uint8_t i=0;i<ptWidget->itemCount;i++)
+    {
+        if(strcmp((const char *)ptWidget->ppItemStrGroup[i], (const char *)text) == 0)
+        {
+            ptWidget->itemSelect=i;
+            if(ptWidget->isEdit)
+            {
+                ptWidget->isWaitMove=true;
+            }
+            return;
+        }
+    }
+}
+
+uint8_t *ldScrollSelecterCurrentText(ldScrollSelecter_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return NULL;
+    }
+    return (uint8_t*)ptWidget->ppItemStrGroup[ptWidget->itemSelect];
 }
 
 void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit)
@@ -504,7 +542,6 @@ void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit)
     int16_t h=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
     arm_2d_region_t region=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
-    
     if(isEdit) //3->1
     {
         region.tLocation.iY-=h;
@@ -539,6 +576,8 @@ void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit)
             ptWidget->itemSpace=0;
         }
     }
+
+    ptWidget->scrollOffset=(-ptWidget->itemSelect)*(ptWidget->itemSpace+ptWidget->ptFont->tCharSize.iHeight);
 }
 
 #if defined(__clang__)

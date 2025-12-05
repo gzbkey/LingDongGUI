@@ -64,6 +64,7 @@ struct ldDateTime_t
     ldColor textColor;
     arm_2d_font_t *ptFont;
     bool isTransparent:1;
+    bool isAutoSysTime:1;
 };
 
 ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);

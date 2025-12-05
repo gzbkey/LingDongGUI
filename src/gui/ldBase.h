@@ -219,6 +219,17 @@ typedef struct {
     uint8_t right;
 }ldBody_t;
 
+typedef struct {
+    uint16_t year;
+    uint8_t mon;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t min;
+    uint8_t sec;
+    uint8_t week;
+    bool isEnable:1;
+}ldBaseRTC_t;
+
 typedef int64_t ldTimer_t;
 
 bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer);
@@ -276,7 +287,7 @@ int16_t ldBaseGetX(ldBase_t* ptWidget);
 int16_t ldBaseGetY(ldBase_t* ptWidget);
 int16_t ldBaseGetWidth(ldBase_t* ptWidget);
 int16_t ldBaseGetHeight(ldBase_t* ptWidget);
-
+uint8_t ldBaseZeller(uint16_t year, uint8_t month, uint8_t day);
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 

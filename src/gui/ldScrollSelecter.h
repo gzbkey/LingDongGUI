@@ -82,7 +82,9 @@ void ldScrollSelecterSetBackgroundImage(ldScrollSelecter_t* pWidget,arm_2d_tile_
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
 void ldScrollSelecterSelectItem(ldScrollSelecter_t *pWidget, int8_t itemNum);
+void ldScrollSelecterSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text);
 void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit);
+uint8_t *ldScrollSelecterCurrentText(ldScrollSelecter_t *ptWidget);
 
 #define ldScrollSelecterInit(nameId,parentNameId,x,y,width,height,ptFont) \
         ldScrollSelecter_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)

@@ -1230,3 +1230,17 @@ int16_t ldBaseGetHeight(ldBase_t* ptWidget)
     }
     return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
 }
+
+// 0=周日，1=周一...6=周六
+uint8_t ldBaseZeller(uint16_t year, uint8_t month, uint8_t day)
+{
+    if (month < 3)
+    {
+        month += 12;
+        --year;
+    }
+    uint16_t c = year / 100;
+    year %= 100;
+    uint16_t w = (c / 4 - 2 * c + year + year / 4 + 13 * (month + 1) / 5 + day - 1) % 7;
+    return (w + 7) % 7;
+}

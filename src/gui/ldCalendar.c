@@ -62,24 +62,10 @@ static int daysOfMonth(int year, int month)
     return t[month - 1] + (month == 2 && isLeap(year));
 }
 
-// 0=周日，1=周一...6=周六
-static int zeller(int year, int month, int day)
-{
-    if (month < 3)
-    {
-        month += 12;
-        --year;
-    }
-    int c = year / 100;
-    year %= 100;
-    int w = (c / 4 - 2 * c + year + year / 4 + 13 * (month + 1) / 5 + day - 1) % 7;
-    return (w + 7) % 7;
-}
-
 static void _getCalBuf(uint16_t year, uint8_t month, uint8_t *calBuf)
 {
     int dim = daysOfMonth(year, month);                /* 本月天数 */
-    int w1 = zeller(year, month, 1);                   /* 本月 1 日星期，0=周日 */
+    int w1 = ldBaseZeller(year, month, 1);             /* 本月1日星期x，0=周日 */
     int pdim = daysOfMonth(year, month - (month > 1)); /* 上月天数 */
 
     int idx = 0;

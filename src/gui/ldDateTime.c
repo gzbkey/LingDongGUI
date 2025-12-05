@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "ldDateTime.h"
+#include "ldGui.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -84,7 +85,7 @@ ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint1
     ptWidget->ptFont=ptFont;
     ptWidget->tAlign=ARM_2D_ALIGN_CENTRE;
     ptWidget->isTransparent=true;
-    ptWidget->year=2024;
+    ptWidget->year=2026;
     ptWidget->month=1;
     ptWidget->day=1;
     ptWidget->hour=12;
@@ -92,6 +93,8 @@ ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint1
     ptWidget->second=0;
     strcpy((char*)ptWidget->formatStr,"yyyy-mm-dd hh:nn:ss");
     memset(ptWidget->formatStrTemp,0,DATE_TIME_BUFFER_SIZE);
+
+    ptWidget->isAutoSysTime=true;
 
     LOG_INFO("[init][dateTime] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
@@ -128,7 +131,16 @@ void ldDateTime_on_load(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if(ptWidget->isAutoSysTime&&(ptWidget->second!=sysRTC.sec))
+    {
+        ptWidget->year=sysRTC.year;
+        ptWidget->month=sysRTC.mon;
+        ptWidget->day=sysRTC.day;
+        ptWidget->hour=sysRTC.hour;
+        ptWidget->minute=sysRTC.min;
+        ptWidget->second=sysRTC.sec;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    }
 }
 
 void ldDateTime_on_frame_complete(ld_scene_t *ptScene, ldDateTime_t *ptWidget)

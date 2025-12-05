@@ -182,7 +182,7 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
     ptWidget->ptFont=ptFont;
     ptWidget->titleHeight=(height-ptWidget->padding.top-ptWidget->padding.bottom)/5;
     ptWidget->msgHeight=ptWidget->titleHeight*3;
-    ptWidget->btnCount=3;
+    ptWidget->btnCount=0;
     ptWidget->releaseColor = __RGB(217, 225, 244);
     ptWidget->pressColor = __RGB(255, 243, 202);
     ptWidget->btnRegion.tLocation.iX=ptWidget->padding.left;
@@ -293,21 +293,25 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
             }
             arm_2d_op_wait_async(NULL);
 
-            //title
-            do {
-                arm_2d_region_t region={
-                    .tLocation={
-                        .iX=ptWidget->padding.left,
-                        .iY=ptWidget->padding.top,
-                    },
-                    .tSize={
-                        .iWidth=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->padding.left-ptWidget->padding.right,
-                        .iHeight=ptWidget->titleHeight,
-                    },
-                };
+            // title
+            do
+            {
+                if (ptWidget->pTitleStr)
+                {
+                    arm_2d_region_t region = {
+                        .tLocation = {
+                            .iX = ptWidget->padding.left,
+                            .iY = ptWidget->padding.top,
+                        },
+                        .tSize = {
+                            .iWidth = ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth - ptWidget->padding.left - ptWidget->padding.right,
+                            .iHeight = ptWidget->titleHeight,
+                        },
+                    };
 
-                ldBaseLabel(&tTarget,&region,(uint8_t*)ptWidget->pTitleStr,ptWidget->ptFont,ARM_2D_ALIGN_LEFT,ptWidget->titleStrColor,ptWidget->use_as__ldBase_t.opacity);
-                arm_2d_op_wait_async(NULL);
+                    ldBaseLabel(&tTarget, &region, (uint8_t *)ptWidget->pTitleStr, ptWidget->ptFont, ARM_2D_ALIGN_LEFT, ptWidget->titleStrColor, ptWidget->use_as__ldBase_t.opacity);
+                    arm_2d_op_wait_async(NULL);
+                }
             } while (false);
 
             //msg
@@ -359,7 +363,6 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
 
             //btn
             do {
-
                 arm_2d_region_t btnRegion=ptWidget->btnRegion;
 
                 for(uint8_t i=0;i<ptWidget->btnCount;i++)
