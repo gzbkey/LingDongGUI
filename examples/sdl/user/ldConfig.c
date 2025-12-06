@@ -1,9 +1,42 @@
 #include "ldConfig.h"
 #include "arm_2d_types.h"
 #include "ldMem.h"
+#include "ldBase.h"
 #include "Virtual_TFT_Port.h"
 #include <time.h>
 #include "virtualNor.h"
+
+__WEAK void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
+{
+    (void)chCond;
+    (void)chLine;
+    (void)wErrCode;
+
+    while(1) {
+    }
+}
+
+/**
+ * @brief      读取年月日时分秒周
+ *
+ * @param      *readBuf yy yy mm dd hh mm ss ww
+ * @return     void
+ */
+void ldCfgGetRtc(ldBaseRTC_t *dateTime)
+{
+#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
+    time_t     now_s  = time(NULL);
+    struct tm  local  = {0};
+    localtime_s(&local, &now_s);
+
+    dateTime->year=local.tm_year+1900;
+    dateTime->mon=local.tm_mon+1;
+    dateTime->day=local.tm_mday;
+    dateTime->hour=local.tm_hour;
+    dateTime->min=local.tm_min;
+    dateTime->sec=local.tm_sec;
+#endif
+}
 
 /**
  * @brief   获取触摸坐标
