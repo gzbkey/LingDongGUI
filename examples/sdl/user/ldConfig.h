@@ -259,8 +259,8 @@ extern "C" {
 #define __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__                  0
 #define __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__           0
 #define __ARM_2D_CFG_SUPPORT_TRANSFORM_FOR_NON_A8_FONTS__             0
-
-bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
+#define __ARM_2D_CFG_OPTIMIZE_FOR_PFB_IN_LAYOUT_ASSISTANT__           0
+#define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                       1
 
 // user key num
 #define KEY_NUM_UP   0

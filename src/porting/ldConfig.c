@@ -13,6 +13,17 @@ __WEAK void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
 }
 
 /**
+ * @brief      读取年月日时分秒周
+ *
+ * @param      *readBuf yy yy mm dd hh mm ss ww
+ * @return     void
+ */
+void ldCfgGetRtc(ldBaseRTC_t *dateTime)
+{
+
+}
+
+/**
  * @brief   获取触摸坐标
  * 
  * @param   x 返回的x坐标
@@ -67,7 +78,7 @@ void __disp_adapter0_vres_read_memory( intptr_t pObj,
                                        size_t nSizeInByte)
 {
     (void)pObj;
-//    w25qxxRead(pBuffer,pAddress,nSizeInByte);
+//    norRead(pBuffer,pAddress,nSizeInByte);
 }
 
 uintptr_t __disp_adapter0_vres_get_asset_address(
@@ -88,7 +99,6 @@ void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,cons
     //参考2
     //函数原型 void lcd_colorFill(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint16_t *color)
     //填写 lcd_colorFill(x,y,width,height,(uint16_t *)bitmap);
-    vtFillMultipleColors(x, y, x + width - 1, y + height - 1, (color_typedef *)bitmap);
 }
 
 #if 0

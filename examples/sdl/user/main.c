@@ -48,7 +48,7 @@ int app_2d_main_thread (void *argument)
 
 static bool __lcd_sync_handler(void *pTarget)
 {
-    return VT_sdl_flush(1);
+    return VT_sdl_vsync();
 }
 
 int main (void) 
