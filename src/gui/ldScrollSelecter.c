@@ -381,7 +381,7 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                 }
                 else
                 {
-                    itemsRegion.tLocation.iY=ptWidget->ptFont->tCharSize.iHeight+((ptWidget->itemSpace+LINE_HEIGHT)>>1);
+                    itemsRegion.tLocation.iY=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->ptIndicatorMaskTile->tRegion.tSize.iHeight)>>1;
                     itemsRegion.tSize=ptWidget->ptIndicatorMaskTile->tRegion.tSize;
 
                     ldBaseImage(&tTarget,
