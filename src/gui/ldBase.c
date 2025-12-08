@@ -274,6 +274,7 @@ void ldBaseImage(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t
             break;
         }
         case ARM_2D_COLOUR_MASK_A8:
+        case ARM_2D_COLOUR_8BIT:
         {
             arm_2d_fill_colour_with_mask_and_opacity(ptTile,
                                                      ptRegion,

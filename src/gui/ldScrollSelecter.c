@@ -217,7 +217,8 @@ void ldScrollSelecter_depose(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget)
 #if USE_VIRTUAL_RESOURCE == 1
     ldFree(ptWidget->ptImgTile);
     ldFree(ptWidget->ptMaskTile);
-    ldFree(ptWidget->ptIndicatorTile);
+    ldFree(ptWidget->ptIndicatorImgTile);
+    ldFree(ptWidget->ptIndicatorMaskTile);
     ldFree(ptWidget->ptFont);
 #endif
     ldFree(ptWidget);
@@ -368,7 +369,7 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
 
             if(ptWidget->isEdit)
             {
-                if(ptWidget->ptIndicatorTile==NULL)
+                if((ptWidget->ptIndicatorImgTile==NULL)&&(ptWidget->ptIndicatorMaskTile==NULL))
                 {
 #define LINE_HEIGHT   2
                     itemsRegion.tLocation.iY=ptWidget->ptFont->tCharSize.iHeight+((ptWidget->itemSpace+LINE_HEIGHT)>>1);
@@ -380,7 +381,15 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                 }
                 else
                 {
-                    ldBaseImage(&tTarget,NULL,NULL,ptWidget->ptIndicatorTile,ptWidget->indicatorColor,ptWidget->use_as__ldBase_t.opacity);
+                    itemsRegion.tLocation.iY=ptWidget->ptFont->tCharSize.iHeight+((ptWidget->itemSpace+LINE_HEIGHT)>>1);
+                    itemsRegion.tSize=ptWidget->ptIndicatorMaskTile->tRegion.tSize;
+
+                    ldBaseImage(&tTarget,
+                                &itemsRegion,
+                                ptWidget->ptIndicatorImgTile,
+                                ptWidget->ptIndicatorMaskTile,
+                                ptWidget->indicatorColor,
+                                ptWidget->use_as__ldBase_t.opacity);
                 }
             }
             arm_2d_op_wait_async(NULL);
@@ -449,6 +458,30 @@ void ldScrollSelecterSetTransparent(ldScrollSelecter_t* ptWidget,bool isTranspar
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isTransparent=isTransparent;
+}
+
+void ldScrollSelecterSetIndicatorColor(ldScrollSelecter_t* ptWidget,ldColor indicatorColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->indicatorColor=indicatorColor;
+}
+
+void ldScrollSelecterSetIndicatorImage(ldScrollSelecter_t* ptWidget, arm_2d_tile_t *ptIndicatorImgTile, arm_2d_tile_t *ptIndicatorMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptIndicatorImgTile=ptIndicatorImgTile;
+    ptWidget->ptIndicatorMaskTile=ptIndicatorMaskTile;
+    ptWidget->isTransparent=false;
 }
 
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *ptWidget, uint8_t speed)

@@ -52,7 +52,8 @@ struct ldScrollSelecter_t
     arm_2d_font_t *ptFont;
     arm_2d_tile_t *ptImgTile;
     arm_2d_tile_t *ptMaskTile;
-    arm_2d_tile_t *ptIndicatorTile;
+    arm_2d_tile_t *ptIndicatorImgTile;
+    arm_2d_tile_t *ptIndicatorMaskTile;
     const uint8_t **ppItemStrGroup;
     int16_t scrollOffset;
     int16_t itemSpace;
@@ -79,6 +80,8 @@ void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget, const uint8_t *pStrA
 void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor);
 void ldScrollSelecterSetBackgroundColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
 void ldScrollSelecterSetBackgroundImage(ldScrollSelecter_t* pWidget,arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile);
+void ldScrollSelecterSetIndicatorColor(ldScrollSelecter_t* ptWidget,ldColor indicatorColor);
+void ldScrollSelecterSetIndicatorImage(ldScrollSelecter_t* ptWidget, arm_2d_tile_t *ptIndicatorImgTile, arm_2d_tile_t *ptIndicatorMaskTile);
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
 void ldScrollSelecterSelectItem(ldScrollSelecter_t *pWidget, int8_t itemNum);
