@@ -12,7 +12,6 @@
 #include "ctype.h"
 #include "stdlib.h"
 
-#if defined(__MICROLIB)
 void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode) 
 {
     (void)chCond;
@@ -22,6 +21,25 @@ void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
     while(1) {
     }
 }
+
+#if defined(__MICROLIB)
+
+#include "time.h"
+time_t time(time_t *time)
+{
+    return 0;
+}
+
+int system(const char *string)
+{
+    return 0;
+}
+
+void exit(int status)
+{
+    exit(status);
+}
+
 #else
 
 #if (__ARMCC_VERSION >= 6010050)
@@ -41,18 +59,22 @@ struct __FILE
 #endif
 
 typedef int FILEHANDLE;
+
 FILEHANDLE _sys_open(const char *name,int openmode)
 {
- return 0;
+    return 0;
 }
+
 int _sys_close(FILEHANDLE fh)
 {
     return 0;
 }
+
 int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
 {
     return 0;
 }
+
 int _sys_read(FILEHANDLE fh, unsigned char*buf, unsigned len, int mode)
 {
     return 0;
@@ -76,10 +98,11 @@ long _sys_flen(FILEHANDLE fh)
 {
     return 0;
 }
+
 void _sys_exit(int status)
 {
-    //while(1);
 }
+
 int _sys_tmpnam(char *name, int fileno, unsigned maxlength)
 {
     return 0;
@@ -88,23 +111,20 @@ int _sys_tmpnam(char *name, int fileno, unsigned maxlength)
 void _ttywrch(int ch)
 {
 }
+
 int remove(const char *filename)
 {
     return 0;
 }
+
 char *_sys_command_string(char *cmd, int len)
 {
- return NULL;
+    return NULL;
 }
 
-void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode) 
+int _sys_tmpnam2(char *name, int fileno, unsigned maxlength)
 {
-    (void)chCond;
-    (void)chLine;
-    (void)wErrCode;
-    
-    while(1) {
-    }
+    return 0;
 }
 
 #endif
