@@ -46,24 +46,38 @@ extern "C"
 
 typedef struct ldKeyboard_t ldKeyboard_t;
 
+typedef struct {
+    arm_2d_region_t region;
+    uint8_t *pText;
+    uint8_t keyCode;
+    arm_2d_tile_t *ptPressImgTile;
+    arm_2d_tile_t *ptPressMaskTile;
+    arm_2d_tile_t *ptReleaseImgTile;
+    arm_2d_tile_t *ptReleaseMaskTile;
+    ldColor pressColor;
+    ldColor releaseColor;
+}kbBtnInfo_t;
+
 struct ldKeyboard_t
 {
     implement(ldBase_t);
     uint8_t **ppStr;
     arm_2d_font_t *ptFont;
-    arm_2d_location_t clickPoint;
-//    arm_2d_region_t targetDirtyRegion;
+    const kbBtnInfo_t *pBtnList;
     ldEditType_t editType;
     uint16_t editorId;
     uint8_t strMax;
-    uint8_t kbValue;
-
-    bool isNumber:1;
-    bool isSymbol:1;
+    uint8_t keyCode;
     bool isClick:1;
-    uint8_t upperState:2;
+    bool isKeySelect:1;
     bool isWaitInit:1;
+    bool isUpper:1;
+    bool isLockUpper:1;
 };
+
+extern const kbBtnInfo_t qwertyBtnList[];
+extern const kbBtnInfo_t numBtnInfo[];
+extern const kbBtnInfo_t symbolBtnInfo[];
 
 ldKeyboard_t* ldKeyboard_init(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, uint16_t nameId, uint16_t parentNameId, arm_2d_font_t *ptFont);
 void ldKeyboard_depose(ld_scene_t *ptScene, ldKeyboard_t *ptWidget);
@@ -74,6 +88,11 @@ void ldKeyboard_show(ld_scene_t *pScene, ldKeyboard_t *ptWidget, const arm_2d_ti
 
 #define ldKeyboardInit(nameId,parentNameId,ptFont) \
         ldKeyboard_init(ptScene,NULL,nameId,parentNameId,ptFont)
+void ldKeyboardNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir);
+extern const kbBtnInfo_t *ldKeyboardGetTargetBtnList(ldKeyboard_t *ptWidget);//weak function
+extern void ldKeyboardCallback(ldKeyboard_t *ptWidget, uint8_t signal);//weak function
+extern ldColor ldKeyboardGetShiftColor(bool isUpper, bool isLock);//weak function
+void ldKeyboardUpdate(ldKeyboard_t *ptWidget);
 
 #define ldKeyboardSetHidden                ldBaseSetHidden
 #define ldKeyboardMove                     ldBaseMove
