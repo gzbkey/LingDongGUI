@@ -122,7 +122,7 @@ typedef enum{
 #define ANGLE_2_RADIAN(angle)           ((float)(angle)*0.0174533f)
 
 #ifndef LD_SELECT_COLOR
-#define LD_SELECT_COLOR                 __RGB(255, 0, 0)
+#define LD_SELECT_COLOR                 __RGB(128, 200, 255)
 #endif
 
 #ifndef LD_SELECT_OPACITY
@@ -166,7 +166,7 @@ struct ldPageFuncGroup_t{
     ldPageFunc_t quit;
     ldDrawFunc_t draw;
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
-    uint8_t pageName[16];
+    char *pageName;
 #endif
 };
 

@@ -44,6 +44,13 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+const ldBaseWidgetFunc_t ldKeyboardFunc = {
+    .depose = (ldDeposeFunc_t)ldKeyboard_depose,
+    .load = (ldLoadFunc_t)ldKeyboard_on_load,
+    .frameStart  = (ldFrameStartFunc_t)ldKeyboard_on_frame_start,
+    .frameComplete = (ldFrameCompleteFunc_t)ldKeyboard_on_frame_complete,
+    .show = (ldShowFunc_t)ldKeyboard_show,
+};
 
 #define KB_SPACE                   (5)
 
@@ -52,25 +59,17 @@
 #define KB_OTHER_RELEASE_COLOR     __RGB(168,176,189)
 #define KB_OTHER_PRESS_COLOR       GLCD_COLOR_WHITE
 
-
 //占用无效ascii
-#define KEY_CODE_NONE         0
 #define KEY_CODE_SHIFT        1
 #define KEY_CODE_SYMBOL_MODE  2
 #define KEY_CODE_NUMBER_MODE  3
 #define KEY_CODE_QWERTY_MODE  4
 
-
-
 #define NUM_COL_NUM      (4)
-
 #define NUM_BTN_W_SPACE   ((LD_CFG_SCREEN_WIDTH-KB_SPACE)/NUM_COL_NUM)
-
 #define NUM_START      ((LD_CFG_SCREEN_WIDTH-NUM_BTN_W_SPACE*NUM_COL_NUM-KB_SPACE)/2)
-
 #define NUM_BTN_W   (NUM_BTN_W_SPACE-KB_SPACE)
 #define NUM_BTN_H   (((LD_CFG_SCREEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE)
-
 #define NUM_OFFSET_W(num)    (KB_SPACE+(NUM_BTN_W+KB_SPACE)*num)
 #define NUM_OFFSET_H(num)    (KB_SPACE+(NUM_BTN_H+KB_SPACE)*num+(LD_CFG_SCREEN_HEIGHT>>1))
 
@@ -98,14 +97,10 @@ const kbBtnInfo_t numBtnInfo[]={
 };
 
 #define QWERTY_COL_NUM      (10)
-
 #define QWERTY_BTN_W_SPACE   ((LD_CFG_SCREEN_WIDTH-KB_SPACE)/QWERTY_COL_NUM)
-
 #define QWERTY_START      ((LD_CFG_SCREEN_WIDTH-QWERTY_BTN_W_SPACE*QWERTY_COL_NUM-KB_SPACE)/2)
-
 #define QWERTY_BTN_W   (QWERTY_BTN_W_SPACE-KB_SPACE)
 #define QWERTY_BTN_H   (((LD_CFG_SCREEN_HEIGHT>>1)-KB_SPACE)/4-KB_SPACE)
-
 #define QWERTY_OFFSET_W(num)    (QWERTY_BTN_W_SPACE*(num/2)+KB_SPACE+QWERTY_BTN_W*(num%2)/2) // (KB_SPACE+((QWERTY_BTN_W+KB_SPACE)>>1)*num)
 #define QWERTY_OFFSET_H(num)    (KB_SPACE+(QWERTY_BTN_H+KB_SPACE)*num+(LD_CFG_SCREEN_HEIGHT>>1))
 
@@ -192,47 +187,6 @@ const kbBtnInfo_t symbolBtnInfo[]={
     {0},
 };
 
-static bool isExit=false;
-
-const ldBaseWidgetFunc_t ldKeyboardFunc = {
-    .depose = (ldDeposeFunc_t)ldKeyboard_depose,
-    .load = (ldLoadFunc_t)ldKeyboard_on_load,
-    .frameStart  = (ldFrameStartFunc_t)ldKeyboard_on_frame_start,
-    .frameComplete = (ldFrameCompleteFunc_t)ldKeyboard_on_frame_complete,
-    .show = (ldShowFunc_t)ldKeyboard_show,
-};
-
-static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget, arm_2d_location_t clickPoint)
-{
-    arm_2d_region_t retRegion={
-        .tLocation={
-            .iX=0,
-            .iY=0,
-        },
-        .tSize={
-            .iWidth=LD_CFG_SCREEN_WIDTH,
-            .iHeight=LD_CFG_SCREEN_HEIGHT>>1,
-        },
-    };
-    ptWidget->keyCode=KEY_CODE_NONE;
-
-    kbBtnInfo_t *pBtnInfo=(kbBtnInfo_t*)ptWidget->pBtnList;
-    if(pBtnInfo)
-    {
-        while (pBtnInfo->keyCode)
-        {
-            if(arm_2d_is_point_inside_region(&pBtnInfo->region,&clickPoint))
-            {
-                retRegion=pBtnInfo->region;
-                ptWidget->keyCode=pBtnInfo->keyCode;
-                break;
-            }
-            pBtnInfo++;
-        }
-    }
-
-    return retRegion;
-}
 
 static bool _addAscii(ldKeyboard_t *ptWidget,uint16_t textLen,uint8_t ascii,bool isBack)
 {
@@ -268,9 +222,13 @@ static bool _addAscii(ldKeyboard_t *ptWidget,uint16_t textLen,uint8_t ascii,bool
     return false;
 }
 
-static void _inputAsciiProcess(ldKeyboard_t *ptWidget,uint8_t ascii)
+void ldKeyboardInputAscii(ldKeyboard_t *ptWidget,uint8_t ascii)
 {
     uint16_t textLen;
+    if(ptWidget->ppStr==NULL)
+    {
+        return;
+    }
     if((*ptWidget->ppStr)!=NULL)
     {
         textLen=strlen((char*)(*ptWidget->ppStr));
@@ -333,22 +291,235 @@ static void _inputAsciiProcess(ldKeyboard_t *ptWidget,uint8_t ascii)
             _addAscii(ptWidget,textLen,ascii,true);
         }
     }
+}
 
-    switch(ascii)
+__WEAK const kbBtnInfo_t *ldKeyboardGetTargetBtnList(ldKeyboard_t *ptWidget)
+{
+    switch(ptWidget->editType)
     {
-    case 0x08://backspace
+    case typeString:
+        return qwertyBtnList;
+    case typeInt:
+        return numBtnInfo;
+    case typeFloat:
+        return numBtnInfo;
+    }
+    return qwertyBtnList;
+}
+
+__WEAK void ldKeyboardCallback(ldKeyboard_t *ptWidget, uint8_t signal)
+{
+    uint16_t textLen;
+
+    if(!ptWidget->isClick)
     {
-        xStringPopBack(*ptWidget->ppStr,textLen);
+        return;
+    }
+
+    switch (ptWidget->keyCode)
+    {
+    case KEY_CODE_SHIFT:
+    {
+        if(signal==SIGNAL_PRESS)
+        {
+            if(!ptWidget->isUpper)
+            {
+                ptWidget->isUpper=true;
+            }
+            else
+            {
+                if(!ptWidget->isLockUpper)
+                {
+                    ptWidget->isLockUpper=true;
+                }
+                else
+                {
+                    ptWidget->isUpper=false;
+                    ptWidget->isLockUpper=false;
+                }
+            }
+        }
+        break;
+    }
+
+    case KEY_CODE_QWERTY_MODE:
+    {
+        if(signal==SIGNAL_RELEASE)
+        {
+            ptWidget->pBtnList=qwertyBtnList;
+            ldKeyboardUpdate(ptWidget);
+        }
+        break;
+    }
+
+    case KEY_CODE_NUMBER_MODE:
+    {
+        if(signal==SIGNAL_RELEASE)
+        {
+            ptWidget->pBtnList=numBtnInfo;
+            ldKeyboardUpdate(ptWidget);
+        }
+        break;
+    }
+
+    case KEY_CODE_SYMBOL_MODE:
+    {
+        if(signal==SIGNAL_RELEASE)
+        {
+            ptWidget->pBtnList=symbolBtnInfo;
+            ldKeyboardUpdate(ptWidget);
+        }
         break;
     }
     case 0x0d://enter
     {
-        isExit=true;
+        if(signal==SIGNAL_RELEASE)
+        {
+            ptWidget->isExit=true;
+        }
+        break;
+    }
+    case 0x08://backspace
+    {
+        if(signal==SIGNAL_PRESS)
+        {
+            if((*ptWidget->ppStr)!=NULL)
+            {
+                textLen=strlen((char*)(*ptWidget->ppStr));
+                xStringPopBack(*ptWidget->ppStr,textLen);
+            }
+        }
         break;
     }
     default:
         break;
     }
+
+    if(signal==SIGNAL_PRESS)
+    {
+        ldKeyboardInputAscii(ptWidget,ptWidget->keyCode);
+        if(ptWidget->keyCode==KEY_CODE_SHIFT)
+        {
+            ldKeyboardUpdate(ptWidget);
+        }
+    }
+    if(signal==SIGNAL_RELEASE)
+    {
+        // process end,reset
+        if((ptWidget->isUpper)&&(!ptWidget->isLockUpper)&&(ptWidget->keyCode>='a')&&(ptWidget->keyCode<='z'))
+        {
+            ptWidget->isUpper=false;
+
+            ldKeyboardUpdate(ptWidget);
+        }
+    }
+}
+
+__WEAK bool ldKeyboardBtnUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget, kbBtnInfo_t *pBtnInfo)
+{
+    //特殊按键处理
+    if(pBtnInfo->keyCode==KEY_CODE_SHIFT)
+    {
+        if ((pBtnInfo->ptReleaseImgTile == NULL) &&
+                (pBtnInfo->ptReleaseMaskTile == NULL) &&
+                (pBtnInfo->ptPressImgTile == NULL) &&
+                (pBtnInfo->ptPressMaskTile == NULL)) // color
+        {
+            if((ptWidget->isClick)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+            {
+                draw_round_corner_box(ptTile,&pBtnInfo->region,pBtnInfo->pressColor,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
+            }
+            else
+            {
+                draw_round_corner_box(ptTile,&pBtnInfo->region,pBtnInfo->releaseColor,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
+            }
+        }
+        else
+        {
+            if((ptWidget->isClick)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+            {
+                ldBaseImage(ptTile,
+                            &pBtnInfo->region,
+                            pBtnInfo->ptPressImgTile,
+                            pBtnInfo->ptPressMaskTile,
+                            pBtnInfo->pressColor,
+                            ptWidget->use_as__ldBase_t.opacity);
+            }
+            else
+            {
+                ldBaseImage(ptTile,
+                            &pBtnInfo->region,
+                            pBtnInfo->ptReleaseImgTile,
+                            pBtnInfo->ptReleaseMaskTile,
+                            pBtnInfo->releaseColor,
+                            ptWidget->use_as__ldBase_t.opacity);
+            }
+        }
+
+        if((ptWidget->isKeySelect)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+        {
+                                        draw_round_corner_border(ptTile,
+&pBtnInfo->region,LD_SELECT_COLOR,
+(arm_2d_border_opacity_t){
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity},
+(arm_2d_corner_opacity_t){
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity});
+        }
+
+        ldColor textColor;
+        textColor=ptWidget->isUpper?(ptWidget->isLockUpper?GLCD_COLOR_BLUE:GLCD_COLOR_BLACK):GLCD_COLOR_WHITE;
+
+        ldBaseLabel(ptTile,
+                    &pBtnInfo->region,
+                    pBtnInfo->pText,
+                    ptWidget->ptFont,
+                    ARM_2D_ALIGN_CENTRE,
+                    textColor,
+                    ptWidget->use_as__ldBase_t.opacity);
+
+        return true;
+    }
+
+    return false;
+}
+
+static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget, arm_2d_location_t clickPoint)
+{
+    arm_2d_region_t retRegion={
+        .tLocation={
+            .iX=0,
+            .iY=0,
+        },
+        .tSize={
+            .iWidth=LD_CFG_SCREEN_WIDTH,
+            .iHeight=LD_CFG_SCREEN_HEIGHT>>1,
+        },
+    };
+    ptWidget->isClick=false;
+
+    kbBtnInfo_t *pBtnInfo=(kbBtnInfo_t*)ptWidget->pBtnList;
+    if(pBtnInfo)
+    {
+        while ((pBtnInfo->region.tSize.iWidth!=0)&&(pBtnInfo->region.tSize.iHeight!=0))
+        {
+            if(arm_2d_is_point_inside_region(&pBtnInfo->region,&clickPoint))
+            {
+                retRegion=pBtnInfo->region;
+                ptWidget->keyCode=pBtnInfo->keyCode;
+                ptWidget->isClick=true;
+                break;
+            }
+            pBtnInfo++;
+        }
+    }
+
+    return retRegion;
 }
 
 void ldKeyboardUpdate(ldKeyboard_t *ptWidget)
@@ -373,41 +544,23 @@ static bool slotKBProcess(ld_scene_t *ptScene,ldMsg_t msg)
     {
      case SIGNAL_PRESS:
      {
-         ptWidget->isClick=true;
          ptWidget->use_as__ldBase_t.tTempRegion =_keyboardGetClickRegion(ptWidget,clickPoint);
          ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
          ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
          ldKeyboardCallback(ptWidget,msg.signal);
-
-         if(ptWidget->keyCode!=0)
-         {
-             _inputAsciiProcess(ptWidget,ptWidget->keyCode);
-
-             if(ptWidget->keyCode==KEY_CODE_SHIFT)
-             {
-                 ldKeyboardUpdate(ptWidget);
-             }
-         }
 
          break;
      }
      case SIGNAL_RELEASE:
      {
-         ptWidget->isClick=false;
          ptWidget->use_as__ldBase_t.tTempRegion =_keyboardGetClickRegion(ptWidget,clickPoint);
          ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
          ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
-         // process end,reset
-         if((ptWidget->isUpper)&&(!ptWidget->isLockUpper)&&(ptWidget->keyCode>='a')&&(ptWidget->keyCode<='z'))
-         {
-             ptWidget->isUpper=false;
-
-             ldKeyboardUpdate(ptWidget);
-         }
-
          ldKeyboardCallback(ptWidget,msg.signal);
+
+         ptWidget->isClick=false;
      }
      default:
          break;
@@ -508,99 +661,6 @@ static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget,arm_2d_tile_t *parentTil
                 ptWidget->use_as__ldBase_t.opacity);
 }
 
-__WEAK const kbBtnInfo_t *ldKeyboardGetTargetBtnList(ldKeyboard_t *ptWidget)
-{
-    switch(ptWidget->editType)
-    {
-    case typeString:
-        return qwertyBtnList;
-    case typeInt:
-        return numBtnInfo;
-    case typeFloat:
-        return numBtnInfo;
-    }
-    return qwertyBtnList;
-}
-
-__WEAK void ldKeyboardCallback(ldKeyboard_t *ptWidget, uint8_t signal)
-{
-    switch (ptWidget->keyCode)
-    {
-    case KEY_CODE_SHIFT:
-    {
-        if(signal==SIGNAL_PRESS)
-        {
-            if(!ptWidget->isUpper)
-            {
-                ptWidget->isUpper=true;
-            }
-            else
-            {
-                if(!ptWidget->isLockUpper)
-                {
-                    ptWidget->isLockUpper=true;
-                }
-                else
-                {
-                    ptWidget->isUpper=false;
-                    ptWidget->isLockUpper=false;
-                }
-            }
-        }
-        break;
-    }
-
-    case KEY_CODE_QWERTY_MODE:
-    {
-        if(signal==SIGNAL_RELEASE)
-        {
-            ptWidget->pBtnList=qwertyBtnList;
-            ldKeyboardUpdate(ptWidget);
-        }
-        break;
-    }
-
-    case KEY_CODE_NUMBER_MODE:
-    {
-        if(signal==SIGNAL_RELEASE)
-        {
-            ptWidget->pBtnList=numBtnInfo;
-            ldKeyboardUpdate(ptWidget);
-        }
-        break;
-    }
-
-    case KEY_CODE_SYMBOL_MODE:
-    {
-        if(signal==SIGNAL_RELEASE)
-        {
-            ptWidget->pBtnList=symbolBtnInfo;
-            ldKeyboardUpdate(ptWidget);
-        }
-        break;
-    }
-    }
-}
-
-__WEAK ldColor ldKeyboardGetShiftColor(bool isUpper, bool isLock)
-{
-    if(isUpper)
-    {
-        if(isLock)
-        {
-            return GLCD_COLOR_BLUE;
-        }
-        else
-        {
-            return GLCD_COLOR_BLACK;
-        }
-    }
-    else
-    {
-        return GLCD_COLOR_WHITE;
-    }
-}
-
 void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
@@ -636,13 +696,13 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
             if(ptWidget->isWaitInit)
             {
                 ptWidget->isWaitInit=false;
-
+                ptWidget->isKeySelect=false;
                 ptWidget->pBtnList=ldKeyboardGetTargetBtnList(ptWidget);
             }
 
-            if(isExit)
+            if(ptWidget->isExit)
             {
-                isExit=false;
+                ptWidget->isExit=false;
                 ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY=LD_CFG_SCREEN_HEIGHT;
                 ldBaseSetHidden((ldBase_t *)ptWidget,true);
                 emit(ptWidget->editorId,SIGNAL_FINISHED,0);
@@ -658,80 +718,88 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
             kbBtnInfo_t *pBtnInfo=(kbBtnInfo_t*)ptWidget->pBtnList;
             if(pBtnInfo)
             {
-                while (pBtnInfo->keyCode)
+                while ((pBtnInfo->region.tSize.iWidth!=0)&&(pBtnInfo->region.tSize.iHeight!=0))
                 {
-                    if ((pBtnInfo->ptReleaseImgTile == NULL) &&
-                            (pBtnInfo->ptReleaseMaskTile == NULL) &&
-                            (pBtnInfo->ptPressImgTile == NULL) &&
-                            (pBtnInfo->ptPressMaskTile == NULL)) // color
+                    if(!ldKeyboardBtnUserDraw(&tTarget,ptWidget,pBtnInfo))
                     {
-                        if((ptWidget->isClick)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+                        if ((pBtnInfo->ptReleaseImgTile == NULL) &&
+                                (pBtnInfo->ptReleaseMaskTile == NULL) &&
+                                (pBtnInfo->ptPressImgTile == NULL) &&
+                                (pBtnInfo->ptPressMaskTile == NULL)) // color
                         {
-                            draw_round_corner_box(&tTarget,&pBtnInfo->region,pBtnInfo->pressColor,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
+                            if((ptWidget->isClick)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+                            {
+                                draw_round_corner_box(&tTarget,&pBtnInfo->region,pBtnInfo->pressColor,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
+                            }
+                            else
+                            {
+                                draw_round_corner_box(&tTarget,&pBtnInfo->region,pBtnInfo->releaseColor,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
+                            }
                         }
                         else
                         {
-                            draw_round_corner_box(&tTarget,&pBtnInfo->region,pBtnInfo->releaseColor,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
+                            if((ptWidget->isClick)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+                            {
+                                ldBaseImage(&tTarget,
+                                            &pBtnInfo->region,
+                                            pBtnInfo->ptPressImgTile,
+                                            pBtnInfo->ptPressMaskTile,
+                                            pBtnInfo->pressColor,
+                                            ptWidget->use_as__ldBase_t.opacity);
+                            }
+                            else
+                            {
+                                ldBaseImage(&tTarget,
+                                            &pBtnInfo->region,
+                                            pBtnInfo->ptReleaseImgTile,
+                                            pBtnInfo->ptReleaseMaskTile,
+                                            pBtnInfo->releaseColor,
+                                            ptWidget->use_as__ldBase_t.opacity);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if((ptWidget->isClick)&&(ptWidget->keyCode==pBtnInfo->keyCode))
+
+                        if((ptWidget->isKeySelect)&&(ptWidget->keyCode==pBtnInfo->keyCode))
                         {
-                            ldBaseImage(&tTarget,
-                                    &pBtnInfo->region,
-                                    pBtnInfo->ptPressImgTile,
-                                    pBtnInfo->ptPressMaskTile,
-                                    pBtnInfo->pressColor,
-                                    ptWidget->use_as__ldBase_t.opacity);
+                            draw_round_corner_border(&tTarget,
+&pBtnInfo->region,LD_SELECT_COLOR,
+(arm_2d_border_opacity_t){
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity},
+(arm_2d_corner_opacity_t){
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity,
+ptWidget->use_as__ldBase_t.opacity});
                         }
-                        else
+
+                        if((ptWidget->isUpper)&&(pBtnInfo->keyCode>='a')&&(pBtnInfo->keyCode<='z'))
                         {
-                            ldBaseImage(&tTarget,
-                                    &pBtnInfo->region,
-                                    pBtnInfo->ptReleaseImgTile,
-                                    pBtnInfo->ptReleaseMaskTile,
-                                    pBtnInfo->releaseColor,
-                                    ptWidget->use_as__ldBase_t.opacity);
-                        }
-                    }
+                            uint8_t tempStr[2]={
+                                pBtnInfo->pText[0]-32,0
+                            };
 
-                    if((ptWidget->isKeySelect)&&(ptWidget->keyCode==pBtnInfo->keyCode))
-                    {
-                        draw_round_corner_box(&tTarget,&pBtnInfo->region,LD_SELECT_COLOR,ptWidget->use_as__ldBase_t.opacity,bIsNewFrame);
-                    }
-
-                    ldColor textColor=GLCD_COLOR_BLACK;
-                    //特殊按键处理
-                    if(pBtnInfo->keyCode==KEY_CODE_SHIFT)
-                    {
-                        textColor=ldKeyboardGetShiftColor(ptWidget->isUpper,ptWidget->isLockUpper);
-                    }
-
-                    if((ptWidget->isUpper)&&(pBtnInfo->keyCode>='a')&&(pBtnInfo->keyCode<='z'))
-                    {
-                        uint8_t tempStr[2]={
-                            pBtnInfo->pText[0]-32,0
-                        };
-
-                        ldBaseLabel(&tTarget,
+                            ldBaseLabel(&tTarget,
                                         &pBtnInfo->region,
                                         tempStr,
                                         ptWidget->ptFont,
                                         ARM_2D_ALIGN_CENTRE,
                                         GLCD_COLOR_BLACK,
                                         ptWidget->use_as__ldBase_t.opacity);
-                    }
-                    else
-                    {
-                        ldBaseLabel(&tTarget,
+                        }
+                        else
+                        {
+                            ldBaseLabel(&tTarget,
                                         &pBtnInfo->region,
                                         pBtnInfo->pText,
                                         ptWidget->ptFont,
                                         ARM_2D_ALIGN_CENTRE,
-                                        textColor,
+                                        GLCD_COLOR_BLACK,
                                         ptWidget->use_as__ldBase_t.opacity);
+                        }
                     }
+
                     pBtnInfo++;
                     
                     arm_2d_op_wait_async(NULL);
@@ -817,40 +885,57 @@ static const kbBtnInfo_t *getBtnByPos(ldKeyboard_t *ptWidget, int16_t x, int16_t
     return best;
 }
 
-static uint8_t _kbNavigate(ldKeyboard_t *ptWidget, uint8_t currentKeyCode, ldNavDir_t dir)
+static uint8_t _kbNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
 {
-    if (!ptWidget) return currentKeyCode;
+    if (!ptWidget)
+    {
+        return 0;
+    }
 
     const kbBtnInfo_t *array = (const kbBtnInfo_t *)ptWidget->pBtnList;
     const kbBtnInfo_t *pCur;
-    if(currentKeyCode==KEY_CODE_NONE)
+    if(!ptWidget->isKeySelect)
     {
         pCur = getBtnByPos(ptWidget,ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth>>1,ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight/4*3);
     }
     else
     {
-        pCur  = getBtnByKeyCode(array, currentKeyCode);
+        pCur  = getBtnByKeyCode(array, ptWidget->keyCode);
     }
     
     if (!pCur)
     {
-        return currentKeyCode;
+        return ptWidget->keyCode;
     }
 
     const kbBtnInfo_t *best = NULL;
     int32_t bestDist = INT32_MAX;
 
-    for (const kbBtnInfo_t *p = array; p->keyCode; ++p)
+    if (dir == NAV_UP || dir == NAV_DOWN)
     {
-        if (p == pCur)
+        for (const kbBtnInfo_t *p = array; p->keyCode; ++p)
         {
-            continue;
+            if (p == pCur) continue;
+            int32_t d = _kbManhattan(pCur, p, dir);
+            if (d < bestDist)
+            {
+                bestDist = d;
+                best     = p;
+            }
         }
-        int32_t d = _kbManhattan(pCur, p, dir);
-        if (d < bestDist)
+    }
+    else if (dir == NAV_LEFT || dir == NAV_RIGHT)
+    {
+        const kbBtnInfo_t *rowStart = pCur;
+        while (rowStart > array && (rowStart - 1)->keyCode && ((rowStart - 1)->region.tLocation.iY == pCur->region.tLocation.iY))
         {
-            bestDist = d;
-            best     = p;
+            --rowStart;
+        }
+        const kbBtnInfo_t *p = dir == NAV_LEFT ? pCur - 1 : pCur + 1;
+        for (; p->keyCode && p->region.tLocation.iY == pCur->region.tLocation.iY; dir == NAV_LEFT ? --p : ++p)
+        {
+            best = p;
+            break;
         }
     }
 
@@ -860,7 +945,7 @@ static uint8_t _kbNavigate(ldKeyboard_t *ptWidget, uint8_t currentKeyCode, ldNav
     ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY+=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     
-    return best ? best->keyCode : currentKeyCode;
+    return best ? best->keyCode : ptWidget->keyCode;
 }
 
 void ldKeyboardNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
@@ -871,9 +956,21 @@ void ldKeyboardNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
         return;
     }
 
-    ptWidget->keyCode = _kbNavigate(ptWidget,ptWidget->keyCode, dir);
+    ptWidget->keyCode = _kbNavigate(ptWidget, dir);
 
     ptWidget->isKeySelect=true;
+}
+
+void ldKeyboardClick(ld_scene_t *ptScene,ldKeyboard_t *ptWidget,uint8_t signal)
+{
+    uint64_t u64Temp;
+    const kbBtnInfo_t* pBtnList=ldKeyboardGetTargetBtnList(ptWidget);
+    const kbBtnInfo_t* pBtnInfo=getBtnByKeyCode(pBtnList,ptWidget->keyCode);
+    
+    u64Temp=pBtnInfo->region.tLocation.iX;
+    u64Temp<<=16;
+    u64Temp+=pBtnInfo->region.tLocation.iY;
+    emit(ptWidget->use_as__ldBase_t.nameId,signal,u64Temp);
 }
 
 #if defined(__clang__)

@@ -29,7 +29,6 @@ static xBtnInfo_t *xBtnLink=NULL;
 
 static uint8_t btnCycle=0;
 
-static uint8_t btnDebounceMs    = 10;   //按键滤波时间
 static uint16_t btnLongPress    = 200;  //长按触发时间
 static uint16_t btnLongShoot    = 10;   //长按连续触发间隔
 static uint16_t btnClickTimeOut = 50;   //连击超时时间
@@ -37,10 +36,9 @@ static bool waitReset           = false;
 
 void xBtnConfig(uint8_t debounceMs,uint16_t longPressMs,uint16_t longShootMs,uint16_t clickTimeOutMs)
 {
-    btnDebounceMs=debounceMs;
-    btnLongPress=longPressMs/btnDebounceMs;
-    btnLongShoot=longShootMs/btnDebounceMs;
-    btnClickTimeOut=clickTimeOutMs/btnDebounceMs;
+    btnLongPress=longPressMs/debounceMs;
+    btnLongShoot=longShootMs/debounceMs;
+    btnClickTimeOut=clickTimeOutMs/debounceMs;
 }
 
 void _xBtnInit(uint16_t id, isBtnPressFunc pFunc, xBtnInfo_t *pBtnBuf)
@@ -116,7 +114,6 @@ static void _xBtnProcess(xBtnInfo_t *btnInfo,void *pUser)
         {
             btnInfo->holdCount=0;
             btnInfo->isPressed=true;
-            btnInfo->holdCount=0;
             btnInfo->FSM_State=BTN_HOLD_DOWN;
         }
         break;
@@ -144,10 +141,10 @@ static void _xBtnProcess(xBtnInfo_t *btnInfo,void *pUser)
 
         if((btnInfo->_isNewPress==false)&&(btnInfo->_isNewPress==btnInfo->_isOldPress))
         {
-            btnInfo->holdCount=0;
             btnInfo->shootCount=0;
             btnInfo->isShoot=false;
             btnInfo->isReleased=true;
+            btnInfo->isClicked = (btnInfo->holdCount < (500/btnCycle));//500ms内完成单击
             btnInfo->doubleClickCount++;//单击计数
             if(btnInfo->doubleClickCount>=2)
             {
@@ -156,6 +153,7 @@ static void _xBtnProcess(xBtnInfo_t *btnInfo,void *pUser)
             }
             btnInfo->repeatCount++;
             btnInfo->timeOutCount=0;//复位超时
+            btnInfo->holdCount=0;
             btnInfo->FSM_State=BTN_NO_OPERATION;
         }
         break;
@@ -258,6 +256,19 @@ uint16_t xBtnGetState(uint16_t id,uint8_t state)
         if(btnInfo->isReleased)
         {
             btnInfo->isReleased=false;
+            ret=true;
+        }
+        else
+        {
+            ret=false;
+        }
+        break;
+    }
+    case BTN_CLICK:
+    {
+        if(btnInfo->isClicked)
+        {
+            btnInfo->isClicked=false;
             ret=true;
         }
         else

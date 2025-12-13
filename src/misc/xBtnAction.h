@@ -38,11 +38,12 @@
 #define BTN_PRESS                       1 //检测按键按下信号
 #define BTN_HOLD_DOWN                   2 //检测按键按住不放信号
 #define BTN_RELEASE                     3 //检测按键释放信号
-#define BTN_DOUBLE_CLICK                4 //检测按键双击信号
-#define BTN_REPEAT_COUNT                5 //获取连击次数
-#define BTN_HOLD_TIME                   6 //获取按键按住不放的时间
-#define BTN_LONG_START                  7 //检测按键长按触发一次的信号
-#define BTN_LONG_SHOOT                  8 //检测按键长按触发一次和连续触发的信号
+#define BTN_CLICK                       4 //检测按键快速单击信号
+#define BTN_DOUBLE_CLICK                5 //检测按键双击信号
+#define BTN_REPEAT_COUNT                6 //获取连击次数
+#define BTN_HOLD_TIME                   7 //获取按键按住不放的时间
+#define BTN_LONG_START                  8 //检测按键长按触发一次的信号
+#define BTN_LONG_SHOOT                  9 //检测按键长按触发一次和连续触发的信号
 
 typedef bool (*isBtnPressFunc)(uint16_t id,void* pUser);
 
@@ -60,6 +61,7 @@ typedef struct xBtnInfo{
     bool _isOldPress:1;
     bool isPressed:1;
     bool isReleased:1;
+    bool isClicked:1;
     bool isDoubleClicked:1;
     bool isRepeatEnd:1;
     bool isShoot:1;

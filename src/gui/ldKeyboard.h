@@ -73,6 +73,7 @@ struct ldKeyboard_t
     bool isWaitInit:1;
     bool isUpper:1;
     bool isLockUpper:1;
+    bool isExit:1;
 };
 
 extern const kbBtnInfo_t qwertyBtnList[];
@@ -91,8 +92,10 @@ void ldKeyboard_show(ld_scene_t *pScene, ldKeyboard_t *ptWidget, const arm_2d_ti
 void ldKeyboardNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir);
 extern const kbBtnInfo_t *ldKeyboardGetTargetBtnList(ldKeyboard_t *ptWidget);//weak function
 extern void ldKeyboardCallback(ldKeyboard_t *ptWidget, uint8_t signal);//weak function
-extern ldColor ldKeyboardGetShiftColor(bool isUpper, bool isLock);//weak function
+extern bool ldKeyboardBtnUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget, kbBtnInfo_t *pBtnInfo);//weak function
 void ldKeyboardUpdate(ldKeyboard_t *ptWidget);
+void ldKeyboardInputAscii(ldKeyboard_t *ptWidget,uint8_t ascii);
+void ldKeyboardClick(ld_scene_t *ptScene,ldKeyboard_t *ptWidget,uint8_t signal);
 
 #define ldKeyboardSetHidden                ldBaseSetHidden
 #define ldKeyboardMove                     ldBaseMove
