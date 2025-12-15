@@ -75,7 +75,7 @@
         <file category="sourceC" name="src/misc/xBtnAction.c" />
 
         <file category="sourceC" name="src/porting/ldConfig.c" attr="config" version="1.2.0" />
-        <file category="header"  name="src/porting/ldConfig.h" attr="config" version="1.4.3" />
+        <file category="header"  name="src/porting/ldConfig.h" attr="config" version="1.5.0" />
         <file category="sourceC" name="src/porting/arm_2d_disp_adapter_0.c" attr="config" version="1.0.0" />
         <file category="header"  name="src/porting/arm_2d_disp_adapter_0.h" attr="config" version="1.0.0" />
       </files>

@@ -76,11 +76,14 @@ extern "C" {
 #endif
 
 #ifndef USE_SCENE_SWITCHING
-// <q>scene switcing support
-// <i> 0:only one scene,user manually clean widget
-// <i> 1:Less ram,fast switching(default)
-// <i> 2:More effects
-#define USE_SCENE_SWITCHING                       (1)
+// <o>scene switcing support
+//     <0=> One scene
+//     <1=> Less ram
+//     <2=> More effects
+// <i> 0: only one scene,user manually clean widget
+// <i> 2: Less ram,fast switching(default)
+// <i> 3:More effects
+#define USE_SCENE_SWITCHING                       (2)
 #endif
 
 // debug config
