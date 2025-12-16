@@ -488,7 +488,7 @@ __WEAK bool ldKeyboardBtnUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget,
     return false;
 }
 
-static bool _isBtnContinue(kbBtnInfo_t *pBtnInfo)
+static bool _isBtnContinue(const kbBtnInfo_t *pBtnInfo)
 {
     if((pBtnInfo->region.tSize.iWidth != 0) && (pBtnInfo->region.tSize.iHeight != 0))
     {
@@ -511,7 +511,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget, arm_2d_lo
     };
     ptWidget->isClick = false;
 
-    kbBtnInfo_t *pBtnInfo = (kbBtnInfo_t *)ptWidget->pBtnList;
+    const kbBtnInfo_t *pBtnInfo = ptWidget->pBtnList;
     if (pBtnInfo)
     {
         while (_isBtnContinue(pBtnInfo))
@@ -859,7 +859,7 @@ static const kbBtnInfo_t *getBtnByKeyCode(const kbBtnInfo_t *array, uint8_t key)
         return NULL;
     }
 
-    for (const kbBtnInfo_t *p = array; (p->region.tSize.iWidth != 0) && (p->region.tSize.iHeight != 0); ++p)
+    for (const kbBtnInfo_t *p = array; _isBtnContinue(p); ++p)
     {
         if (p->keyCode == key)
         {
@@ -884,7 +884,7 @@ static const kbBtnInfo_t *getBtnByPos(ldKeyboard_t *ptWidget, int16_t x, int16_t
     const kbBtnInfo_t *best = NULL;
     uint32_t bestDist = UINT32_MAX;
 
-    for (; (p->region.tSize.iWidth != 0) && (p->region.tSize.iHeight != 0); ++p)
+    for (; _isBtnContinue(p); ++p)
     {
         int16_t bcx = p->region.tLocation.iX + p->region.tSize.iWidth / 2;
         int16_t bcy = p->region.tLocation.iY + p->region.tSize.iHeight / 2;
@@ -927,7 +927,7 @@ static uint8_t _kbNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
 
     if (dir == NAV_UP || dir == NAV_DOWN)
     {
-        for (const kbBtnInfo_t *p = array; _isBtnContinue((kbBtnInfo_t*)p); ++p)
+        for (const kbBtnInfo_t *p = array; _isBtnContinue(p); ++p)
         {
             if (p == pCur)
                 continue;
@@ -942,12 +942,12 @@ static uint8_t _kbNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
     else if (dir == NAV_LEFT || dir == NAV_RIGHT)
     {
         const kbBtnInfo_t *rowStart = pCur;
-        while (rowStart > array && _isBtnContinue((kbBtnInfo_t*)(rowStart - 1)) && ((rowStart - 1)->region.tLocation.iY == pCur->region.tLocation.iY))
+        while (rowStart > array && _isBtnContinue((rowStart - 1)) && ((rowStart - 1)->region.tLocation.iY == pCur->region.tLocation.iY))
         {
             --rowStart;
         }
         const kbBtnInfo_t *p = dir == NAV_LEFT ? pCur - 1 : pCur + 1;
-        for (; _isBtnContinue((kbBtnInfo_t*)p) && p->region.tLocation.iY == pCur->region.tLocation.iY; dir == NAV_LEFT ? --p : ++p)
+        for (; _isBtnContinue(p) && p->region.tLocation.iY == pCur->region.tLocation.iY; dir == NAV_LEFT ? --p : ++p)
         {
             best = p;
             break;
