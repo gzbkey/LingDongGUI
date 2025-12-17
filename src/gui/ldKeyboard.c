@@ -414,6 +414,11 @@ __WEAK void ldKeyboardCallback(ldKeyboard_t *ptWidget, uint8_t signal)
     }
 }
 
+__WEAK bool ldKeyboardBackgroundUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget,arm_2d_region_t *ptRegion)
+{
+    return false;
+}
+
 __WEAK bool ldKeyboardBtnUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget, kbBtnInfo_t *pBtnInfo)
 {
     // 特殊按键处理
@@ -537,6 +542,29 @@ void ldKeyboardUpdate(ldKeyboard_t *ptWidget)
     ptWidget->use_as__ldBase_t.tTempRegion.tSize.iWidth = LD_CFG_SCREEN_WIDTH;
     ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight = LD_CFG_SCREEN_HEIGHT >> 1;
 
+    ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY += ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+}
+
+void ldKeyboardBtnUpdate(ldKeyboard_t *ptWidget,uint8_t keyCode)
+{
+    const kbBtnInfo_t *pBtnInfo = ptWidget->pBtnList;
+    arm_2d_region_t btnRegion;
+
+    if (pBtnInfo)
+    {
+        while (_isBtnContinue(pBtnInfo))
+        {
+            if(pBtnInfo->keyCode==keyCode)
+            {
+                btnRegion = pBtnInfo->region;
+                break;
+            }
+            pBtnInfo++;
+        }
+    }
+
+    ptWidget->use_as__ldBase_t.tTempRegion=btnRegion;
     ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY += ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
@@ -715,10 +743,19 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
                 ldBaseBgMove(ptScene, LD_CFG_SCREEN_WIDTH, LD_CFG_SCREEN_HEIGHT, 0, 0);
             }
 
-            ldBaseColor(&tTarget,
-                        &((arm_2d_region_t){0, (LD_CFG_SCREEN_HEIGHT >> 1), LD_CFG_SCREEN_WIDTH, (LD_CFG_SCREEN_HEIGHT >> 1)}),
+            arm_2d_region_t bgRegion={
+                0, 
+                (LD_CFG_SCREEN_HEIGHT >> 1),
+                LD_CFG_SCREEN_WIDTH,
+                (LD_CFG_SCREEN_HEIGHT >> 1)};
+
+            if (!ldKeyboardBackgroundUserDraw(&tTarget, ptWidget, &bgRegion))
+            {
+                ldBaseColor(&tTarget,
+                        &bgRegion,
                         __RGB(208, 211, 220),
                         ptWidget->use_as__ldBase_t.opacity);
+            }
 
             kbBtnInfo_t *pBtnInfo = (kbBtnInfo_t *)ptWidget->pBtnList;
             if (pBtnInfo)
@@ -763,22 +800,6 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
                             }
                         }
 
-                        if ((ptWidget->isKeySelect) && (ptWidget->keyCode == pBtnInfo->keyCode))
-                        {
-                            draw_round_corner_border(&tTarget,
-                                                     &pBtnInfo->region, LD_SELECT_COLOR,
-                                                     (arm_2d_border_opacity_t){
-                                                         ptWidget->use_as__ldBase_t.opacity,
-                                                         ptWidget->use_as__ldBase_t.opacity,
-                                                         ptWidget->use_as__ldBase_t.opacity,
-                                                         ptWidget->use_as__ldBase_t.opacity},
-                                                     (arm_2d_corner_opacity_t){
-                                                         ptWidget->use_as__ldBase_t.opacity,
-                                                         ptWidget->use_as__ldBase_t.opacity,
-                                                         ptWidget->use_as__ldBase_t.opacity,
-                                                         ptWidget->use_as__ldBase_t.opacity});
-                        }
-
                         if ((ptWidget->isUpper) && (pBtnInfo->keyCode >= 'a') && (pBtnInfo->keyCode <= 'z'))
                         {
                             uint8_t tempStr[2] = {
@@ -801,6 +822,22 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
                                         ARM_2D_ALIGN_CENTRE,
                                         GLCD_COLOR_BLACK,
                                         ptWidget->use_as__ldBase_t.opacity);
+                        }
+
+                        if ((ptWidget->isKeySelect) && (ptWidget->keyCode == pBtnInfo->keyCode))
+                        {
+                            draw_round_corner_border(&tTarget,
+                                                     &pBtnInfo->region, LD_SELECT_COLOR,
+                                                     (arm_2d_border_opacity_t){
+                                                         ptWidget->use_as__ldBase_t.opacity,
+                                                         ptWidget->use_as__ldBase_t.opacity,
+                                                         ptWidget->use_as__ldBase_t.opacity,
+                                                         ptWidget->use_as__ldBase_t.opacity},
+                                                     (arm_2d_corner_opacity_t){
+                                                         ptWidget->use_as__ldBase_t.opacity,
+                                                         ptWidget->use_as__ldBase_t.opacity,
+                                                         ptWidget->use_as__ldBase_t.opacity,
+                                                         ptWidget->use_as__ldBase_t.opacity});
                         }
                     }
 
@@ -852,7 +889,7 @@ static int32_t _kbManhattan(const kbBtnInfo_t *current, const kbBtnInfo_t *targe
     return abs(dx) + abs(dy);
 }
 
-static const kbBtnInfo_t *getBtnByKeyCode(const kbBtnInfo_t *array, uint8_t key)
+const kbBtnInfo_t *getBtnByKeyCode(const kbBtnInfo_t *array, uint8_t key)
 {
     if (!array)
     {
@@ -869,7 +906,7 @@ static const kbBtnInfo_t *getBtnByKeyCode(const kbBtnInfo_t *array, uint8_t key)
     return NULL;
 }
 
-static const kbBtnInfo_t *getBtnByPos(ldKeyboard_t *ptWidget, int16_t x, int16_t y)
+const kbBtnInfo_t *getBtnByPos(ldKeyboard_t *ptWidget, int16_t x, int16_t y)
 {
     if (!ptWidget)
         return NULL;

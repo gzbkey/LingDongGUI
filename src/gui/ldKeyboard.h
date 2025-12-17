@@ -94,7 +94,7 @@ extern const kbBtnInfo_t *ldKeyboardGetTargetBtnList(ldKeyboard_t *ptWidget);//w
 extern void ldKeyboardCallback(ldKeyboard_t *ptWidget, uint8_t signal);//weak function
 extern bool ldKeyboardBtnUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget, kbBtnInfo_t *pBtnInfo);//weak function
 void ldKeyboardUpdate(ldKeyboard_t *ptWidget);
-void ldKeyboardInputAscii(ldKeyboard_t *ptWidget,uint8_t ascii);
+void ldKeyboardBtnUpdate(ldKeyboard_t *ptWidget,uint8_t keyCode);
 void ldKeyboardClick(ld_scene_t *ptScene,ldKeyboard_t *ptWidget,uint8_t signal);
 
 #define ldKeyboardSetHidden                ldBaseSetHidden
