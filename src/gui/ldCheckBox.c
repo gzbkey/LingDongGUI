@@ -167,7 +167,7 @@ static bool slotCheckBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
         {
             if(ptWidget->isChecked==false)
             {
-                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptScene,ptWidget->radioButtonGroup);
+                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptWidget->radioButtonGroup);
                 LOG_DEBUG("old cb=%d",old->use_as__ldBase_t.nameId);
                 LOG_DEBUG("new cb=%d",ptWidget->use_as__ldBase_t.nameId);
                 old->isChecked=false;
@@ -513,7 +513,7 @@ void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num)
     ptWidget->radioButtonGroup=num;
 }
 
-ldCheckBox_t* ldCheckBoxGetRadioSelected(ld_scene_t *ptScene, uint8_t groupNum)
+ldCheckBox_t* _ldCheckBoxGetRadioSelected(ld_scene_t *ptScene, uint8_t groupNum)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
@@ -560,7 +560,7 @@ void _ldCheckBoxSetChecked(ld_scene_t *ptScene,ldCheckBox_t* ptWidget,bool isChe
         {
             if(ptWidget->isChecked==false)
             {
-                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptScene,ptWidget->radioButtonGroup);
+                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptWidget->radioButtonGroup);
                 old->isChecked=false;
                 old->use_as__ldBase_t.isDirtyRegionUpdate = true;
                 ptWidget->isChecked=true;

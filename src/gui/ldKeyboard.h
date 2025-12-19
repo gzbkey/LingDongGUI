@@ -74,6 +74,8 @@ struct ldKeyboard_t
     bool isUpper:1;
     bool isLockUpper:1;
     bool isExit:1;
+    bool onlyNavH:1;//导航水平移动
+    bool onlyNavV:1;//导航纵线移动
 };
 
 extern const kbBtnInfo_t qwertyBtnList[];

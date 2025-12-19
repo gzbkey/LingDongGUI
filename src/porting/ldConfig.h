@@ -81,9 +81,9 @@ extern "C" {
 //     <1=> Less ram
 //     <2=> More effects
 // <i> 0: only one scene,user manually clean widget
-// <i> 2: Less ram,fast switching(default)
-// <i> 3:More effects
-#define USE_SCENE_SWITCHING                       (2)
+// <i> 1: Less ram,fast switching(default)
+// <i> 2:More effects
+#define USE_SCENE_SWITCHING                       (1)
 #endif
 
 // debug config

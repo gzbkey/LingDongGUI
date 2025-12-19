@@ -945,6 +945,7 @@ static uint8_t _kbNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
 
     const kbBtnInfo_t *array = (const kbBtnInfo_t *)ptWidget->pBtnList;
     const kbBtnInfo_t *pCur;
+
     if (!ptWidget->isKeySelect)
     {
         pCur = getBtnByPos(ptWidget, ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth >> 1, ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight / 4 * 3);
@@ -1008,8 +1009,16 @@ void ldKeyboardNavigate(ldKeyboard_t *ptWidget, ldNavDir_t dir)
         return;
     }
 
+    if(ptWidget->onlyNavH&&((dir!=NAV_LEFT)&&(dir!=NAV_RIGHT)))
+    {
+        return;
+    }
+    if(ptWidget->onlyNavV&&((dir!=NAV_UP)&&(dir!=NAV_DOWN)))
+    {
+        return;
+    }
     ptWidget->keyCode = _kbNavigate(ptWidget, dir);
-LOG_DEBUG("code %d",ptWidget->keyCode);
+
     ptWidget->isKeySelect = true;
 }
 

@@ -301,11 +301,8 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                         }
                     }
                 }
-
-                LD_BASE_WIDGET_SELECT;
+                arm_2d_op_wait_async(NULL);
             }
-
-            arm_2d_op_wait_async(NULL);
 
             if(ptWidget->pStr!=NULL)
             {
@@ -316,8 +313,10 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                             ARM_2D_ALIGN_CENTRE,
                             ptWidget->charColor,
                             ptWidget->use_as__ldBase_t.opacity);
-                arm_2d_op_wait_async(NULL);
             }
+
+            LD_BASE_WIDGET_SELECT;
+            arm_2d_op_wait_async(NULL);
         }
     }
 }
@@ -434,6 +433,7 @@ void ldButtonSetPress(ldButton_t *ptWidget,bool isPress)
     {
         return;
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isPressed=isPress;
 }
 

@@ -122,7 +122,7 @@ typedef enum{
 #define ANGLE_2_RADIAN(angle)           ((float)(angle)*0.0174533f)
 
 #ifndef LD_SELECT_COLOR
-#define LD_SELECT_COLOR                 __RGB(128, 200, 255)
+#define LD_SELECT_COLOR                 __RGB(255, 0, 0)
 #endif
 
 #ifndef LD_SELECT_OPACITY

@@ -502,7 +502,7 @@ void ldScrollSelecterSetSpeed(ldScrollSelecter_t *ptWidget, uint8_t speed)
     ptWidget->moveOffset=speed;
 }
 
-void ldScrollSelecterSelectItem(ldScrollSelecter_t *ptWidget, int8_t itemNum)
+void ldScrollSelecterSelectItemNum(ldScrollSelecter_t *ptWidget, int8_t itemNum)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -557,6 +557,16 @@ uint8_t *ldScrollSelecterCurrentText(ldScrollSelecter_t *ptWidget)
         return NULL;
     }
     return (uint8_t*)ptWidget->ppItemStrGroup[ptWidget->itemSelect];
+}
+
+uint8_t ldScrollSelecterCurrentItemNum(ldScrollSelecter_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->itemSelect;
 }
 
 void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit)
