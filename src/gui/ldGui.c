@@ -212,6 +212,7 @@ void ldGuiTouchProcess(ld_scene_t *ptScene)
 void ldGuiSceneInit(ld_scene_t *ptScene)
 {
     ldMsgInit(&ptScene->ptMsgQueue,LD_EMIT_SIZE);
+    LOG_DEBUG("[sys] free memory:%zu",ldGetFreeMemory());
 
     if(ptScene->ldGuiFuncGroup!=NULL)
     {
@@ -318,7 +319,6 @@ void ldGuiDespose(ld_scene_t *ptScene)
     }
 
     LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
-    LOG_DEBUG("[sys] after despose free memory:%zu",ldGetFreeMemory());
 }
 
 void ldGuiFrameComplete(ld_scene_t *ptScene)
@@ -469,7 +469,7 @@ void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
 
     disp_adapter0_init();
 #if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-    LOG_DEBUG("[sys] free memory:%zu",ldGetFreeMemory());
+
     if(ptFuncGroup==NULL)
     {
         return;

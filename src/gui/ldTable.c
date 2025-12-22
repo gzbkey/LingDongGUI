@@ -552,14 +552,15 @@ void ldTable_depose(ld_scene_t *ptScene, ldTable_t *ptWidget)
         if(!ptWidget->ptItemInfo[i].isStaticText)
         {
             ldFree(ptWidget->ptItemInfo[i].pText);
-#if USE_VIRTUAL_RESOURCE == 1
-            ldFree(ptWidget->ptItemInfo[i].ptReleaseImgTile);
-            ldFree(ptWidget->ptItemInfo[i].ptReleaseMaskTile);
-            ldFree(ptWidget->ptItemInfo[i].ptPressImgTile);
-            ldFree(ptWidget->ptItemInfo[i].ptPressMaskTile);
-            ldFree(ptWidget->ptItemInfo[i].ptFont);
-#endif
         }
+#if USE_VIRTUAL_RESOURCE == 1
+        ldFree(ptWidget->ptItemInfo[i].ptReleaseImgTile);
+        ldFree(ptWidget->ptItemInfo[i].ptReleaseMaskTile);
+        ldFree(ptWidget->ptItemInfo[i].ptPressImgTile);
+        ldFree(ptWidget->ptItemInfo[i].ptPressMaskTile);
+        ldFree(ptWidget->ptItemInfo[i].ptFont);
+#endif
+
     }
 
     ldMsgDelConnect(ptWidget);
