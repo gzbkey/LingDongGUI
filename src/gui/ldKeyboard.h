@@ -98,6 +98,7 @@ extern bool ldKeyboardBtnUserDraw(arm_2d_tile_t *ptTile, ldKeyboard_t *ptWidget,
 void ldKeyboardUpdate(ldKeyboard_t *ptWidget);
 void ldKeyboardBtnUpdate(ldKeyboard_t *ptWidget,uint8_t keyCode);
 void ldKeyboardClick(ld_scene_t *ptScene,ldKeyboard_t *ptWidget,uint8_t signal);
+void ldKeyboardExit(ldKeyboard_t *ptWidget);
 
 #define ldKeyboardSetHidden                ldBaseSetHidden
 #define ldKeyboardMove                     ldBaseMove

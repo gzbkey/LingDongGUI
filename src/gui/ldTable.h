@@ -92,7 +92,7 @@ struct ldTable_t
     bool isAlignGrid:1;
 };
 
-ldTable_t* ldTable_init(ld_scene_t *ptScene, ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, arm_2d_font_t *ptFont);
+ldTable_t* ldTable_init(ld_scene_t *ptScene, ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
 void ldTable_depose(ld_scene_t *ptScene, ldTable_t *ptWidget);
 void ldTable_on_load(ld_scene_t *ptScene, ldTable_t *ptWidget);
 void ldTable_on_frame_start(ld_scene_t *ptScene, ldTable_t *ptWidget);
@@ -112,9 +112,15 @@ void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId);
 void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax);
 void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont);
 void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid);
+void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir);
+ldTableItem_t *ldTableGetItem(ldTable_t* ptWidget,uint8_t row,uint8_t column);
+ldTableItem_t *ldTableCurrentItem(ldTable_t *ptWidget);
 
-#define ldTableInit(nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace,ptFont) \
-        ldTable_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace,ptFont)
+void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t *currentItem);
+#define ldTabelShowKeyboard(ptWidget,currentItem)  _ldTabelShowKeyboard(ptScene,ptWidget,currentItem)
+
+#define ldTableInit(nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace) \
+        ldTable_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace)
 
 #define ldTableSetHidden                ldBaseSetHidden
 #define ldTableMove                     ldBaseMove

@@ -1034,6 +1034,16 @@ void ldKeyboardClick(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, uint8_t signal
     emit(ptWidget->use_as__ldBase_t.nameId, signal, u64Temp);
 }
 
+void ldKeyboardExit(ldKeyboard_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isExit=true;
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

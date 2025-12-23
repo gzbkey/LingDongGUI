@@ -220,6 +220,34 @@ ldTableItem_t *ldTableItemAt(ldTable_t *ptWidget,int16_t x,int16_t y)
     return &ptWidget->ptItemInfo[itemY*ptWidget->columnCount+itemX];
 }
 
+void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t *currentItem)
+{
+    ldKeyboard_t *kb;
+    kb=ldBaseGetWidgetById(ptWidget->kbNameId);
+    if(kb!=NULL)
+    {
+        kb->editType=currentItem->editType;
+        kb->ppStr=&currentItem->pText;
+        kb->strMax=currentItem->textMax;
+        kb->editorId=ptWidget->use_as__ldBase_t.nameId;
+        cursorBlinkFlag=true;
+        cursorBlinkCount=0;
+        ldKeyboardSetHidden((ldBase_t *)kb,false);
+
+        arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
+
+        if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY)>(LD_CFG_SCREEN_HEIGHT>>1))
+        {
+            ldKeyboardMove((ldBase_t *)kb,0,LD_CFG_SCREEN_HEIGHT>>1);
+            ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-(LD_CFG_SCREEN_HEIGHT>>1));
+        }
+        else
+        {
+            ldKeyboardMove((ldBase_t *)kb,0,0);
+        }
+    }
+}
+
 static int16_t _scrollOffsetX,_scrollOffsetY;
 static int16_t _totalItemWidth,_totalItemHeight;
 static bool _isStopMove;
@@ -445,7 +473,7 @@ static bool slotEditEnd(ld_scene_t *ptScene,ldMsg_t msg)
     return false;
 }
 
-ldTable_t* ldTable_init( ld_scene_t *ptScene,ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace, arm_2d_font_t* ptFont)
+ldTable_t* ldTable_init( ld_scene_t *ptScene,ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
@@ -519,7 +547,7 @@ ldTable_t* ldTable_init( ld_scene_t *ptScene,ldTable_t *ptWidget, uint16_t nameI
         ptWidget->ptItemInfo[i].isSelect=false;
         ptWidget->ptItemInfo[i].editType=typeString;
         ptWidget->ptItemInfo[i].textMax=0;
-        ptWidget->ptItemInfo[i].ptFont=ptFont;
+        ptWidget->ptItemInfo[i].ptFont=NULL;
         ptWidget->ptItemInfo[i].isEditable=false;
     }
     ptWidget->timer=arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
@@ -752,6 +780,7 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
 
 void ldTableSetItemWidth(ldTable_t *ptWidget,uint8_t column,int16_t width)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -764,6 +793,7 @@ void ldTableSetItemWidth(ldTable_t *ptWidget,uint8_t column,int16_t width)
 
 void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -804,6 +834,7 @@ void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *
 
 void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -825,6 +856,7 @@ void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uin
 
 void ldTableSetItemColor(ldTable_t *ptWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -839,6 +871,7 @@ void ldTableSetItemColor(ldTable_t *ptWidget,uint8_t row,uint8_t column,ldColor 
 
 void ldTableSetBackgroundColor(ldTable_t *ptWidget,ldColor bgColor)
 {
+    assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
@@ -848,6 +881,7 @@ void ldTableSetBackgroundColor(ldTable_t *ptWidget,ldColor bgColor)
 
 void ldTableSetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_align_t tAlign)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -862,6 +896,7 @@ void ldTableSetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_a
 
 void ldTableSetItemImage(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t* ptImgTile,arm_2d_tile_t *ptMaskTile,ldColor maskColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -885,6 +920,7 @@ void ldTableSetItemImage(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t 
 
 void ldTableSetItemButton(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t *ptReleaseImgTile,arm_2d_tile_t *ptReleaseMaskTile,ldColor releaseImgMaskColor,arm_2d_tile_t *ptPressImgTile,arm_2d_tile_t *ptPressMaskTile,ldColor pressImgMaskColor,bool isCheckable)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -910,6 +946,7 @@ void ldTableSetItemButton(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t
 
 void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -919,6 +956,7 @@ void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId)
 
 void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -934,11 +972,13 @@ void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEd
 
 void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
 {
-    uint8_t strBuf[2]={0};
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
     }
+    uint8_t strBuf[2]={0};
+
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
     ldTableSetEditable(ptWidget,0,0,false,0);
@@ -994,11 +1034,59 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
 
 void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
     }
     ptWidget->isAlignGrid=isAlignGrid;
+}
+
+void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+
+    uint8_t row = ptWidget->currentRow;
+    uint8_t col = ptWidget->currentColumn;
+
+    switch (dir)
+    {
+        case NAV_LEFT:
+            if (col > 0)
+                col--;
+            break;
+        case NAV_RIGHT:
+            if (col + 1 < ptWidget->columnCount)
+                col++;
+            break;
+        case NAV_UP:
+            if (row > 0)
+                row--;
+            break;
+        case NAV_DOWN:
+            if (row + 1 < ptWidget->rowCount)
+                row++;
+            break;
+        default:
+            return;
+    }
+
+    _ldTableSelectItem(ptWidget, ldTableItem(ptWidget, row, col));
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+}
+
+ldTableItem_t *ldTableGetItem(ldTable_t* ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return NULL;
+    }
+    return &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
 }
 
 #if defined(__clang__)
