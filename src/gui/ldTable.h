@@ -74,20 +74,21 @@ typedef struct ldTable_t ldTable_t;
 struct ldTable_t
 {
     implement(ldBase_t);
+    int64_t timer;
+    ldColor bgColor;
+    ldColor selectColor;
+    int16_t scrollOffsetX;
+    int16_t scrollOffsetY;
+    uint16_t kbNameId;
     uint8_t rowCount;
     uint8_t columnCount;
     uint8_t itemSpace;//item 间隔
-    int16_t *pColumnWidth;
-    int16_t *pRowHeight;
-    ldColor bgColor;
-    ldColor selectColor;
-    ldTableItem_t *ptItemInfo;
-    int16_t scrollOffsetX;
-    int16_t scrollOffsetY;
     uint8_t currentRow;
     uint8_t currentColumn;
-    int64_t timer;
-    uint16_t kbNameId;
+    arm_2d_location_t _cursorPos;
+    ldTableItem_t *ptItemInfo;
+    int16_t *pColumnWidth;
+    int16_t *pRowHeight;
     bool isBgTransparent:1;
     bool isAlignGrid:1;
 };
@@ -114,7 +115,7 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont);
 void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid);
 void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir);
 ldTableItem_t *ldTableGetItem(ldTable_t* ptWidget,uint8_t row,uint8_t column);
-ldTableItem_t *ldTableCurrentItem(ldTable_t *ptWidget);
+void ldTableSetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_font_t* ptFont);
 
 void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t *currentItem);
 #define ldTabelShowKeyboard(ptWidget,currentItem)  _ldTabelShowKeyboard(ptScene,ptWidget,currentItem)

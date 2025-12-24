@@ -256,8 +256,9 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         cursorBlinkCount++;
     }
 
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer500ms))
+    if(ldTimeOut(500,true,&sysTimer500ms))
     {
+        LOG_DEBUG("500ms");
         if(sysRTC.isEnable)
         {
             extern void ldCfgGetRtc(ldBaseRTC_t *dateTime);
@@ -266,7 +267,7 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         }
     }
     
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer1min))
+    if(ldTimeOut(60000,true,&sysTimer1min))
     {
         if(sysRTC.isEnable)
         {

@@ -51,6 +51,7 @@ struct ldLineEdit_t
     implement(ldBase_t);
     arm_2d_font_t *ptFont;
     arm_2d_align_t tAlign;
+    arm_2d_size_t _strSize;
     uint16_t kbNameId;
     ldColor textColor;
     ldColor backgroundColor;

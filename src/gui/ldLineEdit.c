@@ -182,7 +182,16 @@ void ldLineEdit_on_load(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
 void ldLineEdit_on_frame_start(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if(ptWidget->isEditing)
+    {
+        if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
+        {
+            cursorBlinkCount=0;
+            cursorBlinkFlag=!cursorBlinkFlag;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        }
+    }
+    ptWidget->_strSize=arm_lcd_printf_to_buffer(ptWidget->ptFont,"%s",ptWidget->pText);
 }
 
 void ldLineEdit_on_frame_complete(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
@@ -196,18 +205,6 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
     if(ptWidget == NULL)
     {
         return;
-    }
-
-    if (bIsNewFrame) {
-        if(ptWidget->isEditing)
-        {
-            if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
-            {
-                cursorBlinkCount=0;
-                cursorBlinkFlag=!cursorBlinkFlag;
-            }
-            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-        }
     }
 
     arm_2d_region_t globalRegion;
@@ -254,11 +251,11 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 tempRegion.tSize.iWidth-=CURSOR_WIDTH;
             }
 
-            arm_2d_size_t strSize=arm_lcd_printf_to_buffer(ptWidget->ptFont,"%s",ptWidget->pText);
+            
             if(ptWidget->pText!=NULL)
             {
                 arm_2d_align_t tAlign=ptWidget->tAlign;
-                if(strSize.iWidth>tempRegion.tSize.iWidth)
+                if(ptWidget->_strSize.iWidth>tempRegion.tSize.iWidth)
                 {
                     tAlign=ARM_2D_ALIGN_RIGHT;
                 }
@@ -275,7 +272,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
             if(cursorBlinkFlag&&ptWidget->isEditing)
             {
                 arm_2d_region_t cursorRegion={
-                    tempRegion.tLocation.iX+strSize.iWidth,
+                    tempRegion.tLocation.iX+ptWidget->_strSize.iWidth,
                     ((tTarget_canvas.tSize.iHeight-ptWidget->ptFont->tCharSize.iHeight)>>1)+2,
                     CURSOR_WIDTH,
                     ptWidget->ptFont->tCharSize.iHeight
