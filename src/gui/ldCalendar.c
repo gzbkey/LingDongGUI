@@ -452,6 +452,38 @@ void ldCalendarSetHeaderFormat(ldCalendar_t *ptWidget, uint8_t *format)
     ptWidget->headerNameFormat = format;
 }
 
+void ldCalendarSetDate(ldCalendar_t *ptWidget,uint16_t year,uint8_t month,uint8_t day)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->year = year - 2000;
+    ptWidget->month = month;
+    ptWidget->day = day;
+
+    _getCalBuf(year, month, ptWidget->calBuf);
+}
+
+void ldCalendarGetDate(ldCalendar_t *ptWidget,uint16_t* year,uint8_t* month,uint8_t* day)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if(year != NULL) {
+        *year = ptWidget->year + 2000;
+    }
+    if(month != NULL) {
+        *month = ptWidget->month;
+    }
+    if(day != NULL) {
+        *day = ptWidget->day;
+    }
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

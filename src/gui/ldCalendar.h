@@ -80,7 +80,9 @@ void ldCalendar_show(ld_scene_t *pScene, ldCalendar_t *ptWidget, const arm_2d_ti
 void ldCalendarSetDayNames(ldCalendar_t *ptWidget,uint8_t* names[7]);
 void ldCalendarSetHeader(ldCalendar_t *ptWidget,bool isEnable);
 void ldCalendarSetHeaderFormat(ldCalendar_t *ptWidget,uint8_t* format);
+void ldCalendarSetDate(ldCalendar_t *ptWidget,uint16_t year,uint8_t month,uint8_t day);
 
+void ldCalendarGetDate(ldCalendar_t *ptWidget,uint16_t* year,uint8_t* month,uint8_t* day);
 
 
 #if defined(__clang__)
