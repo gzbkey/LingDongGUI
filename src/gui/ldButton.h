@@ -60,7 +60,7 @@ struct ldButton_t
     uint32_t keyValue;
     arm_2d_font_t *ptFont;
     uint8_t *pStr;
-    ldColor charColor;
+    ldColor textColor;
     ldColor releaseColor;
     ldColor pressColor;
     bool isTransparent : 1;
@@ -69,6 +69,8 @@ struct ldButton_t
 };
 
 ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
+#define ldButtonInit(nameId,parentNameId,x,y,width,height) \
+        ldButton_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 void ldButton_depose(ld_scene_t *ptScene, ldButton_t *ptWidget);
 void ldButton_on_load(ld_scene_t *ptScene, ldButton_t *ptWidget);
 void ldButton_on_frame_start(ld_scene_t *ptScene, ldButton_t *ptWidget);
@@ -80,20 +82,20 @@ void ldButtonSetImage(ldButton_t* ptWidget,arm_2d_tile_t* ptReleaseImgTile,arm_2
 void ldButtonSetTransparent(ldButton_t* ptWidget,bool isTransparent);
 void ldButtonSetFont(ldButton_t *ptWidget, arm_2d_font_t *ptFont);
 void ldButtonSetText(ldButton_t* ptWidget,uint8_t *pStr);
-void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor);
+void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor textColor);
 void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable);
 void ldButtonSetKeyValue(ldButton_t *ptWidget,uint32_t value);
 void ldButtonSetPress(ldButton_t *ptWidget,bool isPress);
 
-#define ldButtonInit(nameId,parentNameId,x,y,width,height) \
-        ldButton_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
-
-#define ldButtonSetHidden               ldBaseSetHidden
-#define ldButtonMove                    ldBaseMove
-#define ldButtonSetOpacity              ldBaseSetOpacity
-#define ldButtonSetSelectable           ldBaseSetSelectable
-#define ldButtonSetSelect               ldBaseSetSelect
-#define ldButtonSetCorner               ldBaseSetCorner
+ldColor ldButtonGetReleaseColor(ldButton_t* ptWidget);
+ldColor ldButtonGetPressColor(ldButton_t* ptWidget);
+bool ldButtonGetTransparent(ldButton_t *ptWidget);
+arm_2d_font_t *ldButtonGetFont(ldButton_t *ptWidget);
+uint8_t *ldButtonGetText(ldButton_t* ptWidget);
+ldColor ldButtonGetTextColor(ldButton_t* ptWidget);
+bool ldButtonGetCheckable(ldButton_t *ptWidget);
+uint32_t ldButtonGetKeyValue(ldButton_t *ptWidget);
+bool ldButtonGetPress(ldButton_t *ptWidget);
 
 // only for btn acion
 #define ldButtonActionInit(nameId)      xBtnInit(nameId,(isBtnPressFunc)ldButtonActionIsPressById)

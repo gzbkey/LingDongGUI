@@ -309,6 +309,7 @@ void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *pText)
     if(ptWidget->textMax==0)
     {
         ptWidget->pText=ldRealloc(ptWidget->pText,textLen+1);
+        memset(ptWidget->pText, 0, textLen + 1);
     }
 
     if((textLen<ptWidget->textMax)||(ptWidget->textMax==0))

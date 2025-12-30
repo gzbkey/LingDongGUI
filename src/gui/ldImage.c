@@ -271,6 +271,16 @@ void ldImageSetBackgroundColor(ldImage_t *ptWidget,ldColor bgColor)
     ptWidget->bgColor=bgColor;
 }
 
+ldColor ldImageGetBackgroundColor(ldImage_t *ptWidget)
+{
+    assert(NULL!= ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->bgColor;
+}
+
 void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile)
 {
     assert(NULL != ptWidget);

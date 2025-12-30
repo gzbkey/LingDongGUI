@@ -36,11 +36,11 @@ bool home_action_Button_open_port_press(ld_scene_t *ptScene,ldMsg_t msg)
         pStr=ldComboBoxGetText(comb,selectNum);
         LOG_DEBUG("data bits:%s",pStr);
 
-        ldCheckBox_t *checkb= ldCheckBoxGetRadioSelected(ptScene,0);
+        ldCheckBox_t *checkb= ldCheckBoxGetRadioSelected(0);
         pStr=ldCheckBoxGetText(checkb);
         LOG_DEBUG("stop bits:%s",pStr);
 
-        checkb= ldCheckBoxGetRadioSelected(ptScene,1);
+        checkb= ldCheckBoxGetRadioSelected(1);
         pStr=ldCheckBoxGetText(checkb);
         LOG_DEBUG("parity:%s",pStr);
 

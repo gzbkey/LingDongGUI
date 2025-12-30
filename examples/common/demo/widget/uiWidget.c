@@ -25,7 +25,7 @@ static bool slotTest(ld_scene_t *ptScene,ldMsg_t msg)
 //   ldButtonMove(btn,150,100);
    ldImage_t *img=ldBaseGetWidget(ptScene->ptNodeRoot,1);
 //   ldImageSetHidden(img,!img->use_as__ldBase_t.isHidden);
-   ldImageSetOpacity((ldBase_t *)img,128);
+   ldBaseSetOpacity((ldBase_t *)img,128);
    return false;
 }
 
@@ -68,6 +68,10 @@ void listItemProcess(ldList_t *ptWidget,uint8_t itemNum,arm_2d_tile_t *ptTile,ar
 const uint8_t titleStr[]="title";
 const uint8_t msgStr[]="12345678abcdefg\n99556";
 const uint8_t *pBtnStr[]={"11","22","33"};
+
+static const char *dayNames[7]={"Sun","Mon","Tue","Wed","Thu","Fir","Sat"};
+static const char headerFormat[]="yyyy - mm - dd";
+
 void uiWidgetInit(ld_scene_t* ptScene)
 {
     void *obj,*list;
@@ -78,19 +82,19 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     obj= ldImageInit(1, 0, 100, 120, 50, 80, NULL, NULL,false);
     ldImageSetImage(obj,IMAGE_LETTER_PAPER_BMP,NULL);
-    ldImageSetCorner(obj,true);
-    ldImageSetSelectable(obj,true);
+    ldBaseSetCorner(obj,true);
+    ldBaseSetSelectable(obj,true);
 
     obj=ldButtonInit(2, 0, 10,10,79,53);
     ldButtonSetFont(obj,FONT_ARIAL_16_A8);
     ldButtonSetText(obj,(uint8_t*)"123");
     ldButtonSetTextColor(obj,GLCD_COLOR_WHITE);
     ldButtonSetImage(obj,IMAGE_KEYRELEASE_PNG,IMAGE_KEYRELEASE_PNG_Mask,IMAGE_KEYPRESS_PNG,IMAGE_KEYPRESS_PNG_Mask);
-    ldButtonSetSelectable(obj,true);
+    ldBaseSetSelectable(obj,true);
 
     obj=ldWindowInit(3, 0, 200, 95, 20, 20);
     ldWindowSetColor(obj,GLCD_COLOR_GREEN);
-    ldWindowSetCorner(obj,true);
+    ldBaseSetCorner(obj,true);
     ldWindowSetSelectable(obj,true);
 
 
@@ -101,8 +105,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldLabelSetText(obj,(uint8_t*)"123");
     ldLabelSetBackgroundColor(obj,GLCD_COLOR_LIGHT_GREY);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_BOTTOM_LEFT);
-    ldLabelSetSelectable(obj,true);
-    ldLabelSetCorner(obj,true);
+    ldBaseSetSelectable(obj,true);
+    ldBaseSetCorner(obj,true);
 
     obj=ldCheckBoxInit(5, 0, 220, 10, 50, 20);
 
@@ -116,7 +120,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldCheckBoxSetSelectable(obj,true);
 
     obj=ldCheckBoxInit(7, 0, 220, 70, 50, 20);
-    ldCheckBoxSetCorner(obj,true);
+    ldBaseSetCorner(obj,true);
     ldCheckBoxSetSelectable(obj,true);
 
     obj=ldProgressBarInit(8,0,10,500,300,30);
@@ -148,11 +152,11 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldRadialMenuAddItem(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask);
     ldRadialMenuAddItem(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask);
     ldRadialMenuAddItem(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask);
-    ldRadialMenuSetSelectable(obj,true);
-    ldRadialMenuSetCorner(obj,true);
+    ldBaseSetSelectable(obj,true);
+    ldBaseSetCorner(obj,true);
 
     obj=ldDateTimeInit(13,0,600,100,200,50,FONT_ARIAL_12);
-    ldDateTimeSetSelectable(obj,true);
+    ldBaseSetSelectable(obj,true);
 
 
     obj=ldIconSliderInit(14,0,500,350,150,65,48,2,5,1,1,FONT_ARIAL_12);
@@ -161,8 +165,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldIconSliderAddIcon(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask,iconName[2]);
     ldIconSliderAddIcon(obj,IMAGE_CHART_PNG,IMAGE_CHART_PNG_Mask,iconName[3]);
     ldIconSliderAddIcon(obj,IMAGE_NOTE_PNG,IMAGE_NOTE_PNG_Mask,iconName[4]);
-    ldIconSliderhSetSelectable(obj,true);
-    ldIconSliderhSetCorner(obj,true);
+    ldBaseSetSelectable(obj,true);
+    ldBaseSetCorner(obj,true);
 
     obj=ldQRCodeInit(15,0,500,10,200,200,"ldgui",GLCD_COLOR_BLUE,GLCD_COLOR_WHITE,QR_ECC_7,2,5);
     ldQRCodeSetOpacity(obj,100);
@@ -171,8 +175,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldScrollSelecterInit(16,0,700,200,30,50,FONT_ARIAL_12);
     ldScrollSelecterSetItems(obj,pStrGroup,5);
     ldScrollSelecterSetBackgroundColor(obj,GLCD_COLOR_WHITE);
-    ldScrollSelecterSetSelectable(obj,true);
-    ldScrollSelecterSetCorner(obj,true);
+    ldBaseSetSelectable(obj,true);
+    ldBaseSetCorner(obj,true);
 
     obj=ldGaugeInit(17,0,700,300,120,98,IMAGE_GAUGE_PNG,IMAGE_GAUGE_PNG_Mask,0,10);
     ldGaugeSetPointerImage(obj,NULL,IMAGE_GAUGEPOINTER_PNG_Mask,5,45);
@@ -201,7 +205,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     }
     ldGraphSetSelectable(obj,true);
 
-    obj=ldTableInit(20,0,780,150,200,100,10,6,1,FONT_ARIAL_12);
+    obj=ldTableInit(20,0,780,150,200,100,10,6,1);
     ldTableSetExcelType(obj,FONT_ARIAL_12);
     ldTableSetKeyboard(obj,ID_KB);
 
@@ -216,13 +220,13 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldTableSetItemText(obj,3,1,(uint8_t*)"2",FONT_ARIAL_12);
     ldTableSetItemText(obj,3,2,(uint8_t*)"image",FONT_ARIAL_12);
     ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",FONT_ARIAL_12);
-    ldTableSetSelectable(obj,true);
+    ldBaseSetSelectable(obj,true);
 
     obj=ldLineEditInit(21,0,850,400,100,50,FONT_ARIAL_12,16);
     ldLineEditSetText(obj,"123");
     ldLineEditSetKeyboard(obj,ID_KB);
-    ldLineEditSetSelectable(obj,true);
-    ldLineEditSetCorner(obj,true);
+    ldBaseSetSelectable(obj,true);
+    ldBaseSetCorner(obj,true);
 
 
     obj=ldWindowInit(23, 0, 850, 450, 100, 100);
@@ -248,7 +252,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldListSetText(list,pStrGroup,5, FONT_ARIAL_12);
     ldListSetAlign(list,ARM_2D_ALIGN_LEFT);
 //    ldListSetItemContainer(list,5);
-    ldListSetSelectable(list,true);
+    ldBaseSetSelectable(list,true);
 
     obj=ldButtonInit(27, 26, 10,3,20,20);
      ldListSetItemWidget(list,1,obj);
@@ -258,6 +262,14 @@ void uiWidgetInit(ld_scene_t* ptScene)
      ldMessageBoxSetTitle(obj,titleStr);
      ldMessageBoxSetMsg(obj,msgStr);
      ldMessageBoxSetBtn(obj,pBtnStr,3);
+
+     obj=ldCalendarInit(29,0,50,340,300,150,FONT_ARIAL_12,2026,1,1);
+     ldCalendarSetDayNames(obj,(uint8_t**)dayNames);
+     ldBaseSetCorner(obj,true);
+     ldBaseSetSelectable(obj,true);
+     ldBaseSetSelect(obj,true);
+     ldCalendarSetHeader(obj,true);
+     ldCalendarSetHeaderFormat(obj,(uint8_t*)headerFormat);
 
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 

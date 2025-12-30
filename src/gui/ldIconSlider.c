@@ -331,7 +331,7 @@ ldIconSlider_t* ldIconSlider_init( ld_scene_t *ptScene,ldIconSlider_t *ptWidget,
     ptWidget->moveOffset=1;
     ptWidget->selectIconOrPage=0;
     ptWidget->ptFont=ptFont;
-    ptWidget->charColor=0;
+    ptWidget->textColor=0;
     if(rowCount==1)
     {
         if(columnCount==1)
@@ -593,7 +593,7 @@ void ldIconSlider_show(ld_scene_t *ptScene, ldIconSlider_t *ptWidget, const arm_
                                         ptWidget->ptIconInfoList[showCount].pName,
                                         ptWidget->ptFont,
                                         ARM_2D_ALIGN_TOP,
-                                        ptWidget->charColor,
+                                        ptWidget->textColor,
                                         ptWidget->use_as__ldBase_t.opacity);
                             arm_2d_op_wait_async(NULL);
                         }

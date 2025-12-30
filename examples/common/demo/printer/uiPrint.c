@@ -55,7 +55,7 @@ void uiPrintInit(ld_scene_t* ptScene)
     obj=ldButtonInit(ID_BTN_RET,ID_BG,20,5,80,40);
     ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetColor(obj,__RGB(0x64,0x95,0xED),__RGB(0x41,0x69,0xE1));
-    ldButtonSetCorner(obj,true);
+    ldBaseSetCorner(obj,true);
     ldButtonSetText(obj,"返回");
 
     connect(ID_BTN_RET,SIGNAL_RELEASE,slotJumpMain);
@@ -77,7 +77,7 @@ void uiPrintInit(ld_scene_t* ptScene)
     obj=ldButtonInit(ID_BTN_PRINT,ID_BG,300,220,150,40);
     ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetText(obj,"打印");
-    ldButtonSetCorner(obj,true);
+    ldBaseSetCorner(obj,true);
     ldButtonSetColor(obj,__RGB(0xF4,0xA4,0x60),__RGB(0xD2,0x69,0x1E));
     connect(ID_BTN_PRINT,SIGNAL_RELEASE,slotJumpPrinting);
 

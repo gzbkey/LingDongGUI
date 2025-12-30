@@ -533,6 +533,66 @@ void ldArcSetColor(ldArc_t *ptWidget,ldColor bgColor,ldColor fgColor)
     ptWidget->color[1]=fgColor;
 }
 
+float ldArcGetBackgroundStartAngle(ldArc_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->startAngle_x10[0]/10.0;
+}
+
+float ldArcGetBackgroundAngle(ldArc_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->endAngle_x10[0]/10.0;
+}
+
+float ldArcGetForegroundAngle(ldArc_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->endAngle_x10[1]/10.0;
+}
+
+float ldArcGetRotationAngle(ldArc_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->rotationAngle_x10/10.0;
+}
+
+ldColor ldArcGetBackgroundColor(ldArc_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->color[0];
+}
+
+ldColor ldArcGetForegroundColor(ldArc_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->color[1];
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

@@ -116,8 +116,9 @@ typedef enum{
 
 #define MEM_MODE_FREERTOS_HEAP4         (0)
 #define MEM_MODE_TLFS                   (1)
-#define MEM_MODE_STDLIB                 (2)
-#define MEM_MODE_USER                   (3)
+#define MEM_MODE_LWMEM                  (2)
+#define MEM_MODE_STDLIB                 (3)
+#define MEM_MODE_USER                   (4)
 
 #define ANGLE_2_RADIAN(angle)           ((float)(angle)*0.0174533f)
 

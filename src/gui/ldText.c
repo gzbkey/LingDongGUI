@@ -481,7 +481,7 @@ void ldTextSetStaticText(ldText_t* ptWidget,const uint8_t *pStr)
                                 strlen((char*)ptWidget->pStr));
 }
 
-void ldTextSetTextColor(ldText_t* ptWidget,ldColor charColor)
+void ldTextSetTextColor(ldText_t* ptWidget,ldColor textColor)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -489,7 +489,7 @@ void ldTextSetTextColor(ldText_t* ptWidget,ldColor charColor)
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->textColor=charColor;
+    ptWidget->textColor=textColor;
 }
 
 void ldTextSetBackgroundImage(ldText_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile)

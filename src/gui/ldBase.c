@@ -26,6 +26,8 @@
 #include "freeRtosHeap4.h"
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
 #include "stdlib.h"
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+#include "lwmem.h"
 #endif
 
 #if defined(__clang__)
@@ -47,9 +49,16 @@
 
 #if LD_MEM_MODE == MEM_MODE_TLFS
 static void *pTlsfMem = NULL;
-__attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
+__attribute__((aligned(4))) uint8_t ucHeap[LD_MEM_SIZE];
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
-__attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
+__attribute__((aligned(4))) uint8_t ucHeap[LD_MEM_SIZE];
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+__attribute__((aligned(4))) uint8_t ucHeap[LD_MEM_SIZE];
+static size_t lwmemSize=0;
+lwmem_region_t lwRegions[] = {
+    { ucHeap, LD_MEM_SIZE },
+    { NULL, 0},
+};
 #endif
 
 __WEAK void *ldMalloc(uint32_t size)
@@ -65,6 +74,15 @@ __WEAK void *ldMalloc(uint32_t size)
     p = pvPortMalloc(size);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
     p = malloc(size);
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+    if(lwmemSize==0)
+    {
+        lwmemSize=lwmem_assignmem(lwRegions);
+    }
+    if(lwmemSize)
+    {
+        p = lwmem_malloc(size);
+    }
 #endif
     return p;
 }
@@ -72,13 +90,23 @@ __WEAK void *ldMalloc(uint32_t size)
 __WEAK void *ldCalloc(uint32_t num, uint32_t size)
 {
     void *p = NULL;
-
+#if LD_MEM_MODE == MEM_MODE_LWMEM
+    if(lwmemSize==0)
+    {
+        lwmemSize=lwmem_assignmem(lwRegions);
+    }
+    if(lwmemSize)
+    {
+        p = lwmem_calloc(num,size);
+    }
+#else
     p = ldMalloc(num * size);
 
     if (p != NULL)
     {
         memset(p, 0, num * size);
     }
+#endif
     return p;
 }
 
@@ -94,6 +122,8 @@ __WEAK void ldFree(void *p)
     vPortFree(p);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
     free(p);
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+    lwmem_free(p);
 #endif
     p=NULL;
 }
@@ -106,12 +136,10 @@ __WEAK void *ldRealloc(void *ptr, uint32_t newSize)
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
     p = pvPortRealloc(ptr, newSize);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
-    return realloc(ptr, newSize);
+    p = realloc(ptr, newSize);
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+    p = lwmem_realloc(ptr,newSize);
 #endif
-    if (p != NULL)
-    {
-        memset(p, 0, newSize);
-    }
     return p;
 }
 

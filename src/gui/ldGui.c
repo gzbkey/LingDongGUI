@@ -258,7 +258,6 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
 
     if(ldTimeOut(500,true,&sysTimer500ms))
     {
-        LOG_DEBUG("500ms");
         if(sysRTC.isEnable)
         {
             extern void ldCfgGetRtc(ldBaseRTC_t *dateTime);

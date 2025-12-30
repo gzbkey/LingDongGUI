@@ -69,25 +69,19 @@ struct ldCalendar_t
 };
 
 ldCalendar_t* ldCalendar_init(ld_scene_t *ptScene, ldCalendar_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont, uint16_t year, uint8_t month, uint8_t day);
+#define ldCalendarInit(nameId,parentNameId,x,y,width,height,ptFont,year,month,day) \
+        ldCalendar_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont,year,month,day)
 void ldCalendar_depose(ld_scene_t *ptScene, ldCalendar_t *ptWidget);
 void ldCalendar_on_load(ld_scene_t *ptScene, ldCalendar_t *ptWidget);
 void ldCalendar_on_frame_start(ld_scene_t *ptScene, ldCalendar_t *ptWidget);
 void ldCalendar_on_frame_complete(ld_scene_t *ptScene, ldCalendar_t *ptWidget);
 void ldCalendar_show(ld_scene_t *pScene, ldCalendar_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-#define ldCalendarInit(nameId,parentNameId,x,y,width,height,ptFont,year,month,day) \
-        ldCalendar_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont,year,month,day)
-
 void ldCalendarSetDayNames(ldCalendar_t *ptWidget,uint8_t* names[7]);
 void ldCalendarSetHeader(ldCalendar_t *ptWidget,bool isEnable);
 void ldCalendarSetHeaderFormat(ldCalendar_t *ptWidget,uint8_t* format);
 
-#define ldCalendarSetHidden                ldBaseSetHidden
-#define ldCalendarMove                     ldBaseMove
-#define ldCalendarSetOpacity               ldBaseSetOpacity
-#define ldCalendarSetSelectable            ldBaseSetSelectable
-#define ldCalendarSetSelect                ldBaseSetSelect
-#define ldCalendarSetCorner                ldBaseSetCorner
+
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

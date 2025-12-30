@@ -49,10 +49,11 @@ extern "C" {
 // <o>Select Memory Manager
 //     <0=>    freertos heap4
 //     <1=>    tlfs
-//     <2=>    stdlib
-//     <3=>    user
+//     <2=>    lwmem
+//     <3=>    stdlib
+//     <4=>    user
 // <i> default = 0
-#define LD_MEM_MODE                               (0)
+#define LD_MEM_MODE                               (2)
 #endif
 
 #ifndef LD_MEM_SIZE

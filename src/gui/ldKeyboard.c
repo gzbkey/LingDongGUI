@@ -198,6 +198,7 @@ static bool _addAscii(ldKeyboard_t *ptWidget, uint16_t textLen, uint8_t ascii, b
             strcpy((char *)pBuf, (char *)(*ptWidget->ppStr));
         }
         *ptWidget->ppStr = ldRealloc(*ptWidget->ppStr, textLen + 2);
+        memset(*ptWidget->ppStr, 0, textLen + 2);
         if (textLen > 0)
         {
             strcpy((char *)(*ptWidget->ppStr), (char *)pBuf);
@@ -682,7 +683,7 @@ void ldKeyboard_on_frame_complete(ld_scene_t *ptScene, ldKeyboard_t *ptWidget)
     assert(NULL != ptWidget);
 }
 
-static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget, arm_2d_tile_t *parentTile, arm_2d_region_t *ptBtnRegion, uint8_t *pStr, ldColor btnColor, ldColor charColor, bool bIsNewFrame)
+static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget, arm_2d_tile_t *parentTile, arm_2d_region_t *ptBtnRegion, uint8_t *pStr, ldColor btnColor, ldColor textColor, bool bIsNewFrame)
 {
     draw_round_corner_box(parentTile, ptBtnRegion, btnColor, 255, bIsNewFrame);
     ldBaseLabel(parentTile,
@@ -690,7 +691,7 @@ static void _ldkeyboardNewButton(ldKeyboard_t *ptWidget, arm_2d_tile_t *parentTi
                 pStr,
                 ptWidget->ptFont,
                 ARM_2D_ALIGN_CENTRE,
-                charColor,
+                textColor,
                 ptWidget->use_as__ldBase_t.opacity);
 }
 

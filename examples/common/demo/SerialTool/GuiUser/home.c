@@ -44,23 +44,23 @@ __WEAK bool home_action_Button_open_port_press(ld_scene_t *ptScene,ldMsg_t msg)
 __WEAK bool home_action_Button_open_port_release(ld_scene_t *ptScene,ldMsg_t msg)
 {
    return false;
-}
-
+}
+
 __WEAK bool home_action_Button_setting_release(ld_scene_t *ptScene,ldMsg_t msg)
 {
    return false;
-}
-
+}
+
 __WEAK bool home_action_Button_send_release(ld_scene_t *ptScene,ldMsg_t msg)
 {
    return false;
-}
-
+}
+
 __WEAK bool home_action_Button_close_release(ld_scene_t *ptScene,ldMsg_t msg)
 {
    return false;
-}
-
+}
+
 __WEAK void home_Timer_0_event(ld_scene_t* ptScene)
 {
 }
@@ -100,7 +100,7 @@ void homeInit(ld_scene_t* ptScene)
     ldButtonSetFont(obj, FONT_ARIAL_10);
     ldButtonSetText(obj, (uint8_t*)"Open");
     ldButtonSetTextColor(obj, __RGB(0x00, 0x00, 0x00));
-    ldButtonSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==0
     ldButtonSetTransparent(obj, true);
 #endif
@@ -114,13 +114,13 @@ void homeInit(ld_scene_t* ptScene)
     ldButtonSetPress(obj, 0);
     ldButtonSetKeyValue(obj, 0);
     connect(ID_BUTTON_OPEN_PORT,SIGNAL_PRESS,home_action_Button_open_port_press);
-    connect(ID_BUTTON_OPEN_PORT,SIGNAL_RELEASE,home_action_Button_open_port_release);
-
+    connect(ID_BUTTON_OPEN_PORT,SIGNAL_RELEASE,home_action_Button_open_port_release);
+
     obj=ldButtonInit(ID_BUTTON_SETTING, ID_BACKGROUND_0, 20, 240, 80, 30);
     ldButtonSetFont(obj, FONT_ARIAL_10);
     ldButtonSetText(obj, (uint8_t*)"Setting");
     ldButtonSetTextColor(obj, __RGB(0x00, 0x00, 0x00));
-    ldButtonSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==0
     ldButtonSetTransparent(obj, true);
 #endif
@@ -133,8 +133,8 @@ void homeInit(ld_scene_t* ptScene)
     ldButtonSetCheckable(obj, 0);
     ldButtonSetPress(obj, 0);
     ldButtonSetKeyValue(obj, 0);
-    connect(ID_BUTTON_SETTING,SIGNAL_RELEASE,home_action_Button_setting_release);
-
+    connect(ID_BUTTON_SETTING,SIGNAL_RELEASE,home_action_Button_setting_release);
+
     obj=ldImageInit(ID_IMAGE_OPEN, ID_BACKGROUND_0, 110, 280, 32, 32,IMAGE_LIGHT_RED_SMALL_PNG,IMAGE_LIGHT_RED_SMALL_PNG_MASK,false);
 
     obj=ldLineEditInit(ID_LINEEDIT_SEND, ID_BACKGROUND_0, 160, 240, 207, 30, FONT_ARIAL_10, 10);
@@ -153,13 +153,13 @@ void homeInit(ld_scene_t* ptScene)
     ldLineEditSetAlign(obj, LINEEDIT_SEND_ALIGN_H);
 #ifdef ID_KEYBOARD_0
     ldLineEditSetKeyboard(obj,ID_KEYBOARD_0);
-#endif
-
+#endif
+
     obj=ldButtonInit(ID_BUTTON_SEND, ID_BACKGROUND_0, 280, 280, 80, 30);
     ldButtonSetFont(obj, FONT_ARIAL_10);
     ldButtonSetText(obj, (uint8_t*)"Send");
     ldButtonSetTextColor(obj, __RGB(0x00, 0x00, 0x00));
-    ldButtonSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==0
     ldButtonSetTransparent(obj, true);
 #endif
@@ -172,8 +172,8 @@ void homeInit(ld_scene_t* ptScene)
     ldButtonSetCheckable(obj, 0);
     ldButtonSetPress(obj, 0);
     ldButtonSetKeyValue(obj, 0);
-    connect(ID_BUTTON_SEND,SIGNAL_RELEASE,home_action_Button_send_release);
-
+    connect(ID_BUTTON_SEND,SIGNAL_RELEASE,home_action_Button_send_release);
+
     obj=ldCheckBoxInit(ID_CHECKBOX_HEXRECV, ID_BACKGROUND_0, 390, 260, 85, 30);
     ldCheckBoxSetText(obj, FONT_ARIAL_10, (uint8_t*)"HEX Recv");
     ldCheckBoxSetTextColor(obj, __RGB(0x00, 0x00, 0x00));
@@ -184,7 +184,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 0);
+    ldBaseSetCorner(obj, 0);
 #if 0==1
     ldCheckBoxSetRadioButtonGroup(obj, 0);
 #endif
@@ -199,7 +199,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 0);
+    ldBaseSetCorner(obj, 0);
 #if 0==1
     ldCheckBoxSetRadioButtonGroup(obj, 0);
 #endif
@@ -219,7 +219,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 1);
-    ldCheckBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==1
     ldCheckBoxSetRadioButtonGroup(obj, 0);
 #endif
@@ -234,7 +234,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==1
     ldCheckBoxSetRadioButtonGroup(obj, 0);
 #endif
@@ -249,7 +249,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==1
     ldCheckBoxSetRadioButtonGroup(obj, 0);
 #endif
@@ -360,7 +360,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 1);
-    ldCheckBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==1
     ldCheckBoxSetRadioButtonGroup(obj, 1);
 #endif
@@ -375,7 +375,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==1
     ldCheckBoxSetRadioButtonGroup(obj, 1);
 #endif
@@ -384,7 +384,7 @@ void homeInit(ld_scene_t* ptScene)
     ldButtonSetFont(obj, FONT_ARIAL_10);
     ldButtonSetText(obj, (uint8_t*)"X");
     ldButtonSetTextColor(obj, __RGB(0x00, 0x00, 0x00));
-    ldButtonSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==0
     ldButtonSetTransparent(obj, true);
 #endif
@@ -397,8 +397,8 @@ void homeInit(ld_scene_t* ptScene)
     ldButtonSetCheckable(obj, 0);
     ldButtonSetPress(obj, 0);
     ldButtonSetKeyValue(obj, 0);
-    connect(ID_BUTTON_CLOSE,SIGNAL_RELEASE,home_action_Button_close_release);
-
+    connect(ID_BUTTON_CLOSE,SIGNAL_RELEASE,home_action_Button_close_release);
+
     obj=ldLabelInit(ID_LABEL_3, ID_WINDOW_SETTING, 20, 170, 68, 20, FONT_ARIAL_10);
     ldLabelSetText(obj, (uint8_t*)"Parity:");
     ldLabelSetTextColor(obj, __RGB(0x00, 0x00, 0x00));
@@ -441,7 +441,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #if 1==1
     ldCheckBoxSetRadioButtonGroup(obj, 1);
 #endif
@@ -487,7 +487,7 @@ void homeInit(ld_scene_t* ptScene)
     ldComboBoxSetStaticItems(obj, (uint8_t**)ComboBox_dataBits_itemList, 4);
     ldComboBoxSetSelectItem(obj, 3);
 #endif
-    ldComboBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #ifdef IMAGE_
     ldComboBoxSetDropdownImage(obj, IMAGE_, IMAGE__MASK);
 #endif
@@ -501,7 +501,7 @@ void homeInit(ld_scene_t* ptScene)
     ldComboBoxSetStaticItems(obj, (uint8_t**)ComboBox_baudRate_itemList, 2);
     ldComboBoxSetSelectItem(obj, 0);
 #endif
-    ldComboBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #ifdef IMAGE_
     ldComboBoxSetDropdownImage(obj, IMAGE_, IMAGE__MASK);
 #endif
@@ -515,7 +515,7 @@ void homeInit(ld_scene_t* ptScene)
     ldComboBoxSetStaticItems(obj, (uint8_t**)ComboBox_portName_itemList, 0);
     ldComboBoxSetSelectItem(obj, 0);
 #endif
-    ldComboBoxSetCorner(obj, 1);
+    ldBaseSetCorner(obj, 1);
 #ifdef IMAGE_
     ldComboBoxSetDropdownImage(obj, IMAGE_, IMAGE__MASK);
 #endif
@@ -530,7 +530,7 @@ void homeInit(ld_scene_t* ptScene)
     ldCheckBoxSetImage(obj, IMAGE_, IMAGE__MASK, IMAGE_, IMAGE__MASK);
 #endif
     ldCheckBoxSetChecked(obj, 0);
-    ldCheckBoxSetCorner(obj, 0);
+    ldBaseSetCorner(obj, 0);
 #if 0==1
     ldCheckBoxSetRadioButtonGroup(obj, 0);
 #endif
@@ -550,8 +550,8 @@ void homeLoop(ld_scene_t* ptScene)
         home_Timer_0_event(ptScene);
     }
 
-    
-
+    
+
     homeLogicLoop(ptScene);
 }
 
@@ -561,7 +561,7 @@ void homeDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
 }
 
 void homeQuit(ld_scene_t* ptScene)
-{
-
+{
+
     homeLogicQuit(ptScene);
 }

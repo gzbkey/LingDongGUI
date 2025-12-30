@@ -160,7 +160,7 @@ ldScrollSelecter_t* ldScrollSelecter_init( ld_scene_t *ptScene,ldScrollSelecter_
 
     ptWidget->ppItemStrGroup=NULL;
     ptWidget->bgColor=GLCD_COLOR_WHITE;
-    ptWidget->charColor=GLCD_COLOR_BLACK;
+    ptWidget->textColor=GLCD_COLOR_BLACK;
     ptWidget->ptFont=ptFont;
     ptWidget->isTransparent=true;
     ptWidget->moveOffset=1;
@@ -362,7 +362,7 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                             (uint8_t*)ptWidget->ppItemStrGroup[strGroupCount],
                             ptWidget->ptFont,
                             ARM_2D_ALIGN_BOTTOM,
-                            ptWidget->charColor,
+                            ptWidget->textColor,
                             ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
             }
@@ -412,7 +412,7 @@ void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrAr
     ptWidget->itemCount=arraySize;
 }
 
-void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor)
+void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor textColor)
 {
     assert(NULL != ptWidget);
     if(ptWidget==NULL)
@@ -420,7 +420,7 @@ void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->charColor=charColor;
+    ptWidget->textColor=textColor;
 }
 
 void ldScrollSelecterSetBackgroundColor(ldScrollSelecter_t* ptWidget,ldColor bgColor)

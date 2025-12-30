@@ -67,7 +67,7 @@ struct ldIconSlider_t
     uint8_t pageMax;
     uint8_t selectIconOrPage;
     uint8_t moveOffset;
-    ldColor charColor;
+    ldColor textColor;
     bool isHorizontalScroll:1;
     bool hasHorizontalBorder:1;
     bool hasVerticalBorder:1;

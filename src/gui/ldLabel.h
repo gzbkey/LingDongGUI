@@ -59,6 +59,8 @@ struct ldLabel_t
 };
 
 ldLabel_t* ldLabel_init(ld_scene_t *ptScene, ldLabel_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,arm_2d_font_t *ptFont);
+#define ldLabelInit(nameId,parentNameId,x,y,width,height,ptFont) \
+        ldLabel_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)
 void ldLabel_depose(ld_scene_t *ptScene, ldLabel_t *ptWidget);
 void ldLabel_on_load(ld_scene_t *ptScene, ldLabel_t *ptWidget);
 void ldLabel_on_frame_start(ld_scene_t *ptScene, ldLabel_t *ptWidget);
@@ -71,16 +73,14 @@ void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor textColor);
 void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign);
 void ldLabelSetBackgroundImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile);
 void ldLabelSetBackgroundColor(ldLabel_t *ptWidget, ldColor bgColor);
+void ldLabelSetFont(ldLabel_t* ptWidget,arm_2d_font_t *ptFont);
 
-#define ldLabelInit(nameId,parentNameId,x,y,width,height,ptFont) \
-        ldLabel_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)
-
-#define ldLabelSetHidden                ldBaseSetHidden
-#define ldLabelMove                     ldBaseMove
-#define ldLabelSetOpacity               ldBaseSetOpacity
-#define ldLabelSetSelectable            ldBaseSetSelectable
-#define ldLabelSetSelect                ldBaseSetSelect
-#define ldLabelSetCorner                ldBaseSetCorner
+bool ldLabelGetTransparent(ldLabel_t* ptWidget);
+uint8_t *ldLabelGetText(ldLabel_t* ptWidget);
+ldColor ldLabelGetTextColor(ldLabel_t* ptWidget);
+arm_2d_align_t ldLabelGetAlign(ldLabel_t *ptWidget);
+ldColor ldLabelGetBackgroundColor(ldLabel_t *ptWidget);
+arm_2d_font_t *ldLabelGetFont(ldLabel_t* ptWidget);
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
