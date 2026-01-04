@@ -209,17 +209,26 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldTableSetExcelType(obj,FONT_ARIAL_12);
     ldTableSetKeyboard(obj,ID_KB);
 
-    ldTableSetItemText(obj,1,1,(uint8_t*)"id",FONT_ARIAL_12);
-    ldTableSetItemText(obj,1,2,(uint8_t*)"name",FONT_ARIAL_12);
-    ldTableSetItemText(obj,1,3,(uint8_t*)"size",FONT_ARIAL_12);
+    ldTableSetItemText(obj,1,1,(uint8_t*)"id");
+    ldTableSetItemFont(obj,1,1,FONT_ARIAL_12);
+    ldTableSetItemText(obj,1,2,(uint8_t*)"name");
+    ldTableSetItemFont(obj,1,2,FONT_ARIAL_12);
+    ldTableSetItemText(obj,1,3,(uint8_t*)"size");
+    ldTableSetItemFont(obj,1,3,FONT_ARIAL_12);
 
-    ldTableSetItemText(obj,2,1,(uint8_t*)"1",FONT_ARIAL_12);
-    ldTableSetItemText(obj,2,2,(uint8_t*)"button",FONT_ARIAL_12);
-    ldTableSetItemText(obj,2,3,(uint8_t*)"30*20",FONT_ARIAL_12);
+    ldTableSetItemText(obj,2,1,(uint8_t*)"1");
+    ldTableSetItemFont(obj,2,1,FONT_ARIAL_12);
+    ldTableSetItemText(obj,2,2,(uint8_t*)"button");
+    ldTableSetItemFont(obj,2,2,FONT_ARIAL_12);
+    ldTableSetItemText(obj,2,3,(uint8_t*)"30*20");
+    ldTableSetItemFont(obj,2,3,FONT_ARIAL_12);
 
-    ldTableSetItemText(obj,3,1,(uint8_t*)"2",FONT_ARIAL_12);
-    ldTableSetItemText(obj,3,2,(uint8_t*)"image",FONT_ARIAL_12);
-    ldTableSetItemText(obj,3,3,(uint8_t*)"100*100",FONT_ARIAL_12);
+    ldTableSetItemText(obj,3,1,(uint8_t*)"2");
+    ldTableSetItemFont(obj,3,1,FONT_ARIAL_12);
+    ldTableSetItemText(obj,3,2,(uint8_t*)"image");
+    ldTableSetItemFont(obj,3,2,FONT_ARIAL_12);
+    ldTableSetItemText(obj,3,3,(uint8_t*)"100*100");
+    ldTableSetItemFont(obj,3,3,FONT_ARIAL_12);
     ldBaseSetSelectable(obj,true);
 
     obj=ldLineEditInit(21,0,850,400,100,50,FONT_ARIAL_12,16);

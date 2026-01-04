@@ -94,6 +94,8 @@ struct ldTable_t
 };
 
 ldTable_t* ldTable_init(ld_scene_t *ptScene, ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
+#define ldTableInit(nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace) \
+        ldTable_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace)
 void ldTable_depose(ld_scene_t *ptScene, ldTable_t *ptWidget);
 void ldTable_on_load(ld_scene_t *ptScene, ldTable_t *ptWidget);
 void ldTable_on_frame_start(ld_scene_t *ptScene, ldTable_t *ptWidget);
@@ -102,33 +104,36 @@ void ldTable_show(ld_scene_t *pScene, ldTable_t *ptWidget, const arm_2d_tile_t *
 
 void ldTableSetItemWidth(ldTable_t *ptWidget,uint8_t column,int16_t width);
 void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height);
-void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont);
-void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont);
+void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText);
+void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText);
 void ldTableSetItemColor(ldTable_t *ptWidget,uint8_t row,uint8_t column,ldColor textColor,ldColor bgColor);
+void ldTableSetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_font_t* ptFont);
 void ldTableSetBackgroundColor(ldTable_t *ptWidget,ldColor bgColor);
 void ldTableSetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_align_t tAlign);
 void ldTableSetItemImage(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t* ptImgTile,arm_2d_tile_t *ptMaskTile,ldColor maskColor);
 void ldTableSetItemButton(ldTable_t *ptWidget,uint8_t row,uint8_t column,int16_t x,int16_t y,arm_2d_tile_t *ptReleaseImgTile,arm_2d_tile_t *ptReleaseMaskTile,ldColor releaseImgMaskColor,arm_2d_tile_t *ptPressImgTile,arm_2d_tile_t *ptPressMaskTile,ldColor pressImgMaskColor,bool isCheckable);
 void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId);
-void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax);
+void ldTableSetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax);
 void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont);
 void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid);
 void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir);
+
 ldTableItem_t *ldTableGetItem(ldTable_t* ptWidget,uint8_t row,uint8_t column);
-void ldTableSetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_font_t* ptFont);
+int16_t ldTableGetItemWidth(ldTable_t *ptWidget,uint8_t column);
+int16_t ldTableGetItemHeight(ldTable_t *ptWidget,uint8_t row);
+uint8_t *ldTableGetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column);
+arm_2d_font_t* ldTableGetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column);
+ldColor ldTableGetItemTextColor(ldTable_t *ptWidget,uint8_t row,uint8_t column);
+ldColor ldTableGetItemBackgroundColor(ldTable_t *ptWidget,uint8_t row,uint8_t column);
+ldColor ldTableGetBackgroundColor(ldTable_t *ptWidget);
+arm_2d_align_t ldTableGetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column);
+bool ldTableGetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column);
+bool ldTableGetAlignGrid(ldTable_t *ptWidget);
 
 void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t *currentItem);
 #define ldTabelShowKeyboard(ptWidget,currentItem)  _ldTabelShowKeyboard(ptScene,ptWidget,currentItem)
 
-#define ldTableInit(nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace) \
-        ldTable_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,rowCount,columnCount,itemSpace)
 
-#define ldTableSetHidden                ldBaseSetHidden
-#define ldTableMove                     ldBaseMove
-#define ldTableSetOpacity               ldBaseSetOpacity
-#define ldTableSetSelectable            ldBaseSetSelectable
-#define ldTableSetSelect                ldBaseSetSelect
-#define ldTableSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

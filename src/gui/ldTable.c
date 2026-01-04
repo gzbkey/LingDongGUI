@@ -792,23 +792,7 @@ void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height)
     }
 }
 
-void ldTableSetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_font_t* ptFont)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-
-    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
-    {
-        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
-        item->ptFont=ptFont;
-    }
-}
-
-void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont)
+void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -831,12 +815,11 @@ void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *
                 item->textMax=textLen;
             }
             strcpy((char*)item->pText,(char*)pText);
-            item->ptFont=ptFont;
         }
     }
 }
 
-void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText,arm_2d_font_t* ptFont)
+void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -853,7 +836,6 @@ void ldTableSetItemStaticText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uin
         }
         item->isStaticText=true;
         item->pText=pText;
-        item->ptFont=ptFont;
         item->isEditable=false;
     }
 }
@@ -870,6 +852,22 @@ void ldTableSetItemColor(ldTable_t *ptWidget,uint8_t row,uint8_t column,ldColor 
         ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
         item->textColor=textColor;
         item->itemBgColor=bgColor;
+    }
+}
+
+void ldTableSetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column,arm_2d_font_t* ptFont)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
+    {
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
+        item->ptFont=ptFont;
     }
 }
 
@@ -958,7 +956,7 @@ void ldTableSetKeyboard(ldTable_t* ptWidget,uint16_t kbNameId)
     ptWidget->kbNameId=kbNameId;
 }
 
-void ldTableSetEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax)
+void ldTableSetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool isEditable,uint8_t textMax)
 {
     assert(NULL != ptWidget);
     if(ptWidget==NULL)
@@ -985,7 +983,7 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
 
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
-    ldTableSetEditable(ptWidget,0,0,false,0);
+    ldTableSetItemEditable(ptWidget,0,0,false,0);
 
     ldTableSetBackgroundColor(ptWidget,__RGB(219,219,219));
     strBuf[0]='1';
@@ -1000,8 +998,9 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
             ldTableSetItemHeight(ptWidget,i,18);
             if(ptFont!=NULL)
             {
-                ldTableSetItemText(ptWidget,i,0,strBuf,ptFont);
-                ldTableSetEditable(ptWidget,i,0,false,0);
+                ldTableSetItemText(ptWidget,i,0,strBuf);
+                ldTableSetItemFont(ptWidget,i,0,ptFont);
+                ldTableSetItemEditable(ptWidget,i,0,false,0);
                 strBuf[0]++;
             }
         }
@@ -1019,8 +1018,9 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
             ldTableSetItemWidth(ptWidget,i,71);
             if(ptFont!=NULL)
             {
-                ldTableSetItemText(ptWidget,0,i,strBuf,ptFont);
-                ldTableSetEditable(ptWidget,0,i,false,0);
+                ldTableSetItemText(ptWidget,0,i,strBuf);
+                ldTableSetItemFont(ptWidget,0,i,ptFont);
+                ldTableSetItemEditable(ptWidget,0,i,false,0);
                 strBuf[0]++;
             }
         }
@@ -1030,7 +1030,7 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
     {
         for(uint8_t column=1;column<ptWidget->columnCount;column++)
         {
-            ldTableSetEditable(ptWidget,row,column,true,10);
+            ldTableSetItemEditable(ptWidget,row,column,true,10);
         }
     }
     ldTableSetAlignGrid(ptWidget,true);
@@ -1088,6 +1088,121 @@ void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir)
                                         &newRegion,
                                         &outRegion);
     ldTableUpdate(ptWidget,outRegion);
+}
+
+int16_t ldTableGetItemWidth(ldTable_t *ptWidget,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+
+    if(column<ptWidget->columnCount)
+    {
+        return ptWidget->pColumnWidth[column];
+    }
+    return 0;
+}
+
+int16_t ldTableGetItemHeight(ldTable_t *ptWidget,uint8_t row)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+    if(row<ptWidget->rowCount)
+    {
+        return ptWidget->pRowHeight[row];
+    }
+    return 0;
+}
+
+uint8_t *ldTableGetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->ptItemInfo[row*ptWidget->columnCount+column].pText;
+}
+
+arm_2d_font_t* ldTableGetItemFont(ldTable_t *ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->ptItemInfo[row*ptWidget->columnCount+column].ptFont;
+}
+
+ldColor ldTableGetItemTextColor(ldTable_t *ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+    return ptWidget->ptItemInfo[row*ptWidget->columnCount+column].textColor;
+}
+
+ldColor ldTableGetItemBackgroundColor(ldTable_t *ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+    return ptWidget->ptItemInfo[row*ptWidget->columnCount+column].itemBgColor;
+}
+
+ldColor ldTableGetBackgroundColor(ldTable_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+    return ptWidget->bgColor;
+}
+
+arm_2d_align_t ldTableGetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+
+    if((row<ptWidget->rowCount)&&(column<ptWidget->columnCount))
+    {
+        ldTableItem_t *item= &ptWidget->ptItemInfo[row*ptWidget->columnCount+column];
+        return item->tAlign;
+    }
+    return 0;
+}
+
+bool ldTableGetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return false;
+    }
+    return ptWidget->ptItemInfo[row*ptWidget->columnCount+column].isEditable;
+}
+
+bool ldTableGetAlignGrid(ldTable_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return false;
+    }
+    return ptWidget->isAlignGrid;
 }
 
 #if defined(__clang__)
