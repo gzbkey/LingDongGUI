@@ -49,10 +49,9 @@ typedef struct ldCalendar_t ldCalendar_t;
 struct ldCalendar_t
 {
     implement(ldBase_t);
-
-    arm_2d_tile_t *ptImgTile;
-    arm_2d_tile_t *ptMaskTile;
-    arm_2d_tile_t *ptItemTile;
+    arm_2d_tile_t *ptBgImgTile;
+    arm_2d_tile_t *ptBgMaskTile;
+    arm_2d_tile_t *ptItemImgTile;
     arm_2d_tile_t *ptItemMaskTile;
     arm_2d_font_t *ptFont;
     ldColor bgColor;

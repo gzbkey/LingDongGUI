@@ -53,7 +53,7 @@ extern "C" {
 //     <3=>    stdlib
 //     <4=>    user
 // <i> default = 0
-#define LD_MEM_MODE                               (2)
+#define LD_MEM_MODE                               (0)
 #endif
 
 #ifndef LD_MEM_SIZE
@@ -77,9 +77,12 @@ extern "C" {
 #endif
 
 #ifndef USE_SCENE_SWITCHING
-// <q>scene switcing support
-// <i> 0:only one scene,user manually clean widget
-// <i> 1:Less ram,fast switching(default)
+// <o>scene switcing support
+//     <0=> One scene
+//     <1=> Less ram
+//     <2=> More effects
+// <i> 0: only one scene,user manually clean widget
+// <i> 1: Less ram,fast switching(default)
 // <i> 2:More effects
 #define USE_SCENE_SWITCHING                       (1)
 #endif
@@ -122,9 +125,6 @@ extern "C" {
 #endif
 
 #endif
-
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
-#define __ARM_2D_CFG_ENABLE_LOG__                 (0)
 
 #ifndef USE_DEMO
 // <o> choose demo to test
@@ -236,12 +236,26 @@ extern "C" {
 #endif
 #endif
 
+// <q>view dirty region
+// <i> Opening this mode will refresh the full screen
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
+
+// <q>ARM 2D output log
+// <i> debug model
+#define __ARM_2D_CFG_ENABLE_LOG__                 (0)
+
+// <q>debug layer
+// <i> view fps
+#define __DISP0_CFG_NAVIGATION_LAYER_MODE__       (0)
+
+// <q>diable ARM 2D default demo
+// <i> default=1 use ldgui
+#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
+
 // <<< end of configuration section >>>
 
 // do not eidt below
 
-#define __DISP0_CFG_NAVIGATION_LAYER_MODE__       (0)
-#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH

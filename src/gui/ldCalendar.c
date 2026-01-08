@@ -70,19 +70,19 @@ static void _getCalBuf(uint16_t year, uint8_t month, uint8_t *calBuf)
 
     int idx = 0;
 
-    /* 1. 补上月尾巴 */
+    //上月
     for (int i = w1; i > 0; --i)
     {
         calBuf[idx++] = pdim - i + 1;
     }
 
-    /* 2. 本月 */
+    //本月
     for (int d = 1; d <= dim; ++d)
     {
         calBuf[idx++] = d | 0x80;
     }
 
-    /* 3. 补下月开头 */
+    //下月
     for (int d = 1; idx < 42; ++d)
     {
         calBuf[idx++] = d;
@@ -207,7 +207,7 @@ void ldCalendar_show(ld_scene_t *ptScene, ldCalendar_t *ptWidget, const arm_2d_t
 
             if (!ptWidget->isTransparent)
             {
-                if (ptWidget->ptImgTile == NULL) // color
+                if (ptWidget->ptBgImgTile == NULL) // color
                 {
                     if (ptWidget->use_as__ldBase_t.isCorner)
                     {
@@ -229,18 +229,18 @@ void ldCalendar_show(ld_scene_t *ptScene, ldCalendar_t *ptWidget, const arm_2d_t
                 {
                     if (ptWidget->use_as__ldBase_t.isCorner)
                     {
-                        draw_round_corner_image(ptWidget->ptImgTile,
+                        draw_round_corner_image(ptWidget->ptBgImgTile,
                                                 &tTarget,
-                                                &ptWidget->ptImgTile->tRegion,
+                                                &ptWidget->ptBgImgTile->tRegion,
                                                 bIsNewFrame,
                                                 ptWidget->use_as__ldBase_t.opacity);
                     }
                     else
                     {
                         ldBaseImage(&tTarget,
-                                    &ptWidget->ptImgTile->tRegion,
-                                    ptWidget->ptImgTile,
-                                    ptWidget->ptMaskTile,
+                                    &ptWidget->ptBgImgTile->tRegion,
+                                    ptWidget->ptBgImgTile,
+                                    ptWidget->ptBgMaskTile,
                                     ptWidget->bgColor,
                                     ptWidget->use_as__ldBase_t.opacity);
                     }
@@ -353,7 +353,7 @@ void ldCalendar_show(ld_scene_t *ptScene, ldCalendar_t *ptWidget, const arm_2d_t
 
                     if (ptWidget->day == (dayNum - 0x80))
                     {
-                        if (ptWidget->ptItemTile == NULL) // color
+                        if (ptWidget->ptItemImgTile == NULL) // color
                         {
                             if (ptWidget->use_as__ldBase_t.isCorner)
                             {
@@ -375,7 +375,7 @@ void ldCalendar_show(ld_scene_t *ptScene, ldCalendar_t *ptWidget, const arm_2d_t
                         {
                             if (ptWidget->use_as__ldBase_t.isCorner)
                             {
-                                draw_round_corner_image(ptWidget->ptItemTile,
+                                draw_round_corner_image(ptWidget->ptItemImgTile,
                                                         &tTarget,
                                                         &cellRegion,
                                                         bIsNewFrame,
@@ -385,7 +385,7 @@ void ldCalendar_show(ld_scene_t *ptScene, ldCalendar_t *ptWidget, const arm_2d_t
                             {
                                 ldBaseImage(&tTarget,
                                             &cellRegion,
-                                            ptWidget->ptItemTile,
+                                            ptWidget->ptItemImgTile,
                                             ptWidget->ptItemMaskTile,
                                             ptWidget->itemColor,
                                             ptWidget->use_as__ldBase_t.opacity);
