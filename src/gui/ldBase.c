@@ -382,35 +382,6 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_puts_label((char*)pStr,tAlign);
 }
 
-void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-#if 0
-    ptWidget->isDirtyRegionUpdate = true;
-    ptWidget->isHidden=isHidden;
-#else
-    arm_2d_control_node_t *ptNodeRoot=ldBaseGetRootNode(&ptWidget->use_as__arm_2d_control_node_t);
-    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
-    int16_t x,y;
-    if(isHidden)
-    {
-        x=ptNode->tRegion.tLocation.iX-ptNodeRoot->tRegion.tSize.iWidth;
-        y=ptNode->tRegion.tLocation.iY-ptNodeRoot->tRegion.tSize.iHeight;
-    }
-    else
-    {
-        x=ptNode->tRegion.tLocation.iX+ptNodeRoot->tRegion.tSize.iWidth;
-        y=ptNode->tRegion.tLocation.iY+ptNodeRoot->tRegion.tSize.iHeight;
-    }
-    ptWidget->isHidden=isHidden;
-    ldBaseMove(ptWidget,x,y);
-#endif
-}
-
 bool ldBaseIsHidden(ldBase_t* ptWidget)
 {
     assert(NULL != ptWidget);
@@ -429,13 +400,8 @@ bool ldBaseIsHidden(ldBase_t* ptWidget)
     return false;
 }
 
-void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
+static void _ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
 {
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
     ptWidget->isDirtyRegionUpdate = true;
 
     ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
@@ -445,6 +411,56 @@ void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
     arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
                                         &ptWidget->use_as__arm_2d_control_node_t.tRegion,
                                         &ptWidget->tTempRegion);
+}
+
+void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->isHidden==isHidden)
+    {
+        return;
+    }
+
+    arm_2d_control_node_t *ptNodeRoot=ldBaseGetRootNode(&ptWidget->use_as__arm_2d_control_node_t);
+    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
+    int16_t x,y;
+    if(isHidden)
+    {
+        x=ptNode->tRegion.tLocation.iX-ptNodeRoot->tRegion.tSize.iWidth;
+        y=ptNode->tRegion.tLocation.iY-ptNodeRoot->tRegion.tSize.iHeight;
+    }
+    else
+    {
+        x=ptNode->tRegion.tLocation.iX+ptNodeRoot->tRegion.tSize.iWidth;
+        y=ptNode->tRegion.tLocation.iY+ptNodeRoot->tRegion.tSize.iHeight;
+    }
+    ptWidget->isHidden=isHidden;
+    _ldBaseMove(ptWidget,x,y);
+}
+
+void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    bool isHidden=ptWidget->isHidden;
+    if(isHidden)
+    {
+        ldBaseSetHidden(ptWidget,false);
+    }
+
+    _ldBaseMove(ptWidget,x,y);
+
+    if(isHidden)
+    {
+        ldBaseSetHidden(ptWidget,true);
+    }
 }
 
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity)

@@ -84,21 +84,15 @@ void ldScrollSelecterSetIndicatorColor(ldScrollSelecter_t* ptWidget,ldColor indi
 void ldScrollSelecterSetIndicatorImage(ldScrollSelecter_t* ptWidget, arm_2d_tile_t *ptIndicatorImgTile, arm_2d_tile_t *ptIndicatorMaskTile);
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
-void ldScrollSelecterSelectItemNum(ldScrollSelecter_t *pWidget, int8_t itemNum);
-void ldScrollSelecterSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text);
+void ldScrollSelecterSetSelectItemNum(ldScrollSelecter_t *pWidget, int8_t itemNum);
+void ldScrollSelecterSetSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text);
 void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit);
-uint8_t *ldScrollSelecterCurrentText(ldScrollSelecter_t *ptWidget);
-uint8_t ldScrollSelecterCurrentItemNum(ldScrollSelecter_t *ptWidget);
+
+uint8_t *ldScrollSelecterGetCurrentText(ldScrollSelecter_t *ptWidget);
+uint8_t ldScrollSelecterGetCurrentItemNum(ldScrollSelecter_t *ptWidget);
 
 #define ldScrollSelecterInit(nameId,parentNameId,x,y,width,height,ptFont) \
         ldScrollSelecter_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)
-
-#define ldScrollSelecterSetHidden                ldBaseSetHidden
-#define ldScrollSelecterMove                     ldBaseMove
-#define ldScrollSelecterSetOpacity               ldBaseSetOpacity
-#define ldScrollSelecterSetSelectable            ldBaseSetSelectable
-#define ldScrollSelecterSetSelect                ldBaseSetSelect
-#define ldScrollSelecterSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

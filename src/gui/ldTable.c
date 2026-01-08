@@ -1205,6 +1205,32 @@ bool ldTableGetAlignGrid(ldTable_t *ptWidget)
     return ptWidget->isAlignGrid;
 }
 
+arm_2d_region_t ldTableGetItemRegion(ldTable_t* ptWidget,uint8_t row,uint8_t column)
+{
+    ldTableItem_t *ptItem=ldTableGetItem(ptWidget,row,column);
+    arm_2d_region_t region={0};
+
+    if(ptItem)
+    {
+        region.tSize.iWidth=ptWidget->pColumnWidth[column];
+        region.tSize.iHeight=ptWidget->pRowHeight[row];
+        region.tLocation.iX = 0;
+        for(uint8_t i = 0; i < column; i++)
+        {
+            region.tLocation.iX += ptWidget->pColumnWidth[i]+ptWidget->itemSpace;
+        }
+        region.tLocation.iX +=ptWidget->itemSpace;
+
+        region.tLocation.iY = 0;
+        for(uint8_t i = 0; i < row; i++)
+        {
+            region.tLocation.iY += ptWidget->pRowHeight[i]+ptWidget->itemSpace;
+        }
+        region.tLocation.iY +=ptWidget->itemSpace;
+    }
+    return region;
+}
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

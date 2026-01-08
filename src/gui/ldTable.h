@@ -129,6 +129,7 @@ ldColor ldTableGetBackgroundColor(ldTable_t *ptWidget);
 arm_2d_align_t ldTableGetItemAlign(ldTable_t *ptWidget,uint8_t row,uint8_t column);
 bool ldTableGetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column);
 bool ldTableGetAlignGrid(ldTable_t *ptWidget);
+arm_2d_region_t ldTableGetItemRegion(ldTable_t* ptWidget,uint8_t row,uint8_t column);
 
 void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t *currentItem);
 #define ldTabelShowKeyboard(ptWidget,currentItem)  _ldTabelShowKeyboard(ptScene,ptWidget,currentItem)

@@ -234,22 +234,7 @@ void ldScrollSelecter_on_frame_start(ld_scene_t *ptScene, ldScrollSelecter_t *pt
 {
     assert(NULL != ptWidget);
     
-}
-
-void ldScrollSelecter_on_frame_complete(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget)
-{
-    assert(NULL != ptWidget);
-}
-
-void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-
-    if((ptWidget->isWaitMove)&&(bIsNewFrame))
+    if(ptWidget->isWaitMove)
     {
         int16_t targetOffset=(-ptWidget->itemSelect)*(ptWidget->itemSpace+ptWidget->ptFont->tCharSize.iHeight);
 
@@ -277,6 +262,20 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                 }
             }
         }
+    }
+}
+
+void ldScrollSelecter_on_frame_complete(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+}
+
+void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
     }
 
     arm_2d_region_t globalRegion;
@@ -345,30 +344,35 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
                 }
             };
 
-            for(uint8_t strGroupCount=0;strGroupCount<ptWidget->itemCount;strGroupCount++)
+            if(!ptWidget->isEdit)
             {
-                itemsRegion.tLocation.iY=strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace);
-                if(ptWidget->isEdit)
-                {
-                    itemsRegion.tLocation.iY+=ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset;
-                }
-                else
-                {
-                    itemsRegion.tLocation.iY-=ptWidget->itemSelect*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace);
-                }
-
                 ldBaseLabel(&tTarget,
-                            &itemsRegion,
-                            (uint8_t*)ptWidget->ppItemStrGroup[strGroupCount],
+                            &tTarget_canvas,
+                            (uint8_t*)ptWidget->ppItemStrGroup[ptWidget->itemSelect],
                             ptWidget->ptFont,
                             ARM_2D_ALIGN_BOTTOM,
                             ptWidget->textColor,
                             ptWidget->use_as__ldBase_t.opacity);
-                arm_2d_op_wait_async(NULL);
             }
-
-            if(ptWidget->isEdit)
+            else
             {
+                for(uint8_t strGroupCount=0;strGroupCount<ptWidget->itemCount;strGroupCount++)
+                {
+                itemsRegion.tLocation.iY=strGroupCount*(ptWidget->ptFont->tCharSize.iHeight+ptWidget->itemSpace);
+                if(ptWidget->isEdit)
+                {
+                    uint16_t itemEditOffset=ptWidget->ptFont->tCharSize.iHeight+ptWidget->scrollOffset;
+                    itemsRegion.tLocation.iY+=itemEditOffset;
+                    ldBaseLabel(&tTarget,
+                                &itemsRegion,
+                                (uint8_t*)ptWidget->ppItemStrGroup[strGroupCount],
+                                ptWidget->ptFont,
+                                ARM_2D_ALIGN_BOTTOM,
+                                ptWidget->textColor,
+                                ptWidget->use_as__ldBase_t.opacity);
+                }
+                    arm_2d_op_wait_async(NULL);
+                }
                 if((ptWidget->ptIndicatorImgTile==NULL)&&(ptWidget->ptIndicatorMaskTile==NULL))
                 {
 #define LINE_HEIGHT   2
@@ -502,7 +506,7 @@ void ldScrollSelecterSetSpeed(ldScrollSelecter_t *ptWidget, uint8_t speed)
     ptWidget->moveOffset=speed;
 }
 
-void ldScrollSelecterSelectItemNum(ldScrollSelecter_t *ptWidget, int8_t itemNum)
+void ldScrollSelecterSetSelectItemNum(ldScrollSelecter_t *ptWidget, int8_t itemNum)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -524,7 +528,7 @@ void ldScrollSelecterSelectItemNum(ldScrollSelecter_t *ptWidget, int8_t itemNum)
     }
 }
 
-void ldScrollSelecterSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text)
+void ldScrollSelecterSetSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -549,7 +553,7 @@ void ldScrollSelecterSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text)
     }
 }
 
-uint8_t *ldScrollSelecterCurrentText(ldScrollSelecter_t *ptWidget)
+uint8_t *ldScrollSelecterGetCurrentText(ldScrollSelecter_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -559,7 +563,7 @@ uint8_t *ldScrollSelecterCurrentText(ldScrollSelecter_t *ptWidget)
     return (uint8_t*)ptWidget->ppItemStrGroup[ptWidget->itemSelect];
 }
 
-uint8_t ldScrollSelecterCurrentItemNum(ldScrollSelecter_t *ptWidget)
+uint8_t ldScrollSelecterGetCurrentItemNum(ldScrollSelecter_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)

@@ -96,6 +96,7 @@ static void _xBtnResetInfo(void)
         p->isDoubleClicked=false;
         p->isRepeatEnd=false;
         p->isShoot=false;
+        p->isClicked=false;
         p=p->pNext;
     }
     waitReset = false;
