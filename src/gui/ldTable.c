@@ -754,7 +754,7 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
 
                     if((item->isSelect)&&(item->isSelectShow))
                     {
-                        arm_2d_draw_box(&tTarget,&tItemTile.tRegion,2,ptWidget->selectColor,255);
+                        arm_2d_draw_box(&tTarget,&tItemTile.tRegion,2,ptWidget->selectColor,ptWidget->use_as__ldBase_t.opacity);
                     }
 
                     arm_2d_op_wait_async(NULL);
@@ -1088,6 +1088,27 @@ void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir)
                                         &newRegion,
                                         &outRegion);
     ldTableUpdate(ptWidget,outRegion);
+}
+
+void ldTableSetItemSelect(ldTable_t *ptWidget,uint8_t row,uint8_t column,bool isSelect)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return ;
+    }
+    ldTableItem_t *pItem=ldTableGetItem(ptWidget, row, column);
+    if(pItem)
+    {
+        if(isSelect)
+        {
+            ptWidget->currentRow=row;
+            ptWidget->currentColumn=column;
+        }
+        pItem->isSelect=isSelect;
+        arm_2d_region_t region= _ldTableGetItemRegion(ptWidget,row,column);
+        ldTableUpdate(ptWidget,region);
+    }
 }
 
 int16_t ldTableGetItemWidth(ldTable_t *ptWidget,uint8_t column)

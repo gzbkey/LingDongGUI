@@ -117,6 +117,7 @@ void ldTableSetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool 
 void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont);
 void ldTableSetAlignGrid(ldTable_t *ptWidget,bool isAlignGrid);
 void ldTableNavigate(ldTable_t *ptWidget, ldNavDir_t dir);
+void ldTableSetItemSelect(ldTable_t *ptWidget,uint8_t row,uint8_t column,bool isSelect);
 
 ldTableItem_t *ldTableGetItem(ldTable_t* ptWidget,uint8_t row,uint8_t column);
 int16_t ldTableGetItemWidth(ldTable_t *ptWidget,uint8_t column);
