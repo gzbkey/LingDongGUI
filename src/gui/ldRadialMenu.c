@@ -146,7 +146,7 @@ static bool slotMenuSelect(ld_scene_t *ptScene,ldMsg_t msg)
                     (tReleaseLoc.iY>ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->pShowList[i]].itemRegion.tLocation.iY)&&
                     (tReleaseLoc.iY<(ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->pShowList[i]].itemRegion.tLocation.iY+ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->pShowList[i]].itemRegion.tSize.iHeight-1))))
                 {
-                    ldRadialMenuSelectItem(ptWidget,ptWidget->pShowList[i]);
+                    ldRadialMenuSetClickItem(ptWidget,ptWidget->pShowList[i]);
                     ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,ptWidget->pShowList[i]);
                     LOG_DEBUG("click item %d",ptWidget->pShowList[i]);
                     break;
@@ -349,7 +349,7 @@ void ldRadialMenu_on_frame_complete(ld_scene_t *ptScene, ldRadialMenu_t *ptWidge
         {
             if (ptWidget->_itemOffset != 0)
             {
-                ldRadialMenuOffsetItem(ptWidget, ptWidget->_itemOffset);
+                ldRadialMenuSetOffsetItem(ptWidget, ptWidget->_itemOffset);
             }
         }
 
@@ -518,9 +518,10 @@ void ldRadialMenuAddItem(ldRadialMenu_t *ptWidget, arm_2d_tile_t *ptImgTile, arm
     }
 }
 
-void ldRadialMenuSelectItem(ldRadialMenu_t *ptWidget,uint8_t num)
+void ldRadialMenuSetClickItem(ldRadialMenu_t *ptWidget,uint8_t num)
 {
-    if(ptWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
@@ -565,9 +566,10 @@ void ldRadialMenuSelectItem(ldRadialMenu_t *ptWidget,uint8_t num)
     ptWidget->offsetAngle=ptWidget->offsetAngle%360;
 }
 
-void ldRadialMenuOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset)
+void ldRadialMenuSetOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset)
 {
-    if(ptWidget==NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
@@ -590,7 +592,25 @@ void ldRadialMenuOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset)
     {
         offset=ptWidget->use_as__ldBase_t.itemCount+offset;
     }
-    ldRadialMenuSelectItem(ptWidget,offset);
+    ldRadialMenuSetClickItem(ptWidget,offset);
+}
+
+void ldRadialMenuSetDefaultItem(ldRadialMenu_t *ptWidget,uint8_t num)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    num=num%ptWidget->use_as__ldBase_t.itemCount;
+    ptWidget->targetItem=num;
+    ptWidget->nowAngle=ITEM_0_ANGLE_OFFSET-ptWidget->ptItemInfoList[ptWidget->targetItem].angle;
+    ptWidget->offsetAngle=0;
+    _autoSort(ptWidget);
+    ptWidget->selectItem=ptWidget->targetItem;
+    ptWidget->nowAngle%=360;
+    _autoScalePercent(ptWidget);
 }
 
 #if defined(__clang__)

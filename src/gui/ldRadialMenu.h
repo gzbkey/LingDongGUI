@@ -81,6 +81,8 @@ struct ldRadialMenu_t
 };
 
 ldRadialMenu_t* ldRadialMenu_init(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint16_t xAxis, uint16_t yAxis, uint8_t itemMax);
+#define ldRadialMenuInit(nameId,parentNameId,x,y,width,height,xAxis,yAxis,itemMax) \
+        ldRadialMenu_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,xAxis,yAxis,itemMax)
 void ldRadialMenu_depose(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget);
 void ldRadialMenu_on_load(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget);
 void ldRadialMenu_on_frame_start(ld_scene_t *ptScene, ldRadialMenu_t *ptWidget);
@@ -88,18 +90,10 @@ void ldRadialMenu_on_frame_complete(ld_scene_t *ptScene, ldRadialMenu_t *ptWidge
 void ldRadialMenu_show(ld_scene_t *pScene, ldRadialMenu_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldRadialMenuAddItem(ldRadialMenu_t *ptWidget,arm_2d_tile_t *ptImgTile,arm_2d_tile_t *ptMaskTile);
-void ldRadialMenuSelectItem(ldRadialMenu_t *ptWidget,uint8_t num);
-void ldRadialMenuOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset);
+void ldRadialMenuSetClickItem(ldRadialMenu_t *ptWidget,uint8_t num);
+void ldRadialMenuSetOffsetItem(ldRadialMenu_t *ptWidget,int8_t offset);
+void ldRadialMenuSetDefaultItem(ldRadialMenu_t *ptWidget,uint8_t num);
 
-#define ldRadialMenuInit(nameId,parentNameId,x,y,width,height,xAxis,yAxis,itemMax) \
-        ldRadialMenu_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,xAxis,yAxis,itemMax)
-
-#define ldRadialMenuSetHidden                ldBaseSetHidden
-#define ldRadialMenuMove                     ldBaseMove
-#define ldRadialMenuSetOpacity               ldBaseSetOpacity
-#define ldRadialMenuSetSelectable            ldBaseSetSelectable
-#define ldRadialMenuSetSelect                ldBaseSetSelect
-#define ldRadialMenuSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
