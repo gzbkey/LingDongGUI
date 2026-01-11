@@ -166,18 +166,23 @@ struct ldPageFuncGroup_t{
     ldPageFunc_t loop;
     ldPageFunc_t quit;
     ldDrawFunc_t draw;
+    ldPageFunc_t frameStart;
+    ldPageFunc_t frameComplete;
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
     char *pageName;
 #endif
+    union {
+        void *pointer;
+        intptr_t addr;
+        size_t userData;
+    };
 };
 
 struct ld_scene_t {
     implement(arm_2d_scene_t);
-//ARM_PRIVATE(
     bool bUserAllocated;
     arm_2d_region_list_item_t tDirtyRegionItem;
     arm_2d_control_enumerator_t tEnum;
-//)
     const ldPageFuncGroup_t *ldGuiFuncGroup;
     arm_2d_control_node_t *ptNodeRoot;
     xQueue_t *ptMsgQueue;

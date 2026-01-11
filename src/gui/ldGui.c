@@ -51,34 +51,6 @@ ldBaseRTC_t sysRTC={
     .isEnable=true
 };
 
-void ldGuiDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
-{
-    // draw ldgui background
-    if(ptScene->ptNodeRoot!=NULL)
-    {
-        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,ptTile,bIsNewFrame);
-    }
-
-    // draw arm 2d code
-    if(ptScene->ldGuiFuncGroup->draw!=NULL)
-    {
-        ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
-    }
-
-    // draw ldgui code
-    if(ptScene->ptNodeRoot!=NULL)
-    {
-        ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
-        if(child!=NULL)
-        {
-            arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
-                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
-            }
-        }
-    }
-}
-
-
 void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
     ldBase_t *ptWidget;
@@ -231,6 +203,20 @@ void ldGuiUpdateScene(void)
     isFullWidgetUpdate=true;
 }
 
+void ldGuiLoad(ld_scene_t *ptScene)
+{
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+        {
+            if(((ldBase_t*)ptItem)->ptGuiFunc->load!=NULL)
+            {
+                ((ldBase_t*)ptItem)->ptGuiFunc->load(ptScene,ptItem);
+            }
+        }
+    }
+}
+
 void ldGuiFrameStart(ld_scene_t *ptScene)
 {
     if(isFullWidgetUpdate==true)
@@ -248,6 +234,12 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
                 ((ldBase_t*)ptItem)->ptGuiFunc->frameStart(ptScene,ptItem);
             }
         }
+    }
+
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->frameStart!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->frameStart(ptScene);
     }
 
     if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer10ms))
@@ -283,42 +275,31 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
     }
 }
 
-void ldGuiLoad(ld_scene_t *ptScene)
+void ldGuiDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
+    // draw ldgui background
     if(ptScene->ptNodeRoot!=NULL)
     {
-        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,ptTile,bIsNewFrame);
+    }
+
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->draw!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
+    }
+
+    // draw ldgui code
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
+        if(child!=NULL)
         {
-            if(((ldBase_t*)ptItem)->ptGuiFunc->load!=NULL)
-            {
-                ((ldBase_t*)ptItem)->ptGuiFunc->load(ptScene,ptItem);
+            arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
+                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
             }
         }
     }
-}
-
-void ldGuiDespose(ld_scene_t *ptScene)
-{
-    if(ptScene->ldGuiFuncGroup!=NULL)
-    {
-        if(ptScene->ldGuiFuncGroup->quit)
-        {
-            ptScene->ldGuiFuncGroup->quit(ptScene);
-        }
-    }
-
-    if(ptScene->ptNodeRoot!=NULL)
-    {
-        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
-        {
-            if(((ldBase_t *)ptItem))
-            {
-                ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptScene,ptItem);
-            }
-        }
-    }
-
-    LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
 }
 
 void ldGuiFrameComplete(ld_scene_t *ptScene)
@@ -332,6 +313,12 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
                 ((ldBase_t*)ptItem)->ptGuiFunc->frameComplete(ptScene,ptItem);
             }
         }
+    }
+
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->frameComplete!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->frameComplete(ptScene);
     }
 
 #if USE_SCENE_SWITCHING == 2
@@ -361,6 +348,30 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
         prevWidget=NULL;
     }
 #endif
+}
+
+void ldGuiDespose(ld_scene_t *ptScene)
+{
+    if(ptScene->ldGuiFuncGroup!=NULL)
+    {
+        if(ptScene->ldGuiFuncGroup->quit)
+        {
+            ptScene->ldGuiFuncGroup->quit(ptScene);
+        }
+    }
+
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
+        {
+            if(((ldBase_t *)ptItem))
+            {
+                ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptScene,ptItem);
+            }
+        }
+    }
+
+    LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
 }
 
 void __ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs)
