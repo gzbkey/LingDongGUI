@@ -1289,3 +1289,10 @@ uint8_t ldBaseZeller(uint16_t year, uint8_t month, uint8_t day)
     uint16_t w = (c / 4 - 2 * c + year + year / 4 + 13 * (month + 1) / 5 + day - 1) % 7;
     return (w + 7) % 7;
 }
+
+arm_2d_region_t ldBaseAlignRegionCenter(arm_2d_region_t parentRegion, arm_2d_region_t childRegion)
+{
+    childRegion.tLocation.iX = parentRegion.tLocation.iX + ((parentRegion.tSize.iWidth - childRegion.tSize.iWidth) >> 1);
+    childRegion.tLocation.iY = parentRegion.tLocation.iY + ((parentRegion.tSize.iHeight - childRegion.tSize.iHeight) >> 1);
+    return childRegion;
+}
