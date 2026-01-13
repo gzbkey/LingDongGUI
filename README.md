@@ -68,6 +68,7 @@ widget demo sdl
 | ✅ | button | 按键 |
 | ✅ | text | 文本 |
 | ✅ | progress bar | 进度条，支持图片移动形成动画效果 |
+| ✅ | progress wheel | 圆环进度条(ARM 2D) |
 | ✅ | check box + radio button| 复选框 + 单选功能，支持自定义图片和文字显示 |
 | ✅ | radia menu | 旋转菜单 |
 | ✅ | label | 简单文本显示 |

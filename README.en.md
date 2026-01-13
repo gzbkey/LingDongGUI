@@ -67,6 +67,7 @@ widget demo sdl
 | ✅ | button | Clickable button |
 | ✅ | text | text |
 | ✅ | progress bar | Progress with movable-image animation |
+| ✅ | progress wheel | progress wheel (ARM 2D) |
 | ✅ | check box + radio button| Check-box & radio styles with custom icons/text |
 | ✅ | radia menu | Rotary selection menu |
 | ✅ | label | Simple text label |
