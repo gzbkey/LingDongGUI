@@ -28,6 +28,7 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldWindow.h"
 #include "ldProgressWheel.h"
 #include "ldCalendar.h"
 #include "ldMessageBox.h"

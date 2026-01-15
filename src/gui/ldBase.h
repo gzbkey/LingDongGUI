@@ -237,6 +237,12 @@ typedef struct {
     bool isEnable:1;
 }ldBaseRTC_t;
 
+typedef enum{
+    none,
+    horizontal,
+    vertical,
+}ldLayoutType_t;
+
 typedef int64_t ldTimer_t;
 
 bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer);

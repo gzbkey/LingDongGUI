@@ -26,6 +26,11 @@ bool ldMsgEmit(xQueue_t *ptQueue, void *ptSender, uint8_t signal, uint64_t value
 
 bool ldMsgConnect(void *ptSender, uint8_t signal, assnFunc pFunc)
 {
+    if(ptSender == NULL)
+    {
+        return false;
+    }
+
     ldAssn_t *ptAssn = NULL, *ptNext = NULL;
 
     ptNext = ((ldBase_t *)ptSender)->ptAssn;
@@ -54,6 +59,10 @@ bool ldMsgConnect(void *ptSender, uint8_t signal, assnFunc pFunc)
 
 void ldMsgDelConnect(void *ptSender)
 {
+    if(ptSender == NULL)
+    {
+        return ;
+    }
     ldAssn_t *ptAssn=((ldBase_t *)ptSender)->ptAssn;
 
     while (ptAssn != NULL)

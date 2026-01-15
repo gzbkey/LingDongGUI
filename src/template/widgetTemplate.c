@@ -128,7 +128,10 @@ void ldTemplate_on_frame_start(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
 void ldTemplate_on_frame_complete(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
 {
     assert(NULL != ptWidget);
-
+    if(ptWidget == NULL)
+    {
+        return;
+    }
 }
 
 void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
@@ -138,12 +141,6 @@ void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_t
     {
         return;
     }
-
-#if 0
-    if (bIsNewFrame) {
-        
-    }
-#endif
 
     arm_2d_region_t globalRegion;
     arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
