@@ -238,7 +238,7 @@ typedef struct {
 }ldBaseRTC_t;
 
 typedef enum{
-    none,
+    layoutNone,
     horizontal,
     vertical,
 }ldLayoutType_t;

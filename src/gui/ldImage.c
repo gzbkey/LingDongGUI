@@ -179,7 +179,7 @@ void ldImage_show( ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *
                                 NULL,
                                 ptWidget->ptImgTile,
                                 ptWidget->ptMaskTile,
-                                0,
+                                ptWidget->maskColor,
                                 ptWidget->use_as__ldBase_t.opacity);
                 }
             }
@@ -202,6 +202,16 @@ void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_
     ptWidget->ptMaskTile=ptMaskTile;
 }
 
+void ldImageSetMaskColor(ldImage_t *ptWidget,ldColor maskColor)
+{
+    assert(NULL!= ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->maskColor=maskColor;
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

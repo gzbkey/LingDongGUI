@@ -166,7 +166,7 @@ void ldWindow_on_frame_start(ld_scene_t *ptScene, ldWindow_t *ptWidget)
         return;
     }
 
-    if((ptWidget->isLayoutUpdate)&&(ptWidget->layoutTpye!=none))
+    if((ptWidget->isLayoutUpdate)&&(ptWidget->layoutTpye!=layoutNone))
     {
         ptWidget->isLayoutUpdate=false;
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;

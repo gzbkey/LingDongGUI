@@ -167,7 +167,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
 
     ARM_2D_UNUSED(tScreenSize);
 
-    ldGuiDraw(pTarget,ptTile,bIsNewFrame);
+    ldGuiDraw(pTarget,(arm_2d_tile_t*)ptTile,bIsNewFrame);
 
     if(ptThis->ptNodeRoot!=NULL)
     {

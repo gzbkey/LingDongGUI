@@ -48,6 +48,7 @@ struct ldImage_t {
     implement(ldBase_t);
     arm_2d_tile_t* ptImgTile;
     arm_2d_tile_t* ptMaskTile;
+    ldColor maskColor;
 };
 
 ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
@@ -60,6 +61,7 @@ void ldImage_on_frame_complete(ld_scene_t *ptScene, ldImage_t *ptWidget);
 void ldImage_show(ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
 void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
+void ldImageSetMaskColor(ldImage_t *ptWidget,ldColor maskColor);
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop
