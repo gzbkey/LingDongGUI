@@ -46,13 +46,22 @@ extern "C"
 
 typedef struct ldWindow_t ldWindow_t;
 
+typedef struct ldPadding_t
+{
+    int16_t left;
+    int16_t top;
+    int16_t right;
+    int16_t bottom;
+}ldPadding_t;
+
 struct ldWindow_t
 {
     implement(ldBase_t);
     ldColor bgColor;
-    arm_2d_tile_t* ptImgTile;
-    arm_2d_tile_t* ptMaskTile;
+    arm_2d_tile_t *ptImgTile;
+    arm_2d_tile_t *ptMaskTile;
     bool isTransparent:1;
+    ldPadding_t *pLayoutPaddingGroup;
     ldLayoutType_t layoutTpye:2;
     bool isLayoutUpdate:1;
 };
@@ -70,6 +79,7 @@ void ldWindowSetColor(ldWindow_t *ptWidget,ldColor bgColor);
 void ldWindowSetImage(ldWindow_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
 
 void ldWindowSetLayout(ldWindow_t *ptWidget, ldLayoutType_t type);
+void ldWindowSetPaddingGroup(ldWindow_t *ptWidget, ldPadding_t *pPaddingGroup);//Local variables forbidden
 
 ldColor ldWindowGetColor(ldWindow_t *ptWidget);
 

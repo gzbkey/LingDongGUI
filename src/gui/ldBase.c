@@ -724,6 +724,18 @@ ldBase_t* ldBaseGetChildList(ldBase_t* ptWidget)
     return (ldBase_t *)ptWidget->use_as__arm_2d_control_node_t.ptChildList;
 }
 
+uint16_t ldBaseGetChildCount(ldBase_t* ptWidget)
+{
+    ldBase_t* ptChild = ldBaseGetChildList(ptWidget);
+    uint8_t count = 0;
+    while (ptChild != NULL)
+    {
+        count++;
+        ptChild = (ldBase_t *)ptChild->use_as__arm_2d_control_node_t.ptNext;
+    }
+    return count;
+}
+
 void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
 {
     ldBase_t *ptWidget= (ldBase_t *)ptScene->ptNodeRoot;

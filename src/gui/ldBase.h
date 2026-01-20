@@ -239,8 +239,8 @@ typedef struct {
 
 typedef enum{
     layoutNone,
-    horizontal,
-    vertical,
+    layoutHorizontal,
+    layoutVertical,
 }ldLayoutType_t;
 
 typedef int64_t ldTimer_t;
@@ -274,6 +274,7 @@ arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 ldBase_t* ldBaseGetParent(ldBase_t* ptWidget);
 ldBase_t* ldBaseGetChildList(ldBase_t* ptWidget);
+uint16_t ldBaseGetChildCount(ldBase_t* ptWidget);
 void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign);
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
