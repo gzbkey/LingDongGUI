@@ -88,8 +88,8 @@ void ldScrollSelecterSetSelectItemNum(ldScrollSelecter_t *pWidget, int8_t itemNu
 void ldScrollSelecterSetSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text);
 void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit);
 
-uint8_t *ldScrollSelecterGetCurrentText(ldScrollSelecter_t *ptWidget);
-uint8_t ldScrollSelecterGetCurrentItemNum(ldScrollSelecter_t *ptWidget);
+uint8_t *ldScrollSelecterGetSelectText(ldScrollSelecter_t *ptWidget);
+uint8_t ldScrollSelecterGetSelectItemNum(ldScrollSelecter_t *ptWidget);
 
 #define ldScrollSelecterInit(nameId,parentNameId,x,y,width,height,ptFont) \
         ldScrollSelecter_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)

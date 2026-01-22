@@ -62,7 +62,7 @@ widget demo sdl
 
 | Status | Name | Description |
 | :----:| ---- | ---- |
-| ✅ | window | Layered container |
+| ✅ | window | Layered container ，Support automatic horizontal or vertical layout|
 | ✅ | image | image display |
 | ✅ | button | Clickable button |
 | ✅ | text | text |

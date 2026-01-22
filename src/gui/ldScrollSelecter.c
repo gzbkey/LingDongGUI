@@ -552,7 +552,7 @@ void ldScrollSelecterSetSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text)
     }
 }
 
-uint8_t *ldScrollSelecterGetCurrentText(ldScrollSelecter_t *ptWidget)
+uint8_t *ldScrollSelecterGetSelectText(ldScrollSelecter_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -562,7 +562,7 @@ uint8_t *ldScrollSelecterGetCurrentText(ldScrollSelecter_t *ptWidget)
     return (uint8_t*)ptWidget->ppItemStrGroup[ptWidget->itemSelect];
 }
 
-uint8_t ldScrollSelecterGetCurrentItemNum(ldScrollSelecter_t *ptWidget)
+uint8_t ldScrollSelecterGetSelectItemNum(ldScrollSelecter_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)

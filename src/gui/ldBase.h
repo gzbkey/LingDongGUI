@@ -60,6 +60,7 @@ typedef enum{
     widgetTypeMessageBox,
     widgetTypeCalendar,
     widgetTypeProgressWheel,
+    widgetTypeClock,
 }ldWidgetType_t;
 
 
