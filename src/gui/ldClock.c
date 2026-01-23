@@ -285,6 +285,7 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
                     meter_pointer_set_current_value(&ptWidget->tSecPointer, -1);
                     ptWidget->nSec = -1;
                 }
+                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
             }
 //    #else
 //            ptWidget->nSec = wSec / 1000;

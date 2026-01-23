@@ -54,10 +54,10 @@ extern "C" {
 #include "ldButton.h"
 #include "ldWindow.h"
 #include "ldImage.h"
+#include "ldClock.h"
 
 extern uint8_t cursorBlinkCount;
 extern bool cursorBlinkFlag;
-extern ldBaseRTC_t sysRTC;
 
 #define CURSOR_BLINK_TIMEOUT        50
 #define SYS_TICK_CYCLE_MS           10
@@ -88,8 +88,6 @@ void __ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *
 #if USE_SCENE_SWITCHING == 0
 #define ldGuiJumpPageReload()                              __ldGuiJumpPage((ldPageFuncGroup_t *)NULL,&ARM_2D_SCENE_SWITCH_MODE_NONE,0)
 #endif
-
-void ldGuiSetRTC(bool isEnable);
 
 #ifdef __cplusplus
 }

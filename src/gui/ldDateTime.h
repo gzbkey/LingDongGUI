@@ -52,12 +52,13 @@ struct ldDateTime_t
 {
     implement(ldBase_t);
     arm_2d_align_t tAlign;
+    int64_t timeStamp;
+    uint16_t year;
     uint8_t month;
     uint8_t day;
     uint8_t hour;
     uint8_t minute;
     uint8_t second;
-    uint16_t year;
     uint8_t formatStr[DATE_TIME_BUFFER_SIZE];
     uint8_t formatStrTemp[DATE_TIME_BUFFER_SIZE];
     ldColor bgColor;

@@ -80,7 +80,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     ldWindowInit(0, 0, 0, 0, LD_CFG_SCREEN_WIDTH, LD_CFG_SCREEN_HEIGHT);
 
-    obj= ldImageInit(1, 0, 100, 120, 50, 80, NULL, NULL,false);
+    obj= ldImageInit(1, 0, 100, 120, 50, 80, NULL, NULL);
     ldImageSetImage(obj,IMAGE_LETTER_PAPER_BMP,NULL);
     ldBaseSetCorner(obj,true);
     ldBaseSetSelectable(obj,true);
@@ -95,7 +95,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldWindowInit(3, 0, 200, 95, 20, 20);
     ldWindowSetColor(obj,GLCD_COLOR_GREEN);
     ldBaseSetCorner(obj,true);
-    ldWindowSetSelectable(obj,true);
+    ldBaseSetSelectable(obj,true);
 
 
     connect(2,SIGNAL_RELEASE,slotTest);
