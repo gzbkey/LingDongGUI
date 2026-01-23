@@ -131,22 +131,104 @@ void ldDateTime_on_load(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 {
     assert(NULL != ptWidget);
-//    if(ptWidget->isAutoSysTime&&(ptWidget->second!=sysRTC.sec))
-//    {
-//        ptWidget->year=sysRTC.year;
-//        ptWidget->month=sysRTC.mon;
-//        ptWidget->day=sysRTC.day;
-//        ptWidget->hour=sysRTC.hour;
-//        ptWidget->minute=sysRTC.min;
-//        ptWidget->second=sysRTC.sec;
-//        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-//    }
+    int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+    lTimeStampInMs=lTimeStampInMs/1000;
+
+    if(ptWidget->timeStamp!=lTimeStampInMs)
+    {
+        ptWidget->timeStamp=lTimeStampInMs;
+        uint32_t sec = lTimeStampInMs;
+        uint32_t days = sec / 86400;
+        uint32_t rem  = sec % 86400;
+        ptWidget->hour = rem / 3600;
+        ptWidget->minute  = (rem % 3600) / 60;
+        ptWidget->second  = rem % 60;
+
+        uint16_t y = 1970;
+        while (days >= 365 + (y % 4 == 0 && y % 100 != 0 || y % 400 == 0)) {
+            days -= 365 + (y % 4 == 0 && y % 100 != 0 || y % 400 == 0);
+            ++y;
+        }
+        ptWidget->year = y;
+        uint8_t mtab[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
+        mtab[1] += (y % 4 == 0 && y % 100 != 0 || y % 400 == 0) ? 1 : 0;
+        uint8_t m = 1;
+        while (days >= mtab[m-1]) { days -= mtab[m-1]; ++m; }
+        ptWidget->month = m;
+        ptWidget->day = days + 1;
+
+        char *addr;
+        int ret;
+        char strTemp[5];
+
+        strcpy((char *)ptWidget->formatStrTemp,(char *)ptWidget->formatStr);
+
+        addr=strstr((char *)ptWidget->formatStrTemp,"yyyy");
+        if(addr)
+        {
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ret=snprintf(strTemp,5,"%04d",ptWidget->year);
+            if(ret > 0)
+            {
+                memcpy(addr,strTemp,4);
+            }
+        }
+        addr=strstr((char *)ptWidget->formatStrTemp,"mm");
+        if(addr)
+        {
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ret=snprintf(strTemp,3,"%02d",ptWidget->month);
+            if(ret > 0)
+            {
+                memcpy(addr,strTemp,2);
+            }
+        }
+        addr=strstr((char *)ptWidget->formatStrTemp,"dd");
+        if(addr)
+        {
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ret=snprintf(strTemp,3,"%02d",ptWidget->day);
+            if(ret > 0)
+            {
+                memcpy(addr,strTemp,2);
+            }
+        }
+        addr=strstr((char *)ptWidget->formatStrTemp,"hh");
+        if(addr)
+        {
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ret=snprintf(strTemp,3,"%02d",ptWidget->hour);
+            if(ret > 0)
+            {
+                memcpy(addr,strTemp,2);
+            }
+        }
+        addr=strstr((char *)ptWidget->formatStrTemp,"nn");
+        if(addr)
+        {
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ret=snprintf(strTemp,3,"%02d",ptWidget->minute);
+            if(ret > 0)
+            {
+                memcpy(addr,strTemp,2);
+            }
+        }
+        addr=strstr((char *)ptWidget->formatStrTemp,"ss");
+        if(addr)
+        {
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ret=snprintf(strTemp,3,"%02d",ptWidget->second);
+            if(ret > 0)
+            {
+                memcpy(addr,strTemp,2);
+            }
+        }
+    }
 }
 
 void ldDateTime_on_frame_complete(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 {
     assert(NULL != ptWidget);
-
 }
 
 void ldDateTime_show(ld_scene_t *ptScene, ldDateTime_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
@@ -167,101 +249,6 @@ void ldDateTime_show(ld_scene_t *ptScene, ldDateTime_t *ptWidget, const arm_2d_t
             if(ldBaseIsHidden((ldBase_t*)ptWidget))
             {
                 break;
-            }
-
-            if(bIsNewFrame)
-            {
-                int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
-                lTimeStampInMs=lTimeStampInMs/1000;
-                
-                if(ptWidget->timeStamp!=lTimeStampInMs)
-                {
-                    ptWidget->timeStamp=lTimeStampInMs;
-                    uint32_t sec = lTimeStampInMs;
-                    uint32_t days = sec / 86400;
-                    uint32_t rem  = sec % 86400;
-                    ptWidget->hour = rem / 3600;
-                    ptWidget->minute  = (rem % 3600) / 60;
-                    ptWidget->second  = rem % 60;
-
-                    /* 天 → 年月日 */
-                    uint16_t y = 1970;
-                    while (days >= 365 + (y % 4 == 0 && y % 100 != 0 || y % 400 == 0)) {
-                        days -= 365 + (y % 4 == 0 && y % 100 != 0 || y % 400 == 0);
-                        ++y;
-                    }
-                    ptWidget->year = y;
-                    uint8_t mtab[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
-                    mtab[1] += (y % 4 == 0 && y % 100 != 0 || y % 400 == 0) ? 1 : 0;
-                    uint8_t m = 1;
-                    while (days >= mtab[m-1]) { days -= mtab[m-1]; ++m; }
-                    ptWidget->month = m;
-                    ptWidget->day = days + 1;
-                
-                    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-                
-                    
-                    char *addr;
-                    int ret;
-                    char strTemp[5];
-
-                    strcpy((char *)ptWidget->formatStrTemp,(char *)ptWidget->formatStr);
-
-                    addr=strstr((char *)ptWidget->formatStrTemp,"yyyy");
-                    if(addr)
-                    {
-                        ret=snprintf(strTemp,5,"%04d",ptWidget->year);
-                        if(ret > 0)
-                        {
-                            memcpy(addr,strTemp,4);
-                        }
-                    }
-                    addr=strstr((char *)ptWidget->formatStrTemp,"mm");
-                    if(addr)
-                    {
-                        ret=snprintf(strTemp,3,"%02d",ptWidget->month);
-                        if(ret > 0)
-                        {
-                            memcpy(addr,strTemp,2);
-                        }
-                    }
-                    addr=strstr((char *)ptWidget->formatStrTemp,"dd");
-                    if(addr)
-                    {
-                        ret=snprintf(strTemp,3,"%02d",ptWidget->day);
-                        if(ret > 0)
-                        {
-                            memcpy(addr,strTemp,2);
-                        }
-                    }
-                    addr=strstr((char *)ptWidget->formatStrTemp,"hh");
-                    if(addr)
-                    {
-                        ret=snprintf(strTemp,3,"%02d",ptWidget->hour);
-                        if(ret > 0)
-                        {
-                            memcpy(addr,strTemp,2);
-                        }
-                    }
-                    addr=strstr((char *)ptWidget->formatStrTemp,"nn");
-                    if(addr)
-                    {
-                        ret=snprintf(strTemp,3,"%02d",ptWidget->minute);
-                        if(ret > 0)
-                        {
-                            memcpy(addr,strTemp,2);
-                        }
-                    }
-                    addr=strstr((char *)ptWidget->formatStrTemp,"ss");
-                    if(addr)
-                    {
-                        ret=snprintf(strTemp,3,"%02d",ptWidget->second);
-                        if(ret > 0)
-                        {
-                            memcpy(addr,strTemp,2);
-                        }
-                    }
-                }
             }
 
             if(!ptWidget->isTransparent)
