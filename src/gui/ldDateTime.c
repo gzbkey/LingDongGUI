@@ -190,7 +190,7 @@ void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            uitoa(ptWidget->month, addr, 2);
+            uitoa(ptWidget->day, addr, 2);
         }
         addr=strstr((char *)ptWidget->formatStrTemp,"hh");
         if(addr)

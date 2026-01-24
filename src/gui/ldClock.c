@@ -215,9 +215,9 @@ void ldClock_depose(ld_scene_t *ptScene, ldClock_t *ptWidget)
 
     meter_pointer_depose(&ptWidget->tSecPointer);
 
-        arm_foreach(spin_zoom_widget_t, ptWidget->tPointers, ptPointer) {
-            spin_zoom_widget_depose(ptPointer);
-        }
+    arm_foreach(spin_zoom_widget_t, ptWidget->tPointers, ptPointer) {
+        spin_zoom_widget_depose(ptPointer);
+    }
 
     ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
 
