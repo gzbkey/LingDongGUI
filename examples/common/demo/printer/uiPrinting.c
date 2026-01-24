@@ -89,7 +89,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldDateTimeSetDate(obj,2024,8,17);
     ldDateTimeSetTime(obj,20,10,0);
 
-    obj=ldImageInit(ID_IMG_VIEW,ID_BG,10,50,200,180,imgList[gPrintImgNum],NULL,false);
+    obj=ldImageInit(ID_IMG_VIEW,ID_BG,10,50,200,180,imgList[gPrintImgNum],NULL);
 
     obj=ldButtonInit(ID_BTN_STOP,ID_BG,220,180,120,50);
     ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_24);
@@ -113,7 +113,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     obj=ldProgressBarInit(ID_PROG_BAR,ID_BG,10,255,460,13);
     ldProgressBarSetPercent(obj,45);
 
-    obj=ldImageInit(ID_IMG_TEMP1,ID_BG,230,55,40,33,IMAGE_TEMP1_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_TEMP1,ID_BG,230,55,40,33,IMAGE_TEMP1_BMP,NULL);
 
     obj=ldLabelInit(ID_LABEL_TEMP1,ID_BG,280,50,60,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"170");
@@ -127,7 +127,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
-    obj=ldImageInit(ID_IMG_TEMP2,ID_BG,230,120,40,33,IMAGE_TEMP2_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_TEMP2,ID_BG,230,120,40,33,IMAGE_TEMP2_BMP,NULL);
 
     obj=ldLabelInit(ID_LABEL_TEMP3,ID_BG,280,110,60,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"60");
@@ -142,7 +142,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
 
-    obj=ldImageInit(ID_IMG_PERCENT,ID_BG,360,55,40,33,IMAGE_PERCENT_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_PERCENT,ID_BG,360,55,40,33,IMAGE_PERCENT_BMP,NULL);
 
     obj=ldLabelInit(ID_LABEL_PERCENT,ID_BG,410,60,80,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"60%");
@@ -151,7 +151,7 @@ void uiPrintingInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
 
-    obj=ldImageInit(ID_IMG_HEIGHT,ID_BG,360,120,40,33,IMAGE_HEIGHT_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_HEIGHT,ID_BG,360,120,40,33,IMAGE_HEIGHT_BMP,NULL);
 
     obj=ldLabelInit(ID_LABEL_HEIGHT,ID_BG,410,130,80,20,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"0.1MM");

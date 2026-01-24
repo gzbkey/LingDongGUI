@@ -128,6 +128,15 @@ void ldDateTime_on_load(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
     
 }
 
+static inline void uitoa(uint32_t val, char *buf, uint8_t width)
+{
+    for (int i = width - 1; i >= 0; i--)
+    {
+        buf[i] = '0' + (val % 10);
+        val /= 10;
+    }
+}
+
 void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 {
     assert(NULL != ptWidget);
@@ -137,6 +146,9 @@ void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
     if(ptWidget->timeStamp!=lTimeStampInMs)
     {
         ptWidget->timeStamp=lTimeStampInMs;
+
+        #define IS_LEAP_YEAR(y) (((y) % 4 == 0 && (y) % 100 != 0) || ((y) % 400 == 0))
+
         uint32_t sec = lTimeStampInMs;
         uint32_t days = sec / 86400;
         uint32_t rem  = sec % 86400;
@@ -145,21 +157,20 @@ void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
         ptWidget->second  = rem % 60;
 
         uint16_t y = 1970;
-        while (days >= 365 + (y % 4 == 0 && y % 100 != 0 || y % 400 == 0)) {
-            days -= 365 + (y % 4 == 0 && y % 100 != 0 || y % 400 == 0);
+        while (days >= 365 + IS_LEAP_YEAR(y))
+        {
+            days -= 365 + IS_LEAP_YEAR(y);
             ++y;
         }
         ptWidget->year = y;
         uint8_t mtab[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
-        mtab[1] += (y % 4 == 0 && y % 100 != 0 || y % 400 == 0) ? 1 : 0;
+        mtab[1] += IS_LEAP_YEAR(y) ? 1 : 0;
         uint8_t m = 1;
         while (days >= mtab[m-1]) { days -= mtab[m-1]; ++m; }
         ptWidget->month = m;
         ptWidget->day = days + 1;
 
         char *addr;
-        int ret;
-        char strTemp[5];
 
         strcpy((char *)ptWidget->formatStrTemp,(char *)ptWidget->formatStr);
 
@@ -167,61 +178,37 @@ void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            ret=snprintf(strTemp,5,"%04d",ptWidget->year);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,4);
-            }
+            uitoa(ptWidget->year, addr, 4);
         }
         addr=strstr((char *)ptWidget->formatStrTemp,"mm");
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            ret=snprintf(strTemp,3,"%02d",ptWidget->month);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
+            uitoa(ptWidget->month, addr, 2);
         }
         addr=strstr((char *)ptWidget->formatStrTemp,"dd");
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            ret=snprintf(strTemp,3,"%02d",ptWidget->day);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
+            uitoa(ptWidget->month, addr, 2);
         }
         addr=strstr((char *)ptWidget->formatStrTemp,"hh");
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            ret=snprintf(strTemp,3,"%02d",ptWidget->hour);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
+            uitoa(ptWidget->hour, addr, 2);
         }
         addr=strstr((char *)ptWidget->formatStrTemp,"nn");
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            ret=snprintf(strTemp,3,"%02d",ptWidget->minute);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
+            uitoa(ptWidget->minute, addr, 2);
         }
         addr=strstr((char *)ptWidget->formatStrTemp,"ss");
         if(addr)
         {
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-            ret=snprintf(strTemp,3,"%02d",ptWidget->second);
-            if(ret > 0)
-            {
-                memcpy(addr,strTemp,2);
-            }
+            uitoa(ptWidget->second, addr, 2);
         }
     }
 }

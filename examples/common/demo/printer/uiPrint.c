@@ -72,7 +72,7 @@ void uiPrintInit(ld_scene_t* ptScene)
 
     connect(ID_LIST,SIGNAL_CLICKED_ITEM,slotShowImg);
 
-    obj=ldImageInit(ID_IMG,ID_BG,280,50,176,160,imgList[gPrintImgNum],NULL,false);
+    obj=ldImageInit(ID_IMG,ID_BG,280,50,176,160,imgList[gPrintImgNum],NULL);
 
     obj=ldButtonInit(ID_BTN_PRINT,ID_BG,300,220,150,40);
     ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);

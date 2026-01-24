@@ -123,11 +123,16 @@ void __disp_adapter0_request_async_flushing(
 
 int64_t arm_2d_helper_get_system_timestamp(void)
 {
-#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
+#if defined(_POSIX_VERSION) || defined(CLOCK_REALTIME) || defined(__APPLE__)
     struct timespec timestamp;
     clock_gettime(CLOCK_REALTIME, &timestamp);
-
-    return 1000000ul * timestamp.tv_sec + timestamp.tv_nsec / 1000ul;
+    static bool waitInit=true;
+    if(waitInit)
+    {
+        waitInit=false;
+        tzset();
+    }
+    return 1000000ul * (timestamp.tv_sec - timezone) + timestamp.tv_nsec / 1000ul;
 #elif defined (__riscv)
     return (int64_t)clock();
 #elif defined (__arm__)
