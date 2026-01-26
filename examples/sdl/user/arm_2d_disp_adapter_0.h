@@ -44,6 +44,13 @@ extern "C" {
 // <h>Screen and Framebuffer
 // =======================
 
+// <q> Only Use Nano mode
+// <i> Removes the scene player from this display adapter and only uses the nano mode.
+// <i> This feature is disabled by default.
+#ifndef __DISP0_CFG_NANO_ONLY__
+#   define __DISP0_CFG_NANO_ONLY__                                0
+#endif
+
 // <o> Select the screen colour solution
 //     <0=>     None
 //     <1=>     Monochrome
@@ -96,13 +103,13 @@ extern "C" {
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           __DISP0_CFG_SCEEN_WIDTH__
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           8 //__DISP0_CFG_SCEEN_WIDTH__
 #endif
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          (__DISP0_CFG_SCEEN_HEIGHT__ / 10)
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          8 //(__DISP0_CFG_SCEEN_HEIGHT__ / 10)
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -250,14 +257,14 @@ extern "C" {
 // <i> This feature is disabled by default.
 // <i> NOTE: When selecting the background loading mode, you can ONLY use virtual resource as the source tile in the tile-copy-only APIs. 
 #ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   2
+#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                    2
 #endif
 
 // <q>Use heap to allocate buffer in the virtual resource helper service
 // <i> Use malloc and free in the virtual resource helper service. When disabled, a static buffer in the size of current display adapter PFB will be used. 
 // <i> This feature is disabled by default.
 #ifndef __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
-#   define __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__      0
+#   define __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__       0
 #endif
 
 // <o>The Anti-Noise-Scanning block Width
@@ -340,10 +347,32 @@ extern "C" {
         };                                                                      \
         ARM_2D_SAFE_NAME(ret);})
 
+#if __DISP0_CFG_NANO_ONLY__
+#   define __DISP_ADAPTER0_NANO_DRAW_RESUME_FULL_FLUSH_FLAG__()                 \
+        arm_2d_helper_pfb_full_frame_refresh_mode(                              \
+                                    &DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t, \
+                                    DISP0_ADAPTER.__bTempflag)
+#else
+#   define __DISP_ADAPTER0_NANO_DRAW_RESUME_FULL_FLUSH_FLAG__()
+#endif
+
 #define DISP_ADAPTER0_NANO_DRAW()                                               \
-                                                                                \
+    arm_using(arm_2d_scene_t *ptScene = disp_adapter0_get_default_scene())      \
     arm_using(const arm_2d_tile_t *ptTile = NULL)                               \
-        arm_using(bool bIsNewFrame = true)                                      \
+        arm_using(bool bIsNewFrame = true,                                      \
+            {                                                                   \
+                if (ptScene->bUseDirtyRegionHelper) {                           \
+                    arm_2d_helper_dirty_region_on_frame_start(                  \
+                                                &ptScene->tDirtyRegionHelper);  \
+                }                                                               \
+                ARM_2D_INVOKE_RT_VOID(  ptScene->fnOnFrameStart,                \
+                                        ARM_2D_PARAM(ptScene));                 \
+            },                                                                  \
+            {                                                                   \
+                ARM_2D_INVOKE_RT_VOID(  ptScene->fnOnFrameCPL,                  \
+                                        ARM_2D_PARAM(ptScene));                 \
+                __DISP_ADAPTER0_NANO_DRAW_RESUME_FULL_FLUSH_FLAG__();           \
+            })                                                                  \
             for (__disp_adapter0_draw_t *ARM_2D_SAFE_NAME(ptUserDraw) = NULL;   \
                 (({ ARM_2D_SAFE_NAME(ptUserDraw)                                \
                         = __disp_adapter0_nano_draw();                          \
@@ -359,10 +388,37 @@ typedef struct {
     bool bIsNewFrame;
 } __disp_adapter0_draw_t;
 
+#if __DISP0_CFG_NANO_ONLY__
+struct disp_adapter0_t {
+    inherit(arm_2d_helper_pfb_t);                                               //!< inherit from arm_2d_helper_pfb_t
+
+    struct {
+        uint32_t wMin;
+        uint32_t wMax;
+        uint64_t dwTotal;
+        uint64_t dwRenderTotal;
+        uint32_t wAverage;
+        float fCPUUsage;
+        uint16_t hwIterations;
+        uint16_t hwFrameCounter;
+        uint32_t wLCDLatency;
+        int64_t lTimestamp;
+    } Benchmark;
+
+    uint8_t chPT;
+    bool __bTempflag;
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
+
 ARM_NOINIT
 extern
+#if __DISP0_CFG_NANO_ONLY__
+struct disp_adapter0_t DISP0_ADAPTER;
+#else
 arm_2d_scene_player_t DISP0_ADAPTER;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 

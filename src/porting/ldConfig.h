@@ -83,8 +83,14 @@ extern "C" {
 //     <2=> More effects
 // <i> 0: only one scene,user manually clean widget
 // <i> 1: Less ram,fast switching(default)
-// <i> 2:More effects
+// <i> 2: More effects
 #define USE_SCENE_SWITCHING                       (1)
+#endif
+
+#if USE_SCENE_SWITCHING == 0
+#define __DISP0_CFG_NANO_ONLY__                   (1)
+#else
+#define __DISP0_CFG_NANO_ONLY__                   (0)
 #endif
 
 // debug config
@@ -131,7 +137,7 @@ extern "C" {
 #define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
 
 // <q>ARM 2D output log
-// <i> debug model
+// <i> debug mode
 #define __ARM_2D_CFG_ENABLE_LOG__                 (0)
 
 // <q>debug layer

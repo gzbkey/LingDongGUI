@@ -92,7 +92,7 @@ uintptr_t __disp_adapter0_vres_get_asset_address(
 }
 #endif
 
-void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap) 
+void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap)
 {
     //对接屏幕驱动的彩色填充函数
     //参考1
@@ -120,11 +120,16 @@ void __disp_adapter0_request_async_flushing(
 
 int64_t arm_2d_helper_get_system_timestamp(void)
 {
-#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
+#if defined(_POSIX_VERSION) || defined(CLOCK_REALTIME) || defined(__APPLE__)
     struct timespec timestamp;
-    clock_gettime(CLOCK_MONOTONIC, &timestamp);
-
-    return 1000000ul * timestamp.tv_sec + timestamp.tv_nsec / 1000ul;
+    clock_gettime(CLOCK_REALTIME, &timestamp);
+    static bool waitInit=true;
+    if(waitInit)
+    {
+        waitInit=false;
+        tzset();
+    }
+    return 1000000ul * (timestamp.tv_sec - timezone) + timestamp.tv_nsec / 1000ul;
 #elif defined (__riscv)
     return (int64_t)clock();
 #elif defined (__arm__)
@@ -155,7 +160,7 @@ uint32_t arm_2d_helper_get_reference_clock_frequency(void)
 
 #if ( !__x86_64__ && !__i386__ && !__APPLE__ )
 
-void *__arm_2d_allocate_scratch_memory( uint32_t wSize, 
+void *__arm_2d_allocate_scratch_memory( uint32_t wSize,
                                         uint_fast8_t nAlign,
                                         arm_2d_mem_type_t tType)
 {
@@ -167,7 +172,7 @@ void *__arm_2d_allocate_scratch_memory( uint32_t wSize,
 
     void *pBuff = ldCalloc(1,wSize);
     assert(0 == ((uintptr_t)pBuff & (nAlign - 1)));
-    
+
     return pBuff;
 }
 

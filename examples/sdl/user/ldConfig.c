@@ -21,7 +21,7 @@ __WEAK void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
 
 /**
  * @brief   Get touch coordinates
- *
+ * 
  * @param   x Returned x coordinate
  * @param   y Returned y coordinate
  * @return  true Valid touch
@@ -69,7 +69,7 @@ bool ldCfgTouchGetPoint(int16_t *x,int16_t *y)
 #if USE_VIRTUAL_RESOURCE == 1
 /**
  * @brief   Read external storage data
- *
+ * 
  * @param   pObj
  * @param   pBuffer         buffer pointer
  * @param   pAddress        offset address
