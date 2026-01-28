@@ -82,13 +82,7 @@ extern "C" {
 // <i> 0: only one scene,user manually clean widget
 // <i> 1: Less ram,fast switching(default)
 // <i> 2: More effects
-#define USE_SCENE_SWITCHING                       (1)
-#endif
-
-#if USE_SCENE_SWITCHING == 0
-#define __DISP0_CFG_NANO_ONLY__                   (1)
-#else
-#define __DISP0_CFG_NANO_ONLY__                   (0)
+#define USE_SCENE_SWITCHING                       (2)
 #endif
 
 // debug config

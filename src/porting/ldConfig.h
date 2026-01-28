@@ -68,8 +68,6 @@ extern "C" {
 #define USE_VIRTUAL_RESOURCE                      (0)
 #endif
 
-// widget config
-
 #ifndef USE_RADIA_MENU_SCALE
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
@@ -85,12 +83,6 @@ extern "C" {
 // <i> 1: Less ram,fast switching(default)
 // <i> 2: More effects
 #define USE_SCENE_SWITCHING                       (1)
-#endif
-
-#if USE_SCENE_SWITCHING == 0
-#define __DISP0_CFG_NANO_ONLY__                   (1)
-#else
-#define __DISP0_CFG_NANO_ONLY__                   (0)
 #endif
 
 // debug config
