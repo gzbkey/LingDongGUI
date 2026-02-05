@@ -237,7 +237,6 @@ void ldClock_show(ld_scene_t *ptScene, ldClock_t *ptWidget, const arm_2d_tile_t 
                                 ptWidget->bgMaskColor,
                                 ptWidget->use_as__ldBase_t.opacity);
                 }
-                ldBaseColor(&tTarget,&__centre_region,GLCD_COLOR_LIGHT_GREY,255);
 
                 arm_2d_point_float_t bgRotationCentre=
                 {
@@ -291,12 +290,6 @@ void ldClock_show(ld_scene_t *ptScene, ldClock_t *ptWidget, const arm_2d_tile_t 
                     }
 
                 }
-
-                arm_2d_location_t point={
-                    .iX=(tTarget_canvas.tSize.iWidth>>1),
-                    .iY=(tTarget_canvas.tSize.iHeight>>1),
-                };
-                arm_2d_draw_point(&tTarget,point, GLCD_COLOR_RED,255);
 
                 arm_2d_op_wait_async(NULL);
             }

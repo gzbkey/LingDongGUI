@@ -590,7 +590,7 @@ void ldIconSlider_show(ld_scene_t *ptScene, ldIconSlider_t *ptWidget, const arm_
                             };
                             ldBaseLabel(&tTarget,
                                         &fontRegion,
-                                        ptWidget->ptIconInfoList[showCount].pName,
+                                        (uint8_t*)ptWidget->ptIconInfoList[showCount].pName,
                                         ptWidget->ptFont,
                                         ARM_2D_ALIGN_TOP,
                                         ptWidget->textColor,
