@@ -144,22 +144,19 @@ void ldClock_on_load(ld_scene_t *ptScene, ldClock_t *ptWidget)
 void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
+    if(ptWidget == NULL) return;
 
     int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
 
     uint32_t total_seconds = lTimeStampInMs / 1000UL;
 
     uint32_t hour_sec = total_seconds % (12UL * 3600UL);
-    float hour_angle = (hour_sec / 3600.0f) * 30.0f +
-                       ((hour_sec % 3600UL) / 60.0f) * 0.5f;
+    float hour_angle = (hour_sec / 3600UL) * 30.0f +
+                       ((hour_sec % 3600UL) / 60UL) * 0.5f;
     ptWidget->pointerInfo[0].radian = ANGLE_2_RADIAN(hour_angle);
 
     uint32_t min_sec = total_seconds % 3600UL;
-    float min_angle = (min_sec / 60.0f) * 6.0f + (min_sec % 60UL) * 0.1f;
+    float min_angle = (min_sec / 60UL) * 6.0f;
     ptWidget->pointerInfo[1].radian = ANGLE_2_RADIAN(min_angle);
 
     uint32_t sec_ms = lTimeStampInMs % 60000UL;
