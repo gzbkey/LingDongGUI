@@ -288,17 +288,8 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
             }
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
-//    #else
-//            ptWidget->nSec = wSec / 1000;
-//            spin_zoom_widget_on_frame_start(&ptWidget->tPointers[2], ptWidget->nSec, 1.0f);
-//    #endif
         lTimeStampInMs %= (1000ul);
     } while(0);
-
-//        /* calculate the Ten-Miliseconds */
-//        do {
-//            ptWidget->wMs = lTimeStampInMs;
-//        } while(0);
 }
 
 void ldClock_on_frame_complete(ld_scene_t *ptScene, ldClock_t *ptWidget)
@@ -355,29 +346,30 @@ void ldClock_show(ld_scene_t *ptScene, ldClock_t *ptWidget, const arm_2d_tile_t 
                     h=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
                 }
             }
+            
             arm_2d_align_centre(tTarget_canvas, w, h)
             {
-                ldBaseImage(&tTarget,
-                            &__centre_region,
-                            ptWidget->ptBgImgTile,
-                            ptWidget->ptBgMaskTile,
-                            ptWidget->maskColor,
-                            ptWidget->use_as__ldBase_t.opacity);
+                if(ptWidget->ptBgImgTile||ptWidget->ptBgMaskTile)
+                {
+                    ldBaseImage(&tTarget,
+                                &__centre_region,
+                                ptWidget->ptBgImgTile,
+                                ptWidget->ptBgMaskTile,
+                                ptWidget->maskColor,
+                                ptWidget->use_as__ldBase_t.opacity);
+                }
 
                 arm_foreach(spin_zoom_widget_t, ptWidget->tPointers, ptPointer) {
                     spin_zoom_widget_show(ptPointer, &tTarget, &__centre_region, NULL, 255);
                 }
                 meter_pointer_show(&ptWidget->tSecPointer, &tTarget, &__centre_region, NULL, 255);
-                arm_2d_draw_box(&tTarget,&tTarget_canvas,1,0,255);
+                arm_2d_op_wait_async(NULL);
             }
-
         }
     }
-
-    arm_2d_op_wait_async(NULL);
 }
 
-void ldClockSetBackground(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile)
+void ldClockSetBackgroundImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -387,20 +379,10 @@ void ldClockSetBackground(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->ptBgImgTile = ptImgTile;
     ptWidget->ptBgMaskTile = ptMaskTile;
-}
-
-void ldClockSetMaskColor(ldClock_t *ptWidget, ldColor maskColor)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->maskColor = maskColor;
 }
 
-void ldClockSetHourPointer(ldClock_t *ptWidget, arm_2d_tile_t *ptHourPointerMaskTile, ldColor pointerColor, float x, float y)
+void ldClockSetHourPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -408,12 +390,22 @@ void ldClockSetHourPointer(ldClock_t *ptWidget, arm_2d_tile_t *ptHourPointerMask
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->tPointers[0].tCFG.Source.ptMask = ptHourPointerMaskTile;
-    ptWidget->tPointers[0].tCFG.Source.tColourToFill = pointerColor;
+    ptWidget->tPointers[0].tCFG.Source.ptSource = ptImgTile;
+    ptWidget->tPointers[0].tCFG.Source.ptMask = ptMaskTile;
+    ptWidget->tPointers[0].tCFG.Source.tColourToFill = maskColor;
     ptWidget->tPointers[0].tCFG.Source.tCentreFloat = (arm_2d_point_float_t){x,y};
+    
+    if(ptImgTile==NULL)
+    {
+        ptWidget->tPointers[0].tCFG.ptTransformMode=&SPIN_ZOOM_MODE_FILL_COLOUR;
+    }
+    else
+    {
+        ptWidget->tPointers[0].tCFG.ptTransformMode=&SPIN_ZOOM_MODE_TILE_WITH_MASK;
+    }
 }
 
-void ldClockSetMinutePointer(ldClock_t *ptWidget, arm_2d_tile_t *ptMinutePointerMaskTile, ldColor pointerColor, float x, float y)
+void ldClockSetMinutePointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -421,12 +413,21 @@ void ldClockSetMinutePointer(ldClock_t *ptWidget, arm_2d_tile_t *ptMinutePointer
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->tPointers[1].tCFG.Source.ptMask = ptMinutePointerMaskTile;
-    ptWidget->tPointers[1].tCFG.Source.tColourToFill = pointerColor;
+    ptWidget->tPointers[1].tCFG.Source.ptSource = ptImgTile;
+    ptWidget->tPointers[1].tCFG.Source.ptMask = ptMaskTile;
+    ptWidget->tPointers[1].tCFG.Source.tColourToFill = maskColor;
     ptWidget->tPointers[1].tCFG.Source.tCentreFloat = (arm_2d_point_float_t){x,y};
+    if(ptImgTile==NULL)
+    {
+        ptWidget->tPointers[1].tCFG.ptTransformMode=&SPIN_ZOOM_MODE_FILL_COLOUR;
+    }
+    else
+    {
+        ptWidget->tPointers[1].tCFG.ptTransformMode=&SPIN_ZOOM_MODE_TILE_WITH_MASK;
+    }
 }
 
-void ldClockSetSecondPointer(ldClock_t *ptWidget, arm_2d_tile_t *ptSecondPointerMaskTile, ldColor pointerColor, float x, float y)
+void ldClockSetSecondPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -434,9 +435,18 @@ void ldClockSetSecondPointer(ldClock_t *ptWidget, arm_2d_tile_t *ptSecondPointer
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.Source.ptMask = ptSecondPointerMaskTile;
-    ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.Source.tColourToFill = pointerColor;
+    ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.Source.ptMask = ptMaskTile;
+    ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.Source.ptSource = ptImgTile;
+    ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.Source.tColourToFill = maskColor;
     ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.Source.tCentreFloat = (arm_2d_point_float_t){x,y};
+    if(ptImgTile==NULL)
+    {
+        ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.ptTransformMode=&SPIN_ZOOM_MODE_FILL_COLOUR;
+    }
+    else
+    {
+        ptWidget->tSecPointer.use_as__spin_zoom_widget_t.tCFG.ptTransformMode=&SPIN_ZOOM_MODE_TILE_WITH_MASK;
+    }
 }
 
 

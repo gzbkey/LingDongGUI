@@ -303,7 +303,9 @@ int16_t ldBaseGetX(ldBase_t* ptWidget);
 int16_t ldBaseGetY(ldBase_t* ptWidget);
 int16_t ldBaseGetWidth(ldBase_t* ptWidget);
 int16_t ldBaseGetHeight(ldBase_t* ptWidget);
-uint8_t ldBaseZeller(uint16_t year, uint8_t month, uint8_t day);
+void ldBaseGetTime(uint8_t *pHour,uint8_t *pMinute,uint8_t *pSecond);
+void ldBaseGetDate(uint16_t *pYear,uint8_t *pMonth,uint8_t *pDay);
+uint8_t ldBaseGetWeek(uint16_t year, uint8_t month, uint8_t day);
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 

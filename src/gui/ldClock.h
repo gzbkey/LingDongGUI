@@ -68,11 +68,10 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget);
 void ldClock_on_frame_complete(ld_scene_t *ptScene, ldClock_t *ptWidget);
 void ldClock_show(ld_scene_t *pScene, ldClock_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-void ldClockSetBackground(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile);
-void ldClockSetMaskColor(ldClock_t *ptWidget, ldColor maskColor);
-void ldClockSetHourPointer(ldClock_t *ptWidget, arm_2d_tile_t *ptHourPointerMaskTile, ldColor pointerColor, float x, float y);
-void ldClockSetMinutePointer(ldClock_t *ptWidget, arm_2d_tile_t *ptMinutePointerMaskTile, ldColor pointerColor, float x, float y);
-void ldClockSetSecondPointer(ldClock_t *ptWidget, arm_2d_tile_t *ptSecondPointerMaskTile, ldColor pointerColor, float x, float y);
+void ldClockSetBackgroundImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor);
+void ldClockSetHourPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y);
+void ldClockSetMinutePointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y);
+void ldClockSetSecondPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y);
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

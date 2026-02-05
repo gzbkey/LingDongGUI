@@ -1288,8 +1288,44 @@ int16_t ldBaseGetHeight(ldBase_t* ptWidget)
     return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
 }
 
+#define IS_LEAP_YEAR(y) (((y) % 4 == 0 && (y) % 100 != 0) || ((y) % 400 == 0))
+
+void ldBaseGetTime(uint8_t *pHour,uint8_t *pMinute,uint8_t *pSecond)
+{
+    int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+    
+    uint32_t sec = lTimeStampInMs/1000;
+    uint32_t rem  = sec % 86400;
+    *pHour = rem / 3600;
+    *pMinute  = (rem % 3600) / 60;
+    *pSecond  = rem % 60;
+}
+
+void ldBaseGetDate(uint16_t *pYear,uint8_t *pMonth,uint8_t *pDay)
+{
+    int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+    uint32_t days = lTimeStampInMs / 86400000;
+    uint16_t y = 1970;
+    while (days >= 365 + IS_LEAP_YEAR(y))
+    {
+        days -= 365 + IS_LEAP_YEAR(y);
+        ++y;
+    }
+    *pYear = y;
+    uint8_t mtab[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    mtab[1] += IS_LEAP_YEAR(y) ? 1 : 0;
+    uint8_t m = 1;
+    while (days >= mtab[m - 1])
+    {
+        days -= mtab[m - 1];
+        ++m;
+    }
+    *pMonth = m;
+    *pDay = days + 1;
+}
+
 // 0=周日，1=周一...6=周六
-uint8_t ldBaseZeller(uint16_t year, uint8_t month, uint8_t day)
+uint8_t ldBaseGetWeek(uint16_t year, uint8_t month, uint8_t day)
 {
     if (month < 3)
     {

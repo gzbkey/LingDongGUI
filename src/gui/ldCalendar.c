@@ -65,7 +65,7 @@ static int daysOfMonth(int year, int month)
 static void _getCalBuf(uint16_t year, uint8_t month, uint8_t *calBuf)
 {
     int dim = daysOfMonth(year, month);                /* 本月天数 */
-    int w1 = ldBaseZeller(year, month, 1);             /* 本月1日星期x，0=周日 */
+    int w1 = ldBaseGetWeek(year, month, 1);             /* 本月1日星期x，0=周日 */
     int pdim = daysOfMonth(year, month - (month > 1)); /* 上月天数 */
 
     int idx = 0;
