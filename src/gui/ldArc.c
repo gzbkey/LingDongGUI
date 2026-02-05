@@ -335,7 +335,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                         {
                             tempAngle-=360.0;
                         }
-                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op[i],
+                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op[i],
                                                                            ptWidget->ptImgTile,
                                                                            &tTarget,
                                                                            &showRegion,
@@ -353,7 +353,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                         {
                             tempAngle-=360.0;
                         }
-                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op2[i],
+                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op2[i],
                                                                            ptWidget->ptImgTile,
                                                                            &tTarget,
                                                                            &showRegion,
@@ -373,7 +373,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                             tempAngle-=360.0;
                         }
 
-                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op[i],
+                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op[i],
                                                                            ptWidget->ptImgTile,
                                                                            &tTarget,
                                                                            &showRegion,
@@ -393,7 +393,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
 
                         if((tempAngle!=0)&&(tempAngle!=90)&&(tempAngle!=180)&&(tempAngle!=270))
                         {
-                            arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op2[i],
+                            arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op2[i],
                                                                            ptWidget->ptMaskTile,
                                                                            &tTarget,
                                                                            &showRegion,
@@ -412,7 +412,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                                 {
                                     tempAngle-=360.0;
                                 }
-                                arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op3,
+                                arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op3,
                                                                                        ptWidget->ptImgTile,
                                                                                        &tTarget,
                                                                                        &showRegion,
@@ -437,7 +437,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                         tempAngle-=360.0;
                     }
 
-                    arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op[i],
+                    arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op[i],
                                                                            ptWidget->ptImgTile,
                                                                            &tTarget,
                                                                            &showRegion,
@@ -459,7 +459,7 @@ void ldArc_show(ld_scene_t *ptScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptT
                     }
                     if((tempAngle!=90)&&(tempAngle!=180)&&(tempAngle!=270)&&(tempAngle!=360))
                     {
-                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op2[i],
+                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy(&ptWidget->op2[i],
                                                                            ptWidget->ptImgTile,
                                                                            &tTarget,
                                                                            &showRegion,
