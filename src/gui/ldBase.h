@@ -193,6 +193,8 @@ struct ld_scene_t {
 typedef struct {
     arm_2d_region_t itemRegion;
     arm_2d_region_t tTempItemRegion;
+    bool isDRUpdate:1;
+    bool isDRReset:1;
 }ldBaseItemRegion_t;
 
 typedef struct {

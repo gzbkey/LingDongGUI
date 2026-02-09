@@ -103,6 +103,8 @@ ldClock_t* ldClock_init(ld_scene_t *ptScene,ldClock_t *ptWidget, uint16_t nameId
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptWidget->pointerInfo[0].ptMaskTile->tRegion;
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iX+=x;
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iY+=y;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRReset=true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
 
     ptWidget->pointerInfo[1].ptMaskTile=(arm_2d_tile_t*)&c_tilePointerMinMask;
     ptWidget->pointerInfo[1].rotationCentre.fX=c_tilePointerMinMask.tRegion.tSize.iWidth>>1;
@@ -110,6 +112,8 @@ ldClock_t* ldClock_init(ld_scene_t *ptScene,ldClock_t *ptWidget, uint16_t nameId
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion=ptWidget->pointerInfo[1].ptMaskTile->tRegion;
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iX+=x;
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iY+=y;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRReset=true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRUpdate=true;
 
     ptWidget->pointerInfo[2].ptMaskTile=(arm_2d_tile_t*)&c_tilePointerSecMask;
     ptWidget->pointerInfo[2].rotationCentre.fX=c_tilePointerSecMask.tRegion.tSize.iWidth>>1;
@@ -117,6 +121,8 @@ ldClock_t* ldClock_init(ld_scene_t *ptScene,ldClock_t *ptWidget, uint16_t nameId
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion=ptWidget->pointerInfo[2].ptMaskTile->tRegion;
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iX+=x;
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iY+=y;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRReset=true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRUpdate=true;
 
     LOG_INFO("[init][clock] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
@@ -158,70 +164,105 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
     if(ptWidget == NULL) return;
 
     int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
-
     uint32_t total_seconds = lTimeStampInMs / 1000UL;
 
+    bool bNeedHourUpdate = false;
+    bool bNeedMinuteUpdate = false;
+    bool bNeedSecondUpdate = false;
+
     uint32_t hour_sec = total_seconds % (12UL * 3600UL);
-    float hour_angle = (hour_sec / 3600UL) * 30.0f +
-                       ((hour_sec % 3600UL) / 60UL) * 0.5f;
-    ptWidget->pointerInfo[0].radian = ANGLE_2_RADIAN(hour_angle);
-
     uint32_t min_sec = total_seconds % 3600UL;
-    float min_angle = (min_sec / 60UL) * 6.0f;
-    ptWidget->pointerInfo[1].radian = ANGLE_2_RADIAN(min_angle);
-
     uint32_t sec_ms = lTimeStampInMs % 60000UL;
-    float sec_angle;
+
     if(ptWidget->isStepSecond)
     {
-        sec_angle = (total_seconds % 60UL) * 6.0f;
+        uint32_t current_second = total_seconds % 60UL;
+        if(current_second != (ptWidget->lastTotalSeconds % 60UL))
+        {
+            bNeedSecondUpdate = true;
+        }
     }
     else
     {
-        sec_angle = (sec_ms / 1000.0f) * 6.0f;
+        bNeedSecondUpdate = true;
     }
-    ptWidget->pointerInfo[2].radian = ANGLE_2_RADIAN(sec_angle);
 
-    arm_2d_region_t globalRegion;
-    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
-
-    if(ptWidget->pointerInfo[0].op.Target.ptRegion!=NULL)
+    uint32_t current_minute = min_sec / 60UL;
+    uint32_t last_minute = (ptWidget->lastTotalSeconds % 3600UL) / 60UL;
+    if(current_minute != last_minute)
     {
-        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion = *ptWidget->pointerInfo[0].op.Target.ptRegion;
-
-        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
-        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
-
-        arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[0].tTempItemRegion,
-                                            &ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion,
-                                            &ptWidget->use_as__ldBase_t.ptItemRegionList[0].tTempItemRegion);
+        bNeedMinuteUpdate = true;
     }
 
-    if(ptWidget->pointerInfo[1].op.Target.ptRegion!=NULL)
+    uint32_t current_hour = hour_sec / 3600UL;
+    uint32_t last_hour = (ptWidget->lastTotalSeconds % (12UL * 3600UL)) / 3600UL;
+
+    if(current_hour != last_hour ||
+       (current_minute / 2) != (last_minute / 2))
     {
-        ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion = *ptWidget->pointerInfo[1].op.Target.ptRegion;
-
-        ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
-        ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
-
-        arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[1].tTempItemRegion,
-                                            &ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion,
-                                            &ptWidget->use_as__ldBase_t.ptItemRegionList[1].tTempItemRegion);
+        bNeedHourUpdate = true;
     }
 
-    if(ptWidget->pointerInfo[2].op.Target.ptRegion!=NULL)
+    if(bNeedHourUpdate || bNeedMinuteUpdate || bNeedSecondUpdate)
     {
-        ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion = *ptWidget->pointerInfo[2].op.Target.ptRegion;
+        ptWidget->lastTotalSeconds = total_seconds;
 
-        ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
-        ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
+        arm_2d_region_t globalRegion;
+        arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
-        arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[2].tTempItemRegion,
-                                            &ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion,
-                                            &ptWidget->use_as__ldBase_t.ptItemRegionList[2].tTempItemRegion);
+        float hour_angle = (hour_sec / 3600UL) * 30.0f +
+                           ((hour_sec % 3600UL) / 60UL) * 0.5f;
+        ptWidget->pointerInfo[0].radian = ANGLE_2_RADIAN(hour_angle);
+
+        float min_angle = (min_sec / 60UL) * 6.0f;
+        ptWidget->pointerInfo[1].radian = ANGLE_2_RADIAN(min_angle);
+
+        float sec_angle;
+        if(ptWidget->isStepSecond)
+        {
+            sec_angle = (total_seconds % 60UL) * 6.0f;
+        }
+        else
+        {
+            sec_angle = (sec_ms / 1000.0f) * 6.0f;
+        }
+        ptWidget->pointerInfo[2].radian = ANGLE_2_RADIAN(sec_angle);
+
+        if(bNeedHourUpdate && ptWidget->pointerInfo[0].op.Target.ptRegion!=NULL)
+        {
+            ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion = *ptWidget->pointerInfo[0].op.Target.ptRegion;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
+            arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[0].tTempItemRegion,
+                                                &ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion,
+                                                &ptWidget->use_as__ldBase_t.ptItemRegionList[0].tTempItemRegion);
+        }
+
+        if(bNeedMinuteUpdate && ptWidget->pointerInfo[1].op.Target.ptRegion!=NULL)
+        {
+            ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion = *ptWidget->pointerInfo[1].op.Target.ptRegion;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRUpdate=true;
+            arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[1].tTempItemRegion,
+                                                &ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion,
+                                                &ptWidget->use_as__ldBase_t.ptItemRegionList[1].tTempItemRegion);
+        }
+
+        if(bNeedSecondUpdate && ptWidget->pointerInfo[2].op.Target.ptRegion!=NULL)
+        {
+            ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion = *ptWidget->pointerInfo[2].op.Target.ptRegion;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
+            ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRUpdate=true;
+            arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[2].tTempItemRegion,
+                                                &ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion,
+                                                &ptWidget->use_as__ldBase_t.ptItemRegionList[2].tTempItemRegion);
+        }
+
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     }
-
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
 
 void ldClock_on_frame_complete(ld_scene_t *ptScene, ldClock_t *ptWidget)
@@ -364,7 +405,8 @@ void ldClockSetHourPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, a
     {
         return;
     }
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;    
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
     ptWidget->pointerInfo[0].ptImgTile = ptImgTile;
     ptWidget->pointerInfo[0].ptMaskTile = ptMaskTile;
     ptWidget->pointerInfo[0].maskColor = maskColor;
@@ -379,6 +421,7 @@ void ldClockSetMinutePointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile,
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRUpdate=true;
     ptWidget->pointerInfo[1].ptImgTile = ptImgTile;
     ptWidget->pointerInfo[1].ptMaskTile = ptMaskTile;
     ptWidget->pointerInfo[1].maskColor = maskColor;
@@ -392,12 +435,23 @@ void ldClockSetSecondPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile,
     {
         return;
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRUpdate=true;
     ptWidget->pointerInfo[2].ptImgTile = ptImgTile;
     ptWidget->pointerInfo[2].ptMaskTile = ptMaskTile;
     ptWidget->pointerInfo[2].maskColor = maskColor;
     ptWidget->pointerInfo[2].rotationCentre = (arm_2d_point_float_t){x,y};
 }
 
+void ldClockSetStepSecond(ldClock_t *ptWidget, bool isStepSecond)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isStepSecond=isStepSecond;
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

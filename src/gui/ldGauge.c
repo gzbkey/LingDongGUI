@@ -454,6 +454,17 @@ void ldGaugeSetPointerImage(ldGauge_t *ptWidget,arm_2d_tile_t *ptPointerImgTile,
     ptWidget->ptPointerMaskTile=ptPointerMaskTile;
     ptWidget->pointerOriginOffsetX=pointerOriginOffsetX;
     ptWidget->pointerOriginOffsetY=pointerOriginOffsetY;
+
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRReset=false;
+    if(ptWidget->ptPointerImgTile!=NULL)
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptWidget->ptPointerImgTile->tRegion;
+    }
+    else
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptWidget->ptPointerMaskTile->tRegion;
+    }
 }
 
 void ldGaugeSetPointerColor(ldGauge_t *ptWidget,ldColor color)

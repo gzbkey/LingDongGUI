@@ -500,9 +500,8 @@ void ldRadialMenuAddItem(ldRadialMenu_t *ptWidget, arm_2d_tile_t *ptImgTile, arm
         ptWidget->ptItemInfoList[ptWidget->use_as__ldBase_t.itemCount].ptImgTile=ptImgTile;
         ptWidget->ptItemInfoList[ptWidget->use_as__ldBase_t.itemCount].ptMaskTile=ptMaskTile;
         ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->use_as__ldBase_t.itemCount].itemRegion=ptImgTile->tRegion;
-
-//        ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->use_as__ldBase_t.itemCount].tTempItemRegion=ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->use_as__ldBase_t.itemCount].itemRegion;
-
+        ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->use_as__ldBase_t.itemCount].isDRReset=false;
+        ptWidget->use_as__ldBase_t.ptItemRegionList[ptWidget->use_as__ldBase_t.itemCount].isDRUpdate=true;
         ptWidget->use_as__ldBase_t.itemCount++;
 
         float preAngle=360.0/ptWidget->use_as__ldBase_t.itemCount;

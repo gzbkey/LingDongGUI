@@ -62,6 +62,7 @@ struct ldClock_t
     arm_2d_tile_t *ptBgImgTile;
     arm_2d_tile_t *ptBgMaskTile;
     ldColor bgMaskColor;
+    uint32_t lastTotalSeconds;
     bool isStepSecond:1;
 };
 
@@ -78,6 +79,8 @@ void ldClockSetBackgroundImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, ar
 void ldClockSetHourPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y);
 void ldClockSetMinutePointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y);
 void ldClockSetSecondPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y);
+
+void ldClockSetStepSecond(ldClock_t *ptWidget, bool isStepSecond);
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
