@@ -101,8 +101,6 @@ ldClock_t* ldClock_init(ld_scene_t *ptScene,ldClock_t *ptWidget, uint16_t nameId
     ptWidget->pointerInfo[0].rotationCentre.fX=c_tilePointerHourMask.tRegion.tSize.iWidth>>1;
     ptWidget->pointerInfo[0].rotationCentre.fY=c_tilePointerHourMask.tRegion.tSize.iHeight;
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptWidget->pointerInfo[0].ptMaskTile->tRegion;
-    ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iX+=x;
-    ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iY+=y;
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRReset=true;
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
 
@@ -110,8 +108,6 @@ ldClock_t* ldClock_init(ld_scene_t *ptScene,ldClock_t *ptWidget, uint16_t nameId
     ptWidget->pointerInfo[1].rotationCentre.fX=c_tilePointerMinMask.tRegion.tSize.iWidth>>1;
     ptWidget->pointerInfo[1].rotationCentre.fY=c_tilePointerMinMask.tRegion.tSize.iHeight;
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion=ptWidget->pointerInfo[1].ptMaskTile->tRegion;
-    ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iX+=x;
-    ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iY+=y;
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRReset=true;
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRUpdate=true;
 
@@ -119,8 +115,6 @@ ldClock_t* ldClock_init(ld_scene_t *ptScene,ldClock_t *ptWidget, uint16_t nameId
     ptWidget->pointerInfo[2].rotationCentre.fX=c_tilePointerSecMask.tRegion.tSize.iWidth>>1;
     ptWidget->pointerInfo[2].rotationCentre.fY=100;
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion=ptWidget->pointerInfo[2].ptMaskTile->tRegion;
-    ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iX+=x;
-    ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iY+=y;
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRReset=true;
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRUpdate=true;
 
@@ -231,8 +225,6 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
         if(bNeedHourUpdate && ptWidget->pointerInfo[0].op.Target.ptRegion!=NULL)
         {
             ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion = *ptWidget->pointerInfo[0].op.Target.ptRegion;
-            ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
-            ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
             ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
             arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[0].tTempItemRegion,
                                                 &ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion,
@@ -242,8 +234,6 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
         if(bNeedMinuteUpdate && ptWidget->pointerInfo[1].op.Target.ptRegion!=NULL)
         {
             ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion = *ptWidget->pointerInfo[1].op.Target.ptRegion;
-            ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
-            ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
             ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRUpdate=true;
             arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[1].tTempItemRegion,
                                                 &ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion,
@@ -253,8 +243,6 @@ void ldClock_on_frame_start(ld_scene_t *ptScene, ldClock_t *ptWidget)
         if(bNeedSecondUpdate && ptWidget->pointerInfo[2].op.Target.ptRegion!=NULL)
         {
             ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion = *ptWidget->pointerInfo[2].op.Target.ptRegion;
-            ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iX+=globalRegion.tLocation.iX;
-            ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion.tLocation.iY+=globalRegion.tLocation.iY;
             ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRUpdate=true;
             arm_2d_region_get_minimal_enclosure(&ptWidget->use_as__ldBase_t.ptItemRegionList[2].tTempItemRegion,
                                                 &ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion,
@@ -294,29 +282,21 @@ void ldClock_show(ld_scene_t *ptScene, ldClock_t *ptWidget, const arm_2d_tile_t 
                 break;
             }
 
-            int16_t w,h;
-            if(ptWidget->ptBgImgTile != NULL)
+            if(ptWidget->ptBgImgTile||ptWidget->ptBgMaskTile)
             {
-                w=ptWidget->ptBgImgTile->tRegion.tSize.iWidth;
-                h=ptWidget->ptBgImgTile->tRegion.tSize.iHeight;
-            }
-            else
-            {
-                if(ptWidget->ptBgMaskTile != NULL)
+                int16_t w,h;
+                if(ptWidget->ptBgImgTile != NULL)
+                {
+                    w=ptWidget->ptBgImgTile->tRegion.tSize.iWidth;
+                    h=ptWidget->ptBgImgTile->tRegion.tSize.iHeight;
+                }
+                else if(ptWidget->ptBgMaskTile != NULL)
                 {
                     w=ptWidget->ptBgMaskTile->tRegion.tSize.iWidth;
                     h=ptWidget->ptBgMaskTile->tRegion.tSize.iHeight;
                 }
-                else
-                {
-                    w=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth;
-                    h=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
-                }
-            }
-            
-            arm_2d_align_centre(tTarget_canvas, w, h)
-            {
-                if(ptWidget->ptBgImgTile||ptWidget->ptBgMaskTile)
+
+                arm_2d_align_centre(tTarget_canvas, w, h)
                 {
                     ldBaseImage(&tTarget,
                                 &__centre_region,
@@ -325,62 +305,61 @@ void ldClock_show(ld_scene_t *ptScene, ldClock_t *ptWidget, const arm_2d_tile_t 
                                 ptWidget->bgMaskColor,
                                 ptWidget->use_as__ldBase_t.opacity);
                 }
+            }
 
-                arm_2d_point_float_t bgRotationCentre=
+            arm_2d_point_float_t bgRotationCentre=
+            {
+                .fX = (tTarget_canvas.tSize.iWidth>>1),
+                .fY = (tTarget_canvas.tSize.iHeight>>1),
+            };
+
+            for(uint8_t i=0;i<3;i++)
+            {
+                if((ptWidget->pointerInfo[i].ptImgTile!=NULL)&&(ptWidget->pointerInfo[i].ptMaskTile!=NULL))
                 {
-                    .fX = (tTarget_canvas.tSize.iWidth>>1),
-                    .fY = (tTarget_canvas.tSize.iHeight>>1),
-                };
-
-                for(uint8_t i=0;i<3;i++)
+                    arm_2dp_tile_transform_xy_with_src_mask_and_opacity(&ptWidget->pointerInfo[i].op,
+                                                                        ptWidget->pointerInfo[i].ptImgTile,
+                                                                        ptWidget->pointerInfo[i].ptMaskTile,
+                                                                        &tTarget,
+                                                                        &tTarget_canvas,
+                                                                        ptWidget->pointerInfo[i].rotationCentre,
+                                                                        ptWidget->pointerInfo[i].radian,
+                                                                        1.0,
+                                                                        1.0,
+                                                                        ptWidget->use_as__ldBase_t.opacity,
+                                                                        &bgRotationCentre);
+                }
+                else if((ptWidget->pointerInfo[i].ptImgTile==NULL)&&(ptWidget->pointerInfo[i].ptMaskTile!=NULL))
                 {
-                    if((ptWidget->pointerInfo[i].ptImgTile!=NULL)&&(ptWidget->pointerInfo[i].ptMaskTile!=NULL))
-                    {
-                        arm_2dp_tile_transform_xy_with_src_mask_and_opacity(&ptWidget->pointerInfo[i].op,
-                                                                            ptWidget->pointerInfo[i].ptImgTile,
-                                                                            ptWidget->pointerInfo[i].ptMaskTile,
-                                                                            &tTarget,
-                                                                            &__centre_region,
-                                                                            ptWidget->pointerInfo[i].rotationCentre,
-                                                                            ptWidget->pointerInfo[i].radian,
-                                                                            1.0,
-                                                                            1.0,
-                                                                            ptWidget->use_as__ldBase_t.opacity,
-                                                                            &bgRotationCentre);
-                    }
-                    else if((ptWidget->pointerInfo[i].ptImgTile==NULL)&&(ptWidget->pointerInfo[i].ptMaskTile!=NULL))
-                    {
-                        arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t*)&ptWidget->pointerInfo[i].op,
-                                                                               ptWidget->pointerInfo[i].ptMaskTile,
-                                                                               &tTarget,
-                                                                               &__centre_region,
-                                                                               ptWidget->pointerInfo[i].rotationCentre,
-                                                                               ptWidget->pointerInfo[i].radian,
-                                                                               1.0,
-                                                                               1.0,
-                                                                               ptWidget->pointerInfo[i].maskColor,
-                                                                               ptWidget->use_as__ldBase_t.opacity,
-                                                                               &bgRotationCentre);
-                    }
-                    else if((ptWidget->pointerInfo[i].ptImgTile!=NULL)&&(ptWidget->pointerInfo[i].ptMaskTile==NULL))
-                    {
-                        arm_2dp_tile_transform_xy_with_opacity((arm_2d_op_trans_opa_t*)&ptWidget->pointerInfo[i].op,
-                                                               ptWidget->pointerInfo[i].ptImgTile,
-                                                               &tTarget,
-                                                               &__centre_region,
-                                                               ptWidget->pointerInfo[i].rotationCentre,
-                                                               ptWidget->pointerInfo[i].radian,
-                                                               1.0,
-                                                               1.0,
-                                                               ptWidget->pointerInfo[i].maskColor,
-                                                               ptWidget->use_as__ldBase_t.opacity,
-                                                               &bgRotationCentre);
-                    }
-
+                    arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t*)&ptWidget->pointerInfo[i].op,
+                                                                           ptWidget->pointerInfo[i].ptMaskTile,
+                                                                           &tTarget,
+                                                                           &tTarget_canvas,
+                                                                           ptWidget->pointerInfo[i].rotationCentre,
+                                                                           ptWidget->pointerInfo[i].radian,
+                                                                           1.0,
+                                                                           1.0,
+                                                                           ptWidget->pointerInfo[i].maskColor,
+                                                                           ptWidget->use_as__ldBase_t.opacity,
+                                                                           &bgRotationCentre);
+                }
+                else if((ptWidget->pointerInfo[i].ptImgTile!=NULL)&&(ptWidget->pointerInfo[i].ptMaskTile==NULL))
+                {
+                    arm_2dp_tile_transform_xy_with_opacity((arm_2d_op_trans_opa_t*)&ptWidget->pointerInfo[i].op,
+                                                           ptWidget->pointerInfo[i].ptImgTile,
+                                                           &tTarget,
+                                                           &tTarget_canvas,
+                                                           ptWidget->pointerInfo[i].rotationCentre,
+                                                           ptWidget->pointerInfo[i].radian,
+                                                           1.0,
+                                                           1.0,
+                                                           ptWidget->pointerInfo[i].maskColor,
+                                                           ptWidget->use_as__ldBase_t.opacity,
+                                                           &bgRotationCentre);
                 }
 
-                arm_2d_op_wait_async(NULL);
             }
+            arm_2d_op_wait_async(NULL);
         }
     }
 }
@@ -407,10 +386,19 @@ void ldClockSetHourPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, a
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;    
     ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
+    memset(&ptWidget->pointerInfo[0].op, 0, sizeof(arm_2d_op_trans_opa_t));
     ptWidget->pointerInfo[0].ptImgTile = ptImgTile;
     ptWidget->pointerInfo[0].ptMaskTile = ptMaskTile;
     ptWidget->pointerInfo[0].maskColor = maskColor;
     ptWidget->pointerInfo[0].rotationCentre = (arm_2d_point_float_t){x,y};
+    if(ptImgTile)
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptImgTile->tRegion;
+    }
+    else
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptMaskTile->tRegion;
+    }
 }
 
 void ldClockSetMinutePointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y)
@@ -422,10 +410,19 @@ void ldClockSetMinutePointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile,
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.ptItemRegionList[1].isDRUpdate=true;
+    memset(&ptWidget->pointerInfo[1].op, 0, sizeof(arm_2d_op_trans_opa_t));
     ptWidget->pointerInfo[1].ptImgTile = ptImgTile;
     ptWidget->pointerInfo[1].ptMaskTile = ptMaskTile;
     ptWidget->pointerInfo[1].maskColor = maskColor;
     ptWidget->pointerInfo[1].rotationCentre = (arm_2d_point_float_t){x,y};
+    if(ptImgTile)
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion=ptImgTile->tRegion;
+    }
+    else
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[1].itemRegion=ptMaskTile->tRegion;
+    }
 }
 
 void ldClockSetSecondPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile, ldColor maskColor, float x, float y)
@@ -437,10 +434,19 @@ void ldClockSetSecondPointerImage(ldClock_t *ptWidget, arm_2d_tile_t *ptImgTile,
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->use_as__ldBase_t.ptItemRegionList[2].isDRUpdate=true;
+    memset(&ptWidget->pointerInfo[2].op, 0, sizeof(arm_2d_op_trans_opa_t));
     ptWidget->pointerInfo[2].ptImgTile = ptImgTile;
     ptWidget->pointerInfo[2].ptMaskTile = ptMaskTile;
     ptWidget->pointerInfo[2].maskColor = maskColor;
     ptWidget->pointerInfo[2].rotationCentre = (arm_2d_point_float_t){x,y};
+    if(ptImgTile)
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion=ptImgTile->tRegion;
+    }
+    else
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[2].itemRegion=ptMaskTile->tRegion;
+    }
 }
 
 void ldClockSetStepSecond(ldClock_t *ptWidget, bool isStepSecond)
