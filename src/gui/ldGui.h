@@ -28,6 +28,9 @@ extern "C" {
 
 
 #include "ldBase.h"
+#include "ldWindow.h"
+#include "ldProgressWheel.h"
+#include "ldCalendar.h"
 #include "ldMessageBox.h"
 #include "ldList.h"
 #include "ldAnimation.h"
@@ -51,6 +54,7 @@ extern "C" {
 #include "ldButton.h"
 #include "ldWindow.h"
 #include "ldImage.h"
+#include "ldClock.h"
 
 extern uint8_t cursorBlinkCount;
 extern bool cursorBlinkFlag;
@@ -76,13 +80,45 @@ void ldGuiLcdTest(void);
 
 void __ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs);
 
-#define ldGuiJumpPage(pageFuncGroupName,mode,ms)           ({extern const ldPageFuncGroup_t pageFuncGroupName; \
-                                                            __ldGuiJumpPage((ldPageFuncGroup_t *)&pageFuncGroupName,&mode,ms);})
-
-#define ldGuiJumpPageFast(pageFuncGroupName)               ldGuiJumpPage(pageFuncGroupName,ARM_2D_SCENE_SWITCH_MODE_NONE,0)
-
 #if USE_SCENE_SWITCHING == 0
-#define ldGuiJumpPageReload()                              __ldGuiJumpPage((ldPageFuncGroup_t *)NULL,&ARM_2D_SCENE_SWITCH_MODE_NONE,0)
+#define ldGuiJumpPage(pageFuncGroupName,...) \
+    ARM_CONNECT2(ldGuiJumpPage_, __ARM_VA_NUM_ARGS(__VA_ARGS__))(pageFuncGroupName, ##__VA_ARGS__)
+
+#define ldGuiJumpPage_0(page) __ldGuiJumpPage((ldPageFuncGroup_t *)NULL,&ARM_2D_SCENE_SWITCH_MODE_NONE,0)
+#define ldGuiJumpPage_1(page,mode) __ldGuiJumpPage((ldPageFuncGroup_t *)NULL,&ARM_2D_SCENE_SWITCH_MODE_NONE,0)
+#define ldGuiJumpPage_2(page,mode,ms) __ldGuiJumpPage((ldPageFuncGroup_t *)NULL,&ARM_2D_SCENE_SWITCH_MODE_NONE,0)
+#elif USE_SCENE_SWITCHING == 1
+#define ldGuiJumpPage(pageFuncGroupName,...) \
+    ARM_CONNECT2(ldGuiJumpPage_, __ARM_VA_NUM_ARGS(__VA_ARGS__))(pageFuncGroupName, ##__VA_ARGS__)
+
+#define ldGuiJumpPage_0(page) \
+    ({ extern const ldPageFuncGroup_t page; \
+       extern arm_2d_scene_switch_mode_t ARM_2D_SCENE_SWITCH_MODE_NONE; \
+       __ldGuiJumpPage((ldPageFuncGroup_t *)&page,&ARM_2D_SCENE_SWITCH_MODE_NONE,0); })
+
+#define ldGuiJumpPage_1(page,mode) \
+    ({ extern const ldPageFuncGroup_t page; \
+       __ldGuiJumpPage((ldPageFuncGroup_t *)&page,&ARM_2D_SCENE_SWITCH_MODE_NONE,0); })
+
+#define ldGuiJumpPage_2(page,mode,ms) \
+    ({ extern const ldPageFuncGroup_t page; \
+       __ldGuiJumpPage((ldPageFuncGroup_t *)&page,&ARM_2D_SCENE_SWITCH_MODE_NONE,0); })
+#else
+#define ldGuiJumpPage(pageFuncGroupName,...) \
+    ARM_CONNECT2(ldGuiJumpPage_, __ARM_VA_NUM_ARGS(__VA_ARGS__))(pageFuncGroupName, ##__VA_ARGS__)
+
+#define ldGuiJumpPage_0(page) \
+    ({ extern const ldPageFuncGroup_t page; \
+       extern arm_2d_scene_switch_mode_t ARM_2D_SCENE_SWITCH_MODE_NONE; \
+       __ldGuiJumpPage((ldPageFuncGroup_t *)&page,&ARM_2D_SCENE_SWITCH_MODE_NONE,0); })
+
+#define ldGuiJumpPage_1(page,mode) \
+    ({ extern const ldPageFuncGroup_t page; \
+       __ldGuiJumpPage((ldPageFuncGroup_t *)&page,&(mode),0); })
+
+#define ldGuiJumpPage_2(page,mode,ms) \
+    ({ extern const ldPageFuncGroup_t page; \
+       __ldGuiJumpPage((ldPageFuncGroup_t *)&page,&(mode),ms); })
 #endif
 
 #ifdef __cplusplus

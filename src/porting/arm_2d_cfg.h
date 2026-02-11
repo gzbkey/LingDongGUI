@@ -56,6 +56,7 @@ extern "C" {
 // <o>Enable Anti-Alias support for all transform operations.
 //     <0=>     No Anti-Alias
 //     <1=>     Use 4x Supersampling Anti-Alias (4xSSAA)
+//     <2=>     Use 2x Supersampling Anti-Alias (2xSSAA)
 // <i> Note that enabling this feature suffers a non-negligible performance drop.
 // <i> This feature is disabled by default.
 #ifndef __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__
@@ -72,7 +73,7 @@ extern "C" {
 // <q>Enable ccca8888(ARGB8888) implicit conversion 
 // <i> This feature is disabled by default to save code size
 #ifndef __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__
-#   define __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__      0
+#   define __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__      1
 #endif
 
 // <q>Improve the Quality of IIR Blur
@@ -190,6 +191,7 @@ extern "C" {
 #ifndef __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__
 #   define __ARM_2D_CFG_OPTIMIZE_FOR_POINTER_LIKE_SHAPES_IN_TRANSFORM__     1
 #endif
+// </h>
 
 // <q> Optimize the scaler version of transform operations for hollow out masks
 // <i> This feature is disabled by default. There is no guarantee that the performance will increase or decrease. It is all depends your applications. If your application uses a lot of hollow out masks, it might help.
@@ -202,10 +204,14 @@ extern "C" {
 // <i> Ignore the user application code when a PFB is output of the areas that generated with the layout assistant. Enabling this feature can improve the user application performance. This feature is disabled by default. It is recommended when you trys to optimize the application performance.
 // <i> If you see some visual elements are imcomplete, you can choose those layout assistants with "_open" as posfix in corresonding area. For example, arm_2d_align_centre() can be changed to arm_2d_align_centre_open().
 #ifndef __ARM_2D_CFG_OPTIMIZE_FOR_PFB_IN_LAYOUT_ASSISTANT__
-#   define __ARM_2D_CFG_OPTIMIZE_FOR_PFB_IN_LAYOUT_ASSISTANT__              0
+#   define __ARM_2D_CFG_OPTIMIZE_FOR_PFB_IN_LAYOUT_ASSISTANT__              1
 #endif
 
-// </h>
+// <q> Force to disable Anti-Alias in Fill-colour-with-transformed-mask-and-opacity.
+// <i> This feature is disabled by default. You can disable it to improve performance as long as the rendering is good enough.
+#ifndef __ARM_2D_CFG_DISABLE_ANTI_ALIAS_IN_FILL_COLOUR_WITH_TRANSFORMED_MASK_AND_TARGET_MASK__
+#   define __ARM_2D_CFG_DISABLE_ANTI_ALIAS_IN_FILL_COLOUR_WITH_TRANSFORMED_MASK_AND_TARGET_MASK__   0
+#endif
 
 // <h>Extra Components
 // =======================
@@ -265,7 +271,7 @@ extern "C" {
 // <q> Enable the nebula effect mode in the Benchmark:Watch-panel
 // <i> This feature is disabled by default and it is only available in the Tiny mode.
 #ifndef __ARM_2D_CFG_BENCHMARK_WATCH_PANEL_USE_NEBULA__
-#   define __ARM_2D_CFG_BENCHMARK_WATCH_PANEL_USE_NEBULA__              0
+#   define __ARM_2D_CFG_BENCHMARK_WATCH_PANEL_USE_NEBULA__              1
 #endif
 
 // <q> Exit benchmark when finished

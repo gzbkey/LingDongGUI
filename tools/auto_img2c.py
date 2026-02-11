@@ -178,7 +178,10 @@ extern const arm_2d_tile_t c_tile_{text_file_name}_Mask;
 
     with open(images_txt_path, 'w') as f:
         for name, offset in sorted(combined_offsets.items(), key=lambda x: x[1]):
-            f.write(f"{name}:0x{offset:08x}\n")
+            if offset>=0xFFFFFFFF:
+                f.write(f"#define IMAGE_{name}_MASK NULL\n")
+            else:
+                f.write(f"{name}:0x{offset:08x}\n")
     
     full_header = header_content_start + ''.join(header_parts) + header_content_end
     with open(f"{output_dir}/uiImages.h", 'w') as file:
@@ -201,7 +204,7 @@ def main(argv):
         for filename in os.listdir(output_dir):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
                 full_path = os.path.abspath(os.path.join(output_dir, filename))
-                image_entries.append({"image": {"path": full_path}})
+                image_entries.append({"image": {"path": full_path, "depth": 16}})
 
         if image_entries:
             with open(image_yaml_path, 'w') as file:

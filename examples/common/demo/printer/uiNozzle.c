@@ -42,11 +42,11 @@ void uiNozzleInit(ld_scene_t* ptScene)
     obj=ldButtonInit(ID_BTN_RET,ID_BG,20,5,80,40);
     ldButtonSetFont(obj,FONT_ALIBABAPUHUITI_3_55_REGULAR_18);
     ldButtonSetColor(obj,__RGB(0x64,0x95,0xED),__RGB(0x41,0x69,0xE1));
-    ldButtonSetCorner(obj,true);
+    ldBaseSetCorner(obj,true);
     ldButtonSetText(obj,"返回");
     connect(ID_BTN_RET,SIGNAL_RELEASE,slotJumpReady);
 
-    obj=ldImageInit(ID_IMG_1,ID_BG,20,60,42,30,IMAGE_NOZZLEICON1_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_1,ID_BG,20,60,42,30,IMAGE_NOZZLEICON1_BMP,NULL);
     obj=ldLabelInit(ID_LABEL_1,ID_BG,65,60,80,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"喷头温度");
     ldLabelSetTransparent(obj,true);
@@ -54,7 +54,7 @@ void uiNozzleInit(ld_scene_t* ptScene)
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
 
-    obj=ldImageInit(ID_IMG_2,ID_BG,20,168,42,30,IMAGE_NOZZLEICON2_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_2,ID_BG,20,168,42,30,IMAGE_NOZZLEICON2_BMP,NULL);
     obj=ldLabelInit(ID_LABEL_1,ID_BG,65,168,40,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"进料");
     ldLabelSetTransparent(obj,true);
@@ -71,7 +71,7 @@ void uiNozzleInit(ld_scene_t* ptScene)
     ldLabelSetTextColor(obj,GLCD_COLOR_WHITE);
     ldLabelSetAlign(obj,ARM_2D_ALIGN_LEFT);
 
-    obj=ldImageInit(ID_IMG_3,ID_BG,20,223,42,30,IMAGE_NOZZLEICON3_BMP,NULL,false);
+    obj=ldImageInit(ID_IMG_3,ID_BG,20,223,42,30,IMAGE_NOZZLEICON3_BMP,NULL);
     obj=ldLabelInit(ID_LABEL_1,ID_BG,65,223,40,30,FONT_ALIBABAPUHUITI_3_55_REGULAR_20);
     ldLabelSetText(obj,"出料");
     ldLabelSetTransparent(obj,true);

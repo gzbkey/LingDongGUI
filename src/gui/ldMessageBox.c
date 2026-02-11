@@ -182,19 +182,14 @@ ldMessageBox_t* ldMessageBox_init( ld_scene_t *ptScene,ldMessageBox_t *ptWidget,
     ptWidget->ptFont=ptFont;
     ptWidget->titleHeight=(height-ptWidget->padding.top-ptWidget->padding.bottom)/5;
     ptWidget->msgHeight=ptWidget->titleHeight*3;
-    ptWidget->btnCount=3;
     ptWidget->releaseColor = __RGB(217, 225, 244);
     ptWidget->pressColor = __RGB(255, 243, 202);
-    ptWidget->btnRegion.tLocation.iX=ptWidget->padding.left;
-    ptWidget->btnRegion.tLocation.iY=ptWidget->padding.top+ptWidget->titleHeight+ptWidget->msgHeight;
-    ptWidget->btnRegion.tSize.iWidth=(ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->padding.left-ptWidget->padding.right)/ptWidget->btnCount-LD_MSG_BOX_SPACE*2;
-    ptWidget->btnRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight-ptWidget->padding.top-ptWidget->padding.bottom-ptWidget->titleHeight-ptWidget->msgHeight;
     ptWidget->clickNum=-1;
 
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotMsgBoxToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotMsgBoxToggle);
 
-    LOG_INFO("[init][messageBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][messageBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -293,25 +288,27 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
             }
             arm_2d_op_wait_async(NULL);
 
-            //title
-            do {
-                arm_2d_region_t region={
-                    .tLocation={
-                        .iX=ptWidget->padding.left,
-                        .iY=ptWidget->padding.top,
+            // title
+            if (ptWidget->pTitleStr)
+            {
+                arm_2d_region_t region = {
+                    .tLocation = {
+                        .iX = ptWidget->padding.left,
+                        .iY = ptWidget->padding.top,
                     },
-                    .tSize={
-                        .iWidth=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth-ptWidget->padding.left-ptWidget->padding.right,
-                        .iHeight=ptWidget->titleHeight,
+                    .tSize = {
+                        .iWidth = ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth - ptWidget->padding.left - ptWidget->padding.right,
+                        .iHeight = ptWidget->titleHeight,
                     },
                 };
 
-                ldBaseLabel(&tTarget,&region,(uint8_t*)ptWidget->pTitleStr,ptWidget->ptFont,ARM_2D_ALIGN_LEFT,ptWidget->titleStrColor,ptWidget->use_as__ldBase_t.opacity);
+                ldBaseLabel(&tTarget, &region, (uint8_t *)ptWidget->pTitleStr, ptWidget->ptFont, ARM_2D_ALIGN_LEFT, ptWidget->titleStrColor, ptWidget->use_as__ldBase_t.opacity);
                 arm_2d_op_wait_async(NULL);
-            } while (false);
+            }
 
             //msg
-            do {
+            if(ptWidget->pMsgStr)
+            {
                 arm_2d_region_t region={
                     .tLocation={
                         .iX=ptWidget->padding.left,
@@ -355,11 +352,11 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
                 }
 
                 arm_2d_op_wait_async(NULL);
-            } while (false);
+            }
 
             //btn
-            do {
-
+            if(ptWidget->btnCount)
+            {
                 arm_2d_region_t btnRegion=ptWidget->btnRegion;
 
                 for(uint8_t i=0;i<ptWidget->btnCount;i++)
@@ -401,7 +398,7 @@ void ldMessageBox_show(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, const arm_
                 }
 
                 arm_2d_op_wait_async(NULL);
-            } while (false);
+            }
         }
     }
 

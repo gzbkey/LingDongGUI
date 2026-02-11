@@ -41,14 +41,14 @@ int app_2d_main_thread (void *argument)
         if (VT_is_request_quit()) {
             break;
         }
-        disp_adapter0_task();
+        ldGuiLoop();
     }
     return 0;
 }
 
 static bool __lcd_sync_handler(void *pTarget)
 {
-    return VT_sdl_flush(1);
+    return VT_sdl_vsync();
 }
 
 int main (void) 
@@ -79,14 +79,7 @@ int main (void)
     xBtnInit(KEY_NUM_ENTER,vtIsKeyPress);
     xBtnInit(KEY_NUM_ESC,vtIsKeyPress);
 
-    arm_irq_safe {
-        arm_2d_init();
-    }
-
-    disp_adapter0_init();
-#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
     ldGuiInit((ldPageFuncGroup_t *)&LD_DEMO_GUI_FUNC);
-#endif
 
     do {
         arm_2d_helper_pfb_dependency_t tDependency = {

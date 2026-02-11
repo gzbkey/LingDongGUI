@@ -19,46 +19,76 @@
 #ifndef __LD_WINDOW_H__
 #define __LD_WINDOW_H__
 
-#ifdef   __cplusplus
-extern "C" {
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 #if defined(__clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wmissing-declarations"
-#   pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
-#   pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
+#pragma clang diagnostic ignored "-Wpadded"
 #endif
 
-#include "ldImage.h"
 
-#define ldWindow_t                      ldImage_t
 
-#define ldWindow_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height) \
-        ldImage_init(ptScene,ptWidget,nameId,parentNameId,x,y,width,height,NULL,NULL,true)
+/* OOC header, please DO NOT modify  */
+#ifdef __LD_WINDOW_IMPLEMENT__
+#undef __LD_WINDOW_IMPLEMENT__
+#define __ARM_2D_IMPL__
+#elif defined(__LD_WINDOW_INHERIT__)
+#undef __LD_WINDOW_INHERIT__
+#define __ARM_2D_INHERIT__
+#endif
+#include "arm_2d_utils.h"
+#include "ldBase.h"
 
+typedef struct ldWindow_t ldWindow_t;
+
+typedef struct ldPadding_t
+{
+    int16_t left;
+    int16_t top;
+    int16_t right;
+    int16_t bottom;
+}ldPadding_t;
+
+struct ldWindow_t
+{
+    implement(ldBase_t);
+    ldColor bgColor;
+    arm_2d_tile_t *ptImgTile;
+    arm_2d_tile_t *ptMaskTile;
+    bool isTransparent:1;
+    ldPadding_t *pLayoutPaddingGroup;
+    ldLayoutType_t layoutTpye:2;
+    bool isLayoutUpdate:1;
+};
+
+ldWindow_t* ldWindow_init(ld_scene_t *ptScene, ldWindow_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
 #define ldWindowInit(nameId,parentNameId,x,y,width,height) \
-        ldImageInit(nameId,parentNameId,x,y,width,height,NULL,NULL,true)
+        ldWindow_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
+void ldWindow_depose(ld_scene_t *ptScene, ldWindow_t *ptWidget);
+void ldWindow_on_load(ld_scene_t *ptScene, ldWindow_t *ptWidget);
+void ldWindow_on_frame_start(ld_scene_t *ptScene, ldWindow_t *ptWidget);
+void ldWindow_on_frame_complete(ld_scene_t *ptScene, ldWindow_t *ptWidget);
+void ldWindow_show(ld_scene_t *pScene, ldWindow_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-#define ldWindow_depose                 ldImage_depose
-#define ldWindow_on_load                ldImage_on_load
-#define ldWindow_on_frame_start         ldImage_on_frame_start
-#define ldWindow_show                   ldImage_show
-#define ldWindowSetColor                ldImageSetBackgroundColor
-#define ldWindowSetImage                ldImageSetImage
+void ldWindowSetColor(ldWindow_t *ptWidget,ldColor bgColor);
+void ldWindowSetImage(ldWindow_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
 
-#define ldWindowSetHidden               ldBaseSetHidden
-#define ldWindowMove                    ldBaseMove
-#define ldWindowSetOpacity              ldBaseSetOpacity
-#define ldWindowSetSelectable           ldBaseSetSelectable
-#define ldWindowSetSelect               ldBaseSetSelect
-#define ldWindowSetCorner               ldBaseSetCorner
+void ldWindowSetLayout(ldWindow_t *ptWidget, ldLayoutType_t type);
+void ldWindowSetPaddingGroup(ldWindow_t *ptWidget, ldPadding_t *pPaddingGroup);//Local variables forbidden
+
+ldColor ldWindowGetColor(ldWindow_t *ptWidget);
+
 
 #if defined(__clang__)
-#   pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
 
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

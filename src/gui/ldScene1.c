@@ -167,7 +167,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
 
     ARM_2D_UNUSED(tScreenSize);
 
-    ldGuiDraw(pTarget,ptTile,bIsNewFrame);
+    ldGuiDraw(pTarget,(arm_2d_tile_t*)ptTile,bIsNewFrame);
 
     if(ptThis->ptNodeRoot!=NULL)
     {
@@ -189,63 +189,43 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
 
                             arm_2d_region_t tRegion;
                             ldBase_t *ptWidget=(ldBase_t *)ptThis->tEnum.ptCurrent;
-#if 0
-                            if((ptWidget->tTempRegion.tLocation.iX==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX)&&
-                                    (ptWidget->tTempRegion.tLocation.iY==ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY)&&
-                                    (ptWidget->tTempRegion.tSize.iWidth==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth)&&
-                                    (ptWidget->tTempRegion.tSize.iHeight==ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight))
-#else
-                            if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
-#endif
+
+                            if(ptWidget->itemCount) // widget has item
+                            {
+                                ptCurrentWidget=ptWidget;
+                                itemCount=0;
+                                widgetLoca.iX=0;
+                                widgetLoca.iY=0;
+                                widgetLoca= ldBaseGetAbsoluteLocation(ptWidget,widgetLoca);
+
+                                break;
+                            }
+                            else
                             {
                                 widgetLoca.iX=0;
                                 widgetLoca.iY=0;
                                 widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
 
-                                //region no change
-                                tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                if(memcmp(&ptWidget->tTempRegion,&ptWidget->use_as__arm_2d_control_node_t.tRegion,sizeof (arm_2d_region_t))==0)
+                                {
+                                    tRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                }
+                                else
+                                {
+                                    tRegion=ptWidget->tTempRegion;
+                                    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+                                }
 
                                 tRegion.tLocation.iX+=widgetLoca.iX;
                                 tRegion.tLocation.iY+=widgetLoca.iY;
-                            }
-                            else
-                            {
-                                if(ptWidget->itemCount)// widget has item
-                                {
-                                    ptCurrentWidget=ptWidget;
-                                    itemCount=0;
-                                    widgetLoca.iX=0;
-                                    widgetLoca.iY=0;
-                                    widgetLoca= ldBaseGetAbsoluteLocation(ptWidget,widgetLoca);
-                                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
-                                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
-                                    arm_2d_dynamic_dirty_region_update(
-                                                &ptThis->tDirtyRegionItem,
-                                                (arm_2d_tile_t*)ptTile,
-                                                &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
-                                                SCENE_DR_UPDATE);
-                                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
-                                    itemCount++;
-                                    break;
-                                }
-                                else// widget update region
-                                {
-                                    widgetLoca.iX=0;
-                                    widgetLoca.iY=0;
-                                    widgetLoca= ldBaseGetAbsoluteLocation(ldBaseGetParent(ptWidget),widgetLoca);
 
-                                    tRegion=ptWidget->tTempRegion;
-                                    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
-                                    tRegion.tLocation.iX+=widgetLoca.iX;
-                                    tRegion.tLocation.iY+=widgetLoca.iY;
-                                }
+                                arm_2d_dynamic_dirty_region_update(
+                                            &ptThis->tDirtyRegionItem,
+                                            (arm_2d_tile_t*)ptTile,
+                                            &tRegion,
+                                            SCENE_DR_UPDATE);
+                                break;
                             }
-
-                            arm_2d_dynamic_dirty_region_update(
-                                        &ptThis->tDirtyRegionItem,
-                                        (arm_2d_tile_t*)ptTile,
-                                        &tRegion,
-                                        SCENE_DR_UPDATE);
                         }
                         else
                         {
@@ -257,26 +237,47 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
                         arm_2d_dynamic_dirty_region_change_user_region_index_only(
                                     &ptThis->tDirtyRegionItem,
                                     SCENE_DR_DONE);
+                        break;
                     }
-                    break;
                 } while (true);
             }
-            else
+
+            if(ptCurrentWidget!=NULL)
             {
-                if(itemCount<ptCurrentWidget->itemCount)
+                while(itemCount < ptCurrentWidget->itemCount)
                 {
-                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
-                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
-                    arm_2d_dynamic_dirty_region_update(
-                                &ptThis->tDirtyRegionItem,
-                                (arm_2d_tile_t*)ptTile,
-                                &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
-                                SCENE_DR_UPDATE);
-                    ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
-                    itemCount++;
+                    if(ptCurrentWidget->ptItemRegionList[itemCount].isDRUpdate)
+                    {
+                        if(ptCurrentWidget->ptItemRegionList[itemCount].isDRReset)
+                        {
+                            ptCurrentWidget->ptItemRegionList[itemCount].isDRUpdate = false;
+                        }
+
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iX+=widgetLoca.iX;
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion.tLocation.iY+=widgetLoca.iY;
+
+                        arm_2d_dynamic_dirty_region_update(
+                                    &ptThis->tDirtyRegionItem,
+                                    (arm_2d_tile_t*)ptTile,
+                                    &ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion,
+                                    SCENE_DR_UPDATE);
+
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
+                        itemCount++;
+
+                        break;
+                    }
+                    else
+                    {
+                        ptCurrentWidget->ptItemRegionList[itemCount].tTempItemRegion=ptCurrentWidget->ptItemRegionList[itemCount].itemRegion;
+                        itemCount++;
+                    }
                 }
-                else
+
+                if(itemCount >= ptCurrentWidget->itemCount)
                 {
+                    ptCurrentWidget->tTempRegion = ptCurrentWidget->use_as__arm_2d_control_node_t.tRegion;
+
                     ptCurrentWidget=NULL;
                     arm_2d_dynamic_dirty_region_change_user_region_index_only(
                                 &ptThis->tDirtyRegionItem,

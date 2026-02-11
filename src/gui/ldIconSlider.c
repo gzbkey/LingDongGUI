@@ -331,7 +331,7 @@ ldIconSlider_t* ldIconSlider_init( ld_scene_t *ptScene,ldIconSlider_t *ptWidget,
     ptWidget->moveOffset=1;
     ptWidget->selectIconOrPage=0;
     ptWidget->ptFont=ptFont;
-    ptWidget->charColor=0;
+    ptWidget->textColor=0;
     if(rowCount==1)
     {
         if(columnCount==1)
@@ -390,7 +390,7 @@ ldIconSlider_t* ldIconSlider_init( ld_scene_t *ptScene,ldIconSlider_t *ptWidget,
         ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotIconSliderScroll);
     }
 
-    LOG_INFO("[init][iconSlider] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][iconSlider] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -590,10 +590,10 @@ void ldIconSlider_show(ld_scene_t *ptScene, ldIconSlider_t *ptWidget, const arm_
                             };
                             ldBaseLabel(&tTarget,
                                         &fontRegion,
-                                        ptWidget->ptIconInfoList[showCount].pName,
+                                        (uint8_t*)ptWidget->ptIconInfoList[showCount].pName,
                                         ptWidget->ptFont,
                                         ARM_2D_ALIGN_TOP,
-                                        ptWidget->charColor,
+                                        ptWidget->textColor,
                                         ptWidget->use_as__ldBase_t.opacity);
                             arm_2d_op_wait_async(NULL);
                         }

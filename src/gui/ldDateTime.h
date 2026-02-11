@@ -52,18 +52,20 @@ struct ldDateTime_t
 {
     implement(ldBase_t);
     arm_2d_align_t tAlign;
+    int64_t timeStamp;
+    uint16_t year;
     uint8_t month;
     uint8_t day;
     uint8_t hour;
     uint8_t minute;
     uint8_t second;
-    uint16_t year;
     uint8_t formatStr[DATE_TIME_BUFFER_SIZE];
     uint8_t formatStrTemp[DATE_TIME_BUFFER_SIZE];
     ldColor bgColor;
     ldColor textColor;
     arm_2d_font_t *ptFont;
     bool isTransparent:1;
+    bool isAutoSysTime:1;
 };
 
 ldDateTime_t* ldDateTime_init(ld_scene_t *ptScene, ldDateTime_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);

@@ -70,7 +70,10 @@
 
 #undef arm_irq_safe
 #undef arm_exit_irq_safe
-#define arm_irq_safe  arm_using(  uint32_t ARM_2D_SAFE_NAME(temp) = 0 )
+#define arm_irq_safe  arm_using( uint32_t ARM_2D_SAFE_NAME(temp) = 0,         \
+                                 {  ARM_2D_UNUSED(ARM_2D_SAFE_NAME(temp));    \
+                                    VT_enter_global_mutex();},                \
+                                 {  VT_leave_global_mutex();} )
 #define arm_exit_irq_safe    continue
 
 
@@ -80,7 +83,7 @@
   \param [in]    wValue  the two half words to reverse
   \return               Reversed value
  */
-__STATIC_FORCEINLINE uint32_t __REV16(uint32_t wValue)
+__STATIC_FORCEINLINE uint32_t __rev16(uint32_t wValue)
 {
     uint32_t wHigh = wValue & 0xFF00FF00;
     uint32_t wLow = wValue & 0x00FF00FF;
@@ -88,6 +91,23 @@ __STATIC_FORCEINLINE uint32_t __REV16(uint32_t wValue)
     return (wHigh >> 8) | (wLow << 8);
 }
 
+/**
+  \brief   Reverse byte order (32 bit)
+  \details Reverses the byte order within word. For example, 0x12345678 becomes 0x78563412.
+  \param [in]    wValue  the word to reverse
+  \return               Reversed value
+ */
+__STATIC_FORCEINLINE uint32_t __rev(uint32_t x)
+{
+    return ((x >> 24) & 0x000000FFU) |
+           ((x >>  8) & 0x0000FF00U) |
+           ((x <<  8) & 0x00FF0000U) |
+           ((x << 24) & 0xFF000000U);
+}
+
+
+extern void VT_enter_global_mutex(void);
+extern void VT_leave_global_mutex(void);
 #endif
 
 #endif  /* end of __ARM_2D_USER_ARCH_PORT_H__ */

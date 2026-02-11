@@ -58,6 +58,9 @@ typedef enum{
     widgetTypeAnimation,
     widgetTypeList,
     widgetTypeMessageBox,
+    widgetTypeCalendar,
+    widgetTypeProgressWheel,
+    widgetTypeClock,
 }ldWidgetType_t;
 
 
@@ -115,8 +118,9 @@ typedef enum{
 
 #define MEM_MODE_FREERTOS_HEAP4         (0)
 #define MEM_MODE_TLFS                   (1)
-#define MEM_MODE_STDLIB                 (2)
-#define MEM_MODE_USER                   (3)
+#define MEM_MODE_LWMEM                  (2)
+#define MEM_MODE_STDLIB                 (3)
+#define MEM_MODE_USER                   (4)
 
 #define ANGLE_2_RADIAN(angle)           ((float)(angle)*0.0174533f)
 
@@ -164,18 +168,23 @@ struct ldPageFuncGroup_t{
     ldPageFunc_t loop;
     ldPageFunc_t quit;
     ldDrawFunc_t draw;
+    ldPageFunc_t frameStart;
+    ldPageFunc_t frameComplete;
 #if (USE_LOG_LEVEL>=LOG_LEVEL_INFO)
-    uint8_t pageName[16];
+    char *pageName;
 #endif
+    union {
+        void *pointer;
+        intptr_t addr;
+        size_t userData;
+    };
 };
 
 struct ld_scene_t {
     implement(arm_2d_scene_t);
-//ARM_PRIVATE(
     bool bUserAllocated;
     arm_2d_region_list_item_t tDirtyRegionItem;
     arm_2d_control_enumerator_t tEnum;
-//)
     const ldPageFuncGroup_t *ldGuiFuncGroup;
     arm_2d_control_node_t *ptNodeRoot;
     xQueue_t *ptMsgQueue;
@@ -184,6 +193,8 @@ struct ld_scene_t {
 typedef struct {
     arm_2d_region_t itemRegion;
     arm_2d_region_t tTempItemRegion;
+    bool isDRUpdate:1;
+    bool isDRReset:1;
 }ldBaseItemRegion_t;
 
 typedef struct {
@@ -218,6 +229,23 @@ typedef struct {
     uint8_t right;
 }ldBody_t;
 
+typedef struct {
+    uint16_t year;
+    uint8_t mon;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t min;
+    uint8_t sec;
+    uint8_t week;
+    bool isEnable:1;
+}ldBaseRTC_t;
+
+typedef enum{
+    layoutNone,
+    layoutHorizontal,
+    layoutVertical,
+}ldLayoutType_t;
+
 typedef int64_t ldTimer_t;
 
 bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer);
@@ -237,12 +265,6 @@ void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color
 void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,uint8_t opacity,bool bIsNewFrame);
 void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
-void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
-void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
-void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
-void ldBaseSetSelectable(ldBase_t* ptWidget,bool isSelectable);
-void ldBaseSetSelect(ldBase_t* ptWidget,bool isSelect);
-void ldBaseSetCorner(ldBase_t* ptWidget,bool isCorner);
 ldWidgetType_t ldBaseGetWidgetType(ldBase_t *ptWidget);
 uint16_t ldBaseGetNameId(ldBase_t *ptWidget);
 uint16_t ldBaseGetOpacity(ldBase_t *ptWidget);
@@ -255,11 +277,37 @@ arm_2d_location_t ldBaseGetAbsoluteLocation(ldBase_t *ptWidget,arm_2d_location_t
 void ldBaseDrawLine(arm_2d_tile_t *pTile,int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t lineSize, ldColor color,uint8_t opacityMax, uint8_t opacityMin);
 ldBase_t* ldBaseGetParent(ldBase_t* ptWidget);
 ldBase_t* ldBaseGetChildList(ldBase_t* ptWidget);
+uint16_t ldBaseGetChildCount(ldBase_t* ptWidget);
 void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY);
 arm_2d_region_t ldBaseGetAlignRegion(arm_2d_region_t parentRegion,arm_2d_region_t childRegion,arm_2d_align_t tAlign);
 arm_2d_control_node_t *ldBaseGetRootNode(arm_2d_control_node_t *ptNode);
 int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion, int16_t currentOffset, uint8_t itemCount, uint8_t itemHeight, uint8_t space);
+arm_2d_region_t ldBaseAlignRegionCenter(arm_2d_region_t parentRegion, arm_2d_region_t childRegion);
+
 void ldBaseSetCenter(ldBase_t *ptWidget);
+void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden);
+void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity);
+void ldBaseSetSelectable(ldBase_t* ptWidget,bool isSelectable);
+void ldBaseSetSelect(ldBase_t* ptWidget,bool isSelect);
+void ldBaseSetCorner(ldBase_t* ptWidget,bool isCorner);
+
+void ldBaseSetRegion(ldBase_t* ptWidget,arm_2d_region_t region);
+void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y);
+void ldBaseResize(ldBase_t* ptWidget,arm_2d_size_t size);
+void ldBaseSetX(ldBase_t* ptWidget,int16_t x);
+void ldBaseSetY(ldBase_t* ptWidget,int16_t y);
+void ldBaseSetWidth(ldBase_t* ptWidget,int16_t width);
+void ldBaseSetHeight(ldBase_t* ptWidget,int16_t height);
+arm_2d_region_t ldBaseGetRegion(ldBase_t* ptWidget);
+arm_2d_location_t ldBaseGetLocation(ldBase_t* ptWidget);
+arm_2d_size_t ldBaseGetSize(ldBase_t* ptWidget);
+int16_t ldBaseGetX(ldBase_t* ptWidget);
+int16_t ldBaseGetY(ldBase_t* ptWidget);
+int16_t ldBaseGetWidth(ldBase_t* ptWidget);
+int16_t ldBaseGetHeight(ldBase_t* ptWidget);
+void ldBaseGetTime(uint8_t *pHour,uint8_t *pMinute,uint8_t *pSecond);
+void ldBaseGetDate(uint16_t *pYear,uint8_t *pMonth,uint8_t *pDay);
+uint8_t ldBaseGetWeek(uint16_t year, uint8_t month, uint8_t day);
 
 #define ldBaseGetWidgetById(nameId)     ldBaseGetWidget(ptScene->ptNodeRoot, nameId)
 

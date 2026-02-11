@@ -63,11 +63,12 @@ widget demo sdl
 
 | 状态 | 名称 | 说明 |
 | :----:| ---- | ---- |
-| ✅ | window | 窗体，多用于分层 |
+| ✅ | window | 窗体，多用于分层，支持横向纵向自动布局 |
 | ✅ | image | 图片，用工具生成图片数据，支持png格式 |
 | ✅ | button | 按键 |
 | ✅ | text | 文本 |
 | ✅ | progress bar | 进度条，支持图片移动形成动画效果 |
+| ✅ | progress wheel | 圆环进度条(ARM 2D) |
 | ✅ | check box + radio button| 复选框 + 单选功能，支持自定义图片和文字显示 |
 | ✅ | radia menu | 旋转菜单 |
 | ✅ | label | 简单文本显示 |
@@ -84,7 +85,7 @@ widget demo sdl
 | ✅ | combo box | 下拉框 |
 | ✅ | arc bar | 圆环进度条 |
 | ✅ | animation | gif动画 |
-| 🔲 | calendar | 日历 |
+| ✅ | calendar | 日历 |
 | ✅ | message box | 消息框 |
 | 🔲 | clock | 模拟时钟 |
 | ✅ | list | 列表，可嵌入其他类型控件 |

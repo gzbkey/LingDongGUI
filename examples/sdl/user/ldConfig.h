@@ -49,8 +49,9 @@ extern "C" {
 // <o>Select Memory Manager
 //     <0=>    freertos heap4
 //     <1=>    tlfs
-//     <2=>    stdlib
-//     <3=>    user
+//     <2=>    lwmem
+//     <3=>    stdlib
+//     <4=>    user
 // <i> default = 0
 #define LD_MEM_MODE                               (0)
 #endif
@@ -67,8 +68,6 @@ extern "C" {
 #define USE_VIRTUAL_RESOURCE                      (0)
 #endif
 
-// widget config
-
 #ifndef USE_RADIA_MENU_SCALE
 // <q>Radia menu's scale function support
 // <i> Radia menu's scale function support
@@ -76,11 +75,14 @@ extern "C" {
 #endif
 
 #ifndef USE_SCENE_SWITCHING
-// <q>scene switcing support
-// <i> 0:only one scene,user manually clean widget
-// <i> 1:Less ram,fast switching(default)
-// <i> 2:More effects
-#define USE_SCENE_SWITCHING                       (1)
+// <o>scene switcing support
+//     <0=> One scene
+//     <1=> Less ram
+//     <2=> More effects
+// <i> 0: only one scene,user manually clean widget
+// <i> 1: Less ram,fast switching(default)
+// <i> 2: More effects
+#define USE_SCENE_SWITCHING                       (2)
 #endif
 
 // debug config
@@ -121,9 +123,6 @@ extern "C" {
 #endif
 
 #endif
-
-#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
-#define __ARM_2D_CFG_ENABLE_LOG__                 (0)
 
 #ifndef USE_DEMO
 // <o> choose demo to test
@@ -171,7 +170,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiStartup.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          uiStartupFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 #if USE_DEMO == 2
@@ -186,7 +189,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiWidget.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          uiWidgetFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 #if USE_DEMO == 3
@@ -201,7 +208,11 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "uiLogo.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          uiLogoFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
+#endif
 #endif
 
 #if USE_DEMO == 4
@@ -216,15 +227,33 @@ extern "C" {
 #undef LD_CFG_PFB_HEIGHT
 #define LD_CFG_PFB_HEIGHT                         (LD_CFG_SCREEN_HEIGHT/10)
 #define LD_DEMO_GUI_INCLUDE                       "home.h"
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__ == 0
 #define LD_DEMO_GUI_FUNC                          homeFunc
+#else
+#define LD_DEMO_GUI_FUNC                          (*(void*)0)
 #endif
+#endif
+
+// <q>view dirty region
+// <i> Opening this mode will refresh the full screen
+#define __DISP0_CFG_DEBUG_DIRTY_REGIONS__         (0)
+
+// <q>ARM 2D output log
+// <i> debug mode
+#define __ARM_2D_CFG_ENABLE_LOG__                 (0)
+
+// <q>debug layer
+// <i> view fps
+#define __DISP0_CFG_NAVIGATION_LAYER_MODE__       (0)
+
+// <q>diable ARM 2D default demo
+// <i> default=1 use ldgui
+#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
 
 // <<< end of configuration section >>>
 
 // do not eidt below
 
-#define __DISP0_CFG_NAVIGATION_LAYER_MODE__       (0)
-#define __DISP0_CFG_DISABLE_DEFAULT_SCENE__       (1)
 #define __DISP0_CFG_PFB_BLOCK_WIDTH__             LD_CFG_PFB_WIDTH
 #define __DISP0_CFG_PFB_BLOCK_HEIGHT__            LD_CFG_PFB_HEIGHT
 #define __DISP0_CFG_COLOUR_DEPTH__                LD_CFG_COLOR_DEPTH
@@ -243,8 +272,8 @@ extern "C" {
 #define __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__                  0
 #define __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__           0
 #define __ARM_2D_CFG_SUPPORT_TRANSFORM_FOR_NON_A8_FONTS__             0
-
-bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
+#define __ARM_2D_CFG_OPTIMIZE_FOR_PFB_IN_LAYOUT_ASSISTANT__           0
+#define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                       1
 
 // user key num
 #define KEY_NUM_UP   0

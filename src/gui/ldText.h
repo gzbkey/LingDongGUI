@@ -80,7 +80,7 @@ void ldText_show(ld_scene_t *pScene, ldText_t *ptWidget, const arm_2d_tile_t *pt
 void ldTextSetTransparent(ldText_t* ptWidget,bool isTransparent);
 void ldTextSetText(ldText_t* ptWidget,uint8_t *pStr);
 void ldTextSetStaticText(ldText_t* ptWidget,const uint8_t *pStr);
-void ldTextSetTextColor(ldText_t* ptWidget,ldColor charColor);
+void ldTextSetTextColor(ldText_t* ptWidget,ldColor textColor);
 void ldTextSetBackgroundImage(ldText_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile);
 void ldTextSetBackgroundColor(ldText_t *ptWidget, ldColor bgColor);
 void ldTextScrollSeek(ldText_t *ptWidget,int16_t offset);

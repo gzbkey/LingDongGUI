@@ -26,6 +26,8 @@
 #include "freeRtosHeap4.h"
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
 #include "stdlib.h"
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+#include "lwmem.h"
 #endif
 
 #if defined(__clang__)
@@ -47,9 +49,16 @@
 
 #if LD_MEM_MODE == MEM_MODE_TLFS
 static void *pTlsfMem = NULL;
-__attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
+__attribute__((aligned(4))) uint8_t ucHeap[LD_MEM_SIZE];
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
-__attribute__((aligned(8))) uint8_t ucHeap[LD_MEM_SIZE];
+__attribute__((aligned(4))) uint8_t ucHeap[LD_MEM_SIZE];
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+__attribute__((aligned(4))) uint8_t ucHeap[LD_MEM_SIZE];
+static size_t lwmemSize=0;
+lwmem_region_t lwRegions[] = {
+    { ucHeap, LD_MEM_SIZE },
+    { NULL, 0},
+};
 #endif
 
 __WEAK void *ldMalloc(uint32_t size)
@@ -65,6 +74,15 @@ __WEAK void *ldMalloc(uint32_t size)
     p = pvPortMalloc(size);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
     p = malloc(size);
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+    if(lwmemSize==0)
+    {
+        lwmemSize=lwmem_assignmem(lwRegions);
+    }
+    if(lwmemSize)
+    {
+        p = lwmem_malloc(size);
+    }
 #endif
     return p;
 }
@@ -72,13 +90,23 @@ __WEAK void *ldMalloc(uint32_t size)
 __WEAK void *ldCalloc(uint32_t num, uint32_t size)
 {
     void *p = NULL;
-
+#if LD_MEM_MODE == MEM_MODE_LWMEM
+    if(lwmemSize==0)
+    {
+        lwmemSize=lwmem_assignmem(lwRegions);
+    }
+    if(lwmemSize)
+    {
+        p = lwmem_calloc(num,size);
+    }
+#else
     p = ldMalloc(num * size);
 
     if (p != NULL)
     {
         memset(p, 0, num * size);
     }
+#endif
     return p;
 }
 
@@ -94,6 +122,8 @@ __WEAK void ldFree(void *p)
     vPortFree(p);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
     free(p);
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+    lwmem_free(p);
 #endif
     p=NULL;
 }
@@ -106,12 +136,10 @@ __WEAK void *ldRealloc(void *ptr, uint32_t newSize)
 #elif LD_MEM_MODE == MEM_MODE_FREERTOS_HEAP4
     p = pvPortRealloc(ptr, newSize);
 #elif LD_MEM_MODE == MEM_MODE_STDLIB
-    return realloc(ptr, newSize);
+    p = realloc(ptr, newSize);
+#elif LD_MEM_MODE == MEM_MODE_LWMEM
+    p = lwmem_realloc(ptr,newSize);
 #endif
-    if (p != NULL)
-    {
-        memset(p, 0, newSize);
-    }
     return p;
 }
 
@@ -274,6 +302,7 @@ void ldBaseImage(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t
             break;
         }
         case ARM_2D_COLOUR_MASK_A8:
+        case ARM_2D_COLOUR_8BIT:
         {
             arm_2d_fill_colour_with_mask_and_opacity(ptTile,
                                                      ptRegion,
@@ -342,6 +371,7 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     {
         return;
     }
+    arm_lcd_text_set_char_spacing(1);
     arm_lcd_text_set_target_framebuffer(ptTile);
     arm_lcd_text_set_draw_region(ptRegion);
     arm_lcd_text_set_colour(textColor, GLCD_COLOR_WHITE);
@@ -350,35 +380,6 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_text_location(0,0);
 
     arm_lcd_puts_label((char*)pStr,tAlign);
-}
-
-void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
-#if 0
-    ptWidget->isDirtyRegionUpdate = true;
-    ptWidget->isHidden=isHidden;
-#else
-    arm_2d_control_node_t *ptNodeRoot=ldBaseGetRootNode(&ptWidget->use_as__arm_2d_control_node_t);
-    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
-    int16_t x,y;
-    if(isHidden)
-    {
-        x=ptNode->tRegion.tLocation.iX-ptNodeRoot->tRegion.tSize.iWidth;
-        y=ptNode->tRegion.tLocation.iY-ptNodeRoot->tRegion.tSize.iHeight;
-    }
-    else
-    {
-        x=ptNode->tRegion.tLocation.iX+ptNodeRoot->tRegion.tSize.iWidth;
-        y=ptNode->tRegion.tLocation.iY+ptNodeRoot->tRegion.tSize.iHeight;
-    }
-    ptWidget->isHidden=isHidden;
-    ldBaseMove(ptWidget,x,y);
-#endif
 }
 
 bool ldBaseIsHidden(ldBase_t* ptWidget)
@@ -399,13 +400,8 @@ bool ldBaseIsHidden(ldBase_t* ptWidget)
     return false;
 }
 
-void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
+static void _ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
 {
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
     ptWidget->isDirtyRegionUpdate = true;
 
     ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
@@ -415,6 +411,56 @@ void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
     arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
                                         &ptWidget->use_as__arm_2d_control_node_t.tRegion,
                                         &ptWidget->tTempRegion);
+}
+
+void ldBaseSetHidden(ldBase_t* ptWidget,bool isHidden)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    if(ptWidget->isHidden==isHidden)
+    {
+        return;
+    }
+
+    arm_2d_control_node_t *ptNodeRoot=ldBaseGetRootNode(&ptWidget->use_as__arm_2d_control_node_t);
+    arm_2d_control_node_t *ptNode=&ptWidget->use_as__arm_2d_control_node_t;
+    int16_t x,y;
+    if(isHidden)
+    {
+        x=ptNode->tRegion.tLocation.iX-ptNodeRoot->tRegion.tSize.iWidth;
+        y=ptNode->tRegion.tLocation.iY-ptNodeRoot->tRegion.tSize.iHeight;
+    }
+    else
+    {
+        x=ptNode->tRegion.tLocation.iX+ptNodeRoot->tRegion.tSize.iWidth;
+        y=ptNode->tRegion.tLocation.iY+ptNodeRoot->tRegion.tSize.iHeight;
+    }
+    ptWidget->isHidden=isHidden;
+    _ldBaseMove(ptWidget,x,y);
+}
+
+void ldBaseMove(ldBase_t* ptWidget,int16_t x,int16_t y)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    bool isHidden=ptWidget->isHidden;
+    if(isHidden)
+    {
+        ldBaseSetHidden(ptWidget,false);
+    }
+
+    _ldBaseMove(ptWidget,x,y);
+
+    if(isHidden)
+    {
+        ldBaseSetHidden(ptWidget,true);
+    }
 }
 
 void ldBaseSetOpacity(ldBase_t *ptWidget, uint8_t opacity)
@@ -676,6 +722,18 @@ ldBase_t* ldBaseGetParent(ldBase_t* ptWidget)
 ldBase_t* ldBaseGetChildList(ldBase_t* ptWidget)
 {
     return (ldBase_t *)ptWidget->use_as__arm_2d_control_node_t.ptChildList;
+}
+
+uint16_t ldBaseGetChildCount(ldBase_t* ptWidget)
+{
+    ldBase_t* ptChild = ldBaseGetChildList(ptWidget);
+    uint8_t count = 0;
+    while (ptChild != NULL)
+    {
+        count++;
+        ptChild = (ldBase_t *)ptChild->use_as__arm_2d_control_node_t.ptNext;
+    }
+    return count;
 }
 
 void ldBaseBgMove(ld_scene_t *ptScene, int16_t bgWidth,int16_t bgHeight,int16_t offsetX,int16_t offsetY)
@@ -1068,4 +1126,221 @@ void ldBaseSetCorner(ldBase_t* ptWidget,bool isCorner)
     }
     ptWidget->isDirtyRegionUpdate = true;
     ptWidget->isCorner=isCorner;
+}
+
+void ldBaseResize(ldBase_t* ptWidget,arm_2d_size_t size)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize=size;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetX(ldBase_t* ptWidget,int16_t x)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX=x;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetY(ldBase_t* ptWidget,int16_t y)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY=y;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetWidth(ldBase_t* ptWidget,int16_t width)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth=width;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetHeight(ldBase_t* ptWidget,int16_t height)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=height;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+void ldBaseSetRegion(ldBase_t* ptWidget,arm_2d_region_t region)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->isDirtyRegionUpdate = true;
+    ptWidget->tTempRegion=ptWidget->use_as__arm_2d_control_node_t.tRegion;
+    ptWidget->use_as__arm_2d_control_node_t.tRegion=region;
+    arm_2d_region_get_minimal_enclosure(&ptWidget->tTempRegion,
+                                        &ptWidget->use_as__arm_2d_control_node_t.tRegion,
+                                        &ptWidget->tTempRegion);
+}
+
+arm_2d_region_t ldBaseGetRegion(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return (arm_2d_region_t){0};
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion;
+}
+
+arm_2d_location_t ldBaseGetLocation(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return (arm_2d_location_t){0};
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation;
+}
+
+arm_2d_size_t ldBaseGetSize(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return (arm_2d_size_t){0};
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize;
+}
+
+int16_t ldBaseGetX(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iX;
+}
+
+int16_t ldBaseGetY(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+}
+
+int16_t ldBaseGetWidth(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iWidth;
+}
+
+int16_t ldBaseGetHeight(ldBase_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
+}
+
+#define IS_LEAP_YEAR(y) (((y) % 4 == 0 && (y) % 100 != 0) || ((y) % 400 == 0))
+
+void ldBaseGetTime(uint8_t *pHour,uint8_t *pMinute,uint8_t *pSecond)
+{
+    int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+    
+    uint32_t sec = lTimeStampInMs/1000;
+    uint32_t rem  = sec % 86400;
+    *pHour = rem / 3600;
+    *pMinute  = (rem % 3600) / 60;
+    *pSecond  = rem % 60;
+}
+
+void ldBaseGetDate(uint16_t *pYear,uint8_t *pMonth,uint8_t *pDay)
+{
+    int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
+    uint32_t days = lTimeStampInMs / 86400000;
+    uint16_t y = 1970;
+    while (days >= 365 + IS_LEAP_YEAR(y))
+    {
+        days -= 365 + IS_LEAP_YEAR(y);
+        ++y;
+    }
+    *pYear = y;
+    uint8_t mtab[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    mtab[1] += IS_LEAP_YEAR(y) ? 1 : 0;
+    uint8_t m = 1;
+    while (days >= mtab[m - 1])
+    {
+        days -= mtab[m - 1];
+        ++m;
+    }
+    *pMonth = m;
+    *pDay = days + 1;
+}
+
+// 0=周日，1=周一...6=周六
+uint8_t ldBaseGetWeek(uint16_t year, uint8_t month, uint8_t day)
+{
+    if (month < 3)
+    {
+        month += 12;
+        --year;
+    }
+    uint16_t c = year / 100;
+    year %= 100;
+    uint16_t w = (c / 4 - 2 * c + year + year / 4 + 13 * (month + 1) / 5 + day - 1) % 7;
+    return (w + 7) % 7;
+}
+
+arm_2d_region_t ldBaseAlignRegionCenter(arm_2d_region_t parentRegion, arm_2d_region_t childRegion)
+{
+    childRegion.tLocation.iX = parentRegion.tLocation.iX + ((parentRegion.tSize.iWidth - childRegion.tSize.iWidth) >> 1);
+    childRegion.tLocation.iY = parentRegion.tLocation.iY + ((parentRegion.tSize.iHeight - childRegion.tSize.iHeight) >> 1);
+    return childRegion;
 }

@@ -52,11 +52,12 @@ struct ldScrollSelecter_t
     arm_2d_font_t *ptFont;
     arm_2d_tile_t *ptImgTile;
     arm_2d_tile_t *ptMaskTile;
-    arm_2d_tile_t *ptIndicatorTile;
+    arm_2d_tile_t *ptIndicatorImgTile;
+    arm_2d_tile_t *ptIndicatorMaskTile;
     const uint8_t **ppItemStrGroup;
     int16_t scrollOffset;
     int16_t itemSpace;
-    ldColor charColor;
+    ldColor textColor;
     ldColor bgColor;
     ldColor indicatorColor;
     uint8_t itemSelect;
@@ -65,7 +66,7 @@ struct ldScrollSelecter_t
     bool isTransparent:1;
     bool isWaitMove:1;
     bool isAutoMove:1;
-    bool is3Row:1;
+    bool isEdit:1;
 };
 
 ldScrollSelecter_t* ldScrollSelecter_init(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);
@@ -76,23 +77,22 @@ void ldScrollSelecter_on_frame_complete(ld_scene_t *ptScene, ldScrollSelecter_t 
 void ldScrollSelecter_show(ld_scene_t *pScene, ldScrollSelecter_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize);
-void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor charColor);
+void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor textColor);
 void ldScrollSelecterSetBackgroundColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
 void ldScrollSelecterSetBackgroundImage(ldScrollSelecter_t* pWidget,arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile);
+void ldScrollSelecterSetIndicatorColor(ldScrollSelecter_t* ptWidget,ldColor indicatorColor);
+void ldScrollSelecterSetIndicatorImage(ldScrollSelecter_t* ptWidget, arm_2d_tile_t *ptIndicatorImgTile, arm_2d_tile_t *ptIndicatorMaskTile);
 void ldScrollSelecterSetTransparent(ldScrollSelecter_t* pWidget,bool isTransparent);
 void ldScrollSelecterSetSpeed(ldScrollSelecter_t *pWidget, uint8_t speed);
-void ldScrollSelecterSelectItem(ldScrollSelecter_t *pWidget, uint8_t itemNum);
-void lldScrollSelecterSetOneRowMode(ldScrollSelecter_t *ptWidget, bool isOneRow);
+void ldScrollSelecterSetSelectItemNum(ldScrollSelecter_t *pWidget, int8_t itemNum);
+void ldScrollSelecterSetSelectText(ldScrollSelecter_t *ptWidget, uint8_t *text);
+void ldScrollSelecterSetEditMode(ldScrollSelecter_t *ptWidget, bool isEdit);
+
+uint8_t *ldScrollSelecterGetSelectText(ldScrollSelecter_t *ptWidget);
+uint8_t ldScrollSelecterGetSelectItemNum(ldScrollSelecter_t *ptWidget);
 
 #define ldScrollSelecterInit(nameId,parentNameId,x,y,width,height,ptFont) \
         ldScrollSelecter_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont)
-
-#define ldScrollSelecterSetHidden                ldBaseSetHidden
-#define ldScrollSelecterMove                     ldBaseMove
-#define ldScrollSelecterSetOpacity               ldBaseSetOpacity
-#define ldScrollSelecterSetSelectable            ldBaseSetSelectable
-#define ldScrollSelecterSetSelect                ldBaseSetSelect
-#define ldScrollSelecterSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

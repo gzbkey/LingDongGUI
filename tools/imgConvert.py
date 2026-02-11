@@ -62,18 +62,17 @@ class BinaryTracker:
         self.offset = 0
         self.binfile = binfile
         self.offsets = {}
-        
+        self.has_alpha = False
+                
     def write_header_file(self, header_path, prefix):
         with open(header_path, 'w') as f:
             for name, offset in sorted(self.offsets.items()):
                 name=name.replace('__', '_')
                 name=name.strip('_').upper()
                 print(f'{name}:0x{offset:08x}', file=f)
-                
-    def __init__(self, binfile):
-        self.offset = 0
-        self.binfile = binfile
-        self.offsets = {}
+            if not self.has_alpha:
+                prefix=prefix.strip('_').upper()
+                print(f'{prefix}:0xFFFFFFFF', file=f)
                 
     def write_data(self, data, align=4, name=None, width=0, height=0, color_type=0):
         start_offset = self.offset
@@ -100,6 +99,13 @@ class BinaryTracker:
         else:
             self.binfile.write(data)
             self.offset += len(data)
+            
+        if align > 1:
+            current_position = self.offset
+            pad = (align - (current_position % align)) % align
+            if pad > 0:
+                self.binfile.write(bytes([0] * pad))
+                self.offset += pad
             
         if name:
             self.offsets[name] = start_offset
@@ -473,6 +479,7 @@ def main(argv):
                                                    width=row, 
                                                    height=col,
                                                    color_type=ColorType.MASK_A8)
+            binary_tracker.has_alpha = True
             print('ARM_ALIGN(4) ARM_SECTION(\"arm2d.asset.c_bmp%sAlpha\")' % (arr_name), file=o)
             # alpha channel array available
             print('static const uint8_t c_bmp%sAlpha[%d*%d] = {' % (arr_name, row, col),file=o)

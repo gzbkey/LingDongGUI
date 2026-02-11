@@ -74,9 +74,11 @@ void ldCheckBoxSetColor(ldCheckBox_t* ptWidget,ldColor bgColor,ldColor fgColor);
 void ldCheckBoxSetImage(ldCheckBox_t* ptWidget,arm_2d_tile_t* ptUncheckedImgTile,arm_2d_tile_t* ptUncheckedMaskTile,arm_2d_tile_t* ptCheckedImgTile,arm_2d_tile_t* ptCheckedMaskTile);
 void ldCheckBoxSetText(ldCheckBox_t* ptWidget,arm_2d_font_t *ptFont,uint8_t *pStr);
 void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num);
-ldCheckBox_t* ldCheckBoxGetRadioSelected(ld_scene_t *ptScene, uint8_t groupNum);
+ldCheckBox_t* _ldCheckBoxGetRadioSelected(ld_scene_t *ptScene, uint8_t groupNum);
+#define ldCheckBoxGetRadioSelected(groupNum) _ldCheckBoxGetRadioSelected(ptScene,groupNum)
 void ldCheckBoxSetTextColor(ldCheckBox_t* ptWidget,ldColor textColor);
-void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked);
+void _ldCheckBoxSetChecked(ld_scene_t *ptScene,ldCheckBox_t* ptWidget,bool isChecked);
+#define ldCheckBoxSetChecked(ptWidget,isChecked) _ldCheckBoxSetChecked(ptScene,ptWidget,isChecked)
 void ldCheckBoxSetStringLeftSpace(ldCheckBox_t* ptWidget,uint16_t space);//only for image mode
 uint8_t* ldCheckBoxGetText(ldCheckBox_t* ptWidget);
 bool ldCheckBoxIsChecked(ldCheckBox_t* ptWidget);

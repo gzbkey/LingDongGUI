@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-#define __LD_TEMPLATE_IMPLEMENT__
+#define __LD_PROGRESS_WHEEL_IMPLEMENT__
 #include "./__common.h"
 #include "arm_2d.h"
 #include "arm_2d_helper.h"
 #include <assert.h>
 #include <string.h>
 
-#include "ldTemplate.h"
+#include "ldProgressWheel.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -42,31 +42,31 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-const ldBaseWidgetFunc_t ldTemplateFunc = {
-    .depose = (ldDeposeFunc_t)ldTemplate_depose,
-    .load = (ldLoadFunc_t)ldTemplate_on_load,
-    .frameStart = (ldFrameStartFunc_t)ldTemplate_on_frame_start,
-    .frameComplete = (ldFrameCompleteFunc_t)ldTemplate_on_frame_complete,
-    .show = (ldShowFunc_t)ldTemplate_show,
+const ldBaseWidgetFunc_t ldProgressWheelFunc = {
+    .depose = (ldDeposeFunc_t)ldProgressWheel_depose,
+    .load = (ldLoadFunc_t)ldProgressWheel_on_load,
+    .frameStart = (ldFrameStartFunc_t)ldProgressWheel_on_frame_start,
+    .frameComplete = (ldFrameCompleteFunc_t)ldProgressWheel_on_frame_complete,
+    .show = (ldShowFunc_t)ldProgressWheel_show,
 };
 
-ldTemplate_t* ldTemplate_init(ld_scene_t *ptScene,ldTemplate_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
+ldProgressWheel_t* ldProgressWheel_init(ld_scene_t *ptScene,ldProgressWheel_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
 
     if (NULL == ptWidget)
     {
-        ptWidget = ldCalloc(1, sizeof(ldTemplate_t));
+        ptWidget = ldCalloc(1, sizeof(ldProgressWheel_t));
         if (NULL == ptWidget)
         {
-            LOG_ERROR("[init failed][template] id:%d", nameId);
+            LOG_ERROR("[init failed][progressWheel] id:%d", nameId);
             return NULL;
         }
     }
     else
     {
-        memset(ptWidget, 0, sizeof(ldTemplate_t));
+        memset(ptWidget, 0, sizeof(ldProgressWheel_t));
     }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot,parentNameId);
@@ -77,37 +77,68 @@ ldTemplate_t* ldTemplate_init(ld_scene_t *ptScene,ldTemplate_t *ptWidget, uint16
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = width;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = height;
     ptWidget->use_as__ldBase_t.nameId = nameId;
-    ptWidget->use_as__ldBase_t.widgetType = widgetTypeTemplate;
-    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldTemplateFunc;
-    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = true;
+    ptWidget->use_as__ldBase_t.widgetType = widgetTypeProgressWheel;
+    ptWidget->use_as__ldBase_t.ptGuiFunc = &ldProgressWheelFunc;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = false;
+    ptWidget->use_as__ldBase_t.isDirtyRegionAutoReset = false;
     ptWidget->use_as__ldBase_t.opacity=255;
 
-    LOG_INFO("[init][template] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
+
+    progress_wheel_cfg_t tCFG = {
+        .tDotColour     = GLCD_COLOR_WHITE,
+        .tWheelColour   = GLCD_COLOR_GREEN,
+        .iWheelDiameter = MIN(width,height),
+        .bUseDirtyRegions = true,
+    };
+
+    progress_wheel_init(&ptWidget->tWheel,(arm_2d_scene_t*)&ptScene,&tCFG);
+
+    LOG_INFO("[init][progressWheel] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
-void ldTemplate_depose(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
+void ldProgressWheel_depose(ld_scene_t *ptScene, ldProgressWheel_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
     {
         return;
     }
-    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeTemplate)
+    if(ptWidget->use_as__ldBase_t.widgetType!=widgetTypeProgressWheel)
     {
         return;
     }
 
-    LOG_INFO("[depose][template] id:%d", ptWidget->use_as__ldBase_t.nameId);
+    LOG_INFO("[depose][progressWheel] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
     ldMsgDelConnect(ptWidget);
+    progress_wheel_depose(&ptWidget->tWheel);
     ldBaseNodeRemove((arm_2d_control_node_t*)ptWidget);
 
     ldFree(ptWidget);
 }
 
-void ldTemplate_on_load(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
+void ldProgressWheel_on_load(ld_scene_t *ptScene, ldProgressWheel_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    progress_wheel_on_load(&ptWidget->tWheel);
+}
+
+void ldProgressWheel_on_frame_start(ld_scene_t *ptScene, ldProgressWheel_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    progress_wheel_on_frame_start(&ptWidget->tWheel);
+}
+
+void ldProgressWheel_on_frame_complete(ld_scene_t *ptScene, ldProgressWheel_t *ptWidget)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -116,31 +147,19 @@ void ldTemplate_on_load(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
     }
 }
 
-void ldTemplate_on_frame_start(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
+void ldProgressWheel_show(ld_scene_t *ptScene, ldProgressWheel_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
     {
         return;
     }
-}
 
-void ldTemplate_on_frame_complete(ld_scene_t *ptScene, ldTemplate_t *ptWidget)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
+#if 0
+    if (bIsNewFrame) {
+        
     }
-}
-
-void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame)
-{
-    assert(NULL != ptWidget);
-    if(ptWidget == NULL)
-    {
-        return;
-    }
+#endif
 
     arm_2d_region_t globalRegion;
     arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
@@ -153,12 +172,51 @@ void ldTemplate_show(ld_scene_t *ptScene, ldTemplate_t *ptWidget, const arm_2d_t
             {
                 break;
             }
-
-
+            progress_wheel_show(&ptWidget->tWheel,
+                                &tTarget,
+                                &tTarget_canvas,
+                                ptWidget->iProgress,
+                                ptWidget->use_as__ldBase_t.opacity,
+                                bIsNewFrame);
+            arm_2d_op_wait_async(NULL);
         }
     }
 
-    arm_2d_op_wait_async(NULL);
+
+}
+
+void ldProgressWheelSetProgress(ldProgressWheel_t *ptWidget,int16_t value)//0-1000
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->iProgress=value;
+}
+
+void ldProgressWheelSetWheelColor(ldProgressWheel_t *ptWidget,ldColor wheelColor)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->tWheel.tCFG.tWheelColour=wheelColor;
+}
+
+void ldProgressWheelSetDotColor(ldProgressWheel_t *ptWidget,ldColor dotColor,bool isEnable)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->tWheel.tCFG.tDotColour=dotColor;
+    ptWidget->tWheel.tCFG.bIgnoreDot=!isEnable;
 }
 
 #if defined(__clang__)

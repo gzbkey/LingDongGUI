@@ -209,7 +209,7 @@ ldComboBox_t* ldComboBox_init(ld_scene_t *ptScene,ldComboBox_t *ptWidget, uint16
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotComboBoxProcess);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotComboBoxProcess);
 
-    LOG_INFO("[init][comboBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][comboBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -331,7 +331,7 @@ void ldComboBox_show(ld_scene_t *ptScene, ldComboBox_t *ptWidget, const arm_2d_t
             {
                 arm_2d_align_centre(tChildTile.tRegion, c_tile_dropDownV_Mask.tRegion.tSize)
                 {
-                    ldBaseImage(&tTarget,&__centre_region,NULL,&c_tile_dropDownV_Mask,GLCD_COLOR_BLACK,ptWidget->use_as__ldBase_t.opacity);
+                    ldBaseImage(&tTarget,&__centre_region,NULL,(arm_2d_tile_t*)&c_tile_dropDownV_Mask,GLCD_COLOR_BLACK,ptWidget->use_as__ldBase_t.opacity);
                 }
             }
 

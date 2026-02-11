@@ -62,11 +62,12 @@ widget demo sdl
 
 | Status | Name | Description |
 | :----:| ---- | ---- |
-| ✅ | window | Layered container |
+| ✅ | window | Layered container ，Support automatic horizontal or vertical layout|
 | ✅ | image | image display |
 | ✅ | button | Clickable button |
 | ✅ | text | text |
 | ✅ | progress bar | Progress with movable-image animation |
+| ✅ | progress wheel | progress wheel (ARM 2D) |
 | ✅ | check box + radio button| Check-box & radio styles with custom icons/text |
 | ✅ | radia menu | Rotary selection menu |
 | ✅ | label | Simple text label |
@@ -83,7 +84,7 @@ widget demo sdl
 | ✅ | combo box | Drop-down list |
 | ✅ | arc bar | Circular progress ring |
 | ✅ | animation | GIF-style animation |
-| 🔲 | calendar | calendar |
+| ✅ | calendar | calendar |
 | ✅ | message box | Pop-up message |
 | 🔲 | clock | Analog clock |
 | ✅ | list | Scrollable list hosting any widget |

@@ -56,30 +56,31 @@ struct ldArc_t
     uint16_t startAngle_x10[2];
     uint16_t endAngle_x10[2];
     uint16_t rotationAngle_x10;
-    bool isClockwise:1;
+    arm_2d_op_trans_opa_t op[2];
+    arm_2d_op_trans_opa_t op2[2];
+    arm_2d_op_trans_opa_t op3;
 };
 
 ldArc_t* ldArc_init(ld_scene_t *ptScene, ldArc_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height,arm_2d_tile_t *ptQuarterImgTile,arm_2d_tile_t *ptQuarterMaskTile,ldColor parentColor);
+#define ldArcInit(nameId,parentNameId,x,y,width,height,ptQuarterImgTile,ptQuarterMaskTile,parentColor) \
+        ldArc_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptQuarterImgTile,ptQuarterMaskTile,parentColor)
 void ldArc_depose(ld_scene_t *ptScene, ldArc_t *ptWidget);
 void ldArc_on_load(ld_scene_t *ptScene, ldArc_t *ptWidget);
 void ldArc_on_frame_start(ld_scene_t *ptScene, ldArc_t *ptWidget);
 void ldArc_on_frame_complete(ld_scene_t *ptScene, ldArc_t *ptWidget);
 void ldArc_show(ld_scene_t *pScene, ldArc_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-void ldArcSetBackgroundAngle(ldArc_t *pWidget,float bgStart,float bgEnd);
-void ldArcSetForegroundAngle(ldArc_t *pWidget,float fgEnd);
-void ldArcSetRotationAngle(ldArc_t *pWidget,float rotationAngle);
-void ldArcSetColor(ldArc_t *pWidget,ldColor bgColor,ldColor fgColor);
+void ldArcSetBackgroundAngle(ldArc_t *ptWidget,float bgStart,float bgEnd);
+void ldArcSetForegroundAngle(ldArc_t *ptWidget,float fgEnd);
+void ldArcSetRotationAngle(ldArc_t *ptWidget,float rotationAngle);
+void ldArcSetColor(ldArc_t *ptWidget,ldColor bgColor,ldColor fgColor);
 
-#define ldArcInit(nameId,parentNameId,x,y,width,height,ptQuarterImgTile,ptQuarterMaskTile,parentColor) \
-        ldArc_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptQuarterImgTile,ptQuarterMaskTile,parentColor)
-
-#define ldArcSetHidden                ldBaseSetHidden
-#define ldArcMove                     ldBaseMove
-#define ldArcSetOpacity               ldBaseSetOpacity
-#define ldArcSetSelectable            ldBaseSetSelectable
-#define ldArcSetSelect                ldBaseSetSelect
-#define ldArcSetCorner                ldBaseSetCorner
+float ldArcGetBackgroundStartAngle(ldArc_t *ptWidget);
+float ldArcGetBackgroundAngle(ldArc_t *ptWidget);
+float ldArcGetForegroundAngle(ldArc_t *ptWidget);
+float ldArcGetRotationAngle(ldArc_t *ptWidget);
+ldColor ldArcGetBackgroundColor(ldArc_t *ptWidget);
+ldColor ldArcGetForegroundColor(ldArc_t *ptWidget);
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

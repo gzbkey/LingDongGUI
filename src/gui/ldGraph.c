@@ -111,7 +111,7 @@ ldGraph_t* ldGraph_init( ld_scene_t *ptScene,ldGraph_t *ptWidget, uint16_t nameI
     ptWidget->use_as__ldBase_t.opacity=255;
     ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
-    ptWidget->ptPointMaskTile=&c_tile_graphDefalutDot_Mask;
+    ptWidget->ptPointMaskTile=(arm_2d_tile_t*)&c_tile_graphDefalutDot_Mask;
     ptWidget->use_as__ldBase_t.isCorner=true;
     ptWidget->isFrame=true;
     ptWidget->frameSpace=10;
@@ -122,7 +122,7 @@ ldGraph_t* ldGraph_init( ld_scene_t *ptScene,ldGraph_t *ptWidget, uint16_t nameI
     ldGraphSetAxis(ptWidget,width-ptWidget->frameSpace*2,height-ptWidget->frameSpace*2,5);
     ldGraphSetGridOffset(ptWidget,5);
 
-    LOG_INFO("[init][graph] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][graph] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 

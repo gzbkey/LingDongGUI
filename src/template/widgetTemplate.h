@@ -55,18 +55,16 @@ struct ldTemplate_t
 };
 
 ldTemplate_t* ldTemplate_init(ld_scene_t *ptScene, ldTemplate_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height);
+#define ldTemplateInit(nameId,parentNameId,x,y,width,height) \
+        ldTemplate_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 void ldTemplate_depose(ld_scene_t *ptScene, ldTemplate_t *ptWidget);
 void ldTemplate_on_load(ld_scene_t *ptScene, ldTemplate_t *ptWidget);
 void ldTemplate_on_frame_start(ld_scene_t *ptScene, ldTemplate_t *ptWidget);
 void ldTemplate_on_frame_complete(ld_scene_t *ptScene, ldTemplate_t *ptWidget);
 void ldTemplate_show(ld_scene_t *pScene, ldTemplate_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-#define ldTemplateInit(nameId,parentNameId,x,y,width,height) \
-        ldTemplate_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 
-#define ldTemplateSetHidden                ldBaseSetHidden
-#define ldTemplateMove                     ldBaseMove
-#define ldTemplateSetOpacity               ldBaseSetOpacity
+
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

@@ -129,7 +129,7 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotButtonToggle);
     ldMsgConnect(ptWidget, SIGNAL_RELEASE, slotButtonToggle);
 
-    LOG_INFO("[init][button] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][button] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -301,11 +301,8 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                         }
                     }
                 }
-
-                LD_BASE_WIDGET_SELECT;
+                arm_2d_op_wait_async(NULL);
             }
-
-            arm_2d_op_wait_async(NULL);
 
             if(ptWidget->pStr!=NULL)
             {
@@ -314,10 +311,12 @@ void ldButton_show(ld_scene_t *ptScene, ldButton_t *ptWidget, const arm_2d_tile_
                             ptWidget->pStr,
                             ptWidget->ptFont,
                             ARM_2D_ALIGN_CENTRE,
-                            ptWidget->charColor,
+                            ptWidget->textColor,
                             ptWidget->use_as__ldBase_t.opacity);
-                arm_2d_op_wait_async(NULL);
             }
+
+            LD_BASE_WIDGET_SELECT;
+            arm_2d_op_wait_async(NULL);
         }
     }
 }
@@ -386,7 +385,7 @@ void ldButtonSetText(ldButton_t* ptWidget,uint8_t *pStr)
     }
 }
 
-void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor)
+void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor textColor)
 {
     assert(NULL != ptWidget);
     if(ptWidget == NULL)
@@ -394,7 +393,7 @@ void ldButtonSetTextColor(ldButton_t* ptWidget,ldColor charColor)
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->charColor=charColor;
+    ptWidget->textColor=textColor;
 }
 
 void ldButtonSetCheckable(ldButton_t *ptWidget,bool isCheckable)
@@ -434,7 +433,98 @@ void ldButtonSetPress(ldButton_t *ptWidget,bool isPress)
     {
         return;
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ptWidget->isPressed=isPress;
+}
+
+arm_2d_font_t *ldButtonGetFont(ldButton_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->ptFont;
+}
+
+uint8_t *ldButtonGetText(ldButton_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->pStr;
+}
+
+uint32_t ldButtonGetKeyValue(ldButton_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->keyValue;
+}
+
+bool ldButtonGetTransparent(ldButton_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return false;
+    }
+    return ptWidget->isTransparent;
+}
+
+bool ldButtonGetCheckable(ldButton_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return false;
+    }
+    return ptWidget->isCheckable;
+}
+
+bool ldButtonGetPress(ldButton_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return false;
+    }
+    return ptWidget->isPressed;
+}
+
+ldColor ldButtonGetTextColor(ldButton_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->textColor;
+}
+
+ldColor ldButtonGetReleaseColor(ldButton_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->releaseColor;
+}
+
+ldColor ldButtonGetPressColor(ldButton_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return 0;
+    }
+    return ptWidget->pressColor;
 }
 
 #if defined(__clang__)

@@ -167,18 +167,13 @@ static bool slotCheckBoxToggle(ld_scene_t *ptScene,ldMsg_t msg)
         {
             if(ptWidget->isChecked==false)
             {
-                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptScene,ptWidget->radioButtonGroup);
-                LOG_DEBUG("old cb=%d",old->use_as__ldBase_t.nameId);
-                LOG_DEBUG("new cb=%d",ptWidget->use_as__ldBase_t.nameId);
-                old->isChecked=false;
-                old->use_as__ldBase_t.isDirtyRegionUpdate = true;
-
+                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptWidget->radioButtonGroup);
+                if(old)
+                {
+                    old->isChecked=false;
+                    old->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                }
                 ptWidget->isChecked=true;
-//                radioButtonValue.group=ptWidget->radioButtonGroup;
-//                radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
-
-
-//                ptWidget->isRadioReady=true;
                 ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
                 ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,(ptWidget->radioButtonGroup<<16)&0xFFFF+ptWidget->use_as__ldBase_t.nameId);
             }
@@ -228,7 +223,7 @@ ldCheckBox_t* ldCheckBox_init( ld_scene_t *ptScene,ldCheckBox_t *ptWidget, uint1
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotCheckBoxToggle);
 
-    LOG_INFO("[init][checkBox] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][checkBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -302,16 +297,6 @@ void ldCheckBox_show(ld_scene_t *ptScene, ldCheckBox_t *ptWidget, const arm_2d_t
             {
                 break;
             }
-
-//            //自动清除radioButton选中状态
-//            if((ptWidget->isChecked)&&(ptWidget->isRadioButton))
-//            {
-//                if((ptWidget->radioButtonGroup==radioButtonValue.group)&&(ptWidget->use_as__ldBase_t.nameId!=radioButtonValue.nameId))
-//                {
-//                    ptWidget->isChecked=false;
-//                    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-//                }
-//            }
 
             arm_2d_region_t tBoxRegion = {
                 .tLocation = {
@@ -523,7 +508,7 @@ void ldCheckBoxSetRadioButtonGroup(ldCheckBox_t* ptWidget,uint8_t num)
     ptWidget->radioButtonGroup=num;
 }
 
-ldCheckBox_t* ldCheckBoxGetRadioSelected(ld_scene_t *ptScene, uint8_t groupNum)
+ldCheckBox_t* _ldCheckBoxGetRadioSelected(ld_scene_t *ptScene, uint8_t groupNum)
 {
     arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
     {
@@ -550,7 +535,7 @@ void ldCheckBoxSetTextColor(ldCheckBox_t* ptWidget, ldColor textColor)
     ptWidget->textColor=textColor;
 }
 
-void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked)
+void _ldCheckBoxSetChecked(ld_scene_t *ptScene,ldCheckBox_t* ptWidget,bool isChecked)
 {
     assert(NULL != ptWidget);
     if(ptWidget==NULL)
@@ -558,19 +543,28 @@ void ldCheckBoxSetChecked(ldCheckBox_t* ptWidget,bool isChecked)
         return;
     }
 
-    if(!ptWidget->isRadioButton)
+    if(ptWidget->isChecked!=isChecked)
     {
-        ptWidget->isChecked=isChecked;
-        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    }
-    else
-    {
-        if(ptWidget->isChecked==false)
+        if(!ptWidget->isRadioButton)
         {
-            ptWidget->isChecked=true;
-//            radioButtonValue.group=ptWidget->radioButtonGroup;
-//            radioButtonValue.nameId=ptWidget->use_as__ldBase_t.nameId;
+            ptWidget->isChecked=isChecked;
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+            ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_VALUE_CHANGED,ptWidget->isChecked);
+        }
+        else
+        {
+            if(ptWidget->isChecked==false)
+            {
+                ldCheckBox_t *old=ldCheckBoxGetRadioSelected(ptWidget->radioButtonGroup);
+                if(old)
+                {
+                    old->isChecked=false;
+                    old->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                }
+                ptWidget->isChecked=true;
+                ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+                ldMsgEmit(ptScene->ptMsgQueue,ptWidget,SIGNAL_CLICKED_ITEM,(ptWidget->radioButtonGroup<<16)&0xFFFF+ptWidget->use_as__ldBase_t.nameId);
+            }
         }
     }
 }

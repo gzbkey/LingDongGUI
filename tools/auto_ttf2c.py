@@ -184,7 +184,14 @@ def merge_bin_files(output_dir, bin_info_list):
                 with open(bin_file, 'rb') as f:
                     data = f.read()
                     merged_file.write(data)
-                    current_offset += len(data)
+
+                    data_len = len(data)
+                    aligned_size = (data_len + 3) & ~3
+                    padding = aligned_size - data_len
+                    if padding > 0:
+                        merged_file.write(bytes([0] * padding))
+
+                    current_offset += aligned_size
 
     with open(offset_info_path, 'w') as offset_file:
         for info in offset_info:

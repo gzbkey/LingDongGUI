@@ -46,31 +46,22 @@ typedef struct ldImage_t ldImage_t;
 
 struct ldImage_t {
     implement(ldBase_t);
-    ldColor bgColor;
     arm_2d_tile_t* ptImgTile;
     arm_2d_tile_t* ptMaskTile;
-    bool isTransparent:1;//window专用
+    ldColor maskColor;
 };
 
-ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, bool isWindow);
+ldImage_t* ldImage_init(ld_scene_t *ptScene, ldImage_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
+#define ldImageInit(nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile) \
+        ldImage_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile)
 void ldImage_depose(ld_scene_t *ptScene, ldImage_t *ptWidget);
 void ldImage_on_load(ld_scene_t *ptScene, ldImage_t *ptWidget);
 void ldImage_on_frame_start(ld_scene_t *ptScene, ldImage_t *ptWidget);
 void ldImage_on_frame_complete(ld_scene_t *ptScene, ldImage_t *ptWidget);
 void ldImage_show(ld_scene_t *ptScene,ldImage_t *ptWidget,const arm_2d_tile_t *ptTile,bool bIsNewFrame);
 
-void ldImageSetBackgroundColor(ldImage_t *ptWidget,ldColor bgColor);
 void ldImageSetImage(ldImage_t *ptWidget, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile);
-
-#define ldImageInit(nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile,isWindow) \
-        ldImage_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptImgTile,ptMaskTile,isWindow)
-
-#define ldImageSetHidden                ldBaseSetHidden
-#define ldImageMove                     ldBaseMove
-#define ldImageSetOpacity               ldBaseSetOpacity
-#define ldImageSetSelectable            ldBaseSetSelectable
-#define ldImageSetSelect                ldBaseSetSelect
-#define ldImageSetCorner                ldBaseSetCorner
+void ldImageSetMaskColor(ldImage_t *ptWidget,ldColor maskColor);
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop

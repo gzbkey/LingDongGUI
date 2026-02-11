@@ -224,7 +224,7 @@ static void monitor_sdl_init(void)
                                 SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, VT_WIDTH, VT_HEIGHT);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
-    SDL_RenderSetLogicalSize(renderer, __DISP0_CFG_SCEEN_WIDTH__, __DISP0_CFG_SCEEN_HEIGHT__);
+    SDL_RenderSetLogicalSize(renderer, VT_WIDTH, VT_HEIGHT);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
@@ -439,7 +439,7 @@ void VT_deinit(void)
 }
 
 
-bool VT_sdl_flush(int32_t nMS)
+bool VT_sdl_vsync(void)
 {
     bool bResult = false;
     
@@ -451,8 +451,7 @@ bool VT_sdl_flush(int32_t nMS)
     }
 
     if (!bResult) {
-        nMS = MAX(1, nMS);
-        SDL_Delay(nMS);
+        SDL_Delay(1);
     }
 
     return bResult;

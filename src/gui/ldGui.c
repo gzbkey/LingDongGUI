@@ -43,33 +43,7 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 bool isFullWidgetUpdate=false;
 
-void ldGuiDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
-{
-    // draw ldgui background
-    if(ptScene->ptNodeRoot!=NULL)
-    {
-        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,ptTile,bIsNewFrame);
-    }
-
-    // draw arm 2d code
-    if(ptScene->ldGuiFuncGroup->draw!=NULL)
-    {
-        ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
-    }
-
-    // draw ldgui code
-    if(ptScene->ptNodeRoot!=NULL)
-    {
-        ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
-        if(child!=NULL)
-        {
-            arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
-                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
-            }
-        }
-    }
-}
-
+ldTimer_t sysTimer10ms=0;
 
 void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
@@ -170,6 +144,7 @@ void ldGuiTouchProcess(ld_scene_t *ptScene)
     bool nowState;
     static bool prevState=TOUCH_NO_CLICK;
     uint8_t touchSignal=SIGNAL_NO_OPERATION;
+    extern bool ldCfgTouchGetPoint(int16_t *x,int16_t *y);
 
     nowState = ldCfgTouchGetPoint(&clickLocation.iX,&clickLocation.iY);
 
@@ -203,6 +178,7 @@ void ldGuiTouchProcess(ld_scene_t *ptScene)
 void ldGuiSceneInit(ld_scene_t *ptScene)
 {
     ldMsgInit(&ptScene->ptMsgQueue,LD_EMIT_SIZE);
+    LOG_DEBUG("[sys] free memory:%zu",ldGetFreeMemory());
 
     if(ptScene->ldGuiFuncGroup!=NULL)
     {
@@ -219,6 +195,20 @@ void ldGuiSceneInit(ld_scene_t *ptScene)
 void ldGuiUpdateScene(void)
 {
     isFullWidgetUpdate=true;
+}
+
+void ldGuiLoad(ld_scene_t *ptScene)
+{
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+        {
+            if(((ldBase_t*)ptItem)->ptGuiFunc->load!=NULL)
+            {
+                ((ldBase_t*)ptItem)->ptGuiFunc->load(ptScene,ptItem);
+            }
+        }
+    }
 }
 
 void ldGuiFrameStart(ld_scene_t *ptScene)
@@ -240,7 +230,13 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         }
     }
 
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,true))
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->frameStart!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->frameStart(ptScene);
+    }
+
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer10ms))
     {
         xBtnTick(SYS_TICK_CYCLE_MS,ptScene);
         cursorBlinkCount++;
@@ -255,43 +251,31 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
     }
 }
 
-void ldGuiLoad(ld_scene_t *ptScene)
+void ldGuiDraw(ld_scene_t *ptScene,arm_2d_tile_t *ptTile,bool bIsNewFrame)
 {
+    // draw ldgui background
     if(ptScene->ptNodeRoot!=NULL)
     {
-        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, PREORDER_TRAVERSAL)
+        ((ldBase_t*)ptScene->ptNodeRoot)->ptGuiFunc->show(ptScene,ptScene->ptNodeRoot,ptTile,bIsNewFrame);
+    }
+
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->draw!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->draw(ptScene,ptTile,bIsNewFrame);
+    }
+
+    // draw ldgui code
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        ldBase_t *child=ldBaseGetChildList((ldBase_t*)ptScene->ptNodeRoot);
+        if(child!=NULL)
         {
-            if(((ldBase_t*)ptItem)->ptGuiFunc->load!=NULL)
-            {
-                ((ldBase_t*)ptItem)->ptGuiFunc->load(ptScene,ptItem);
+            arm_ctrl_enum(child, ptItem, PREORDER_TRAVERSAL) {
+                ((ldBase_t*)ptItem)->ptGuiFunc->show(ptScene,ptItem,ptTile,bIsNewFrame);
             }
         }
     }
-}
-
-void ldGuiDespose(ld_scene_t *ptScene)
-{
-    if(ptScene->ldGuiFuncGroup!=NULL)
-    {
-        if(ptScene->ldGuiFuncGroup->quit)
-        {
-            ptScene->ldGuiFuncGroup->quit(ptScene);
-        }
-    }
-
-    if(ptScene->ptNodeRoot!=NULL)
-    {
-        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
-        {
-            if(((ldBase_t *)ptItem))
-            {
-                ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptScene,ptItem);
-            }
-        }
-    }
-
-    LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
-    LOG_DEBUG("[sys] after despose free memory:%zu",ldGetFreeMemory());
 }
 
 void ldGuiFrameComplete(ld_scene_t *ptScene)
@@ -305,6 +289,12 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
                 ((ldBase_t*)ptItem)->ptGuiFunc->frameComplete(ptScene,ptItem);
             }
         }
+    }
+
+    // draw arm 2d code
+    if(ptScene->ldGuiFuncGroup->frameComplete!=NULL)
+    {
+        ptScene->ldGuiFuncGroup->frameComplete(ptScene);
     }
 
 #if USE_SCENE_SWITCHING == 2
@@ -334,6 +324,30 @@ void ldGuiFrameComplete(ld_scene_t *ptScene)
         prevWidget=NULL;
     }
 #endif
+}
+
+void ldGuiDespose(ld_scene_t *ptScene)
+{
+    if(ptScene->ldGuiFuncGroup!=NULL)
+    {
+        if(ptScene->ldGuiFuncGroup->quit)
+        {
+            ptScene->ldGuiFuncGroup->quit(ptScene);
+        }
+    }
+
+    if(ptScene->ptNodeRoot!=NULL)
+    {
+        arm_ctrl_enum(ptScene->ptNodeRoot, ptItem, POSTORDER_TRAVERSAL)
+        {
+            if(((ldBase_t *)ptItem))
+            {
+                ((ldBase_t *)ptItem)->ptGuiFunc->depose(ptScene,ptItem);
+            }
+        }
+    }
+
+    LOG_INFO("[sys] page %s quit",ptScene->ldGuiFuncGroup->pageName);
 }
 
 void __ldGuiJumpPage(ldPageFuncGroup_t *ptFuncGroup,arm_2d_scene_switch_mode_t *ptMode,uint16_t switchTimeMs)
@@ -417,7 +431,7 @@ void ldGuiLcdTest(void)
         for(uint16_t c=0;c<BLOCK_COLUMNS;c++)
         {
             uint8_t idx = (r*BLOCK_COLUMNS + c) * 3;
-            uint16_t color = __RGB(rgb[idx],rgb[idx+1],rgb[idx+2]);
+            ldColor color = __RGB(rgb[idx],rgb[idx+1],rgb[idx+2]);
             uint16_t w=bw,h=bh;
             if(c==(BLOCK_COLUMNS-1))
             {
@@ -441,8 +455,8 @@ void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
     }
 
     disp_adapter0_init();
+#if __DISP0_CFG_DISABLE_DEFAULT_SCENE__
 
-    LOG_DEBUG("[sys] free memory:%zu",ldGetFreeMemory());
     if(ptFuncGroup==NULL)
     {
         return;
@@ -456,6 +470,7 @@ void ldGuiInit(ldPageFuncGroup_t *ptFuncGroup)
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 #elif USE_SCENE_SWITCHING == 1 || USE_SCENE_SWITCHING == 0
     __arm_2d_scene0_init(&DISP0_ADAPTER,NULL,ptSysGuiFuncGroup[0]);
+#endif
 #endif
 }
 

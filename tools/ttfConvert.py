@@ -349,25 +349,25 @@ def write_c_code(glyphs_data, output_file, name, char_max_width, char_max_height
             for i in range(0, len(hex_str), char_max_width*2):
                 line = hex_str[i:i+char_max_width*2]
                 spaced_line = ' '.join(f"0x{line[j:j+2]}," for j in range(0, len(line), 2))
-                f.write("    ");
+                f.write("    ")
                 f.write(spaced_line)
-                f.write("\n");
+                f.write("\n")
 
-        f.write("    // a white space\n    ");
+        f.write("    // a white space\n    ")
         f.write("0x00, " * (char_max_width * char_max_height))
         f.write("\n};\n\n")
 
         print("ARM_SECTION(\"arm2d.asset.FONT.c_tUTF8{0}LookUpTableA{1}\")\n const __ttf_char_descriptor_t c_tUTF8{0}LookUpTableA{1}[{2}] = {{\n"
                 .format(name, font_bit_size, len(glyphs_data) + 1), file=f)
 
-        last_index = 0;
-        last_advance = 0;
-        last_height = 0;
+        last_index = 0
+        last_advance = 0
+        last_height = 0
         for char, data, width, height, index, advance_width, bearing_x, bearing_y, utf8_encoding in glyphs_data:
             utf8_c_array = utf8_to_c_array(utf8_encoding)
             last_index = index
             last_advance = advance_width
-            last_height = height;
+            last_height = height
             f.write(f"    {{ {round(index / char_max_width)}, {{ {width}, {height}, }}, {advance_width}, {bearing_x}, {bearing_y}, {len(utf8_encoding)}, {utf8_c_array} }},\n")
 
         last_index += char_max_width * last_height
@@ -390,15 +390,15 @@ color_type_array = {
 }
 
 def write_bin_header(glyphs_data, bin_tracker, name, char_max_width, char_max_height, font_bit_size):
-    header_size = 13 + len(glyphs_data) * 17
+    header_size = 13 + (len(glyphs_data) + 1) * 17
     bin_tracker.write(char_max_width.to_bytes(2, byteorder='little'))
-    total_height = char_max_height * len(glyphs_data)
+    total_height = char_max_height * (len(glyphs_data) + 1)
     bin_tracker.write(total_height.to_bytes(2, byteorder='little'))
     bin_tracker.write(color_type_array[font_bit_size].to_bytes(1, byteorder='little'))
     bin_tracker.write(header_size.to_bytes(2, byteorder='little'))
     bin_tracker.write(char_max_width.to_bytes(2, byteorder='little'))
     bin_tracker.write(char_max_height.to_bytes(2, byteorder='little'))
-    char_count = len(glyphs_data)
+    char_count = len(glyphs_data) + 1
     bin_tracker.write(char_count.to_bytes(2, byteorder='little'))
 
     for char, data, width, height, index, advance_width, bearing_x, bearing_y, utf8_encoding in glyphs_data:
@@ -413,8 +413,37 @@ def write_bin_header(glyphs_data, bin_tracker, name, char_max_width, char_max_he
         for _ in range(4 - len(utf8_encoding)):
             bin_tracker.write((0).to_bytes(1, byteorder='little'))
 
+    last_index = 0
+    last_height = 0
+    if glyphs_data:
+        last_char = glyphs_data[-1]
+        last_index = last_char[4]
+        last_height = last_char[3]
+        last_index += char_max_width * last_height
+    
+    bin_tracker.write(round(last_index / char_max_width).to_bytes(2, byteorder='little'))
+    bin_tracker.write(char_max_width.to_bytes(2, byteorder='little'))
+    bin_tracker.write(char_max_height.to_bytes(2, byteorder='little'))
+    bin_tracker.write(char_max_width.to_bytes(2, byteorder='little'))
+    bin_tracker.write((0).to_bytes(2, byteorder='little', signed=True))
+    bin_tracker.write(char_max_height.to_bytes(2, byteorder='little', signed=True))
+    utf8_encoding = bytes([0x20])
+    bin_tracker.write(len(utf8_encoding).to_bytes(1, byteorder='little'))
+    bin_tracker.write(utf8_encoding)
+    for _ in range(4 - len(utf8_encoding)):
+        bin_tracker.write((0).to_bytes(1, byteorder='little'))
+
     for char, data, width, height, index, advance_width, bearing_x, bearing_y, utf8_encoding in glyphs_data:
         bin_tracker.write(data.tobytes())
+
+    whitespace_data = bytes([0] * (char_max_width * char_max_height))
+    bin_tracker.write(whitespace_data)
+
+    current_position = bin_tracker.tell()
+    aligned_size = (current_position + 3) & ~3
+    padding = aligned_size - current_position
+    if padding > 0:
+        bin_tracker.write(bytes([0] * padding))
 
 def main():
     parser = argparse.ArgumentParser(description='TrueTypeFont to C array converter (v2.2.0)')

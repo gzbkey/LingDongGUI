@@ -89,7 +89,7 @@ ldLabel_t* ldLabel_init( ld_scene_t *ptScene,ldLabel_t *ptWidget,uint16_t nameId
     ptWidget->textColor = GLCD_COLOR_BLACK;
     ptWidget->ptFont = ptFont;
 
-    LOG_INFO("[init][label] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    LOG_INFO("[init][label] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -225,6 +225,7 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
 
 void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -235,6 +236,7 @@ void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent)
 
 void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -250,6 +252,7 @@ void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr)
 
 void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor textColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -260,6 +263,7 @@ void ldLabelSetTextColor(ldLabel_t* ptWidget,ldColor textColor)
 
 void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -270,6 +274,7 @@ void ldLabelSetAlign(ldLabel_t *ptWidget,arm_2d_align_t tAlign)
 
 void ldLabelSetBackgroundImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -282,6 +287,7 @@ void ldLabelSetBackgroundImage(ldLabel_t *ptWidget, arm_2d_tile_t *ptImgTile, ar
 
 void ldLabelSetBackgroundColor(ldLabel_t *ptWidget, ldColor bgColor)
 {
+    assert(NULL != ptWidget);
     if(ptWidget==NULL)
     {
         return;
@@ -290,6 +296,77 @@ void ldLabelSetBackgroundColor(ldLabel_t *ptWidget, ldColor bgColor)
     ptWidget->bgColor=bgColor;
     ptWidget->isTransparent=false;
     ptWidget->ptImgTile=NULL;
+}
+
+void ldLabelSetFont(ldLabel_t* ptWidget,arm_2d_font_t *ptFont)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptFont=ptFont;
+}
+
+bool ldLabelGetTransparent(ldLabel_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return false;
+    }
+    return ptWidget->isTransparent;
+}
+
+uint8_t *ldLabelGetText(ldLabel_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->pStr;
+}
+
+ldColor ldLabelGetTextColor(ldLabel_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+    return ptWidget->textColor;
+}
+
+arm_2d_align_t ldLabelGetAlign(ldLabel_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return ARM_2D_ALIGN_CENTRE;
+    }
+    return ptWidget->tAlign;
+}
+
+ldColor ldLabelGetBackgroundColor(ldLabel_t *ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return 0;
+    }
+    return ptWidget->bgColor;
+}
+
+arm_2d_font_t *ldLabelGetFont(ldLabel_t* ptWidget)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return NULL;
+    }
+    return ptWidget->ptFont;
 }
 
 #if defined(__clang__)

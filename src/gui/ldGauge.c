@@ -87,8 +87,6 @@ ldGauge_t* ldGauge_init( ld_scene_t *ptScene,ldGauge_t *ptWidget, uint16_t nameI
     ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptItemRegion->tTempItemRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
-    ptItemRegion->tTempItemRegion.tLocation.iX=0;
-    ptItemRegion->tTempItemRegion.tLocation.iY=0;
     ptItemRegion->itemRegion=ptItemRegion->tTempItemRegion;
 
     ptWidget->use_as__ldBase_t.ptItemRegionList=ptItemRegion;
@@ -98,8 +96,8 @@ ldGauge_t* ldGauge_init( ld_scene_t *ptScene,ldGauge_t *ptWidget, uint16_t nameI
     ptWidget->ptBgMaskTile=ptBgMaskTile;
     ptWidget->centreOffsetX=centreOffsetX;
     ptWidget->centreOffsetY=centreOffsetY;
-
-    LOG_INFO("[init][gauge] id:%d, size:%llu", nameId,sizeof (*ptWidget));
+    
+    LOG_INFO("[init][gauge] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
 }
 
@@ -132,13 +130,89 @@ void ldGauge_depose(ld_scene_t *pScene, ldGauge_t *ptWidget)
 void ldGauge_on_load(ld_scene_t *pScene, ldGauge_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if (ptWidget == NULL)
+    {
+        return;
+    }
 }
 
 void ldGauge_on_frame_start(ld_scene_t *pScene, ldGauge_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+
+    if (!ptWidget->isAutoMove || ptWidget->_nowAngle_x10 == ptWidget->endAngle_x10)
+    {
+        return;
+    }
+
+    int16_t endDiff = ptWidget->endAngle_x10 - ptWidget->_nowAngle_x10;
+    if(endDiff > 1800)
+    {
+        endDiff -= 3600;
+    }
+    else if(endDiff < -1800)
+    {
+        endDiff += 3600;
+    }
+
+    if(ptWidget->isProgressBar)
+    {
+        ptWidget->_trailOpacity=ptWidget->use_as__ldBase_t.opacity;
+    }
+    else
+    {
+        int16_t startDiff = ptWidget->startAngle_x10 - ptWidget->_nowAngle_x10;
+        if (startDiff > 1800)
+        {
+            startDiff -= 3600;
+        }
+        else if (startDiff < -1800)
+        {
+            startDiff += 3600;
+        }
+
+        uint16_t dStart = (uint16_t)abs(startDiff);
+        dStart=(dStart > 1800)?(3600 - dStart):dStart;
+        uint16_t dEnd   = (uint16_t)abs(endDiff);
+        dEnd=(dEnd > 1800)?(3600 - dEnd):dEnd;
+        uint16_t fadeDist = (dStart < dEnd) ? dStart : dEnd;
+
+        ptWidget->_trailOpacity = (fadeDist > 510) ? 255 : (uint8_t)(fadeDist >>1);
+        //二次处理透明度
+        ptWidget->_trailOpacity=(uint8_t)((((uint16_t)(ptWidget->_trailOpacity) * (ptWidget->use_as__ldBase_t.opacity) * 0x8081U) >> 23) & 0xFFU);
+    }
+
+#define ANGLE_STEP (10)
+
+    int16_t dir = ptWidget->startAngle_x10 - ptWidget->endAngle_x10;
+
+    if(abs(endDiff) <= ANGLE_STEP)
+    {
+        ptWidget->_nowAngle_x10 = ptWidget->endAngle_x10;
+    }
+    else
+    {
+        if(dir < 0)
+        {
+            ptWidget->_nowAngle_x10 += ANGLE_STEP;
+        }
+        else
+        {
+            ptWidget->_nowAngle_x10 -= ANGLE_STEP;
+        }
+    }
+
+    ptWidget->_nowAngle_x10 %= 3600;
+    if (ptWidget->_nowAngle_x10 < 0)
+    {
+        ptWidget->_nowAngle_x10 += 3600;
+    }
+
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
 
 void ldGauge_on_frame_complete(ld_scene_t *pScene, ldGauge_t *ptWidget)
@@ -154,9 +228,9 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
         return;
     }
 
-
-    if (bIsNewFrame) {
-        if((ptWidget->op.Target.ptRegion!=NULL)&&(ptWidget->use_as__ldBase_t.isDirtyRegionUpdate==false))
+    if (bIsNewFrame)
+    {
+        if((ptWidget->op.Target.ptRegion!=NULL)&&(ptWidget->use_as__ldBase_t.isDirtyRegionUpdate==true))
         {
         ptWidget->use_as__ldBase_t.ptItemRegionList->itemRegion= *ptWidget->op.Target.ptRegion;
 
@@ -188,65 +262,173 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
             arm_2d_op_wait_async(NULL);
 
             do {
-                arm_2d_location_t pointerRotationCentre =
+
+                arm_2d_point_float_t pointerRotationCentre =
                 {
-                    .iX = ptWidget->pointerOriginOffsetX,
-                    .iY = ptWidget->pointerOriginOffsetY,
+                    .fX = ptWidget->pointerOriginOffsetX,
+                    .fY = ptWidget->pointerOriginOffsetY,
                 };
 
-                arm_2d_location_t bgRotationCentre=
+                arm_2d_point_float_t bgRotationCentre=
                 {
-                    .iX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX,
-                    .iY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY,
+                    .fX = (tTarget_canvas.tSize.iWidth>>1)+ptWidget->centreOffsetX-1,
+                    .fY = (tTarget_canvas.tSize.iHeight>>1)+ptWidget->centreOffsetY-1,
                 };
+
+                float angle = (ptWidget->_nowAngle_x10 / 10.0f) + ANGLE_OFFSET;
+
+                if((ptWidget->isAutoMove)&&(ptWidget->ptBgTrailMaskTile!=NULL)&&(ptWidget->ptPointerTrailMaskTile!=NULL))
+                {
+                    arm_2d_point_float_t maskPointerRotationCentre={
+                        .fX=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iWidth-1,
+                        .fY=ptWidget->ptPointerTrailMaskTile->tRegion.tSize.iHeight-1,
+                    };
+
+
+                    if(ptWidget->isProgressBar)
+                    {
+
+                        arm_2d_tile_t childTile= impl_child_tile(*ptWidget->ptBgTrailMaskTile,0,0,0,0);
+
+                        if(angle>270)
+                        {
+                            //左下角
+                            childTile.tRegion.tLocation.iX=0;
+                            childTile.tRegion.tLocation.iY=bgRotationCentre.fY;
+                            childTile.tRegion.tSize.iWidth=bgRotationCentre.fX+1;
+                            childTile.tRegion.tSize.iHeight=ptWidget->ptBgTrailMaskTile->tRegion.tSize.iHeight-bgRotationCentre.fY;
+
+                            arm_2d_fill_colour_with_mask_and_opacity(&tTarget,&childTile.tRegion,&childTile,(__arm_2d_color_t){ptWidget->maskColor},ptWidget->use_as__ldBase_t.opacity);
+                        }
+                        if(angle>360)
+                        {
+                            //左上角
+                            childTile.tRegion.tLocation.iX=0;
+                            childTile.tRegion.tLocation.iY=0;
+                            childTile.tRegion.tSize.iWidth=bgRotationCentre.fX+1;
+                            childTile.tRegion.tSize.iHeight=bgRotationCentre.fY+1;
+
+                            arm_2d_fill_colour_with_mask_and_opacity(&tTarget,&tTarget_canvas,&childTile,(__arm_2d_color_t){ptWidget->maskColor},ptWidget->use_as__ldBase_t.opacity);
+                        }
+                        if(angle>450)
+                        {
+                            //右上角
+                            childTile.tRegion.tLocation.iX=bgRotationCentre.fX;
+                            childTile.tRegion.tLocation.iY=0;
+                            childTile.tRegion.tSize.iWidth=ptWidget->ptBgTrailMaskTile->tRegion.tSize.iWidth-bgRotationCentre.fX;
+                            childTile.tRegion.tSize.iHeight=ptWidget->ptBgTrailMaskTile->tRegion.tSize.iHeight-bgRotationCentre.fY;
+
+                            arm_2d_fill_colour_with_mask_and_opacity(&tTarget,&childTile.tRegion,&childTile,(__arm_2d_color_t){ptWidget->maskColor},ptWidget->use_as__ldBase_t.opacity);
+                        }
+//                        if(angle>540)
+//                        {
+//                            //右下角
+//                            childTile.tRegion.tLocation.iX=bgRotationCentre.fX;
+//                            childTile.tRegion.tLocation.iY=bgRotationCentre.fY;
+//                            childTile.tRegion.tSize.iWidth=ptWidget->ptBgTrailMaskTile->tRegion.tSize.iWidth-bgRotationCentre.fX;
+//                            childTile.tRegion.tSize.iHeight=ptWidget->ptBgTrailMaskTile->tRegion.tSize.iHeight-bgRotationCentre.fY;
+
+//                            arm_2d_fill_colour_with_mask_and_opacity(&tTarget,&childTile.tRegion,&childTile,(__arm_2d_color_t){ptWidget->maskColor},ptWidget->use_as__ldBase_t.opacity);
+//                        }
+
+                        arm_2dp_fill_colour_with_transformed_mask_target_mask_and_opacity(&ptWidget->trailOp,
+                                                                                          ptWidget->ptPointerTrailMaskTile,
+                                                                                          &tTarget,
+                                                                                          ptWidget->ptBgTrailMaskTile,
+                                                                                          &tTarget_canvas,
+                                                                                          maskPointerRotationCentre,
+                                                                                          ANGLE_2_RADIAN(angle),
+                                                                                          1.0,
+                                                                                          1.0,
+                                                                                          ptWidget->maskColor,
+                                                                                          ptWidget->_trailOpacity,
+                                                                                          &bgRotationCentre);
+                    }
+                    else
+                    {
+                        float scale=1.0;
+
+                        if((ptWidget->endAngle_x10-ptWidget->_nowAngle_x10)<0)
+                        {
+                            scale=-1.0;
+                        }
+
+                        arm_2dp_fill_colour_with_transformed_mask_target_mask_and_opacity(&ptWidget->trailOp,
+                                                                                          ptWidget->ptPointerTrailMaskTile,
+                                                                                          &tTarget,
+                                                                                          ptWidget->ptBgTrailMaskTile,
+                                                                                          &tTarget_canvas,
+                                                                                          maskPointerRotationCentre,
+                                                                                          ANGLE_2_RADIAN(angle),
+                                                                                          scale,
+                                                                                          1.0,
+                                                                                          ptWidget->maskColor,
+                                                                                          ptWidget->_trailOpacity,
+                                                                                          &bgRotationCentre);
+                    }
+
+                    arm_2d_op_wait_async(NULL);
+                }
 
                 if((ptWidget->ptPointerImgTile!=NULL)&&(ptWidget->ptPointerMaskTile!=NULL))
                 {
-                    arm_2dp_tile_transform_with_src_mask_and_opacity(&ptWidget->op,
+                    arm_2dp_tile_transform_xy_with_src_mask_and_opacity(&ptWidget->op,
                                                                      ptWidget->ptPointerImgTile,
                                                                      ptWidget->ptPointerMaskTile,
                                                                      &tTarget,
                                                                      &tTarget_canvas,
                                                                      pointerRotationCentre,
-                                                                     ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),
+                                                                     ANGLE_2_RADIAN(angle),
                                                                      1.0,
-                                                                     255,
+                                                                     1.0,
+                                                                     ptWidget->use_as__ldBase_t.opacity,
                                                                      &bgRotationCentre);
                 }
                 else if((ptWidget->ptPointerImgTile==NULL)&&(ptWidget->ptPointerMaskTile!=NULL))
                 {
-                    arm_2dp_fill_colour_with_mask_opacity_and_transform((arm_2d_op_trans_opa_t *)&ptWidget->op,
-                                                                        ptWidget->ptPointerMaskTile,
-                                                                        &tTarget,
-                                                                        &tTarget_canvas,
-                                                                        pointerRotationCentre,
-                                                                        ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),//ptWidget->helper.fAngle,
-                                                                        1.0,//ptWidget->helper.fScale,
-                                                                        ptWidget->keyingOrMaskColor,
-                                                                        255,
-                                                                        &bgRotationCentre);
+                    arm_2dp_fill_colour_with_mask_opacity_and_transform_xy((arm_2d_op_trans_opa_t *)&ptWidget->op,
+                                                                           ptWidget->ptPointerMaskTile,
+                                                                           &tTarget,
+                                                                           &tTarget_canvas,
+                                                                           pointerRotationCentre,
+                                                                           ANGLE_2_RADIAN(angle),//ptWidget->helper.fAngle,
+                                                                           1.0,
+                                                                           1.0,
+                                                                           ptWidget->maskColor,
+                                                                           ptWidget->use_as__ldBase_t.opacity,
+                                                                           &bgRotationCentre);
                 }
                 else if((ptWidget->ptPointerImgTile!=NULL)&&(ptWidget->ptPointerMaskTile==NULL))
                 {
-                    arm_2dp_tile_transform_only((arm_2d_op_trans_t *)&ptWidget->op,
-                                                ptWidget->ptPointerImgTile,
-                                                &tTarget,
-                                                &tTarget_canvas,
-                                                pointerRotationCentre,
-                                                ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                                                1.0,
-                                                &bgRotationCentre);
+                    arm_2dp_tile_transform_xy_with_opacity((arm_2d_op_trans_opa_t *)&ptWidget->op,
+                                                           ptWidget->ptPointerImgTile,
+                                                           &tTarget,
+                                                           &tTarget_canvas,
+                                                           pointerRotationCentre,
+                                                           ANGLE_2_RADIAN(angle),
+                                                           1.0,
+                                                           1.0,
+                                                           ptWidget->maskColor,
+                                                           ptWidget->use_as__ldBase_t.opacity,
+                                                           &bgRotationCentre);
                 }
                 else if(ptWidget->isKeying)
                 {
-                    arm_2dp_tile_rotation_with_colour_keying((arm_2d_op_trans_t *)&ptWidget->op,
-                                                             ptWidget->ptPointerImgTile,
-                                                             &tTarget,
-                                                             &tTarget_canvas,
-                                                             pointerRotationCentre,
-                                                             ANGLE_2_RADIAN((ptWidget->angle_x10)/10.0+ANGLE_OFFSET),
-                                                             __RGB(255,255,255),
-                                                             &bgRotationCentre);
+                    if (bIsNewFrame)
+                    {
+                        arm_2dp_rgb565_tile_transform_xy_with_colour_keying_prepare((arm_2d_op_trans_t *)&ptWidget->op,
+                                                                                    ptWidget->ptPointerImgTile,
+                                                                                    pointerRotationCentre,
+                                                                                    ANGLE_2_RADIAN(angle),
+                                                                                    1.0,
+                                                                                    1.0,
+                                                                                    ptWidget->maskColor);
+                    };
+                    arm_2dp_tile_transform_xy((arm_2d_op_trans_t *)&ptWidget->op,
+                                              &tTarget,
+                                              &tTarget_canvas,
+                                              &bgRotationCentre);
+
                     break;
                 }
                 arm_2d_op_wait_async(NULL);
@@ -263,7 +445,8 @@ void ldGauge_show(ld_scene_t *ptScene, ldGauge_t *ptWidget, const arm_2d_tile_t 
 
 void ldGaugeSetPointerImage(ldGauge_t *ptWidget,arm_2d_tile_t *ptPointerImgTile,arm_2d_tile_t *ptPointerMaskTile,int16_t pointerOriginOffsetX,int16_t pointerOriginOffsetY)
 {
-    if (ptWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
@@ -271,28 +454,95 @@ void ldGaugeSetPointerImage(ldGauge_t *ptWidget,arm_2d_tile_t *ptPointerImgTile,
     ptWidget->ptPointerMaskTile=ptPointerMaskTile;
     ptWidget->pointerOriginOffsetX=pointerOriginOffsetX;
     ptWidget->pointerOriginOffsetY=pointerOriginOffsetY;
+
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRUpdate=true;
+    ptWidget->use_as__ldBase_t.ptItemRegionList[0].isDRReset=false;
+    if(ptWidget->ptPointerImgTile!=NULL)
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptWidget->ptPointerImgTile->tRegion;
+    }
+    else
+    {
+        ptWidget->use_as__ldBase_t.ptItemRegionList[0].itemRegion=ptWidget->ptPointerMaskTile->tRegion;
+    }
 }
 
 void ldGaugeSetPointerColor(ldGauge_t *ptWidget,ldColor color)
 {
-    if (ptWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
-    ptWidget->keyingOrMaskColor=color;
+    ptWidget->maskColor=color;
 }
 
 void ldGaugeSetAngle(ldGauge_t *ptWidget, float angle)
 {
-    if (ptWidget == NULL)
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->angle_x10=(int16_t)(angle*10);
-    ptWidget->angle_x10%=3600;
+    int16_t newEnd = ((int16_t)(angle * 10)) % 3600;
+    if(newEnd < 0)
+    {
+        newEnd += 3600;
+    }
+
+    if(ptWidget->_nowAngle_x10 == ptWidget->endAngle_x10)
+    {
+        ptWidget->startAngle_x10 = ptWidget->_nowAngle_x10;
+    }
+
+    ptWidget->endAngle_x10 = newEnd;
+
+    if(!ptWidget->isAutoMove)
+    {
+        ptWidget->_nowAngle_x10=ptWidget->endAngle_x10;
+    }
 }
 
+void ldGaugeSetTrail(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgTrailMaskTile,arm_2d_tile_t *ptPointerTrailMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptBgTrailMaskTile=ptBgTrailMaskTile;
+    ptWidget->ptPointerTrailMaskTile=ptPointerTrailMaskTile;
+    ptWidget->isProgressBar=false;
+}
+
+void ldGaugeSetProgressBar(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgProgressBarMaskTile,arm_2d_tile_t *ptPointerProgressBarMaskTile)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->ptBgTrailMaskTile=ptBgProgressBarMaskTile;
+    ptWidget->ptPointerTrailMaskTile=ptPointerProgressBarMaskTile;
+    ptWidget->isProgressBar=true;
+}
+
+void ldGaugeSetAutoMove(ldGauge_t *ptWidget, bool enable)
+{
+    if(ptWidget == NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptWidget->isAutoMove = enable;
+    if(enable && ptWidget->_nowAngle_x10 == 0)
+    {
+        ptWidget->_nowAngle_x10 = ptWidget->endAngle_x10;
+    }
+}
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
