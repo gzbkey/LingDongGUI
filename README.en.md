@@ -86,10 +86,9 @@ widget demo sdl
 | ✅ | animation | GIF-style animation |
 | ✅ | calendar | calendar |
 | ✅ | message box | Pop-up message |
-| 🔲 | clock | Analog clock |
+| ✅ | clock | Analog clock |
 | ✅ | list | Scrollable list hosting any widget |
-| 🔲 | time picker | time picker |
-| 🔲 | date picker | date picker |
+| 🔲 | spectrum viewer | Spectrum viewer |
 
 ## File Structure
 

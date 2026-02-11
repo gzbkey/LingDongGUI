@@ -87,10 +87,9 @@ widget demo sdl
 | ✅ | animation | gif动画 |
 | ✅ | calendar | 日历 |
 | ✅ | message box | 消息框 |
-| 🔲 | clock | 模拟时钟 |
+| ✅ | clock | 模拟时钟 |
 | ✅ | list | 列表，可嵌入其他类型控件 |
-| 🔲 | time picker | 时间选择器 |
-| 🔲 | date picker | 日期选择器 |
+| 🔲 | spectrum viewer | 频谱显示 |
 
 ## 文件结构
 |名称|类型|说明|
