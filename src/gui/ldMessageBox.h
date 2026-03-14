@@ -74,6 +74,8 @@ struct ldMessageBox_t
 };
 
 ldMessageBox_t* ldMessageBox_init(ld_scene_t *ptScene, ldMessageBox_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);
+#define ldMessageBoxInit(nameId,parentNameId,width,height,ptFont) \
+        ldMessageBox_init(ptScene,NULL,nameId,parentNameId,-1,-1,width,height,ptFont)
 void ldMessageBox_depose(ld_scene_t *ptScene, ldMessageBox_t *ptWidget);
 void ldMessageBox_on_load(ld_scene_t *ptScene, ldMessageBox_t *ptWidget);
 void ldMessageBox_on_frame_start(ld_scene_t *ptScene, ldMessageBox_t *ptWidget);
@@ -87,13 +89,6 @@ void ldMessageBoxSetCallback(ldMessageBox_t* ptWidget,ldMsgBoxFunc_t ptFunc);
 void ldMessageBoxSetStringColor(ldMessageBox_t* ptWidget, ldColor titleStrColor, ldColor msgStrColor, ldColor btnStrColor);
 void ldMessageBoxSetButtonColor(ldMessageBox_t* ptWidget, ldColor releaseColor, ldColor pressColor);
 void ldMessageBoxSetBackgroundColor(ldMessageBox_t* ptWidget, ldColor bgColor);
-#define ldMessageBoxInit(nameId,parentNameId,width,height,ptFont) \
-        ldMessageBox_init(ptScene,NULL,nameId,parentNameId,-1,-1,width,height,ptFont)
-
-#define ldMessageBoxSetHidden                ldBaseSetHidden
-#define ldMessageBoxMove                     ldBaseMove
-#define ldMessageBoxSetOpacity               ldBaseSetOpacity
-#define ldMessageBoxSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

@@ -87,13 +87,6 @@ void ldProgressBarSetInverted(ldProgressBar_t *ptWidget,bool isInverted);
 #define ldProgressBarInit(nameId,parentNameId,x,y,width,height) \
         ldProgressBar_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 
-#define ldProgressBarSetHidden                ldBaseSetHidden
-#define ldProgressBarMove                     ldBaseMove
-#define ldProgressBarSetOpacity               ldBaseSetOpacity
-#define ldProgressBarSetSelectable           ldBaseSetSelectable
-#define ldProgressBarSetSelect               ldBaseSetSelect
-#define ldProgressBarSetCorner               ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

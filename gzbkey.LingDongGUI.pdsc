@@ -64,6 +64,7 @@
         <file category="sourceC" name="src/gui/ldScene1.c" />
         <file category="sourceC" name="src/gui/ldScrollSelecter.c" />
         <file category="sourceC" name="src/gui/ldSlider.c" />
+        <file category="sourceC" name="src/gui/ldSpectrum.c" />
         <file category="sourceC" name="src/gui/ldTable.c" />
         <file category="sourceC" name="src/gui/ldText.c" />
         <file category="sourceC" name="src/gui/ldWindow.c" />

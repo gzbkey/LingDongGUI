@@ -80,13 +80,6 @@ uint8_t *ldLineEditGetText(ldLineEdit_t *ptWidget);
 #define ldLineEditInit(nameId,parentNameId,x,y,width,height,ptFont,textMax) \
         ldLineEdit_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont,textMax)
 
-#define ldLineEditSetHidden                ldBaseSetHidden
-#define ldLineEditMove                     ldBaseMove
-#define ldLineEditSetOpacity               ldBaseSetOpacity
-#define ldLineEditSetSelectable            ldBaseSetSelectable
-#define ldLineEditSetSelect                ldBaseSetSelect
-#define ldLineEditSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

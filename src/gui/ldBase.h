@@ -61,6 +61,7 @@ typedef enum{
     widgetTypeCalendar,
     widgetTypeProgressWheel,
     widgetTypeClock,
+    widgetTypeSpectrum,
 }ldWidgetType_t;
 
 
@@ -254,6 +255,7 @@ bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer);
                                           __ldTimeOut(__ms, \
                                                       isReset, \
                                                       (&arm_2d_safe_name(s_lTimestamp),##__VA_ARGS__));})
+int32_t ldBaseGetTickMs(void);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
 void ldBaseNodeRemove(arm_2d_control_node_t *ptNode);

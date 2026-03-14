@@ -55,6 +55,7 @@ extern "C" {
 #include "ldWindow.h"
 #include "ldImage.h"
 #include "ldClock.h"
+#include "ldSpectrum.h"
 
 extern uint8_t cursorBlinkCount;
 extern bool cursorBlinkFlag;

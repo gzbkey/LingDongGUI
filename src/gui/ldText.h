@@ -89,13 +89,6 @@ void ldTextScrollMove(ldText_t *ptWidget, int8_t moveValue);
 #define ldTextInit(nameId,parentNameId,x,y,width,height,ptFont,align,isScroll) \
         ldText_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptFont,align,isScroll)
 
-#define ldTextSetHidden                ldBaseSetHidden
-#define ldTextMove                     ldBaseMove
-#define ldTextSetOpacity               ldBaseSetOpacity
-#define ldTextSetSelectable            ldBaseSetSelectable
-#define ldTextSetSelect                ldBaseSetSelect
-#define ldTextSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

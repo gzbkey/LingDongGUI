@@ -79,13 +79,6 @@ void ldSliderSetSlimSize(ldSlider_t *ptWidget,uint8_t slimSize);
 #define ldSliderInit(nameId,parentNameId,x,y,width,height) \
         ldSlider_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 
-#define ldSliderSetHidden                ldBaseSetHidden
-#define ldSliderMove                     ldBaseMove
-#define ldSliderSetOpacity               ldBaseSetOpacity
-#define ldSliderSetSelectable            ldBaseSetSelectable
-#define ldSliderSetSelect                ldBaseSetSelect
-#define ldSliderSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

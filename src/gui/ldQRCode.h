@@ -74,13 +74,6 @@ void ldQRCodeSetText(ldQRCode_t *ptWidget, uint8_t *pStr);
 #define ldQRCodeInit(nameId,parentNameId,x,y,width,height,pStr,qrColor,bgColor,qrEcc,qrMaxVersion,qrZoom) \
         ldQRCode_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,pStr,qrColor,bgColor,qrEcc,qrMaxVersion,qrZoom)
 
-#define ldQRCodeSetHidden                ldBaseSetHidden
-#define ldQRCodeMove                     ldBaseMove
-#define ldQRCodeSetOpacity               ldBaseSetOpacity
-#define ldQRCodeSetSelectable            ldBaseSetSelectable
-#define ldQRCodeSetSelect                ldBaseSetSelect
-#define ldQRCodeSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

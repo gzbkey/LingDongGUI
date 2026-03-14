@@ -86,13 +86,6 @@ bool ldCheckBoxIsChecked(ldCheckBox_t* ptWidget);
 #define ldCheckBoxInit(nameId,parentNameId,x,y,width,height) \
         ldCheckBox_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 
-#define ldCheckBoxSetHidden                ldBaseSetHidden
-#define ldCheckBoxMove                     ldBaseMove
-#define ldCheckBoxSetOpacity               ldBaseSetOpacity
-#define ldCheckBoxSetSelectable            ldBaseSetSelectable
-#define ldCheckBoxSetSelect                ldBaseSetSelect
-#define ldCheckBoxSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

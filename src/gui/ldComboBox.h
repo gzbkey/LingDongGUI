@@ -88,13 +88,6 @@ void ldComboBoxSetDropdownImage(ldComboBox_t* ptWidget,arm_2d_tile_t* ptDropdown
 uint8_t* ldComboBoxGetText(ldComboBox_t* ptWidget, uint8_t num);
 uint8_t ldComboBoxGetSelectItem(ldComboBox_t* ptWidget);
 
-#define ldComboBoxSetHidden                ldBaseSetHidden
-#define ldComboBoxMove                     ldBaseMove
-#define ldComboBoxSetOpacity               ldBaseSetOpacity
-#define ldComboBoxSetSelectable            ldBaseSetSelectable
-#define ldComboBoxSetSelect                ldBaseSetSelect
-#define ldComboBoxSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

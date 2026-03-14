@@ -92,13 +92,6 @@ void ldListSetMargin(ldList_t* ptWidget,uint8_t top,uint8_t bottom,uint8_t left,
 #define ldListInit(nameId,parentNameId,x,y,width,height) \
         ldList_init(ptScene,NULL,nameId,parentNameId,x,y,width,height)
 
-#define ldListSetHidden                ldBaseSetHidden
-#define ldListMove                     ldBaseMove
-#define ldListSetOpacity               ldBaseSetOpacity
-#define ldListSetSelectable            ldBaseSetSelectable
-#define ldListSetSelect                ldBaseSetSelect
-#define ldListSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

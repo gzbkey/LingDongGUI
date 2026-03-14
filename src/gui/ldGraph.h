@@ -89,13 +89,6 @@ void ldGraphMoveAdd(ldGraph_t *ptWidget,uint8_t seriesNum,uint16_t newValue);
 #define ldGraphInit(nameId,parentNameId,x,y,width,height,seriesMax) \
         ldGraph_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,seriesMax)
 
-#define ldGraphSetHidden                ldBaseSetHidden
-#define ldGraphMove                     ldBaseMove
-#define ldGraphSetOpacity               ldBaseSetOpacity
-#define ldGraphSetSelectable            ldBaseSetSelectable
-#define ldGraphSetSelect                ldBaseSetSelect
-#define ldGraphSetCorner                ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

@@ -232,18 +232,18 @@ void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t 
         kb->editorId=ptWidget->use_as__ldBase_t.nameId;
         cursorBlinkFlag=true;
         cursorBlinkCount=0;
-        ldKeyboardSetHidden((ldBase_t *)kb,false);
+        ldBaseSetHidden((ldBase_t *)kb,false);
 
         arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
 
         if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY)>(LD_CFG_SCREEN_HEIGHT>>1))
         {
-            ldKeyboardMove((ldBase_t *)kb,0,LD_CFG_SCREEN_HEIGHT>>1);
+            ldBaseMove((ldBase_t *)kb,0,LD_CFG_SCREEN_HEIGHT>>1);
             ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-(LD_CFG_SCREEN_HEIGHT>>1));
         }
         else
         {
-            ldKeyboardMove((ldBase_t *)kb,0,0);
+            ldBaseMove((ldBase_t *)kb,0,0);
         }
     }
 }

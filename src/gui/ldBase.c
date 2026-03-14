@@ -187,6 +187,13 @@ bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer)
     return false;
 }
 
+int32_t ldBaseGetTickMs(void)
+{
+    int64_t lTimestamp = arm_2d_helper_get_system_timestamp();
+    int64_t ms=arm_2d_helper_convert_ticks_to_ms(lTimestamp);
+    return (int32_t)(ms & 0xFFFFFFFFLL);
+}
+
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
 {
     child->ptParent = parent;
