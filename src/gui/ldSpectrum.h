@@ -61,6 +61,12 @@ struct ldSpectrumFFT_t {
     float *pMagBuffer;
 };
 
+typedef struct {
+    int16_t offsetY;
+    uint8_t speed;
+    uint8_t active;
+} ldSpectrumParticle_t;
+
 typedef struct ldSpectrum_t ldSpectrum_t;
 
 struct ldSpectrum_t
@@ -68,6 +74,8 @@ struct ldSpectrum_t
     implement(ldBase_t);
     uint8_t *pValueList;
     uint8_t *pDisplayValueList;
+    uint8_t *pPeakValueList;
+    ldSpectrumParticle_t *pParticles;
     uint8_t barCount;
     uint8_t barWidth;
     uint8_t barGap;
@@ -78,10 +86,10 @@ struct ldSpectrum_t
     arm_2d_tile_t *ptBgMaskTile;
     uint8_t fallSpeed;
     uint8_t riseSpeed;
+    uint8_t peakFallSpeed;
     uint8_t gain;
     ldSpectrumStyle_t style;
     ldSpectrumFFT_t *pFFT;
-    bool isGradient:1;
 };
 
 ldSpectrum_t* ldSpectrum_init(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t barCount);
@@ -96,10 +104,11 @@ void ldSpectrum_show(ld_scene_t *pScene, ldSpectrum_t *ptWidget, const arm_2d_ti
 void ldSpectrumSetData(ldSpectrum_t *ptWidget, uint8_t *pData, uint8_t len);
 void ldSpectrumSetRawData(ldSpectrum_t *ptWidget, int16_t *pData, uint16_t len);
 void ldSpectrumSetBarStyle(ldSpectrum_t *ptWidget, uint8_t barWidth, uint8_t barGap);
-void ldSpectrumSetColor(ldSpectrum_t *ptWidget, ldColor startColor, ldColor endColor, bool isGradient);
+void ldSpectrumSetColor(ldSpectrum_t *ptWidget, ldColor startColor, ldColor endColor);
 void ldSpectrumSetBgColor(ldSpectrum_t *ptWidget, ldColor bgColor);
 void ldSpectrumSetBgImage(ldSpectrum_t *ptWidget, arm_2d_tile_t *ptBgImgTile, arm_2d_tile_t *ptBgMaskTile);
 void ldSpectrumSetAnimation(ldSpectrum_t *ptWidget, uint8_t riseSpeed, uint8_t fallSpeed);
+void ldSpectrumSetPeakFallSpeed(ldSpectrum_t *ptWidget, uint8_t peakFallSpeed);
 void ldSpectrumSetStyle(ldSpectrum_t *ptWidget, ldSpectrumStyle_t style);
 void ldSpectrumSetGain(ldSpectrum_t *ptWidget, uint8_t gain);
 void ldSpectrumEnableBuiltinFFT(ldSpectrum_t *ptWidget, uint16_t fftSize);

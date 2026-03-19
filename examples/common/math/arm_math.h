@@ -12,10 +12,17 @@ extern "C"
 #include "csi_instance.h"
 #endif
 
+#include "csi_math.h"
+
 float32_t arm_sin_f32(float32_t x);
 float32_t arm_cos_f32(float32_t x);
 q31_t arm_sin_q31(q31_t x);
 q31_t arm_cos_q31(q31_t x);
+
+#define arm_rfft_fast_instance_f32    csi_rfft_fast_instance_f32
+#define arm_rfft_fast_init_f32        csi_rfft_fast_init_f32
+#define arm_rfft_fast_f32             csi_rfft_fast_f32
+#define arm_cmplx_mag_f32             csi_cmplx_mag_f32
 
 #else
 
