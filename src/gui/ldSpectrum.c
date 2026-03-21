@@ -27,7 +27,9 @@
 
 #include "ldSpectrum.h"
 
-#define LD_SPECTRUM_GRADIENT_HEIGHT  200
+#define LD_SPECTRUM_RISE_SPEED     8
+#define LD_SPECTRUM_FALL_SPEED     3
+#define LD_SPECTRUM_PEAK_FALL_SPEED 1
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -49,40 +51,14 @@
 #include "arm_math.h"
 
 #if __GLCD_CFG_COLOUR_DEPTH__ == 16
-ARM_SECTION("arm2d.asset.c_bmpSpectrumGradientRGB565")
-static const uint16_t c_bmpSpectrumGradientRGB565[LD_SPECTRUM_GRADIENT_HEIGHT] = {
-0xFD40, 0xFC40, 0xFB41, 0xFA41, 0xF942, 0xF842, 0xF743, 0xF643,
-0xF544, 0xF444, 0xF345, 0xF245, 0xF146, 0xF046, 0xEF47, 0xEE47,
-0xED48, 0xEC48, 0xEB49, 0xEA49, 0xE94A, 0xE84A, 0xE74B, 0xE64B,
-0xE54C, 0xE44C, 0xE34D, 0xE24D, 0xE14E, 0xE04E, 0xDF4F, 0xDE4F,
-0xDD50, 0xDC50, 0xDB51, 0xDA51, 0xD952, 0xD852, 0xD753, 0xD653,
-0xD554, 0xD454, 0xD355, 0xD255, 0xD156, 0xD056, 0xCF57, 0xCE57,
-0xCD58, 0xCC58, 0xCB59, 0xCA59, 0xC95A, 0xC85A, 0xC75B, 0xC65B,
-0xC55C, 0xC45C, 0xC35D, 0xC25D, 0xC15E, 0xC05E, 0xBF5F, 0xBE5F,
-0xBD60, 0xBC60, 0xBB61, 0xBA61, 0xB962, 0xB862, 0xB763, 0xB663,
-0xB564, 0xB464, 0xB365, 0xB265, 0xB166, 0xB066, 0xAF67, 0xAE67,
-0xAD68, 0xAC68, 0xAB69, 0xAA69, 0xA96A, 0xA86A, 0xA76B, 0xA66B,
-0xA56C, 0xA46C, 0xA36D, 0xA26D, 0xA16E, 0xA06E, 0x9F6F, 0x9E6F,
-0x9D70, 0x9C70, 0x9B71, 0x9A71, 0x9972, 0x9872, 0x9773, 0x9673,
-0x9574, 0x9474, 0x9375, 0x9275, 0x9176, 0x9076, 0x8F77, 0x8E77,
-0x8D78, 0x8C78, 0x8B79, 0x8A79, 0x897A, 0x887A, 0x877B, 0x867B,
-0x857C, 0x847C, 0x837D, 0x827D, 0x817E, 0x807E, 0x7F7F, 0x7E7F,
-0x7D80, 0x7C80, 0x7B81, 0x7A81, 0x7982, 0x7882, 0x7783, 0x7683,
-0x7584, 0x7484, 0x7385, 0x7285, 0x7186, 0x7086, 0x6F87, 0x6E87,
-0x6D88, 0x6C88, 0x6B89, 0x6A89, 0x698A, 0x688A, 0x678B, 0x668B,
-0x658C, 0x648C, 0x638D, 0x628D, 0x618E, 0x608E, 0x5F8F, 0x5E8F,
-0x5D90, 0x5C90, 0x5B91, 0x5A91, 0x5992, 0x5892, 0x5793, 0x5693,
-0x5594, 0x5494, 0x5395, 0x5295, 0x5196, 0x5096, 0x4F97, 0x4E97,
-0x4D98, 0x4C98, 0x4B99, 0x4A99, 0x499A, 0x489A, 0x479B, 0x469B,
-0x459C, 0x449C, 0x439D, 0x429D, 0x419E, 0x409E, 0x3F9F, 0x3E9F,
-0x3DA0, 0x3CA0, 0x3BA1, 0x3AA1, 0x39A2, 0x38A2, 0x37A3, 0x36A3,
-};
-
-static const arm_2d_tile_t c_tileSpectrumGradientRGB565 = {
+ARM_SECTION("arm2d.asset.c_bmp_spectrumBeam_png_RGB565")
+const uint16_t c_bmp_spectrumBeam_png_RGB565[1*600] = {
+    0xfca1, 0xfca1, 0xfca1, 0xfca1, 0xfca1, 0xfca1, 0xfca1, 0xfca1, 0xfca2, 0xfca2, 0xfca2, 0xfca2, 0xfca2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfcc2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfce2, 0xfd02, 0xfd02, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd03, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd23, 0xfd43, 0xfd43, 0xfd43, 0xfd43, 0xfd43, 0xfd43, 0xfd43, 0xfd43, 0xfd43, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd44, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd64, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd84, 0xfd85, 0xfd85, 0xfd85, 0xfd85, 0xfd85, 0xfd85, 0xfd85, 0xfd85, 0xfd85, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfda5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc5, 0xfdc6, 0xfdc6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xfde6, 0xf5e6, 0xf5e6, 0xf5e6, 0xf5e6, 0xf5e6, 0xf5e6, 0xf5e6, 0xede6, 0xede6, 0xede6, 0xede6, 0xede6, 0xede6, 0xede6, 0xe5e6, 0xe5e6, 0xe5e5, 0xe5e5, 0xe5e5, 0xe5e5, 0xe5e5, 0xdde5, 0xdde5, 0xdde5, 0xdde5, 0xdde5, 0xdde5, 0xdde5, 0xd5e5, 0xd5e5, 0xd5e5, 0xd5e5, 0xd5e5, 0xd5e5, 0xd5e5, 0xcde5, 0xcde5, 0xcde5, 0xcdc5, 0xcdc5, 0xcdc5, 0xcdc5, 0xc5c5, 0xc5c5, 0xc5c5, 0xc5c5, 0xc5c5, 0xc5c5, 0xc5c5, 0xbdc5, 0xbdc5, 0xbdc5, 0xbdc5, 0xbdc5, 0xbdc5, 0xbdc5, 0xb5c5, 0xb5c5, 0xb5c5, 0xb5c5, 0xb5c5, 0xb5c5, 0xb5c5, 0xadc5, 0xadc5, 0xadc5, 0xadc5, 0xadc5, 0xadc5, 0xadc5, 0xa5c5, 0xa5c5, 0xa5c5, 0xa5c5, 0xa5c5, 0xa5c5, 0xa5c5, 0x9dc5, 0x9dc5, 0x9dc5, 0x9dc5, 0x9dc5, 0x9dc5, 0x9dc5, 0x95c5, 0x95c5, 0x95c5, 0x95c5, 0x95c5, 0x95c5, 0x8dc5, 0x8dc5, 0x8dc5, 0x8dc5, 0x8dc5, 0x8dc5, 0x8dc5, 0x85c5, 0x85c5, 0x85c5, 0x85c5, 0x85c5, 0x85c5, 0x85c5, 0x7dc5, 0x7dc4, 0x7dc4, 0x7dc4, 0x7dc4, 0x7dc4, 0x7dc4, 0x75c4, 0x75c4, 0x75c4, 0x75c4, 0x75c4, 0x75c4, 0x75c4, 0x6dc4, 0x6dc4, 0x6dc4, 0x6dc4, 0x6dc4, 0x6dc4, 0x6dc4, 0x65c4, 0x65c4, 0x65a4, 0x65a4, 0x65a4, 0x65a4, 0x65a4, 0x5da4, 0x5da4, 0x5da4, 0x5da4, 0x5da4, 0x5da4, 0x5da4, 0x55a4, 0x55a4, 0x55a4, 0x55a4, 0x55a4, 0x55a4, 0x55a4, 0x4da4, 0x4da4, 0x4da4, 0x4da4, 0x4da4, 0x4da4, 0x4da4, 0x45a4, 0x45a4, 0x45a4, 0x45a4, 0x45a4, 0x45a4, 0x45a4, 0x3da4, 0x3da4, 0x3da4, 0x3da4, 0x3da4, 0x3da4, 0x3da4, 0x35a4, 0x35a4, 0x35a4, 0x35a4, 0x35a4, 0x35a4, 0x35a4, 0x2da4, 0x2da4, 0x2da4, 0x2da4, 0x2da4, 0x2da4, 0x2da4, 0x25a4, 0x25a4, 0x25a4, 0x25a4, 0x25a4, 0x25a4, 0x25a4, 0x1da4, 0x1da4, 0x1da4, 0x1da4, 0x1da4, 0x1da4, 0x1da3, 0x15a3, 0x15a3, 0x15a3, 0x15a3, 0x15a3, 0x15a3, 0x15a3, 0x0da3, 0x0da3, 0x0da3, 0x0da3, 0x0da3, 0x0da3, 0x0da3, 0x05a3, 0x05a3, 0x05a3, 0x05a3, 0x05a3, 0x05a3, 0x05a3};
+const arm_2d_tile_t c_tile_spectrumBeam_png_RGB565 = {
     .tRegion = {
         .tSize = {
             .iWidth = 1,
-            .iHeight = LD_SPECTRUM_GRADIENT_HEIGHT,
+            .iHeight = 600,
         },
     },
     .tInfo = {
@@ -92,61 +68,17 @@ static const arm_2d_tile_t c_tileSpectrumGradientRGB565 = {
             .chScheme = ARM_2D_COLOUR_RGB565,
         },
     },
-    .phwBuffer = (uint16_t*)c_bmpSpectrumGradientRGB565,
+    .phwBuffer = (uint16_t*)c_bmp_spectrumBeam_png_RGB565,
 };
-
-#elif __GLCD_CFG_COLOUR_DEPTH__ == 32
-ARM_SECTION("arm2d.asset.c_bmpSpectrumGradientCCCA8888")
-static const uint32_t c_bmpSpectrumGradientCCCA8888[LD_SPECTRUM_GRADIENT_HEIGHT] = {
-0xFF00A5FF, 0xFF01A1FB, 0xFF029DF7, 0xFF0399F3,
-0xFF0495EF, 0xFF0591EB, 0xFF068DE7, 0xFF0789E3,
-0xFF0885DF, 0xFF0981DB, 0xFF0A7DD7, 0xFF0B79D3,
-0xFF0C75CF, 0xFF0D71CB, 0xFF0E6DC7, 0xFF0F69C3,
-0xFF1065BF, 0xFF1161BB, 0xFF125DB7, 0xFF1359B3,
-0xFF1455AF, 0xFF1551AB, 0xFF164DA7, 0xFF1749A3,
-0xFF18459F, 0xFF19419B, 0xFF1A3D97, 0xFF1B3993,
-0xFF1C358F, 0xFF1D318B, 0xFF1E2D87, 0xFF1F2983,
-0xFF20257F, 0xFF21217B, 0xFF221D77, 0xFF231973,
-0xFF24156F, 0xFF25116B, 0xFF260D67, 0xFF270963,
-0xFF28055F, 0xFF29015B, 0xFF2A0057, 0xFF2B0053,
-0xFF2C004F, 0xFF2D004B, 0xFF2E0047, 0xFF2F0043,
-0xFF30003F, 0xFF31003B, 0xFF320037, 0xFF330033,
-0xFF34002F, 0xFF35002B, 0xFF360027, 0xFF370023,
-0xFF38001F, 0xFF39001B, 0xFF3A0017, 0xFF3B0013,
-0xFF3C000F, 0xFF3D000B, 0xFF3E0007, 0xFF3F0003,
-0xFF400000, 0xFF410000, 0xFF420000, 0xFF430000,
-0xFF440000, 0xFF450000, 0xFF460000, 0xFF470000,
-0xFF480000, 0xFF490000, 0xFF4A0000, 0xFF4B0000,
-0xFF4C0000, 0xFF4D0000, 0xFF4E0000, 0xFF4F0000,
-0xFF500000, 0xFF510000, 0xFF520000, 0xFF530000,
-0xFF540000, 0xFF550000, 0xFF560000, 0xFF570000,
-0xFF580000, 0xFF590000, 0xFF5A0000, 0xFF5B0000,
-0xFF5C0000, 0xFF5D0000, 0xFF5E0000, 0xFF5F0000,
-0xFF600000, 0xFF610000, 0xFF620000, 0xFF630000,
-0xFF640000, 0xFF650000, 0xFF660000, 0xFF670000,
-0xFF680000, 0xFF690000, 0xFF6A0000, 0xFF6B0000,
-0xFF6C0000, 0xFF6D0000, 0xFF6E0000, 0xFF6F0000,
-0xFF700000, 0xFF710000, 0xFF720000, 0xFF730000,
-0xFF740000, 0xFF750000, 0xFF760000, 0xFF770000,
-0xFF780000, 0xFF790000, 0xFF7A0000, 0xFF7B0000,
-0xFF7C0000, 0xFF7D0000, 0xFF7E0000, 0xFF7F0000,
-0xFF800000, 0xFF810000, 0xFF820000, 0xFF830000,
-0xFF840000, 0xFF850000, 0xFF860000, 0xFF870000,
-0xFF880000, 0xFF890000, 0xFF8A0000, 0xFF8B0000,
-0xFF8C0000, 0xFF8D0000, 0xFF8E0000, 0xFF8F0000,
-0xFF900000, 0xFF910000, 0xFF920000, 0xFF930000,
-0xFF940000, 0xFF950000, 0xFF960000, 0xFF970000,
-0xFF980000, 0xFF990000, 0xFF9A0000, 0xFF9B0000,
-0xFF9C0000, 0xFF9D0000, 0xFF9E0000, 0xFF9F0000,
-0xFFA00000, 0xFFA10000, 0xFFA20000, 0xFFA30000,
-0xFFA40000, 0xFFA50000, 0xFFA60000, 0xFFA70000,
-};
-
-static const arm_2d_tile_t c_tileSpectrumGradientCCCA8888 = {
+#else
+ARM_SECTION("arm2d.asset.c_bmp_spectrumBeam_png_CCCA8888")
+const uint32_t c_bmp_spectrumBeam_png_CCCA8888[1*600] = {
+    0xffff960f, 0xffff960f, 0xffff960f, 0xffff960f, 0xffff960f, 0xffff960f, 0xffff960f, 0xffff970f, 0xffff9710, 0xffff9710, 0xffff9710, 0xffff9710, 0xffff9710, 0xffff9810, 0xffff9810, 0xffff9811, 0xffff9811, 0xffff9811, 0xffff9811, 0xffff9911, 0xffff9911, 0xffff9911, 0xffff9912, 0xffff9912, 0xffff9912, 0xffff9912, 0xffff9a12, 0xffff9a12, 0xffff9a12, 0xffff9a13, 0xffff9a13, 0xffff9a13, 0xffff9b13, 0xffff9b13, 0xffff9b13, 0xffff9b13, 0xffff9b14, 0xffff9b14, 0xffff9c14, 0xffff9c14, 0xffff9c14, 0xffff9c14, 0xffff9c14, 0xffff9c14, 0xffff9c15, 0xffff9d15, 0xffff9d15, 0xffff9d15, 0xffff9d15, 0xffff9d15, 0xffff9d15, 0xffff9e16, 0xffff9e16, 0xffff9e16, 0xffff9e16, 0xffff9e16, 0xffff9e16, 0xffff9f16, 0xffff9f17, 0xffff9f17, 0xffff9f17, 0xffff9f17, 0xffff9f17, 0xffffa017, 0xffffa017, 0xffffa018, 0xffffa018, 0xffffa018, 0xffffa018, 0xffffa018, 0xffffa118, 0xffffa118, 0xffffa119, 0xffffa119, 0xffffa119, 0xffffa119, 0xffffa219, 0xffffa219, 0xffffa219, 0xffffa219, 0xffffa21a, 0xffffa21a, 0xffffa31a, 0xffffa31a, 0xffffa31a, 0xffffa31a, 0xffffa31a, 0xffffa31b, 0xffffa31b, 0xffffa41b, 0xffffa41b, 0xffffa41b, 0xffffa41b, 0xffffa41b, 0xffffa41c, 0xffffa51c, 0xffffa51c, 0xffffa51c, 0xffffa51c, 0xffffa51c, 0xffffa51c, 0xffffa61d, 0xffffa61d, 0xffffa61d, 0xffffa61d, 0xffffa61d, 0xffffa61d, 0xffffa61d, 0xffffa71e, 0xffffa71e, 0xffffa71e, 0xffffa71e, 0xffffa71e, 0xffffa71e, 0xffffa81e, 0xffffa81e, 0xffffa81f, 0xffffa81f, 0xffffa81f, 0xffffa81f, 0xffffa91f, 0xffffa91f, 0xffffa91f, 0xffffa920, 0xffffa920, 0xffffa920, 0xffffaa20, 0xffffaa20, 0xffffaa20, 0xffffaa20, 0xffffaa21, 0xffffaa21, 0xffffaa21, 0xffffab21, 0xffffab21, 0xffffab21, 0xffffab21, 0xffffab22, 0xffffab22, 0xffffac22, 0xffffac22, 0xffffac22, 0xffffac22, 0xffffac22, 0xffffac23, 0xffffad23, 0xffffad23, 0xffffad23, 0xffffad23, 0xffffad23, 0xffffad23, 0xffffad23, 0xffffae24, 0xffffae24, 0xffffae24, 0xffffae24, 0xffffae24, 0xffffae24, 0xffffaf24, 0xffffaf25, 0xffffaf25, 0xffffaf25, 0xffffaf25, 0xffffaf25, 0xffffb025, 0xffffb025, 0xffffb026, 0xffffb026, 0xffffb026, 0xffffb026, 0xffffb026, 0xffffb126, 0xffffb126, 0xffffb127, 0xffffb127, 0xffffb127, 0xffffb127, 0xffffb227, 0xffffb227, 0xffffb227, 0xffffb228, 0xffffb228, 0xffffb228, 0xffffb328, 0xffffb328, 0xffffb328, 0xffffb328, 0xffffb328, 0xffffb329, 0xffffb429, 0xffffb429, 0xffffb429, 0xffffb429, 0xffffb429, 0xffffb429, 0xffffb42a, 0xffffb52a, 0xffffb52a, 0xffffb52a, 0xffffb52a, 0xffffb52a, 0xffffb52a, 0xffffb62b, 0xffffb62b, 0xffffb62b, 0xffffb62b, 0xffffb62b, 0xffffb62b, 0xffffb72b, 0xffffb72c, 0xffffb72c, 0xffffb72c, 0xffffb72c, 0xffffb72c, 0xffffb72c, 0xffffb82c, 0xffffb82d, 0xffffb82d, 0xffffb82d, 0xffffb82d, 0xffffb82d, 0xffffb92d, 0xffffb92d, 0xffffb92d, 0xffffb92e, 0xffffb92e, 0xffffb92e, 0xffffba2e, 0xffffba2e, 0xffffba2e, 0xffffba2e, 0xffffba2f, 0xffffba2f, 0xffffba2f, 0xffffbb2f, 0xffffbb2f, 0xffffbb2f, 0xffffbb2f, 0xffffbb30, 0xffffbb30, 0xffffbc30, 0xffffbc30, 0xffffbc30, 0xffffbc30, 0xffffbc30, 0xffffbc31, 0xffffbd31, 0xffffbd31, 0xffffbd31, 0xffffbd31, 0xffffbd31, 0xffffbd31, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xffffbe32, 0xfffebd31, 0xfffdbd31, 0xfffcbd31, 0xfffbbd31, 0xfffabd31, 0xfff9bd31, 0xfff8bd31, 0xfff6bd31, 0xfff5bd31, 0xfff4bd31, 0xfff3bd31, 0xfff2bd31, 0xfff1bd30, 0xfff0bd30, 0xffeebd30, 0xffedbd30, 0xffecbd30, 0xffebbd30, 0xffeabd30, 0xffe9bd30, 0xffe8bd30, 0xffe6bd30, 0xffe5bd30, 0xffe4bc2f, 0xffe3bc2f, 0xffe2bc2f, 0xffe1bc2f, 0xffe0bc2f, 0xffdebc2f, 0xffddbc2f, 0xffdcbc2f, 0xffdbbc2f, 0xffdabc2f, 0xffd9bc2f, 0xffd8bc2e, 0xffd6bc2e, 0xffd5bc2e, 0xffd4bc2e, 0xffd3bc2e, 0xffd2bc2e, 0xffd1bc2e, 0xffd0bc2e, 0xffcebc2e, 0xffcdbc2e, 0xffccbc2e, 0xffcbbb2d, 0xffcabb2d, 0xffc9bb2d, 0xffc8bb2d, 0xffc6bb2d, 0xffc5bb2d, 0xffc4bb2d, 0xffc3bb2d, 0xffc2bb2d, 0xffc1bb2d, 0xffc0bb2d, 0xffbebb2c, 0xffbdbb2c, 0xffbcbb2c, 0xffbbbb2c, 0xffbabb2c, 0xffb9bb2c, 0xffb8bb2c, 0xffb6bb2c, 0xffb5bb2c, 0xffb4bb2c, 0xffb3bb2c, 0xffb2ba2b, 0xffb1ba2b, 0xffb0ba2b, 0xffaeba2b, 0xffadba2b, 0xffacba2b, 0xffabba2b, 0xffaaba2b, 0xffa9ba2b, 0xffa8ba2b, 0xffa6ba2b, 0xffa5ba2a, 0xffa4ba2a, 0xffa3ba2a, 0xffa2ba2a, 0xffa1ba2a, 0xffa0ba2a, 0xff9eba2a, 0xff9dba2a, 0xff9cba2a, 0xff9bba2a, 0xff9aba2a, 0xff99ba2a, 0xff98b929, 0xff96b929, 0xff95b929, 0xff94b929, 0xff93b929, 0xff92b929, 0xff91b929, 0xff8fb929, 0xff8eb929, 0xff8db929, 0xff8cb929, 0xff8bb928, 0xff8ab928, 0xff89b928, 0xff87b928, 0xff86b928, 0xff85b928, 0xff84b928, 0xff83b928, 0xff82b928, 0xff81b928, 0xff7fb928, 0xff7eb827, 0xff7db827, 0xff7cb827, 0xff7bb827, 0xff7ab827, 0xff79b827, 0xff77b827, 0xff76b827, 0xff75b827, 0xff74b827, 0xff73b827, 0xff72b826, 0xff71b826, 0xff6fb826, 0xff6eb826, 0xff6db826, 0xff6cb826, 0xff6bb826, 0xff6ab826, 0xff69b826, 0xff67b826, 0xff66b826, 0xff65b725, 0xff64b725, 0xff63b725, 0xff62b725, 0xff61b725, 0xff5fb725, 0xff5eb725, 0xff5db725, 0xff5cb725, 0xff5bb725, 0xff5ab725, 0xff59b724, 0xff57b724, 0xff56b724, 0xff55b724, 0xff54b724, 0xff53b724, 0xff52b724, 0xff51b724, 0xff4fb724, 0xff4eb724, 0xff4db724, 0xff4cb724, 0xff4bb623, 0xff4ab623, 0xff49b623, 0xff47b623, 0xff46b623, 0xff45b623, 0xff44b623, 0xff43b623, 0xff42b623, 0xff41b623, 0xff3fb623, 0xff3eb622, 0xff3db622, 0xff3cb622, 0xff3bb622, 0xff3ab622, 0xff39b622, 0xff37b622, 0xff36b622, 0xff35b622, 0xff34b622, 0xff33b622, 0xff32b521, 0xff31b521, 0xff2fb521, 0xff2eb521, 0xff2db521, 0xff2cb521, 0xff2bb521, 0xff2ab521, 0xff29b521, 0xff27b521, 0xff26b521, 0xff25b520, 0xff24b520, 0xff23b520, 0xff22b520, 0xff21b520, 0xff1fb520, 0xff1eb520, 0xff1db520, 0xff1cb520, 0xff1bb520, 0xff1ab520, 0xff19b41f, 0xff17b41f, 0xff16b41f, 0xff15b41f, 0xff14b41f, 0xff13b41f, 0xff12b41f, 0xff11b41f, 0xff0fb41f, 0xff0eb41f, 0xff0db41f, 0xff0cb41e, 0xff0bb41e, 0xff0ab41e, 0xff09b41e, 0xff07b41e, 0xff06b41e, 0xff05b41e, 0xff04b41e, 0xff03b41e, 0xff02b41e, 0xff01b41e};
+const arm_2d_tile_t c_tile_spectrumBeam_png_CCCA8888 = {
     .tRegion = {
         .tSize = {
             .iWidth = 1,
-            .iHeight = LD_SPECTRUM_GRADIENT_HEIGHT,
+            .iHeight = 600,
         },
     },
     .tInfo = {
@@ -156,53 +88,7 @@ static const arm_2d_tile_t c_tileSpectrumGradientCCCA8888 = {
             .chScheme = ARM_2D_COLOUR_BGRA8888,
         },
     },
-    .pwBuffer = (uint32_t*)c_bmpSpectrumGradientCCCA8888,
-};
-
-#else
-ARM_SECTION("arm2d.asset.c_bmpSpectrumGradientGRAY8")
-static const uint8_t c_bmpSpectrumGradientGRAY8[LD_SPECTRUM_GRADIENT_HEIGHT] = {
-0xB8, 0xB7, 0xB6, 0xB5, 0xB4, 0xB3, 0xB2, 0xB1,
-0xB0, 0xAF, 0xAE, 0xAD, 0xAC, 0xAB, 0xAA, 0xA9,
-0xA8, 0xA7, 0xA6, 0xA5, 0xA4, 0xA3, 0xA2, 0xA1,
-0xA0, 0x9F, 0x9E, 0x9D, 0x9C, 0x9B, 0x9A, 0x99,
-0x98, 0x97, 0x96, 0x95, 0x94, 0x93, 0x92, 0x91,
-0x90, 0x8F, 0x8E, 0x8D, 0x8C, 0x8B, 0x8A, 0x89,
-0x88, 0x87, 0x86, 0x85, 0x84, 0x83, 0x82, 0x81,
-0x80, 0x7F, 0x7E, 0x7D, 0x7C, 0x7B, 0x7A, 0x79,
-0x78, 0x77, 0x76, 0x75, 0x74, 0x73, 0x72, 0x71,
-0x70, 0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x69,
-0x68, 0x67, 0x66, 0x65, 0x64, 0x63, 0x62, 0x61,
-0x60, 0x5F, 0x5E, 0x5D, 0x5C, 0x5B, 0x5A, 0x59,
-0x58, 0x57, 0x56, 0x55, 0x54, 0x53, 0x52, 0x51,
-0x50, 0x4F, 0x4E, 0x4D, 0x4C, 0x4B, 0x4A, 0x49,
-0x48, 0x47, 0x46, 0x45, 0x44, 0x43, 0x42, 0x41,
-0x40, 0x3F, 0x3E, 0x3D, 0x3C, 0x3B, 0x3A, 0x39,
-0x38, 0x37, 0x36, 0x35, 0x34, 0x33, 0x32, 0x31,
-0x30, 0x2F, 0x2E, 0x2D, 0x2C, 0x2B, 0x2A, 0x29,
-0x28, 0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21,
-0x20, 0x1F, 0x1E, 0x1D, 0x1C, 0x1B, 0x1A, 0x19,
-0x18, 0x17, 0x16, 0x15, 0x14, 0x13, 0x12, 0x11,
-0x10, 0x0F, 0x0E, 0x0D, 0x0C, 0x0B, 0x0A, 0x09,
-0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-static const arm_2d_tile_t c_tileSpectrumGradientGRAY8 = {
-    .tRegion = {
-        .tSize = {
-            .iWidth = 1,
-            .iHeight = LD_SPECTRUM_GRADIENT_HEIGHT,
-        },
-    },
-    .tInfo = {
-        .bIsRoot = true,
-        .bHasEnforcedColour = true,
-        .tColourInfo = {
-            .chScheme = ARM_2D_COLOUR_GRAY8,
-        },
-    },
-    .pchBuffer = (uint8_t*)c_bmpSpectrumGradientGRAY8,
+    .pwBuffer = (uint32_t*)c_bmp_spectrumBeam_png_CCCA8888,
 };
 #endif
 
@@ -214,69 +100,9 @@ const ldBaseWidgetFunc_t ldSpectrumFunc = {
     .show = (ldShowFunc_t)ldSpectrum_show,
 };
 
-#if LD_SPECTRUM_USE_BUILTIN_FFT
-
-ldSpectrumFFT_t* ldSpectrumFFT_init(uint16_t fftSize, uint8_t barCount)
+static void _fft_process(ldSpectrum_t *ptWidget, int16_t *pInputData, uint16_t len)
 {
-    ldSpectrumFFT_t *pFFT = ldCalloc(1, sizeof(ldSpectrumFFT_t));
-    if (pFFT == NULL)
-    {
-        return NULL;
-    }
-
-    pFFT->fftSize = fftSize;
-    pFFT->barCount = barCount;
-    pFFT->pOutputData = ldCalloc(1, barCount);
-    pFFT->pFftBuffer = ldCalloc(1, fftSize * sizeof(float));
-    pFFT->pMagBuffer = ldCalloc(1, (fftSize / 2) * sizeof(float));
-
-    if (pFFT->pOutputData == NULL || pFFT->pFftBuffer == NULL || pFFT->pMagBuffer == NULL)
-    {
-        ldFree(pFFT->pOutputData);
-        ldFree(pFFT->pFftBuffer);
-        ldFree(pFFT->pMagBuffer);
-        ldFree(pFFT);
-        return NULL;
-    }
-
-    arm_rfft_fast_instance_f32 *pInst = ldCalloc(1, sizeof(arm_rfft_fast_instance_f32));
-    if (pInst == NULL)
-    {
-        ldFree(pFFT->pOutputData);
-        ldFree(pFFT->pFftBuffer);
-        ldFree(pFFT->pMagBuffer);
-        ldFree(pFFT);
-        return NULL;
-    }
-
-    arm_rfft_fast_init_f32(pInst, fftSize);
-    pFFT->pFftInstance = pInst;
-
-    return pFFT;
-}
-
-void ldSpectrumFFT_depose(ldSpectrumFFT_t *pFFT)
-{
-    if (pFFT == NULL)
-    {
-        return;
-    }
-
-    ldFree(pFFT->pOutputData);
-    ldFree(pFFT->pFftBuffer);
-    ldFree(pFFT->pMagBuffer);
-    ldFree(pFFT->pFftInstance);
-    ldFree(pFFT);
-}
-
-void ldSpectrumFFT_process(ldSpectrumFFT_t *pFFT, int16_t *pInputData, uint16_t len, uint8_t gain)
-{
-    if (pFFT == NULL || pInputData == NULL)
-    {
-        return;
-    }
-
-    uint16_t processLen = (len < pFFT->fftSize) ? len : pFFT->fftSize;
+    uint16_t processLen = (len < ptWidget->fftSize) ? len : ptWidget->fftSize;
 
     int32_t dataSum = 0;
     for (uint16_t i = 0; i < processLen; i++)
@@ -286,31 +112,31 @@ void ldSpectrumFFT_process(ldSpectrumFFT_t *pFFT, int16_t *pInputData, uint16_t 
 
     if (dataSum < processLen)
     {
-        memset(pFFT->pOutputData, 0, pFFT->barCount);
+        memset(ptWidget->pValueList, 0, ptWidget->barCount);
         return;
     }
 
     for (uint16_t i = 0; i < processLen; i++)
     {
-        pFFT->pFftBuffer[i] = (float)pInputData[i];
+        ptWidget->pFftBuffer[i] = (float)pInputData[i];
     }
-    for (uint16_t i = processLen; i < pFFT->fftSize; i++)
+    for (uint16_t i = processLen; i < ptWidget->fftSize; i++)
     {
-        pFFT->pFftBuffer[i] = 0.0f;
+        ptWidget->pFftBuffer[i] = 0.0f;
     }
 
-    arm_rfft_fast_instance_f32 *pInst = (arm_rfft_fast_instance_f32 *)pFFT->pFftInstance;
-    arm_rfft_fast_f32(pInst, pFFT->pFftBuffer, pFFT->pFftBuffer, 0);
+    arm_rfft_fast_instance_f32 *pInst = (arm_rfft_fast_instance_f32 *)ptWidget->pFftInstance;
+    arm_rfft_fast_f32(pInst, ptWidget->pFftBuffer, ptWidget->pFftBuffer, 0);
 
-    uint16_t magLen = pFFT->fftSize / 2;
-    arm_cmplx_mag_f32(pFFT->pFftBuffer, pFFT->pMagBuffer, magLen);
+    uint16_t magLen = ptWidget->fftSize / 2;
+    arm_cmplx_mag_f32(ptWidget->pFftBuffer, ptWidget->pMagBuffer, magLen);
 
-    int binsPerBar = magLen / pFFT->barCount;
+    int binsPerBar = magLen / ptWidget->barCount;
     if (binsPerBar < 1) binsPerBar = 1;
 
-    float refMag = (float)pFFT->fftSize * 2048.0f / (float)gain;
+    float refMag = (float)ptWidget->fftSize * 32.0f / (float)ptWidget->gain;
 
-    for (uint8_t i = 0; i < pFFT->barCount; i++)
+    for (uint8_t i = 0; i < ptWidget->barCount; i++)
     {
         float sum = 0.0f;
         int startBin = i * binsPerBar;
@@ -320,20 +146,18 @@ void ldSpectrumFFT_process(ldSpectrumFFT_t *pFFT, int16_t *pInputData, uint16_t 
 
         for (int j = startBin; j < endBin; j++)
         {
-            sum += pFFT->pMagBuffer[j];
+            sum += ptWidget->pMagBuffer[j];
         }
 
         float avg = sum / (endBin - startBin);
         float normalized = (avg / refMag) * 255.0f;
         if (normalized > 255.0f) normalized = 255.0f;
 
-        pFFT->pOutputData[i] = (uint8_t)normalized;
+        ptWidget->pValueList[i] = (uint8_t)normalized;
     }
 }
 
-#endif
-
-ldSpectrum_t* ldSpectrum_init(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t barCount)
+ldSpectrum_t* ldSpectrum_init(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t barCount, uint16_t fftSize)
 {
     assert(NULL != ptScene);
     ldBase_t *ptParent;
@@ -341,6 +165,9 @@ ldSpectrum_t* ldSpectrum_init(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, uint1
     uint8_t *pDisplayValueList = NULL;
     uint8_t *pPeakValueList = NULL;
     ldSpectrumParticle_t *pParticles = NULL;
+    float *pFftBuffer = NULL;
+    float *pMagBuffer = NULL;
+    arm_rfft_fast_instance_f32 *pFftInst = NULL;
     uint8_t defaultBarWidth = 8;
 
     if (NULL == ptWidget)
@@ -350,16 +177,26 @@ ldSpectrum_t* ldSpectrum_init(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, uint1
         pDisplayValueList = ldCalloc(1, barCount);
         pPeakValueList = ldCalloc(1, barCount);
         pParticles = ldCalloc(barCount, sizeof(ldSpectrumParticle_t));
-        if ((NULL == ptWidget) || (NULL == pValueList) || (NULL == pDisplayValueList) || (NULL == pPeakValueList) || (NULL == pParticles))
+        pFftBuffer = ldCalloc(1, fftSize * sizeof(float));
+        pMagBuffer = ldCalloc(1, (fftSize / 2) * sizeof(float));
+        pFftInst = ldCalloc(1, sizeof(arm_rfft_fast_instance_f32));
+
+        if ((NULL == ptWidget) || (NULL == pValueList) || (NULL == pDisplayValueList) || 
+            (NULL == pPeakValueList) || (NULL == pParticles) || (NULL == pFftBuffer) || 
+            (NULL == pMagBuffer) || (NULL == pFftInst))
         {
             ldFree(ptWidget);
             ldFree(pValueList);
             ldFree(pDisplayValueList);
             ldFree(pPeakValueList);
             ldFree(pParticles);
+            ldFree(pFftBuffer);
+            ldFree(pMagBuffer);
+            ldFree(pFftInst);
             LOG_ERROR("[init failed][spectrum] id:%d", nameId);
             return NULL;
         }
+        arm_rfft_fast_init_f32(pFftInst, fftSize);
     }
 
     ptParent = ldBaseGetWidget(ptScene->ptNodeRoot, parentNameId);
@@ -382,18 +219,21 @@ ldSpectrum_t* ldSpectrum_init(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, uint1
     ptWidget->pParticles = pParticles;
     ptWidget->barCount = barCount;
     ptWidget->barWidth = defaultBarWidth;
-    ptWidget->barGap = 2;
-    ptWidget->startColor = __RGB(0, 255, 128);
-    ptWidget->endColor = __RGB(255, 165, 0);
+    ptWidget->barColor = __RGB(255, 165, 0);
     ptWidget->bgColor = 0;
+#if __GLCD_CFG_COLOUR_DEPTH__ == 16
+    ptWidget->ptBarImgTile = (arm_2d_tile_t *)&c_tile_spectrumBeam_png_RGB565;
+#else
+    ptWidget->ptBarImgTile = (arm_2d_tile_t *)&c_tile_spectrumBeam_png_CCCA8888;
+#endif
+    ptWidget->ptBarMaskTile = NULL;
     ptWidget->ptBgImgTile = NULL;
     ptWidget->ptBgMaskTile = NULL;
-    ptWidget->fallSpeed = 3;
-    ptWidget->riseSpeed = 8;
-    ptWidget->peakFallSpeed = 1;
-    ptWidget->gain = 64;
-    ptWidget->style = SPECTRUM_STYLE_BAR;
-    ptWidget->pFFT = NULL;
+    ptWidget->gain = 1;
+    ptWidget->fftSize = fftSize;
+    ptWidget->pFftInstance = pFftInst;
+    ptWidget->pFftBuffer = pFftBuffer;
+    ptWidget->pMagBuffer = pMagBuffer;
 
     LOG_INFO("[init][spectrum] id:%d, size:%d", nameId, (int)sizeof(*ptWidget));
     return ptWidget;
@@ -416,13 +256,9 @@ void ldSpectrum_depose(ld_scene_t *ptScene, ldSpectrum_t *ptWidget)
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove((arm_2d_control_node_t *)ptWidget);
 
-#if LD_SPECTRUM_USE_BUILTIN_FFT
-    if (ptWidget->pFFT != NULL)
-    {
-        ldSpectrumFFT_depose(ptWidget->pFFT);
-    }
-#endif
-
+    ldFree(ptWidget->pFftInstance);
+    ldFree(ptWidget->pFftBuffer);
+    ldFree(ptWidget->pMagBuffer);
     ldFree(ptWidget->pValueList);
     ldFree(ptWidget->pDisplayValueList);
     ldFree(ptWidget->pPeakValueList);
@@ -451,7 +287,7 @@ void ldSpectrum_on_frame_start(ld_scene_t *ptScene, ldSpectrum_t *ptWidget)
 
         if (target > current)
         {
-            current += ptWidget->riseSpeed;
+            current += LD_SPECTRUM_RISE_SPEED;
             if (current > target)
             {
                 current = target;
@@ -459,9 +295,9 @@ void ldSpectrum_on_frame_start(ld_scene_t *ptScene, ldSpectrum_t *ptWidget)
         }
         else if (target < current)
         {
-            if (current > ptWidget->fallSpeed)
+            if (current > LD_SPECTRUM_FALL_SPEED)
             {
-                current -= ptWidget->fallSpeed;
+                current -= LD_SPECTRUM_FALL_SPEED;
             }
             else
             {
@@ -478,9 +314,9 @@ void ldSpectrum_on_frame_start(ld_scene_t *ptScene, ldSpectrum_t *ptWidget)
         }
         else if (peak > current)
         {
-            if (peak > ptWidget->peakFallSpeed)
+            if (peak > LD_SPECTRUM_PEAK_FALL_SPEED)
             {
-                peak -= ptWidget->peakFallSpeed;
+                peak -= LD_SPECTRUM_PEAK_FALL_SPEED;
             }
             else
             {
@@ -509,6 +345,7 @@ void ldSpectrum_on_frame_start(ld_scene_t *ptScene, ldSpectrum_t *ptWidget)
             }
         }
     }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
 
 void ldSpectrum_on_frame_complete(ld_scene_t *ptScene, ldSpectrum_t *ptWidget)
@@ -528,13 +365,7 @@ void ldSpectrum_show(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, const arm_2d_t
         return;
     }
 
-#if __GLCD_CFG_COLOUR_DEPTH__ == 16
-    const arm_2d_tile_t *ptGradientTile = &c_tileSpectrumGradientRGB565;
-#elif __GLCD_CFG_COLOUR_DEPTH__ == 32
-    const arm_2d_tile_t *ptGradientTile = &c_tileSpectrumGradientCCCA8888;
-#else
-    const arm_2d_tile_t *ptGradientTile = &c_tileSpectrumGradientGRAY8;
-#endif
+    const arm_2d_tile_t *ptBarTile = ptWidget->ptBarImgTile;
 
     arm_2d_region_t globalRegion;
     arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t *)ptWidget, &globalRegion, true);
@@ -551,8 +382,9 @@ void ldSpectrum_show(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, const arm_2d_t
             int16_t widgetHeight = ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight;
             int16_t widgetWidth = ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth;
 
-            uint8_t totalBarWidth = ptWidget->barWidth + ptWidget->barGap;
-            int16_t startX = (widgetWidth - (int16_t)ptWidget->barCount * totalBarWidth + ptWidget->barGap) / 2;
+            int16_t totalWidth = ptWidget->barCount * ptWidget->barWidth;
+            int16_t barGap = (widgetWidth - totalWidth) / (ptWidget->barCount + 1);
+            int16_t startX = barGap;
 
             if (ptWidget->ptBgImgTile != NULL || ptWidget->ptBgMaskTile != NULL)
             {
@@ -569,29 +401,21 @@ void ldSpectrum_show(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, const arm_2d_t
                 uint8_t peakValue = ptWidget->pPeakValueList[i];
                 uint16_t barHeight = (uint32_t)displayValue * widgetHeight / 255;
 
-                int16_t barX = startX + i * totalBarWidth;
+                int16_t barX = startX + i * (ptWidget->barWidth + barGap);
 
                 if (barHeight > 0)
                 {
-                    int16_t barY;
+                    int16_t barY = widgetHeight - barHeight;
 
-                    if (ptWidget->style == SPECTRUM_STYLE_MIRROR)
-                    {
-                        barY = widgetHeight / 2 - barHeight / 2;
-                    }
-                    else
-                    {
-                        barY = widgetHeight - barHeight;
-                    }
-
-                    int16_t srcY = (int16_t)LD_SPECTRUM_GRADIENT_HEIGHT - widgetHeight + barY;
+                    int16_t gradientHeight = ptBarTile->tRegion.tSize.iHeight;
+                    int16_t srcY = gradientHeight - widgetHeight + barY;
                     if (srcY < 0) srcY = 0;
-                    if (srcY + barHeight > LD_SPECTRUM_GRADIENT_HEIGHT)
+                    if (srcY + barHeight > gradientHeight)
                     {
-                        barHeight = LD_SPECTRUM_GRADIENT_HEIGHT - srcY;
+                        barHeight = gradientHeight - srcY;
                     }
 
-                    arm_2d_tile_t childTile = impl_child_tile(*ptGradientTile, 0, srcY, 1, barHeight);
+                    arm_2d_tile_t childTile = impl_child_tile(*ptBarTile, 0, srcY, 1, barHeight);
 
                     arm_2d_region_t barRegion = {
                         .tLocation = {barX, barY},
@@ -604,22 +428,14 @@ void ldSpectrum_show(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, const arm_2d_t
                 if (peakValue > displayValue)
                 {
                     uint16_t peakHeight = (uint32_t)peakValue * widgetHeight / 255;
-                    int16_t peakY;
+                    int16_t peakY = widgetHeight - peakHeight;
 
-                    if (ptWidget->style == SPECTRUM_STYLE_MIRROR)
-                    {
-                        peakY = widgetHeight / 2 - peakHeight / 2;
-                    }
-                    else
-                    {
-                        peakY = widgetHeight - peakHeight;
-                    }
-
-                    int16_t peakSrcY = (int16_t)LD_SPECTRUM_GRADIENT_HEIGHT - widgetHeight + peakY;
+                    int16_t gradientHeight = ptBarTile->tRegion.tSize.iHeight;
+                    int16_t peakSrcY = gradientHeight - widgetHeight + peakY;
                     if (peakSrcY < 0) peakSrcY = 0;
-                    if (peakSrcY >= LD_SPECTRUM_GRADIENT_HEIGHT) peakSrcY = LD_SPECTRUM_GRADIENT_HEIGHT - 1;
+                    if (peakSrcY >= gradientHeight) peakSrcY = gradientHeight - 1;
 
-                    arm_2d_tile_t peakTile = impl_child_tile(*ptGradientTile, 0, peakSrcY, 1, 2);
+                    arm_2d_tile_t peakTile = impl_child_tile(*ptBarTile, 0, peakSrcY, 1, 2);
 
                     arm_2d_region_t peakRegion = {
                         .tLocation = {barX, peakY},
@@ -639,51 +455,29 @@ void ldSpectrum_show(ld_scene_t *ptScene, ldSpectrum_t *ptWidget, const arm_2d_t
                                 .tLocation = {barX, particleY},
                                 .tSize = {ptWidget->barWidth, 1}
                             };
-                            ldBaseColor(&tTarget, &particleRegion, ptWidget->endColor, ptWidget->use_as__ldBase_t.opacity);
+                            ldBaseColor(&tTarget, &particleRegion, ptWidget->barColor, ptWidget->use_as__ldBase_t.opacity);
                         }
                     }
                 }
             }
-
-            ldBaseSetOpacity((ldBase_t *)ptWidget, ptWidget->use_as__ldBase_t.opacity);
         }
     }
 
     arm_2d_op_wait_async(NULL);
 }
 
-void ldSpectrumSetData(ldSpectrum_t *ptWidget, uint8_t *pData, uint8_t len)
+void ldSpectrumSetData(ldSpectrum_t *ptWidget, int16_t *pAudioData, uint16_t len)
 {
     assert(NULL != ptWidget);
-    if (ptWidget == NULL || pData == NULL)
+    if (ptWidget == NULL || pAudioData == NULL || ptWidget->pFftInstance == NULL)
     {
         return;
     }
 
-    uint8_t copyLen = (len < ptWidget->barCount) ? len : ptWidget->barCount;
-    memcpy(ptWidget->pValueList, pData, copyLen);
+    _fft_process(ptWidget, pAudioData, len);
 }
 
-void ldSpectrumSetRawData(ldSpectrum_t *ptWidget, int16_t *pData, uint16_t len)
-{
-    assert(NULL != ptWidget);
-    if (ptWidget == NULL || pData == NULL)
-    {
-        return;
-    }
-
-#if LD_SPECTRUM_USE_BUILTIN_FFT
-    if (ptWidget->pFFT != NULL)
-    {
-        ldSpectrumFFT_process(ptWidget->pFFT, pData, len, ptWidget->gain);
-        ldSpectrumSetData(ptWidget, ptWidget->pFFT->pOutputData, ptWidget->barCount);
-    }
-#else
-    (void)len;
-#endif
-}
-
-void ldSpectrumSetBarStyle(ldSpectrum_t *ptWidget, uint8_t barWidth, uint8_t barGap)
+void ldSpectrumSetBarWidth(ldSpectrum_t *ptWidget, uint8_t barWidth)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -692,10 +486,9 @@ void ldSpectrumSetBarStyle(ldSpectrum_t *ptWidget, uint8_t barWidth, uint8_t bar
     }
 
     ptWidget->barWidth = barWidth;
-    ptWidget->barGap = barGap;
 }
 
-void ldSpectrumSetColor(ldSpectrum_t *ptWidget, ldColor startColor, ldColor endColor)
+void ldSpectrumSetBarImage(ldSpectrum_t *ptWidget, arm_2d_tile_t *ptBarImgTile, arm_2d_tile_t *ptBarMaskTile)
 {
     assert(NULL != ptWidget);
     if (ptWidget == NULL)
@@ -703,8 +496,19 @@ void ldSpectrumSetColor(ldSpectrum_t *ptWidget, ldColor startColor, ldColor endC
         return;
     }
 
-    ptWidget->startColor = startColor;
-    ptWidget->endColor = endColor;
+    ptWidget->ptBarImgTile = ptBarImgTile;
+    ptWidget->ptBarMaskTile = ptBarMaskTile;
+}
+
+void ldSpectrumSetBarColor(ldSpectrum_t *ptWidget, ldColor barColor)
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+
+    ptWidget->barColor = barColor;
 }
 
 void ldSpectrumSetBgColor(ldSpectrum_t *ptWidget, ldColor bgColor)
@@ -730,40 +534,6 @@ void ldSpectrumSetBgImage(ldSpectrum_t *ptWidget, arm_2d_tile_t *ptBgImgTile, ar
     ptWidget->ptBgMaskTile = ptBgMaskTile;
 }
 
-void ldSpectrumSetAnimation(ldSpectrum_t *ptWidget, uint8_t riseSpeed, uint8_t fallSpeed)
-{
-    assert(NULL != ptWidget);
-    if (ptWidget == NULL)
-    {
-        return;
-    }
-
-    ptWidget->riseSpeed = riseSpeed;
-    ptWidget->fallSpeed = fallSpeed;
-}
-
-void ldSpectrumSetPeakFallSpeed(ldSpectrum_t *ptWidget, uint8_t peakFallSpeed)
-{
-    assert(NULL != ptWidget);
-    if (ptWidget == NULL)
-    {
-        return;
-    }
-
-    ptWidget->peakFallSpeed = peakFallSpeed;
-}
-
-void ldSpectrumSetStyle(ldSpectrum_t *ptWidget, ldSpectrumStyle_t style)
-{
-    assert(NULL != ptWidget);
-    if (ptWidget == NULL)
-    {
-        return;
-    }
-
-    ptWidget->style = style;
-}
-
 void ldSpectrumSetGain(ldSpectrum_t *ptWidget, uint8_t gain)
 {
     assert(NULL != ptWidget);
@@ -772,29 +542,7 @@ void ldSpectrumSetGain(ldSpectrum_t *ptWidget, uint8_t gain)
         return;
     }
 
+    if (gain < 1) gain = 1;
+    if (gain > 10) gain = 10;
     ptWidget->gain = gain;
 }
-
-void ldSpectrumEnableBuiltinFFT(ldSpectrum_t *ptWidget, uint16_t fftSize)
-{
-    assert(NULL != ptWidget);
-    if (ptWidget == NULL)
-    {
-        return;
-    }
-
-#if LD_SPECTRUM_USE_BUILTIN_FFT
-    if (ptWidget->pFFT != NULL)
-    {
-        ldSpectrumFFT_depose(ptWidget->pFFT);
-    }
-
-    ptWidget->pFFT = ldSpectrumFFT_init(fftSize, ptWidget->barCount);
-#else
-    (void)fftSize;
-#endif
-}
-
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
