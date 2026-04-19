@@ -400,7 +400,7 @@ void before_scene_switching_handler(void *pTarget,arm_2d_scene_player_t *ptPlaye
 #if USE_LCD_TEST == 1
 static void _ldGuiFillRect(uint16_t xs,uint16_t ys,uint16_t w, uint16_t h,ldColor color)
 {
-    extern void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap);
+    extern void Disp0_DrawBitmap (int16_t x,int16_t y,int16_t width,int16_t height,const uint8_t *bitmap);
     for(uint16_t y=0;y<h;y++)
     {
         for(uint16_t x=0;x<w;x++)
