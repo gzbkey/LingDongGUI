@@ -112,28 +112,28 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
     ldCheckBoxSetRadioButtonGroup(obj,0);
     ldCheckBoxSetText(obj,FONT_ARIAL_12,(uint8_t*)"999");
-    ldCheckBoxSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
 
     obj=ldCheckBoxInit(6, 0, 220, 40, 50, 20);
     ldCheckBoxSetRadioButtonGroup(obj,0);
-    ldCheckBoxSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldCheckBoxInit(7, 0, 220, 70, 50, 20);
     ldBaseSetCorner(obj,true);
-    ldCheckBoxSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldProgressBarInit(8,0,10,500,300,30);
     ldProgressBarSetPercent(obj,45);
 //    ldProgressBarSetHorizontal(obj,false);
     ldProgressBarSetImage(obj,IMAGE_PROGRESSBARBG_BMP,NULL,IMAGE_PROGRESSBARFG_BMP,NULL);
-    ldProgressBarSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldTextInit(9,0,300,10,150,200,FONT_ARIAL_12,TEXT_BOX_LINE_ALIGN_LEFT,true);
     ldTextSetBackgroundImage(obj,IMAGE_LETTER_PAPER_BMP,NULL);
     ldTextSetText(obj,"123\n12333");
-    ldTextSetSelectable(obj,true);
-    ldTextSetCorner(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
+    ldBaseSetCorner((ldBase_t*)obj,true);
 
     obj=ldSliderInit(10,0,50,300,317,(IMAGE_INDICATOR_PNG)->tRegion.tSize.iHeight);
     ldSliderSetPercent(obj,42);
@@ -144,8 +144,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     obj=ldSliderInit(11,0,400,300,30,100);
     ldSliderSetHorizontal(obj,false);
     ldSliderSetPercent(obj,42);
-    ldSliderSetSelectable(obj,true);
-    ldSliderSetCorner(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
+    ldBaseSetCorner((ldBase_t*)obj,true);
 
     obj=ldRadialMenuInit(12,0,500,200,150,100,100,80,5);
     ldRadialMenuAddItem(obj,IMAGE_WEATHER_PNG,IMAGE_WEATHER_PNG_Mask);
@@ -169,8 +169,8 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldBaseSetCorner(obj,true);
 
     obj=ldQRCodeInit(15,0,500,10,200,200,"ldgui",GLCD_COLOR_BLUE,GLCD_COLOR_WHITE,QR_ECC_7,2,5);
-    ldQRCodeSetOpacity(obj,100);
-    ldQRCodeSetSelectable(obj,true);
+    ldBaseSetOpacity((ldBase_t*)obj,100);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldScrollSelecterInit(16,0,700,200,30,50,FONT_ARIAL_12);
     ldScrollSelecterSetItems(obj,pStrGroup,5);
@@ -182,12 +182,12 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldGaugeSetPointerImage(obj,NULL,IMAGE_GAUGEPOINTER_PNG_Mask,5,45);
     ldGaugeSetPointerColor(obj,GLCD_COLOR_BLUE);
     ldGaugeSetAngle(obj,120);
-    ldGaugeSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldComboBoxInit(18,0,700,420,100,30,FONT_ARIAL_12);
 
     ldComboBoxSetStaticItems(obj,pComboBoxStrGroup,3);
-    ldComboBoxSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldGraphInit(19,0,830,10,100,100,2);
     ldGraphSetAxis(obj,80,80,5);
@@ -203,7 +203,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     {
         ldGraphSetValue(obj,1,i,rand() % 81);
     }
-    ldGraphSetSelectable(obj,true);
+    ldBaseSetSelectable((ldBase_t*)obj,true);
 
     obj=ldTableInit(20,0,780,150,200,100,10,6,1);
     ldTableSetExcelType(obj,FONT_ARIAL_12);
@@ -301,22 +301,22 @@ void uiWidgetLoop(ld_scene_t* ptScene)
         }
     }
 
-    if(xBtnGetState(KEY_NUM_UP,BTN_RELEASE))
-    {
-        ldBaseFocusNavigate(ptScene,NAV_UP);
-    }
-    if(xBtnGetState(KEY_NUM_DOWN,BTN_RELEASE))
-    {
-        ldBaseFocusNavigate(ptScene,NAV_DOWN);
-    }
-    if(xBtnGetState(KEY_NUM_LEFT,BTN_RELEASE))
-    {
-        ldBaseFocusNavigate(ptScene,NAV_LEFT);
-    }
-    if(xBtnGetState(KEY_NUM_RIGHT,BTN_RELEASE))
-    {
-        ldBaseFocusNavigate(ptScene,NAV_RIGHT);
-    }
+    // if(xBtnGetState(KEY_NUM_UP,BTN_RELEASE))
+    // {
+    //     ldBaseFocusNavigate(ptScene,NAV_UP);
+    // }
+    // if(xBtnGetState(KEY_NUM_DOWN,BTN_RELEASE))
+    // {
+    //     ldBaseFocusNavigate(ptScene,NAV_DOWN);
+    // }
+    // if(xBtnGetState(KEY_NUM_LEFT,BTN_RELEASE))
+    // {
+    //     ldBaseFocusNavigate(ptScene,NAV_LEFT);
+    // }
+    // if(xBtnGetState(KEY_NUM_RIGHT,BTN_RELEASE))
+    // {
+    //     ldBaseFocusNavigate(ptScene,NAV_RIGHT);
+    // }
 
 
 }

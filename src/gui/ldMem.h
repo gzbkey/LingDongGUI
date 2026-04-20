@@ -7,6 +7,7 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
+#include "stddef.h"
 
 extern void *ldMalloc(uint32_t size);
 extern void *ldCalloc(uint32_t num,uint32_t size);
