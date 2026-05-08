@@ -445,7 +445,7 @@ void ldCalendarSetHeader(ldCalendar_t *ptWidget, bool isEnable)
 void ldCalendarSetHeaderFormat(ldCalendar_t *ptWidget, uint8_t *format)
 {
     assert(NULL != ptWidget);
-    if (ptWidget == NULL)
+    if (ptWidget == NULL || format == NULL)
     {
         return;
     }

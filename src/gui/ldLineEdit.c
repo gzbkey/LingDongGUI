@@ -299,13 +299,17 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
 void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *pText)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget == NULL || pText == NULL)
+    {
+        return;
+    }
+    uint16_t textLen=strlen((char*)pText);
+    if(textLen == 0)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
-    uint16_t textLen=strlen((char*)pText);
     if(ptWidget->textMax==0)
     {
         ptWidget->pText=ldRealloc(ptWidget->pText,textLen+1);

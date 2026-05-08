@@ -43,7 +43,7 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 
 bool isFullWidgetUpdate=false;
 
-ldTimer_t sysTimer10ms=0;
+static ldTimer_t sysTimer=0;
 
 void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
@@ -236,7 +236,7 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         ptScene->ldGuiFuncGroup->frameStart(ptScene);
     }
 
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer10ms))
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer))
     {
         xBtnTick(SYS_TICK_CYCLE_MS,ptScene);
         cursorBlinkCount++;

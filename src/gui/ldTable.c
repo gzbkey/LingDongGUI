@@ -795,7 +795,7 @@ void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height)
 void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget == NULL || pText == NULL)
     {
         return;
     }

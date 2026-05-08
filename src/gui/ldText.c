@@ -440,7 +440,12 @@ void ldTextSetTransparent(ldText_t* ptWidget,bool isTransparent)
 void ldTextSetText(ldText_t* ptWidget,uint8_t *pStr)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget == NULL || pStr == NULL)
+    {
+        return;
+    }
+    int len = strlen((char*)pStr);
+    if(len == 0)
     {
         return;
     }
@@ -450,7 +455,7 @@ void ldTextSetText(ldText_t* ptWidget,uint8_t *pStr)
         ldFree(ptWidget->pStr);
     }
     ptWidget->_isStatic=false;
-    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    ptWidget->pStr=ldCalloc(1,len+1);
     if(ptWidget->pStr!=NULL)
     {
         strcpy((char*)ptWidget->pStr,(char*)pStr);

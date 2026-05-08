@@ -144,12 +144,6 @@ void ldLabel_show(ld_scene_t *ptScene, ldLabel_t *ptWidget, const arm_2d_tile_t 
         return;
     }
 
-#if 0
-    if (bIsNewFrame) {
-        
-    }
-#endif
-
     arm_2d_region_t globalRegion;
     arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
 
@@ -237,13 +231,18 @@ void ldLabelSetTransparent(ldLabel_t* ptWidget,bool isTransparent)
 void ldLabelSetText(ldLabel_t* ptWidget,uint8_t *pStr)
 {
     assert(NULL != ptWidget);
-    if(ptWidget==NULL)
+    if(ptWidget==NULL || pStr==NULL)
+    {
+        return;
+    }
+    int len = strlen((char*)pStr);
+    if(len == 0)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ldFree(ptWidget->pStr);
-    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    ptWidget->pStr=ldCalloc(1,len+1);
     if(ptWidget->pStr!=NULL)
     {
         strcpy((char*)ptWidget->pStr,(char*)pStr);
