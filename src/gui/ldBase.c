@@ -852,7 +852,7 @@ int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion,int16_t current
 }
 
 #if USE_VIRTUAL_RESOURCE == 1
-arm_2d_vres_t* ldBaseGetVresImage(uint32_t addr)
+__WEAK arm_2d_vres_t* ldBaseGetVresImage(uint32_t addr)
 {
     uint8_t header[16]={0};
     __disp_adapter0_vres_read_memory(0,header,addr,16);
@@ -876,8 +876,7 @@ arm_2d_vres_t* ldBaseGetVresImage(uint32_t addr)
     return ptImage;
 }
 
-static
-IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_font_get_char_descriptor)
+__WEAK IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_font_get_char_descriptor)
 {
     assert(NULL != ptFont);
     assert(NULL != ptDescriptor);
@@ -930,7 +929,7 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_font_get_char_descriptor)
     return ptDescriptor;
 }
 
-arm_2d_vres_font_t* ldBaseGetVresFont(uint32_t addr)
+__WEAK arm_2d_vres_font_t* ldBaseGetVresFont(uint32_t addr)
 {
     uint8_t header[13]={0};
     __disp_adapter0_vres_read_memory(0,header,addr,13);
@@ -985,7 +984,6 @@ arm_2d_vres_font_t* ldBaseGetVresFont(uint32_t addr)
     }
     return ptFont;
 }
-
 #endif
 
 static int32_t manhattanDistance(ldBase_t *ptCurrent, ldBase_t *ptNext, ldNavDir_t tDir)
