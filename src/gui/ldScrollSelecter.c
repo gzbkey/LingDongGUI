@@ -159,6 +159,7 @@ ldScrollSelecter_t* ldScrollSelecter_init( ld_scene_t *ptScene,ldScrollSelecter_
     ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
     ptWidget->ppItemStrGroup=NULL;
+    ptWidget->isStatic = true;
     ptWidget->bgColor=GLCD_COLOR_WHITE;
     ptWidget->textColor=GLCD_COLOR_BLACK;
     ptWidget->ptFont=ptFont;
@@ -221,6 +222,14 @@ void ldScrollSelecter_depose(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget)
     ldFree(ptWidget->ptIndicatorMaskTile);
     ldFree(ptWidget->ptFont);
 #endif
+    if(!ptWidget->isStatic)
+    {
+        for(uint8_t i = 0; i < ptWidget->itemCount; i++)
+        {
+            ldFree(ptWidget->ppItemStrGroup[i]);
+        }
+        ldFree(ptWidget->ppItemStrGroup);
+    }
     ldFree(ptWidget);
 }
 
@@ -403,6 +412,25 @@ void ldScrollSelecter_show(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, co
     }
 }
 
+void ldScrollSelecterSetStaticItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+    if(!ptWidget->isStatic)
+    {
+        ldFree(ptWidget->ppItemStrGroup);
+    }
+
+    ptWidget->ppItemStrGroup=(uint8_t **)pStrArray;
+    ptWidget->itemCount=arraySize;
+    ptWidget->isStatic = true;
+}
+
 void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrArray[],uint8_t arraySize)
 {
     assert(NULL != ptWidget);
@@ -411,8 +439,33 @@ void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget,const uint8_t *pStrAr
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->ppItemStrGroup=pStrArray;
-    ptWidget->itemCount=arraySize;
+
+    if(!ptWidget->isStatic)
+    {
+        ldFree(ptWidget->ppItemStrGroup);
+        ptWidget->ppItemStrGroup = NULL;
+    }
+
+    uint8_t **pGroup = NULL;
+    pGroup = ldCalloc(arraySize, sizeof(uint8_t *));
+    if(pGroup == NULL)
+    {
+        return;
+    }
+
+    for(uint8_t i = 0; i < arraySize; i++)
+    {
+        uint8_t len = strlen((const char *)pStrArray[i]) + 1;
+        pGroup[i] = (uint8_t *)ldMalloc(len);
+        if(pGroup[i] != NULL)
+        {
+            memcpy(pGroup[i], pStrArray[i], len);
+        }
+    }
+
+    ptWidget->ppItemStrGroup = pGroup;
+    ptWidget->itemCount = arraySize;
+    ptWidget->isStatic = false;
 }
 
 void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor textColor)

@@ -430,6 +430,45 @@ void ldComboBox_show(ld_scene_t *ptScene, ldComboBox_t *ptWidget, const arm_2d_t
     arm_2d_op_wait_async(NULL);
 }
 
+void ldComboBoxSetItems(ldComboBox_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+    if(ptWidget->isStatic == false)
+    {
+        for (uint8_t i = 0; i < ptWidget->itemCount; ++i)
+        {
+            ldFree(ptWidget->ppItemStrGroup[i]);
+        }
+        ldFree(ptWidget->ppItemStrGroup);
+    }
+
+    uint8_t **pGroup = (uint8_t **)ldCalloc(arraySize, sizeof(uint8_t *));
+    if(pGroup == NULL)
+    {
+        return;
+    }
+
+    for(uint8_t i = 0; i < arraySize; i++)
+    {
+        uint8_t len = strlen((const char *)pStrArray[i]) + 1;
+        pGroup[i] = (uint8_t *)ldMalloc(len);
+        if(pGroup[i] != NULL)
+        {
+            memcpy(pGroup[i], pStrArray[i], len);
+        }
+    }
+
+    ptWidget->ppItemStrGroup = pGroup;
+    ptWidget->itemCount = arraySize;
+    ptWidget->isStatic = false;
+}
+
 void ldComboBoxSetStaticItems(ldComboBox_t* ptWidget,uint8_t *pStrArray[],uint8_t arraySize)
 {
     assert(NULL != ptWidget);
@@ -437,13 +476,20 @@ void ldComboBoxSetStaticItems(ldComboBox_t* ptWidget,uint8_t *pStrArray[],uint8_
     {
         return;
     }
-    if(ptWidget->isStatic==false)//只要使用了动态就不能再使用静态
+
+    if(ptWidget->isStatic == false)
     {
-        return;
+        for (uint8_t i = 0; i < ptWidget->itemCount; ++i)
+        {
+            ldFree(ptWidget->ppItemStrGroup[i]);
+        }
+        ldFree(ptWidget->ppItemStrGroup);
     }
+
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->ppItemStrGroup=pStrArray;
-    ptWidget->itemCount=arraySize;
+    ptWidget->ppItemStrGroup = pStrArray;
+    ptWidget->itemCount = arraySize;
+    ptWidget->isStatic = true;
 }
 
 void ldComboBoxSetItemMax(ldComboBox_t *ptWidget, uint8_t itemMax)

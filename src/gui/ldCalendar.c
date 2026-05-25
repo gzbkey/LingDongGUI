@@ -156,6 +156,18 @@ void ldCalendar_depose(ld_scene_t *ptScene, ldCalendar_t *ptWidget)
 
     LOG_INFO("[depose][calendar] id:%d", ptWidget->use_as__ldBase_t.nameId);
 
+    if (ptWidget->isStatic == false && ptWidget->dayNames != NULL)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            if (ptWidget->dayNames[i] != NULL)
+            {
+                ldFree(ptWidget->dayNames[i]);
+            }
+        }
+        ldFree(ptWidget->dayNames);
+    }
+
     ldMsgDelConnect(ptWidget);
     ldBaseNodeRemove((arm_2d_control_node_t *)ptWidget);
 
@@ -429,7 +441,71 @@ void ldCalendarSetDayNames(ldCalendar_t *ptWidget, uint8_t *names[7])
     {
         return;
     }
+
+    if (ptWidget->isStatic == false && ptWidget->dayNames != NULL)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            if (ptWidget->dayNames[i] != NULL)
+            {
+                ldFree(ptWidget->dayNames[i]);
+            }
+        }
+        ldFree(ptWidget->dayNames);
+    }
+
+    uint8_t **pNames = (uint8_t **)ldCalloc(7, sizeof(uint8_t *));
+    if (pNames == NULL)
+    {
+        LOG_ERROR("[set names failed][calendar] id:%d", ptWidget->use_as__ldBase_t.nameId);
+        return;
+    }
+
+    for (int i = 0; i < 7; i++)
+    {
+        if (names[i] != NULL)
+        {
+            uint8_t len = strlen((const char *)names[i]) + 1;
+            pNames[i] = (uint8_t *)ldMalloc(len);
+            if (pNames[i] != NULL)
+            {
+                memcpy(pNames[i], names[i], len);
+            }
+            else
+            {
+                LOG_ERROR("[set names failed][calendar] id:%d, day:%d", ptWidget->use_as__ldBase_t.nameId, i);
+            }
+        }
+        else
+        {
+            pNames[i] = NULL;
+        }
+    }
+
+    ptWidget->dayNames = pNames;
+    ptWidget->isStatic = false;
+}
+
+void ldCalendarSetStaticDayNames(ldCalendar_t *ptWidget, uint8_t *names[7])
+{
+    assert(NULL != ptWidget);
+    if (ptWidget == NULL)
+    {
+        return;
+    }
+    if (ptWidget->isStatic == false && ptWidget->dayNames != NULL)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            if (ptWidget->dayNames[i] != NULL)
+            {
+                ldFree(ptWidget->dayNames[i]);
+            }
+        }
+        ldFree(ptWidget->dayNames);
+    }
     ptWidget->dayNames = names;
+    ptWidget->isStatic = true;
 }
 
 void ldCalendarSetHeader(ldCalendar_t *ptWidget, bool isEnable)

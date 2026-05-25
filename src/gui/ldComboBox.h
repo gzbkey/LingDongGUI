@@ -81,6 +81,7 @@ void ldComboBoxSetBackgroundColor(ldComboBox_t* ptWidget, ldColor backgroundColo
 void ldComboBoxSetFrameColor(ldComboBox_t* ptWidget, ldColor frameColor);
 void ldComboBoxSetSelectColor(ldComboBox_t* ptWidget, ldColor selectColor);
 void ldComboBoxSetSelectItem(ldComboBox_t* ptWidget, uint8_t itemIndex);
+void ldComboBoxSetItems(ldComboBox_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize);
 void ldComboBoxSetStaticItems(ldComboBox_t* ptWidget, uint8_t *pStrArray[], uint8_t arraySize);
 void ldComboBoxSetItemMax(ldComboBox_t *ptWidget, uint8_t itemMax);
 void ldComboBoxAddItem(ldComboBox_t* ptWidget,uint8_t *pStr);
