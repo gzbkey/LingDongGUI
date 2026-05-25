@@ -278,7 +278,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
      ldBaseSetSelectable(obj,true);
      ldBaseSetSelect(obj,true);
      ldCalendarSetHeader(obj,true);
-     ldCalendarSetHeaderFormat(obj,(uint8_t*)headerFormat);
+     ldCalendarSetDateFormat(obj, YYYY_MM);
 
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 

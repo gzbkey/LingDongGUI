@@ -42,6 +42,11 @@
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+const uint8_t *ldCalendarDateFormats[] = {
+    (uint8_t *)"yyyy-mm",
+    (uint8_t *)"yyyy年mm月",
+};
+
 const ldBaseWidgetFunc_t ldCalendarFunc = {
     .depose = (ldDeposeFunc_t)ldCalendar_depose,
     .load = (ldLoadFunc_t)ldCalendar_on_load,
@@ -135,6 +140,7 @@ ldCalendar_t *ldCalendar_init(ld_scene_t *ptScene, ldCalendar_t *ptWidget, uint1
     ptWidget->year = year - 2000;
     ptWidget->month = month;
     ptWidget->day = day;
+    ptWidget->dateFormatType = YYYY_MM;
 
     _getCalBuf(year, month, ptWidget->calBuf);
 
@@ -298,7 +304,7 @@ void ldCalendar_show(ld_scene_t *ptScene, ldCalendar_t *ptWidget, const arm_2d_t
                 int ret;
                 char strTemp[5];
 
-                strcpy(tempBuf, (char *)ptWidget->headerNameFormat);
+                strcpy(tempBuf, (const char *)ldCalendarDateFormats[ptWidget->dateFormatType]);
 
                 addr = strstr(tempBuf, "yyyy");
                 if (addr)
@@ -518,14 +524,14 @@ void ldCalendarSetHeader(ldCalendar_t *ptWidget, bool isEnable)
     ptWidget->isHeader = isEnable;
 }
 
-void ldCalendarSetHeaderFormat(ldCalendar_t *ptWidget, uint8_t *format)
+void ldCalendarSetDateFormat(ldCalendar_t *ptWidget, ldCalendarDateFormat_t formatType)
 {
     assert(NULL != ptWidget);
-    if (ptWidget == NULL || format == NULL)
+    if (ptWidget == NULL)
     {
         return;
     }
-    ptWidget->headerNameFormat = format;
+    ptWidget->dateFormatType = formatType;
 }
 
 void ldCalendarSetDate(ldCalendar_t *ptWidget,uint16_t year,uint8_t month,uint8_t day)
