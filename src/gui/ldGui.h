@@ -75,6 +75,8 @@ void ldGuiLoop(void);
 void ldGuiTouchProcess(ld_scene_t *ptScene);
 void ldGuiSceneInit(ld_scene_t *ptScene);
 void ldGuiUpdateScene(void);
+
+extern ldBase_t *ptEditingWidget;
 #if USE_LCD_TEST == 1
 void ldGuiLcdTest(void);
 #endif

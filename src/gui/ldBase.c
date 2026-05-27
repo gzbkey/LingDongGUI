@@ -389,6 +389,17 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_puts_label((char*)pStr,tAlign);
 }
 
+arm_2d_size_t ldBaseLabelGetStringSize(uint8_t *pStr, arm_2d_font_t *ptFont)
+{
+    if((pStr==NULL)||(ptFont==NULL))
+    {
+        return (arm_2d_size_t){0, 0};
+    }
+    arm_lcd_text_set_char_spacing(1);
+    arm_lcd_text_set_font(ptFont);
+    return arm_lcd_printf_to_buffer(ptFont, "%s", pStr);
+}
+
 bool ldBaseIsHidden(ldBase_t* ptWidget)
 {
     assert(NULL != ptWidget);

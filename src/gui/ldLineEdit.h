@@ -58,7 +58,6 @@ struct ldLineEdit_t
     ldColor frameColor;
     uint8_t *pText;
     uint8_t textMax;
-    bool isEditing:1;
     ldEditType_t editType:2;
     bool hasFloatPoint:1;
 };

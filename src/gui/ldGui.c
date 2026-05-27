@@ -45,6 +45,8 @@ bool isFullWidgetUpdate=false;
 
 static ldTimer_t sysTimer=0;
 
+ldBase_t *ptEditingWidget = NULL;
+
 void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
     ldBase_t *ptWidget;
@@ -77,6 +79,10 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
 
         if(ptWidget!=NULL)
         {
+            if(ptEditingWidget != NULL && ptWidget->widgetType != widgetTypeKeyboard && ptWidget != ptEditingWidget)
+            {
+                emit(ptEditingWidget->nameId, SIGNAL_FINISHED, 0);
+            }
             u64Temp=tLocation.iX;
             u64Temp<<=16;
             u64Temp+=tLocation.iY;

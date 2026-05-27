@@ -215,6 +215,7 @@ typedef struct {
     bool isSelected:1;
     bool isSelectable:1;
     bool isCorner:1;
+    bool isEditing:1;
 }ldBase_t;
 
 typedef enum{
@@ -267,6 +268,7 @@ void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color
 void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,uint8_t opacity,bool bIsNewFrame);
 void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
+arm_2d_size_t ldBaseLabelGetStringSize(uint8_t *pStr, arm_2d_font_t *ptFont);
 ldWidgetType_t ldBaseGetWidgetType(ldBase_t *ptWidget);
 uint16_t ldBaseGetNameId(ldBase_t *ptWidget);
 uint16_t ldBaseGetOpacity(ldBase_t *ptWidget);

@@ -55,8 +55,9 @@ const ldBaseWidgetFunc_t ldLineEditFunc = {
 static bool slotEditEnd(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldLineEdit_t *ptWidget=msg.ptSender;
-    ptWidget->isEditing=false;
+    ptWidget->use_as__ldBase_t.isEditing=false;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptEditingWidget = NULL;
     return false;
 }
 
@@ -68,12 +69,13 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
 
     if(msg.signal==SIGNAL_PRESS)
     {
-        ptWidget->isEditing=true;
         if(ptWidget->kbNameId)
         {
             kb=ldBaseGetWidgetById(ptWidget->kbNameId);
             if(kb!=NULL)
             {
+                ptWidget->use_as__ldBase_t.isEditing=true;
+                ptEditingWidget = (ldBase_t*)ptWidget;
                 kb->editType=ptWidget->editType;
                 kb->ppStr=&ptWidget->pText;
                 kb->strMax=ptWidget->textMax;
@@ -182,7 +184,7 @@ void ldLineEdit_on_load(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
 void ldLineEdit_on_frame_start(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    if(ptWidget->isEditing)
+    if(ptWidget->use_as__ldBase_t.isEditing)
     {
         if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
         {
@@ -191,7 +193,7 @@ void ldLineEdit_on_frame_start(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
     }
-    ptWidget->_strSize=arm_lcd_printf_to_buffer(ptWidget->ptFont,"%s",ptWidget->pText);
+    ptWidget->_strSize = ldBaseLabelGetStringSize(ptWidget->pText, ptWidget->ptFont);
 }
 
 void ldLineEdit_on_frame_complete(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
@@ -245,7 +247,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 },
             };
 
-            if(ptWidget->isEditing)
+            if(ptWidget->use_as__ldBase_t.isEditing)
             {
                 //预留光标位置
                 tempRegion.tSize.iWidth-=CURSOR_WIDTH;
@@ -269,7 +271,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 arm_2d_op_wait_async(NULL);
             }
 
-            if(cursorBlinkFlag&&ptWidget->isEditing)
+            if(cursorBlinkFlag&&ptWidget->use_as__ldBase_t.isEditing)
             {
                 arm_2d_region_t cursorRegion={
                     tempRegion.tLocation.iX+ptWidget->_strSize.iWidth,

@@ -23,7 +23,7 @@
 #include "arm_2d_helper.h"
 #include <assert.h>
 #include <string.h>
-
+#include "ldGui.h"
 #include "ldComboBox.h"
 
 #if defined(__clang__)
@@ -127,10 +127,12 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
         if(ptWidget->isExpand)
         {
             ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight;
+            ptEditingWidget = ptWidget;
         }
         else
         {
             ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->itemHeight;
+            ptEditingWidget = NULL;
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
@@ -157,6 +159,14 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->itemPreSelect=clickItemNum-1;
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
+        break;
+    }
+    case SIGNAL_FINISHED:
+    {
+        ptWidget->isExpand=false;
+        ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = ptWidget->itemHeight;
+        ptEditingWidget = NULL;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     default:
@@ -208,6 +218,7 @@ ldComboBox_t* ldComboBox_init(ld_scene_t *ptScene,ldComboBox_t *ptWidget, uint16
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotComboBoxProcess);
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotComboBoxProcess);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotComboBoxProcess);
+    ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotComboBoxProcess);
 
     LOG_INFO("[init][comboBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
