@@ -59,11 +59,12 @@ extern "C" {
 
 #define SYS_TICK_CYCLE_MS                 10
 #define CURSOR_WIDTH                     2
-#define CURSOR_BLINK_TIMEOUT             50
+#define CURSOR_BLINK_TIMEOUT             25
 
 extern uint8_t gCursorBlinkCount;
 extern bool gCursorBlinkFlag;
 extern ldBase_t *ptEditingWidget;
+extern ldBase_t *ptEditingKeyboard;
 
 void ldGuiLoad(ld_scene_t *ptScene);
 void ldGuiDespose(ld_scene_t *ptScene);

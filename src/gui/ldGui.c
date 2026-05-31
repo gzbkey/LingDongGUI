@@ -33,6 +33,7 @@ bool gCursorBlinkFlag = false;
 static bool isFullWidgetUpdate=false;
 static ldTimer_t sysTimer=0;
 ldBase_t *ptEditingWidget = NULL;
+ldBase_t *ptEditingKeyboard = NULL;
 
 #if USE_SCENE_SWITCHING == 2
 bool isGuiSwthcnScene=false;
@@ -78,6 +79,11 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
         {
             if(ptEditingWidget != NULL && ptWidget->widgetType != widgetTypeKeyboard && ptWidget != ptEditingWidget)
             {
+                if(ptEditingKeyboard != NULL)
+                {
+                    ldKeyboardExit(ptEditingKeyboard);
+                    ptEditingKeyboard = NULL;
+                }
                 emit(ptEditingWidget->nameId, SIGNAL_FINISHED, 0);
             }
             u64Temp=tLocation.iX;

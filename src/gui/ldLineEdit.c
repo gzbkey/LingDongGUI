@@ -88,6 +88,7 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
             {
                 ptWidget->use_as__ldBase_t.isEditing=true;
                 ptEditingWidget = (ldBase_t*)ptWidget;
+                ptEditingKeyboard = (ldBase_t*)kb;
                 kb->editType=ptWidget->editType;
                 kb->ppStr=&ptWidget->pText;
                 kb->strMax=ptWidget->textMax;
