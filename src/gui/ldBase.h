@@ -115,8 +115,6 @@ typedef enum{
 
 #define ldColor                         COLOUR_INT
 
-#define CURSOR_WIDTH                    (2)
-
 #define MEM_MODE_FREERTOS_HEAP4         (0)
 #define MEM_MODE_TLFS                   (1)
 #define MEM_MODE_LWMEM                  (2)

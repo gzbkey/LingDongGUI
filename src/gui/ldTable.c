@@ -230,8 +230,9 @@ void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t 
         kb->ppStr=&currentItem->pText;
         kb->strMax=currentItem->textMax;
         kb->editorId=ptWidget->use_as__ldBase_t.nameId;
-        cursorBlinkFlag=true;
-        cursorBlinkCount=0;
+        gCursorBlinkFlag=true;
+        gCursorBlinkCount=0;
+        currentItem->isEditing = true;
         ldBaseSetHidden((ldBase_t *)kb,false);
 
         arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
@@ -587,7 +588,6 @@ void ldTable_on_load(ld_scene_t *ptScene, ldTable_t *ptWidget)
 void ldTable_on_frame_start(ld_scene_t *ptScene, ldTable_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
 }
 
 void ldTable_on_frame_complete(ld_scene_t *ptScene, ldTable_t *ptWidget)
@@ -672,14 +672,14 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
                                         ptWidget->use_as__ldBase_t.opacity);
                         }
 
-                        if(item->isEditing&&bIsNewFrame&&(cursorBlinkCount>CURSOR_BLINK_TIMEOUT))
+                        if(item->isEditing&&bIsNewFrame&&(gCursorBlinkCount > CURSOR_BLINK_TIMEOUT))
                         {
-                            cursorBlinkCount=0;
-                            cursorBlinkFlag=!cursorBlinkFlag;
+                            gCursorBlinkCount = 0;
+                            gCursorBlinkFlag = !gCursorBlinkFlag;
                             ldTableUpdate(ptWidget,_ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn));
                         }
 
-                        if(cursorBlinkFlag&&item->isEditing)
+                        if(gCursorBlinkFlag && item->isEditing)
                         {
                             if(bIsNewFrame)
                             {

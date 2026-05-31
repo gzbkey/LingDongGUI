@@ -87,7 +87,7 @@ const kbBtnInfo_t numBtnInfo[] = {
     {NUM_START + NUM_OFFSET_W(0), NUM_OFFSET_H(2), NUM_BTN_W, NUM_BTN_H, (uint8_t *)"7", '7', NULL, NULL, NULL, NULL, KB_NORMAL_PRESS_COLOR, KB_NORMAL_RELEASE_COLOR},
     {NUM_START + NUM_OFFSET_W(1), NUM_OFFSET_H(2), NUM_BTN_W, NUM_BTN_H, (uint8_t *)"8", '8', NULL, NULL, NULL, NULL, KB_NORMAL_PRESS_COLOR, KB_NORMAL_RELEASE_COLOR},
     {NUM_START + NUM_OFFSET_W(2), NUM_OFFSET_H(2), NUM_BTN_W, NUM_BTN_H, (uint8_t *)"9", '9', NULL, NULL, NULL, NULL, KB_NORMAL_PRESS_COLOR, KB_NORMAL_RELEASE_COLOR},
-    {NUM_START + NUM_OFFSET_W(3), NUM_OFFSET_H(2), 0, 0, 0, 0, 0},
+    // {NUM_START + NUM_OFFSET_W(3), NUM_OFFSET_H(2), 0, 0, 0, 0, 0},
 
     {NUM_START + NUM_OFFSET_W(0), NUM_OFFSET_H(3), NUM_BTN_W, NUM_BTN_H, (uint8_t *)"±", '-', NULL, NULL, NULL, NULL, KB_OTHER_PRESS_COLOR, KB_OTHER_RELEASE_COLOR},
     {NUM_START + NUM_OFFSET_W(1), NUM_OFFSET_H(3), NUM_BTN_W, NUM_BTN_H, (uint8_t *)"0", '0', NULL, NULL, NULL, NULL, KB_NORMAL_PRESS_COLOR, KB_NORMAL_RELEASE_COLOR},
@@ -587,6 +587,12 @@ static bool slotKBProcess(ld_scene_t *ptScene, ldMsg_t msg)
 
         ldKeyboardCallback(ptWidget, msg.signal);
 
+        if ((ptWidget->editorId != 0) && (ptWidget->keyCode != KEY_CODE_SHIFT) && 
+            (ptWidget->keyCode != KEY_CODE_QWERTY_MODE) && (ptWidget->keyCode != KEY_CODE_NUMBER_MODE) &&
+            (ptWidget->keyCode != KEY_CODE_SYMBOL_MODE))
+        {
+            ldMsgEmit(ptScene->ptMsgQueue, ldBaseGetWidget(ptScene->ptNodeRoot, ptWidget->editorId), SIGNAL_VALUE_CHANGED, 0);
+        }
         break;
     }
     case SIGNAL_RELEASE:

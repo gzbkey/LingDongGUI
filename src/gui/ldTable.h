@@ -82,7 +82,7 @@ struct ldTable_t
     uint16_t kbNameId;
     uint8_t rowCount;
     uint8_t columnCount;
-    uint8_t itemSpace;//item 间隔
+    uint8_t itemSpace;
     uint8_t currentRow;
     uint8_t currentColumn;
     arm_2d_location_t _cursorPos;
@@ -91,6 +91,7 @@ struct ldTable_t
     int16_t *pRowHeight;
     bool isBgTransparent:1;
     bool isAlignGrid:1;
+    bool isEditing:1;
 };
 
 ldTable_t* ldTable_init(ld_scene_t *ptScene, ldTable_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, uint8_t rowCount, uint8_t columnCount, uint8_t itemSpace);
