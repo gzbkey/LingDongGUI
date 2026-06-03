@@ -99,13 +99,12 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
 
                 if((ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)>(LD_CFG_SCREEN_HEIGHT>>1))
                 {
-                    ldBaseMove((ldBase_t *)kb,0,LD_CFG_SCREEN_HEIGHT>>1);
-                    ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-(LD_CFG_SCREEN_HEIGHT>>1));
-
+                    ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight);
+                    ldBaseMove((ldBase_t *)kb,kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX,LD_CFG_SCREEN_HEIGHT);
                 }
                 else
                 {
-                    ldBaseMove((ldBase_t *)kb,0,0);
+                    ldBaseMove((ldBase_t *)kb,kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX,LD_CFG_SCREEN_HEIGHT - kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight);
                 }
             }
         }

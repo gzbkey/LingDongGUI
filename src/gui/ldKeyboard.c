@@ -71,7 +71,7 @@ const ldBaseWidgetFunc_t ldKeyboardFunc = {
 #define NUM_BTN_W (NUM_BTN_W_SPACE - KB_SPACE)
 #define NUM_BTN_H (((LD_CFG_SCREEN_HEIGHT >> 1) - KB_SPACE) / 4 - KB_SPACE)
 #define NUM_OFFSET_W(num) (KB_SPACE + (NUM_BTN_W + KB_SPACE) * num)
-#define NUM_OFFSET_H(num) (KB_SPACE + (NUM_BTN_H + KB_SPACE) * num + (LD_CFG_SCREEN_HEIGHT >> 1))
+#define NUM_OFFSET_H(num) (KB_SPACE + (NUM_BTN_H + KB_SPACE) * num)
 
 const kbBtnInfo_t numBtnInfo[] = {
     {NUM_START + NUM_OFFSET_W(0), NUM_OFFSET_H(0), NUM_BTN_W, NUM_BTN_H, (uint8_t *)"1", '1', NULL, NULL, NULL, NULL, KB_NORMAL_PRESS_COLOR, KB_NORMAL_RELEASE_COLOR},
@@ -102,7 +102,7 @@ const kbBtnInfo_t numBtnInfo[] = {
 #define QWERTY_BTN_W (QWERTY_BTN_W_SPACE - KB_SPACE)
 #define QWERTY_BTN_H (((LD_CFG_SCREEN_HEIGHT >> 1) - KB_SPACE) / 4 - KB_SPACE)
 #define QWERTY_OFFSET_W(num) (QWERTY_BTN_W_SPACE * (num / 2) + KB_SPACE + QWERTY_BTN_W * (num % 2) / 2) // (KB_SPACE+((QWERTY_BTN_W+KB_SPACE)>>1)*num)
-#define QWERTY_OFFSET_H(num) (KB_SPACE + (QWERTY_BTN_H + KB_SPACE) * num + (LD_CFG_SCREEN_HEIGHT >> 1))
+#define QWERTY_OFFSET_H(num) (KB_SPACE + (QWERTY_BTN_H + KB_SPACE) * num)
 
 const kbBtnInfo_t qwertyBtnList[] = {
     {QWERTY_START + QWERTY_OFFSET_W(0), QWERTY_OFFSET_H(0), QWERTY_BTN_W, QWERTY_BTN_H, (uint8_t *)"q", 'q', NULL, NULL, NULL, NULL, KB_NORMAL_PRESS_COLOR, KB_NORMAL_RELEASE_COLOR},
@@ -538,12 +538,7 @@ static arm_2d_region_t _keyboardGetClickRegion(ldKeyboard_t *ptWidget, arm_2d_lo
 
 void ldKeyboardUpdate(ldKeyboard_t *ptWidget)
 {
-    ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iX = 0;
-    ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY = LD_CFG_SCREEN_HEIGHT >> 1;
-    ptWidget->use_as__ldBase_t.tTempRegion.tSize.iWidth = LD_CFG_SCREEN_WIDTH;
-    ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight = LD_CFG_SCREEN_HEIGHT >> 1;
-
-    ptWidget->use_as__ldBase_t.tTempRegion.tLocation.iY += ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY;
+    ptWidget->use_as__ldBase_t.tTempRegion = ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 }
 
@@ -574,8 +569,10 @@ static bool slotKBProcess(ld_scene_t *ptScene, ldMsg_t msg)
 {
     ldKeyboard_t *ptWidget = msg.ptSender;
     arm_2d_location_t clickPoint;
-    clickPoint.iX = (int16_t)GET_SIGNAL_VALUE_X(msg.value);
-    clickPoint.iY = (int16_t)GET_SIGNAL_VALUE_Y(msg.value);
+    arm_2d_location_t tLocation = {0};
+    tLocation = ldBaseGetAbsoluteLocation((ldBase_t *)ptWidget, tLocation);
+    clickPoint.iX = (int16_t)GET_SIGNAL_VALUE_X(msg.value) - tLocation.iX;
+    clickPoint.iY = (int16_t)GET_SIGNAL_VALUE_Y(msg.value) - tLocation.iY;
 
     switch (msg.signal)
     {
@@ -630,9 +627,9 @@ ldKeyboard_t *ldKeyboard_init(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, uint1
     ldBaseNodeAdd((arm_2d_control_node_t *)ptParent, (arm_2d_control_node_t *)ptWidget);
 
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX = 0;
-    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = 0;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY = LD_CFG_SCREEN_HEIGHT >> 1;
     ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iWidth = LD_CFG_SCREEN_WIDTH;
-    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = LD_CFG_SCREEN_HEIGHT;
+    ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = LD_CFG_SCREEN_HEIGHT >> 1;
     ptWidget->use_as__ldBase_t.nameId = nameId;
     ptWidget->use_as__ldBase_t.widgetType = widgetTypeKeyboard;
     ptWidget->use_as__ldBase_t.ptGuiFunc = &ldKeyboardFunc;
@@ -712,17 +709,20 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
     arm_2d_region_t kbRegion = {
         .tLocation = {
             .iX = 0,
-            .iY = 0,
+            .iY = LD_CFG_SCREEN_HEIGHT >> 1,
         },
         .tSize = {
             .iWidth = LD_CFG_SCREEN_WIDTH,
-            .iHeight = LD_CFG_SCREEN_HEIGHT,
+            .iHeight = LD_CFG_SCREEN_HEIGHT >> 1,
         },
     };
 
-    if (arm_2d_helper_pfb_is_region_active(ptTile, &kbRegion, true))
+    arm_2d_region_t globalRegion;
+    arm_2d_helper_control_get_absolute_region((arm_2d_control_node_t*)ptWidget,&globalRegion,true);
+
+    if (arm_2d_helper_pfb_is_region_active(ptTile, &globalRegion, true))
     {
-        arm_2d_container(ptTile, tTarget, &kbRegion)
+        arm_2d_container(ptTile, tTarget, &globalRegion)
         {
             if (ldBaseIsHidden((ldBase_t *)ptWidget))
             {
@@ -750,11 +750,7 @@ void ldKeyboard_show(ld_scene_t *ptScene, ldKeyboard_t *ptWidget, const arm_2d_t
                 ldBaseBgMove(ptScene, LD_CFG_SCREEN_WIDTH, LD_CFG_SCREEN_HEIGHT, 0, 0);
             }
 
-            arm_2d_region_t bgRegion={
-                0, 
-                (LD_CFG_SCREEN_HEIGHT >> 1),
-                LD_CFG_SCREEN_WIDTH,
-                (LD_CFG_SCREEN_HEIGHT >> 1)};
+            arm_2d_region_t bgRegion={0,0,LD_CFG_SCREEN_WIDTH,(LD_CFG_SCREEN_HEIGHT >> 1)};
 
             if (!ldKeyboardBackgroundUserDraw(&tTarget, ptWidget, &bgRegion))
             {

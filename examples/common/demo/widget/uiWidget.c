@@ -248,7 +248,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
     ldButtonSetText(obj,(uint8_t*)"123");
 
 
-    ldKeyboardInit(ID_KB,0,FONT_ARIAL_12);
+
 
     obj=ldArcInit(25,0,450,450,103,103,IMAGE_ARC_QUARTER_PNG_Mask,IMAGE_ARC_QUARTER_MASK_PNG_Mask,__RGB(240,240,240));
     ldArcSetBackgroundAngle(obj,0,350);
@@ -282,6 +282,7 @@ void uiWidgetInit(ld_scene_t* ptScene)
 
 //    ldBaseNodeTreePrint(ptScene->ptNodeRoot,0);
 
+     ldKeyboardInit(ID_KB,0,FONT_ARIAL_12);
 }
 
 void uiWidgetLoop(ld_scene_t* ptScene)
