@@ -86,6 +86,7 @@ struct ldTable_t
     uint8_t currentRow;
     uint8_t currentColumn;
     arm_2d_location_t _cursorPos;
+    arm_2d_size_t _strSize;
     ldTableItem_t *ptItemInfo;
     int16_t *pColumnWidth;
     int16_t *pRowHeight;
