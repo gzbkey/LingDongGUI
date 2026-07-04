@@ -62,6 +62,21 @@ extern "C" {
 #define LD_MEM_SIZE                               (32*1024) //BYTE
 #endif
 
+#ifndef USE_XIP
+// <q>XIP support
+// <i> Resource in XIP mode, please enable this option
+#define USE_XIP                                   (0)
+#endif
+
+#if USE_XIP == 1
+#ifndef XIP_BASE
+extern uint8_t xipBuf[10*1024*1024];
+// <o>XIP base address
+// <i> XIP base address
+#define XIP_BASE                                  ((uint8_t *)&xipBuf)
+#endif
+#endif
+
 #ifndef USE_VIRTUAL_RESOURCE
 // <q>External NOR support
 // <i> Read external nor, please enable this option
@@ -266,6 +281,9 @@ extern "C" {
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (0)
 #else
 #define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__     (3)
+#endif
+#if USE_XIP == 1
+#define USE_VIRTUAL_RESOURCE                      (0)
 #endif
 #define __GLCD_CFG_COLOUR_DEPTH__                 LD_CFG_COLOR_DEPTH
 

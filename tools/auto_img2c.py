@@ -4,8 +4,9 @@ import subprocess
 import sys
 from PIL import Image
 import shutil
+import argparse
 
-def process_image(output_dir, image_path, output_path, output_name, depth):
+def process_image(output_dir, image_path, output_path, output_name, depth, xip_offset=0):
     if depth == 8:
         format_arg = 'gray8'
     elif depth == 16:
@@ -21,7 +22,8 @@ def process_image(output_dir, image_path, output_path, output_name, depth):
         '-i', image_path,
         '-o', output_path,
         '--name', output_name,
-        '--format', format_arg
+        '--format', format_arg,
+        '--xip-offset', f'0x{xip_offset:08X}'
     ]
 
     try:
@@ -57,20 +59,22 @@ header_content_end = """
 #endif
 """
 
-def generate_image_data_for_each_config(imageYaml, output_dir):
+def generate_image_data_for_each_config(imageYaml, output_dir, xip_offset_start=0):
     header_parts = []
     imagePathList = []
     imageDepthList = []
+    copied_image_paths = set()
     for image_entry in imageYaml:
             image_info = image_entry["image"]
-            image_path = image_info.get("path")
+            image_path = os.path.abspath(image_info.get("path"))
             depth = image_info.get("depth", 0)
             imageDepthList.append(depth)
-            dest_path = os.path.join(output_dir, os.path.basename(image_path))
+            dest_path = os.path.abspath(os.path.join(output_dir, os.path.basename(image_path)))
             imagePathList.append(dest_path)
             if dest_path != image_path:
                 os.makedirs(os.path.dirname(dest_path), exist_ok=True)
                 shutil.copyfile(image_path, dest_path)
+                copied_image_paths.add(dest_path)
 
     print(output_dir)
     print('\nfile list:')
@@ -80,6 +84,7 @@ def generate_image_data_for_each_config(imageYaml, output_dir):
     bin_files = []
     bin_offsets = {}
     current_offset = 0
+    current_xip_offset = xip_offset_start
 
     for filename, depth in zip(imagePathList, imageDepthList):
         filename = os.path.basename(filename)
@@ -96,7 +101,7 @@ def generate_image_data_for_each_config(imageYaml, output_dir):
 
             new_filename = f"{base_name}.c"
             output_path = os.path.join(output_dir, new_filename)
-            process_image(thisPyDirPath, image_path, output_path, output_name, depth)
+            process_image(thisPyDirPath, image_path, output_path, output_name, depth, current_xip_offset)
 
             bin_filename = f"{base_name}.bin"
             bin_filepath = os.path.join(output_dir, bin_filename)
@@ -105,6 +110,7 @@ def generate_image_data_for_each_config(imageYaml, output_dir):
                 bin_offsets[bin_filename] = current_offset
                 file_size = os.path.getsize(bin_filepath)
                 current_offset += file_size
+                current_xip_offset += file_size
 
             header_parts.append(f"\n// {filename} < {imgW}x{imgH} >")
 
@@ -147,7 +153,7 @@ extern const arm_2d_tile_t c_tile_{text_file_name}_Mask;
             header_parts.append("\n")
 
     for imagePath in imagePathList:
-        if os.path.exists(imagePath):
+        if os.path.exists(imagePath) and imagePath in copied_image_paths:
             os.remove(imagePath)
 
     images_bin_path = os.path.join(output_dir, "images.bin")
@@ -188,10 +194,15 @@ extern const arm_2d_tile_t c_tile_{text_file_name}_Mask;
         file.write(full_header)
 
 def main(argv):
-    if not argv:
+    parser = argparse.ArgumentParser(description='Auto image to C converter')
+    parser.add_argument('output_dir', nargs='?', default=None, help='Output directory')
+    parser.add_argument('--xip-offset-start', type=lambda x: int(x, 0), default=0, help='XIP offset start for merged images.bin')
+    args = parser.parse_args(argv)
+
+    if args.output_dir is None:
         output_dir = os.path.dirname(os.path.abspath(__file__))
     else:
-        output_dir = argv[0]
+        output_dir = args.output_dir
 
     if output_dir[-1] in ('\\', '/'):
         output_dir = output_dir[:-1]
@@ -212,7 +223,7 @@ def main(argv):
 
     with open(image_yaml_path, 'r') as file:
         imageYamlData = yaml.safe_load(file)
-        generate_image_data_for_each_config(imageYamlData, output_dir)
+        generate_image_data_for_each_config(imageYamlData, output_dir, args.xip_offset_start)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

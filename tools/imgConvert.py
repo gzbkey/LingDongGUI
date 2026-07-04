@@ -31,6 +31,29 @@ import numpy as np
 import time
 import argparse
 import os
+import re
+
+# Import zhRGB565 compression modules
+try:
+    from __img2c_zhRGB565 import (
+        encode_rgb565_rle_only,
+        generate_c_array as generate_rle_c_array,
+        encode_rgb565_rle_diff,
+        generate_c_array as generate_diff_c_array
+    )
+    ZHRGB565_AVAILABLE = True
+except ImportError:
+    ZHRGB565_AVAILABLE = False
+
+# Import LMSK compression modules
+try:
+    from __img2c_lmsk import (
+        load_mask_from_image,
+        encode_lmsk,
+    )
+    LMSK_AVAILABLE = True
+except ImportError:
+    LMSK_AVAILABLE = False
 
 
 class ColorType:
@@ -58,25 +81,32 @@ class ColorType:
 
 
 class BinaryTracker:
-    def __init__(self, binfile):
+    def __init__(self, binfile, xip_offset=0):
         self.offset = 0
         self.binfile = binfile
         self.offsets = {}
+        self.data_offsets = {}
+        self.xip_macros = []
+        self.xip_offset = xip_offset
         self.has_alpha = False
-                
+
+    def make_macro_name(self, name):
+        name = name.replace('__', '_')
+        name = name.strip('_').upper()
+        return name
+
     def write_header_file(self, header_path, prefix):
         with open(header_path, 'w') as f:
             for name, offset in sorted(self.offsets.items()):
-                name=name.replace('__', '_')
-                name=name.strip('_').upper()
-                print(f'{name}:0x{offset:08x}', file=f)
+                macro_name = self.make_macro_name(name)
+                print(f'{macro_name}:0x{offset:08x}', file=f)
             if not self.has_alpha:
-                prefix=prefix.strip('_').upper()
+                prefix = self.make_macro_name(prefix)
                 print(f'{prefix}:0xFFFFFFFF', file=f)
-                
+
     def write_data(self, data, align=4, name=None, width=0, height=0, color_type=0):
         start_offset = self.offset
-        
+
         data_length = data.nbytes if isinstance(data, np.ndarray) else len(data)
         self.binfile.write(data_length.to_bytes(4, byteorder='little'))
         self.binfile.write(width.to_bytes(2, byteorder='little'))
@@ -91,7 +121,9 @@ class BinaryTracker:
             if pad > 0:
                 self.binfile.write(bytes([0] * pad))
                 self.offset += pad
-        
+
+        data_offset = self.offset
+
         if isinstance(data, np.ndarray):
             data_le = data.astype(data.dtype.newbyteorder('<'))
             data_le.tofile(self.binfile)
@@ -99,24 +131,25 @@ class BinaryTracker:
         else:
             self.binfile.write(data)
             self.offset += len(data)
-            
+
         if align > 1:
             current_position = self.offset
             pad = (align - (current_position % align)) % align
             if pad > 0:
                 self.binfile.write(bytes([0] * pad))
                 self.offset += pad
-            
+
         if name:
             self.offsets[name] = start_offset
-            
-        return start_offset
+            self.data_offsets[name] = data_offset
+            macro_name = self.make_macro_name(name)
+            self.xip_macros.append((macro_name, self.xip_offset + data_offset))
+
+        return data_offset
 hdr="""
 /* Generated on {0} from {1} */
 /* Re-sized : {2} */
 /* Rotated : {3} deg */
-
-
 
 #include "arm_2d.h"
 
@@ -150,7 +183,11 @@ const arm_2d_tile_t c_tile{0}GRAY8 = {{
             .chScheme = ARM_2D_COLOUR_GRAY8,
         }},
     }},
-    {3}c_bmp{0}GRAY8,
+#if defined(USE_XIP)
+    .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
+#else
+    .pchBuffer = (uint8_t *)c_bmp{0}GRAY8,
+#endif
 }};
 
 """
@@ -173,7 +210,11 @@ const arm_2d_tile_t c_tile{0}RGB565 = {{
             .chScheme = ARM_2D_COLOUR_RGB565,
         }},
     }},
-    {3}c_bmp{0}RGB565,
+#if defined(USE_XIP)
+    .phwBuffer = (uint16_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
+#else
+    .phwBuffer = (uint16_t *)c_bmp{0}RGB565,
+#endif
 }};
 
 """
@@ -197,7 +238,11 @@ const arm_2d_tile_t c_tile{0}CCCN888 = {{
             .chScheme = ARM_2D_COLOUR_RGB888,
         }},
     }},
-    {3}c_bmp{0}CCCN888,
+#if defined(USE_XIP)
+    .pwBuffer = (uint32_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
+#else
+    .pwBuffer = (uint32_t *)c_bmp{0}CCCN888,
+#endif
 }};
 
 """
@@ -221,7 +266,11 @@ const arm_2d_tile_t c_tile{0}CCCA8888 = {{
             .chScheme = ARM_2D_COLOUR_BGRA8888,
         }},
     }},
-    {3}c_bmp{0}CCCA8888,
+#if defined(USE_XIP)
+    .pwBuffer = (uint32_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
+#else
+    .pwBuffer = (uint32_t *)c_bmp{0}CCCA8888,
+#endif
 }};
 
 """
@@ -243,15 +292,18 @@ const arm_2d_tile_t c_tile{0}Mask = {{
         .bIsRoot = true,
         .bHasEnforcedColour = true,
         .tColourInfo = {{
-            .chScheme = ARM_2D_COLOUR_8BIT,
+            .chScheme = ARM_2D_COLOUR_MASK_A8,
         }},
     }},
+#if defined(USE_XIP)
+    .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
+#else
     .pchBuffer = (uint8_t *)c_bmp{0}Alpha,
+#endif
 }};
 """
 
 tail1BitAlpha="""
-
 
 extern const arm_2d_tile_t c_tile{0}A1Mask;
 
@@ -270,13 +322,16 @@ const arm_2d_tile_t c_tile{0}A1Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A1,
         }},
     }},
+#if defined(USE_XIP)
+    .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
+#else
     .pchBuffer = (uint8_t *)c_bmp{0}A1Alpha,
+#endif
 }};
 """
 
 
 tail2BitAlpha="""
-
 
 extern const arm_2d_tile_t c_tile{0}A2Mask;
 
@@ -295,12 +350,15 @@ const arm_2d_tile_t c_tile{0}A2Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A2,
         }},
     }},
+#if defined(USE_XIP)
+    .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
+#else
     .pchBuffer = (uint8_t *)c_bmp{0}A2Alpha,
+#endif
 }};
 """
 
 tail4BitAlpha="""
-
 
 extern const arm_2d_tile_t c_tile{0}A4Mask;
 
@@ -319,13 +377,16 @@ const arm_2d_tile_t c_tile{0}A4Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A4,
         }},
     }},
+#if defined(USE_XIP)
+    .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
+#else
     .pchBuffer = (uint8_t *)c_bmp{0}A4Alpha,
+#endif
 }};
 """
 
 
 tailAlpha2="""
-
 
 extern const arm_2d_tile_t c_tile{0}Mask2;
 
@@ -344,8 +405,68 @@ const arm_2d_tile_t c_tile{0}Mask2 = {{
             .chScheme = ARM_2D_CHANNEL_8in32,
         }},
     }},
+#if defined(USE_XIP)
+    .nAddress = (intptr_t)(XIP_BASE + IMAGE_{3}_XIP_OFFSET) + 3,
+#else
     .nAddress = ((intptr_t)c_bmp{0}CCCA8888) + 3,
+#endif
 }};
+"""
+
+
+tailDataZHRGB565="""
+
+extern const arm_2d_tile_t c_tile{0}ZHRGB565;
+ARM_SECTION(\"arm2d.tile.c_tile{0}ZHRGB565\")
+const arm_2d_tile_t c_tile{0}ZHRGB565 = {{
+    .tRegion = {{
+        .tSize = {{
+            .iWidth = {1},
+            .iHeight = {2},
+        }},
+    }},
+    .tInfo = {{
+        .bIsRoot = true,
+        .bHasEnforcedColour = true,
+        .tColourInfo = {{
+            .chScheme = ARM_2D_COLOUR_RGB565,
+        }},
+    }},
+#if defined(USE_XIP)
+    .phwBuffer = (uint16_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
+#else
+    .phwBuffer = (uint16_t *)c_zhrgb{0},
+#endif
+}};
+
+"""
+
+
+tailDataLMSK="""
+
+extern const arm_2d_tile_t c_tile{0}LMSK;
+ARM_SECTION(\"arm2d.tile.c_tile{0}LMSK\")
+const arm_2d_tile_t c_tile{0}LMSK = {{
+    .tRegion = {{
+        .tSize = {{
+            .iWidth = {1},
+            .iHeight = {2},
+        }},
+    }},
+    .tInfo = {{
+        .bIsRoot = true,
+        .bHasEnforcedColour = true,
+        .tColourInfo = {{
+            .chScheme = ARM_2D_COLOUR_MASK_A8,
+        }},
+    }},
+#if defined(USE_XIP)
+    .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
+#else
+    .pchBuffer = (uint8_t *)c_lmsk{0},
+#endif
+}};
+
 """
 
 
@@ -361,18 +482,24 @@ tail="""
 
 def main(argv):
 
-    parser = argparse.ArgumentParser(description='image to C array converter (v1.2.5)')
+    parser = argparse.ArgumentParser(description='image to C array converter (v2.1.0)')
 
     parser.add_argument('-i', nargs='?', type = str,  required=False, help="Input file (png, bmp, etc..)")
     parser.add_argument('-o', nargs='?', type = str,  required=False, help="output C file containing RGB56/RGB888/Gray8 and alpha values arrays")
 
     parser.add_argument('--name', nargs='?',type = str, required=False, help="A specified array name")
-    parser.add_argument('--format', nargs='?',type = str, default="all", help="RGB Format (rgb565, rgb32, gray8, mask, all)")
+    parser.add_argument('--format', nargs='?',type = str, default="all", help="RGB Format (rgb565, rgb32, gray8, mask, zhRGB565, lmsk, all)")
     parser.add_argument('--dim', nargs=2,type = int, help="Resize the image with the given width and height")
     parser.add_argument('--rot', nargs='?',type = float, default=0.0, help="Rotate the image with the given angle in degrees")
     parser.add_argument('--a1', action='store_true', help="Generate 1bit alpha-mask")
     parser.add_argument('--a2', action='store_true', help="Generate 2bit alpha-mask")
     parser.add_argument('--a4', action='store_true', help="Generate 4bit alpha-mask")
+    parser.add_argument('--a8', action='store_true', help="Generate 8bit alpha-mask")
+    parser.add_argument('--border', action='store_true', help="Add a 1pix border")
+    parser.add_argument("--no-gradient", action="store_true", help="Disable gradient detection algorithm. (Repeat>62 still uses GRADIENT tag like C encoder.)")
+    parser.add_argument("--gradient-tolerant", type=int, default=2, choices=[0, 1, 2, 3], help="Gradient tolerant (0~3). Default: 2.")
+    parser.add_argument("--alpha-bits", type=int, default=6, choices=[1, 2, 3, 4, 5, 6, 7, 8], help="Alpha Bits (1~8). Default: 6.")
+    parser.add_argument('--xip-offset', type=lambda x: int(x, 0), default=0, help="XIP base offset for this image bin")
 
     args = parser.parse_args()
 
@@ -389,8 +516,8 @@ def main(argv):
 
     binfile = os.path.splitext(outputfile)[0] + ".bin"
     header_file = os.path.splitext(outputfile)[0] + ".txt"
-    binary_tracker = BinaryTracker(open(binfile, 'wb'))
-    
+    binary_tracker = BinaryTracker(open(binfile, 'wb'), xip_offset=args.xip_offset)
+
     arr_name = args.name
     if arr_name == None or arr_name == "":
         arr_name = basename
@@ -399,9 +526,23 @@ def main(argv):
         args.format != 'rgb32' and \
         args.format != 'gray8' and \
         args.format != 'mask' and \
+        args.format != 'zhRGB565' and \
+        args.format != 'lmsk' and \
         args.format != 'all':
         parser.print_help()
         exit(1)
+
+    if args.a1:
+        args.format = ''
+
+    if args.a2:
+        args.format = ''
+
+    if args.a4:
+        args.format = ''
+
+    if args.a8:
+        args.format = ''
 
     try:
         image = Image.open(inputfile)
@@ -423,6 +564,17 @@ def main(argv):
 
 
     mode = image.mode
+
+    # add 1 pixel border
+    if args.border:
+        data = np.asarray(image)
+        pad_val = 0
+        if data.ndim == 2:
+            padded = np.pad(data, 1, mode='constant', constant_values=pad_val)
+        else:
+            padded = np.pad(data, ((1, 1), (1, 1), (0, 0)),
+                            mode='constant', constant_values=pad_val)
+        image = Image.fromarray(padded, mode=mode)
 
     # Modes supported by Pillow
 
@@ -452,6 +604,8 @@ def main(argv):
     # BGR;32 (32-bit reversed true colour)
 
     # handle {P, LA, RGB, RGBA} for now
+    origin_image = image
+
     if mode == 'P' or mode == 'LA':
         image = image.convert('RGBA')
         mode = 'RGBA'
@@ -474,9 +628,9 @@ def main(argv):
 
         if mode == "RGBA":
             alpha_data = data[...,3].astype(np.uint8)
-            alpha_offset = binary_tracker.write_data(alpha_data, 
+            alpha_offset = binary_tracker.write_data(alpha_data,
                                                    name=f"{arr_name}_ALPHA",
-                                                   width=row, 
+                                                   width=row,
                                                    height=col,
                                                    color_type=ColorType.MASK_A8)
             binary_tracker.has_alpha = True
@@ -492,7 +646,7 @@ def main(argv):
                     if lineWidth % WIDTH_ALPHA == (WIDTH_ALPHA - 1):
                         print("0x%02x," %(alpha) ,file=o)
                     else:
-                        print("0x%02x" %(alpha), end =", ",file=o)
+                        print("0x%02x" %(alpha), end =", ", file=o)
                     lineWidth+=1
                 cnt+=1
                 print('',file=o)
@@ -691,6 +845,120 @@ def main(argv):
             buffStr='phwBuffer'
             typStr='uint16_t'
 
+        # Lossless Compressed Mask (lmsk)
+        if (args.format == 'lmsk') or (args.format == 'all'):
+            if not LMSK_AVAILABLE:
+                print("Warning: LMSK compression library not available, skipping LMSK format", file=sys.stderr)
+            else:
+                # Detect alpha presence robustly
+                has_alpha = ("A" in origin_image.mode) or (origin_image.mode == "P" and "transparency" in origin_image.info)
+
+                if has_alpha:
+                    img = origin_image.convert("RGBA")
+                    alpha = img.getchannel("A")
+                    mask_raw = alpha.tobytes()
+                else:
+                    img = origin_image.convert("L")
+                    mask_raw = img.tobytes()
+
+                mask_compressed = encode_lmsk(mask_raw,
+                    width=img.width,
+                    height=img.height,
+                    raw=False,
+                    no_gradient=args.no_gradient,
+                    tolerant=args.gradient_tolerant,
+                    alpha_bits=args.alpha_bits)
+
+                compressed_array = np.frombuffer(mask_compressed, dtype=np.uint8)
+                lmsk_offset = binary_tracker.write_data(compressed_array,
+                                                    name=f"{arr_name}_LMSK",
+                                                    width=img.width,
+                                                    height=img.height,
+                                                    color_type=ColorType.MASK_A8)
+
+                print('',file=o)
+                print('extern const uint8_t c_lmsk%s[%d];\n' % (arr_name, len(mask_compressed)), file=o)
+                print('ARM_ALIGN(4) ARM_SECTION(\"arm2d.asset.c_lmsk%s\")' % (arr_name), file=o)
+                print('const uint8_t c_lmsk%s[%d] = {' % (arr_name, len(mask_compressed)), file=o)
+
+                for i in range(0, len(mask_compressed), 16):
+                    chunk = mask_compressed[i:i+16]
+                    hex_strings = [f"0x{b:02x}" for b in chunk]
+                    line = ", ".join(hex_strings)
+                    o.write("    ")
+                    o.write(line)
+                    o.write(",\n")
+
+                print('};', file=o)
+
+        # zhRGB565 compressed format
+        if (args.format == 'zhRGB565') or (args.format == 'all'):
+            if not ZHRGB565_AVAILABLE:
+                print("Warning: zhRGB565 compression library not available, skipping zhRGB565 format", file=sys.stderr)
+            else:
+                # Convert to RGB565 first
+                R = (data[...,0]>>3).astype(np.uint16) << 11
+                G = (data[...,1]>>2).astype(np.uint16) << 5
+                B = (data[...,2]>>3).astype(np.uint16)
+                RGB = R | G | B
+
+                # Use RLE+DIFF compression for better gradient compression
+                compressed_data, compressed_size, compression_ratio = encode_rgb565_rle_diff(RGB.flatten(), row, col)
+                compression_method = "RLE+DIFF"
+
+                if compressed_data is not None:
+                    # Write compressed data to bin
+                    compressed_array = np.array(compressed_data, dtype=np.uint16)
+                    zh_offset = binary_tracker.write_data(compressed_array,
+                                                      name=f"{arr_name}_ZHRGB565",
+                                                      width=row,
+                                                      height=col,
+                                                      color_type=ColorType.RGB565)
+
+                    print('',file=o)
+                    print('/* ============================================ */', file=o)
+                    print('/* zhRGB565 compressed data (%s) */' % compression_method, file=o)
+                    print('/* Original size: %d bytes */' % (row * col * 2), file=o)
+                    print('/* Compressed size: %d bytes */' % (compressed_size * 2), file=o)
+                    print('/* Compression ratio: %.2f%% */' % compression_ratio, file=o)
+                    print('/* ============================================ */', file=o)
+                    print('',file=o)
+
+                    # Generate compressed C array
+                    c_code = generate_diff_c_array(compressed_data, compressed_size, row, col, compression_ratio, inputfile, arr_name)
+
+                    # Write the compressed data (extract just the array part)
+                    lines = c_code.split('\n')
+                    in_array = False
+                    for line in lines:
+                        if 'const uint16_t' in line and '[' in line:
+                            in_array = True
+                            # Add ARM_SECTION directive and extern declaration for zhRGB565
+                            # Extract the original array name and convert to ARM format
+                            match = re.search(r'const uint16_t (\w+)\[(.*?)\]', line)
+
+                            if match:
+                                original_name = match.group(1)
+                                # Convert to ARM format: c_zhRGB565_ + name
+                                arm_name = f'c_zhrgb{arr_name}'
+                                array_size = match.group(2) if match.group(2) else ''
+                                # Generate extern declaration
+                                extern_decl = f"extern const uint16_t {arm_name}[{array_size}];"
+                                print(extern_decl, file=o)
+                                print('ARM_SECTION("arm2d.asset.c_zhrgb%s")' % (arr_name), file=o)
+                                # Generate the actual array definition with modified name
+                                modified_line = line.replace(original_name, arm_name)
+                                print(modified_line, file=o)
+
+                            continue
+                        elif line.strip() == '};':
+                            if in_array:
+                                print(line, file=o)
+                                break
+                        elif in_array:
+                            print(line, file=o)
+                else:
+                    print("Warning: RLE compression failed for zhRGB565 format", file=sys.stderr)
 
 
         if args.format == 'rgb32' or args.format == 'all':
@@ -736,42 +1004,66 @@ def main(argv):
             buffStr='pwBuffer'
             typStr='uint32_t'
 
+        # insert XIP offset macros
+        if binary_tracker.xip_macros:
+            print("\n#ifndef XIP_BASE", file=o)
+            print("#define XIP_BASE ((uint8_t *)0x00000000)", file=o)
+            print("#endif", file=o)
+            printed_macros = set()
+            for macro_name, offset in binary_tracker.xip_macros:
+                if macro_name in printed_macros:
+                    continue
+                printed_macros.add(macro_name)
+                print(f"\n#ifndef IMAGE_{macro_name}_XIP_OFFSET", file=o)
+                print(f"#define IMAGE_{macro_name}_XIP_OFFSET 0x{offset:08X}", file=o)
+                print(f"#endif", file=o)
+            print("", file=o)
+
         # insert tail
         if args.format == 'gray8' or args.format == 'all':
-            buffStr='pchBuffer'
-            typStr='uint8_t'
-            print(tailDataGRAY8.format(arr_name, str(row), str(col), "."+buffStr+" = ("+typStr+"*)"), file=o)
+            macro_name = binary_tracker.make_macro_name(f"{arr_name}_GRAY8")
+            print(tailDataGRAY8.format(arr_name, str(row), str(col), macro_name), file=o)
 
         if args.format == 'rgb565' or args.format == 'all':
-            buffStr='phwBuffer'
-            typStr='uint16_t'
-            print(tailDataRGB565.format(arr_name, str(row), str(col), "."+buffStr+" = ("+typStr+"*)"), file=o)
+            macro_name = binary_tracker.make_macro_name(f"{arr_name}_RGB565")
+            print(tailDataRGB565.format(arr_name, str(row), str(col), macro_name), file=o)
 
         if args.format == 'rgb32' or args.format == 'all':
-            buffStr='pwBuffer'
-            typStr='uint32_t'
             if mode == "RGBA":
-                print(tailDataRGBA8888.format(arr_name, str(row), str(col), "."+buffStr+" = ("+typStr+"*)"), file=o)
-                print(tailAlpha2.format(arr_name, str(row), str(col)), file=o)
-            else :
-                print(tailDataRGB888.format(arr_name, str(row), str(col), "."+buffStr+" = ("+typStr+"*)"), file=o)
+                macro_name = binary_tracker.make_macro_name(f"{arr_name}_RGBA8888")
+                print(tailDataRGBA8888.format(arr_name, str(row), str(col), macro_name), file=o)
+                print(tailAlpha2.format(arr_name, str(row), str(col), macro_name), file=o)
+            else:
+                macro_name = binary_tracker.make_macro_name(f"{arr_name}_RGB888")
+                print(tailDataRGB888.format(arr_name, str(row), str(col), macro_name), file=o)
 
+        if args.format == 'zhRGB565' or args.format == 'all':
+            macro_name = binary_tracker.make_macro_name(f"{arr_name}_ZHRGB565")
+            print(tailDataZHRGB565.format(arr_name, str(row), str(col), macro_name), file=o)
+
+        if args.format == 'lmsk' or args.format == 'all':
+            macro_name = binary_tracker.make_macro_name(f"{arr_name}_LMSK")
+            print(tailDataLMSK.format(arr_name, str(row), str(col), macro_name), file=o)
 
         if mode == "RGBA":
-            print(tailAlpha.format(arr_name, str(row), str(col)), file=o)
+            macro_name = binary_tracker.make_macro_name(f"{arr_name}_ALPHA")
+            print(tailAlpha.format(arr_name, str(row), str(col), macro_name), file=o)
 
             if args.a1 or args.format == 'all' or args.format == 'mask':
-                print(tail1BitAlpha.format(arr_name, str(row), str(col)), file=o)
+                macro_name = binary_tracker.make_macro_name(f"{arr_name}_A1ALPHA")
+                print(tail1BitAlpha.format(arr_name, str(row), str(col), macro_name), file=o)
 
             if args.a2 or args.format == 'all' or args.format == 'mask':
-                print(tail2BitAlpha.format(arr_name, str(row), str(col)), file=o)
+                macro_name = binary_tracker.make_macro_name(f"{arr_name}_A2ALPHA")
+                print(tail2BitAlpha.format(arr_name, str(row), str(col), macro_name), file=o)
 
             if args.a4 or args.format == 'all' or args.format == 'mask':
-                print(tail4BitAlpha.format(arr_name, str(row), str(col)), file=o)
+                macro_name = binary_tracker.make_macro_name(f"{arr_name}_A4ALPHA")
+                print(tail4BitAlpha.format(arr_name, str(row), str(col), macro_name), file=o)
 
 
         print(tail.format(arr_name, str(row), str(col)), file=o)
-        
+
         binary_tracker.write_header_file(header_file, arr_name.upper())
         binary_tracker.binfile.close()
 

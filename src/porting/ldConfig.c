@@ -17,7 +17,7 @@ __WEAK void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
 }
 
 /**
- * @brief   Get touch coordinates 
+ * @brief   Get touch coordinates
  * 
  * @param   x Returned x coordinate
  * @param   y Returned y coordinate
