@@ -122,8 +122,8 @@ ldButton_t *ldButton_init(ld_scene_t *ptScene, ldButton_t *ptWidget, uint16_t na
     ptWidget->use_as__ldBase_t.opacity = 255;
     ptWidget->use_as__ldBase_t.tTempRegion=ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion;
 
-    ptWidget->releaseColor = __RGB(217, 225, 244);
-    ptWidget->pressColor = __RGB(255, 243, 202);
+    ptWidget->releaseColor = __RGB(120, 200, 255);
+    ptWidget->pressColor = __RGB(255, 255, 128);
 
 
     ldMsgConnect(ptWidget, SIGNAL_PRESS, slotButtonToggle);
@@ -372,13 +372,18 @@ void ldButtonSetFont(ldButton_t *ptWidget, arm_2d_font_t *ptFont)
 void ldButtonSetText(ldButton_t* ptWidget,uint8_t *pStr)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget == NULL || pStr == NULL)
+    {
+        return;
+    }
+    int len=strlen((char*)pStr);
+    if(len==0)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     ldFree(ptWidget->pStr);
-    ptWidget->pStr=ldCalloc(1,strlen((char*)pStr)+1);
+    ptWidget->pStr=ldCalloc(1,len+1);
     if(ptWidget->pStr!=NULL)
     {
         strcpy((char*)ptWidget->pStr,(char*)pStr);

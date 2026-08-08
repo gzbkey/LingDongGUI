@@ -34,7 +34,7 @@
   </conditions>
 
   <components>
-    <component Cclass="LingDongGui" Cgroup="ldgui" Cversion="0.8.1" condition="Arm-2D">
+    <component Cclass="LingDongGui" Cgroup="ldgui" Cversion="0.9.0" condition="Arm-2D">
       <description>ldgui core files</description>
       <files>
         <file category="include" name="src/gui/" />
@@ -58,12 +58,14 @@
         <file category="sourceC" name="src/gui/ldList.c" />
         <file category="sourceC" name="src/gui/ldMessageBox.c" />
         <file category="sourceC" name="src/gui/ldProgressBar.c" />
+        <file category="sourceC" name="src/gui/ldProgressWheel.c" />
         <file category="sourceC" name="src/gui/ldQRCode.c" />
         <file category="sourceC" name="src/gui/ldRadialMenu.c" />
         <file category="sourceC" name="src/gui/ldScene0.c" />
         <file category="sourceC" name="src/gui/ldScene1.c" />
         <file category="sourceC" name="src/gui/ldScrollSelecter.c" />
         <file category="sourceC" name="src/gui/ldSlider.c" />
+        <file category="sourceC" name="src/gui/ldSpectrum.c" />
         <file category="sourceC" name="src/gui/ldTable.c" />
         <file category="sourceC" name="src/gui/ldText.c" />
         <file category="sourceC" name="src/gui/ldWindow.c" />
@@ -72,6 +74,7 @@
         <file category="sourceC" name="src/misc/freeRtosHeap4.c" />
         <file category="sourceC" name="src/misc/ldMsg.c" />
         <file category="sourceC" name="src/misc/tlsf.c" />
+        <file category="sourceC" name="src/misc/lwmem.c" />
         <file category="sourceC" name="src/misc/xQueue.c" />
         <file category="sourceC" name="src/misc/xString.c" />
         <file category="sourceC" name="src/misc/xBtnAction.c" />

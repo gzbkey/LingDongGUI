@@ -140,6 +140,7 @@ static inline void uitoa(uint32_t val, char *buf, uint8_t width)
 void ldDateTime_on_frame_start(ld_scene_t *ptScene, ldDateTime_t *ptWidget)
 {
     assert(NULL != ptWidget);
+
     int64_t lTimeStampInMs = arm_2d_helper_convert_ticks_to_ms(arm_2d_helper_get_system_timestamp());
     lTimeStampInMs=lTimeStampInMs/1000;
 
@@ -248,7 +249,6 @@ void ldDateTime_show(ld_scene_t *ptScene, ldDateTime_t *ptWidget, const arm_2d_t
             arm_2d_op_wait_async(NULL);
         }
     }
-    arm_2d_op_wait_async(NULL);
 }
 
 void ldDateTimeSetTransparent(ldDateTime_t* ptWidget,bool isTransparent)

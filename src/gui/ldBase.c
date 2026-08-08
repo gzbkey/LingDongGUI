@@ -187,6 +187,13 @@ bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer)
     return false;
 }
 
+int32_t ldBaseGetTickMs(void)
+{
+    int64_t lTimestamp = arm_2d_helper_get_system_timestamp();
+    int64_t ms=arm_2d_helper_convert_ticks_to_ms(lTimestamp);
+    return (int32_t)(ms & 0xFFFFFFFFLL);
+}
+
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child)
 {
     child->ptParent = parent;
@@ -380,6 +387,17 @@ void ldBaseLabel(arm_2d_tile_t *ptTile,arm_2d_region_t *ptRegion,uint8_t *pStr,a
     arm_lcd_text_location(0,0);
 
     arm_lcd_puts_label((char*)pStr,tAlign);
+}
+
+arm_2d_size_t ldBaseLabelGetStringSize(uint8_t *pStr, arm_2d_font_t *ptFont)
+{
+    if((pStr==NULL)||(ptFont==NULL))
+    {
+        return (arm_2d_size_t){0, 0};
+    }
+    arm_lcd_text_set_char_spacing(1);
+    arm_lcd_text_set_font(ptFont);
+    return arm_lcd_printf_to_buffer(ptFont, "%s", pStr);
 }
 
 bool ldBaseIsHidden(ldBase_t* ptWidget)
@@ -845,7 +863,7 @@ int16_t ldBaseAutoVerticalGridAlign(arm_2d_region_t widgetRegion,int16_t current
 }
 
 #if USE_VIRTUAL_RESOURCE == 1
-arm_2d_vres_t* ldBaseGetVresImage(uint32_t addr)
+__WEAK arm_2d_vres_t* ldBaseGetVresImage(uint32_t addr)
 {
     uint8_t header[16]={0};
     __disp_adapter0_vres_read_memory(0,header,addr,16);
@@ -869,8 +887,7 @@ arm_2d_vres_t* ldBaseGetVresImage(uint32_t addr)
     return ptImage;
 }
 
-static
-IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_font_get_char_descriptor)
+__WEAK IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_font_get_char_descriptor)
 {
     assert(NULL != ptFont);
     assert(NULL != ptDescriptor);
@@ -923,7 +940,7 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_font_get_char_descriptor)
     return ptDescriptor;
 }
 
-arm_2d_vres_font_t* ldBaseGetVresFont(uint32_t addr)
+__WEAK arm_2d_vres_font_t* ldBaseGetVresFont(uint32_t addr)
 {
     uint8_t header[13]={0};
     __disp_adapter0_vres_read_memory(0,header,addr,13);
@@ -978,7 +995,6 @@ arm_2d_vres_font_t* ldBaseGetVresFont(uint32_t addr)
     }
     return ptFont;
 }
-
 #endif
 
 static int32_t manhattanDistance(ldBase_t *ptCurrent, ldBase_t *ptNext, ldNavDir_t tDir)

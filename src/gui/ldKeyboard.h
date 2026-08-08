@@ -74,8 +74,8 @@ struct ldKeyboard_t
     bool isUpper:1;
     bool isLockUpper:1;
     bool isExit:1;
-    bool onlyNavH:1;//µ¼º½Ë®Æ½ÒÆ¶¯
-    bool onlyNavV:1;//µ¼º½×ÝÏßÒÆ¶¯
+    bool onlyNavH:1;//ï¿½ï¿½ï¿½ï¿½Ë®Æ½ï¿½Æ¶ï¿½
+    bool onlyNavV:1;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 };
 
 extern const kbBtnInfo_t qwertyBtnList[];
@@ -99,10 +99,6 @@ void ldKeyboardUpdate(ldKeyboard_t *ptWidget);
 void ldKeyboardBtnUpdate(ldKeyboard_t *ptWidget,uint8_t keyCode);
 void ldKeyboardClick(ld_scene_t *ptScene,ldKeyboard_t *ptWidget,uint8_t signal);
 void ldKeyboardExit(ldKeyboard_t *ptWidget);
-
-#define ldKeyboardSetHidden                ldBaseSetHidden
-#define ldKeyboardMove                     ldBaseMove
-#define ldKeyboardSetOpacity               ldBaseSetOpacity
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

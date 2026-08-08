@@ -46,6 +46,11 @@ extern "C"
 
 typedef struct ldCalendar_t ldCalendar_t;
 
+typedef enum ldCalendarDateFormat_t {
+    YYYY_MM = 0,
+    YYYY_MM_CN,
+} ldCalendarDateFormat_t;
+
 struct ldCalendar_t
 {
     implement(ldBase_t);
@@ -58,13 +63,14 @@ struct ldCalendar_t
     ldColor itemColor;
     ldColor textColor;
     uint8_t **dayNames;
-    uint8_t *headerNameFormat;
+    ldCalendarDateFormat_t dateFormatType;
     uint8_t calBuf[42];
     uint8_t year;
     uint8_t month;
     uint8_t day;
     bool isTransparent : 1;
     bool isHeader:1;
+    bool isStatic:1;
 };
 
 ldCalendar_t* ldCalendar_init(ld_scene_t *ptScene, ldCalendar_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont, uint16_t year, uint8_t month, uint8_t day);
@@ -77,8 +83,9 @@ void ldCalendar_on_frame_complete(ld_scene_t *ptScene, ldCalendar_t *ptWidget);
 void ldCalendar_show(ld_scene_t *pScene, ldCalendar_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
 void ldCalendarSetDayNames(ldCalendar_t *ptWidget,uint8_t* names[7]);
+void ldCalendarSetStaticDayNames(ldCalendar_t *ptWidget,uint8_t* names[7]);
 void ldCalendarSetHeader(ldCalendar_t *ptWidget,bool isEnable);
-void ldCalendarSetHeaderFormat(ldCalendar_t *ptWidget,uint8_t* format);
+void ldCalendarSetDateFormat(ldCalendar_t *ptWidget, ldCalendarDateFormat_t formatType);
 void ldCalendarSetDate(ldCalendar_t *ptWidget,uint16_t year,uint8_t month,uint8_t day);
 
 void ldCalendarGetDate(ldCalendar_t *ptWidget,uint16_t* year,uint8_t* month,uint8_t* day);

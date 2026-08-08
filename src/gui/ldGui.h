@@ -55,12 +55,16 @@ extern "C" {
 #include "ldWindow.h"
 #include "ldImage.h"
 #include "ldClock.h"
+#include "ldSpectrum.h"
 
-extern uint8_t cursorBlinkCount;
-extern bool cursorBlinkFlag;
+#define SYS_TICK_CYCLE_MS                 10
+#define CURSOR_WIDTH                     2
+#define CURSOR_BLINK_TIMEOUT             25
 
-#define CURSOR_BLINK_TIMEOUT        50
-#define SYS_TICK_CYCLE_MS           10
+extern uint8_t gCursorBlinkCount;
+extern bool gCursorBlinkFlag;
+extern ldBase_t *ptEditingWidget;
+extern ldBase_t *ptEditingKeyboard;
 
 void ldGuiLoad(ld_scene_t *ptScene);
 void ldGuiDespose(ld_scene_t *ptScene);
@@ -74,6 +78,7 @@ void ldGuiLoop(void);
 void ldGuiTouchProcess(ld_scene_t *ptScene);
 void ldGuiSceneInit(ld_scene_t *ptScene);
 void ldGuiUpdateScene(void);
+
 #if USE_LCD_TEST == 1
 void ldGuiLcdTest(void);
 #endif

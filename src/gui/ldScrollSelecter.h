@@ -67,6 +67,7 @@ struct ldScrollSelecter_t
     bool isWaitMove:1;
     bool isAutoMove:1;
     bool isEdit:1;
+    bool isStatic:1;
 };
 
 ldScrollSelecter_t* ldScrollSelecter_init(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_font_t *ptFont);
@@ -76,7 +77,7 @@ void ldScrollSelecter_on_frame_start(ld_scene_t *ptScene, ldScrollSelecter_t *pt
 void ldScrollSelecter_on_frame_complete(ld_scene_t *ptScene, ldScrollSelecter_t *ptWidget);
 void ldScrollSelecter_show(ld_scene_t *pScene, ldScrollSelecter_t *ptWidget, const arm_2d_tile_t *ptTile, bool bIsNewFrame);
 
-void ldScrollSelecterSetItems(ldScrollSelecter_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize);
+void ldScrollSelecterSetStaticItems(ldScrollSelecter_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize);
 void ldScrollSelecterSetTextColor(ldScrollSelecter_t* ptWidget,ldColor textColor);
 void ldScrollSelecterSetBackgroundColor(ldScrollSelecter_t* pWidget,ldColor bgColor);
 void ldScrollSelecterSetBackgroundImage(ldScrollSelecter_t* pWidget,arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile);

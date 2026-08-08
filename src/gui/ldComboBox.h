@@ -81,19 +81,13 @@ void ldComboBoxSetBackgroundColor(ldComboBox_t* ptWidget, ldColor backgroundColo
 void ldComboBoxSetFrameColor(ldComboBox_t* ptWidget, ldColor frameColor);
 void ldComboBoxSetSelectColor(ldComboBox_t* ptWidget, ldColor selectColor);
 void ldComboBoxSetSelectItem(ldComboBox_t* ptWidget, uint8_t itemIndex);
+void ldComboBoxSetItems(ldComboBox_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize);
 void ldComboBoxSetStaticItems(ldComboBox_t* ptWidget, uint8_t *pStrArray[], uint8_t arraySize);
 void ldComboBoxSetItemMax(ldComboBox_t *ptWidget, uint8_t itemMax);
 void ldComboBoxAddItem(ldComboBox_t* ptWidget,uint8_t *pStr);
 void ldComboBoxSetDropdownImage(ldComboBox_t* ptWidget,arm_2d_tile_t* ptDropdownImgTile,arm_2d_tile_t* ptDropdownMaskTile);
 uint8_t* ldComboBoxGetText(ldComboBox_t* ptWidget, uint8_t num);
 uint8_t ldComboBoxGetSelectItem(ldComboBox_t* ptWidget);
-
-#define ldComboBoxSetHidden                ldBaseSetHidden
-#define ldComboBoxMove                     ldBaseMove
-#define ldComboBoxSetOpacity               ldBaseSetOpacity
-#define ldComboBoxSetSelectable            ldBaseSetSelectable
-#define ldComboBoxSetSelect                ldBaseSetSelect
-#define ldComboBoxSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

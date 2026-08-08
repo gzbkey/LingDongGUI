@@ -8,20 +8,25 @@ extern "C"
 
 #if defined(__riscv)
 
-#ifdef __riscv_xthead
-#include "csi_instance.h"
-#endif
+#include "csi_math.h"
 
-float32_t arm_sin_f32(float32_t x);
-float32_t arm_cos_f32(float32_t x);
-q31_t arm_sin_q31(q31_t x);
-q31_t arm_cos_q31(q31_t x);
+#define arm_sin_f32                     csi_sin_f32
+#define arm_cos_f32                     csi_cos_f32
+#define arm_sin_q31                     csi_sin_q31
+#define arm_cos_q31                     csi_cos_q31
+
+#define arm_rfft_fast_instance_f32      csi_rfft_fast_instance_f32
+#define arm_rfft_fast_init_f32          csi_rfft_fast_init_f32
+#define arm_rfft_fast_f32               csi_rfft_fast_f32
+#define arm_cmplx_mag_f32               csi_cmplx_mag_f32
 
 #else
 
 #include "arm_math_types.h"
 #include "arm_math_memory.h"
 #include "dsp/fast_math_functions.h"
+#include "dsp/complex_math_functions.h"
+#include "dsp/transform_functions.h"
 
 #endif
 
@@ -30,4 +35,3 @@ q31_t arm_cos_q31(q31_t x);
 #endif
 
 #endif
-

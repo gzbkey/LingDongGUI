@@ -18,6 +18,11 @@ bool ldMsgEmit(xQueue_t *ptQueue, void *ptSender, uint8_t signal, uint64_t value
 {
     ldMsg_t tMsg;
 
+    if (ptSender == NULL || ptQueue == NULL)
+    {
+        return false;
+    }
+
     tMsg.ptSender = ptSender;
     tMsg.signal = signal;
     tMsg.value = value;

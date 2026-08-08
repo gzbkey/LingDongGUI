@@ -55,7 +55,20 @@ const ldBaseWidgetFunc_t ldLineEditFunc = {
 static bool slotEditEnd(ld_scene_t *ptScene,ldMsg_t msg)
 {
     ldLineEdit_t *ptWidget=msg.ptSender;
-    ptWidget->isEditing=false;
+    ptWidget->use_as__ldBase_t.isEditing=false;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptEditingWidget = NULL;
+    gCursorBlinkFlag = false;
+    gCursorBlinkCount = 0;
+    return false;
+}
+
+static bool slotTextChanged(ld_scene_t *ptScene,ldMsg_t msg)
+{
+    ldLineEdit_t *ptWidget=msg.ptSender;
+    ptWidget->_strSize = ldBaseLabelGetStringSize(ptWidget->pText, ptWidget->ptFont);
+    gCursorBlinkFlag = true;
+    gCursorBlinkCount = 0;
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     return false;
 }
@@ -68,29 +81,30 @@ static bool slotLineEditProcess(ld_scene_t *ptScene,ldMsg_t msg)
 
     if(msg.signal==SIGNAL_PRESS)
     {
-        ptWidget->isEditing=true;
         if(ptWidget->kbNameId)
         {
             kb=ldBaseGetWidgetById(ptWidget->kbNameId);
             if(kb!=NULL)
             {
+                ptWidget->use_as__ldBase_t.isEditing=true;
+                ptEditingWidget = (ldBase_t*)ptWidget;
+                ptEditingKeyboard = (ldBase_t*)kb;
                 kb->editType=ptWidget->editType;
                 kb->ppStr=&ptWidget->pText;
                 kb->strMax=ptWidget->textMax;
                 kb->editorId=ptWidget->use_as__ldBase_t.nameId;
-                cursorBlinkFlag=true;
-                cursorBlinkCount=0;
-                ldKeyboardSetHidden((ldBase_t *)kb,false);
+                gCursorBlinkFlag=true;
+                gCursorBlinkCount=0;
+                ldBaseSetHidden((ldBase_t *)kb,false);
 
                 if((ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight)>(LD_CFG_SCREEN_HEIGHT>>1))
                 {
-                    ldKeyboardMove((ldBase_t *)kb,0,LD_CFG_SCREEN_HEIGHT>>1);
-                    ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-(LD_CFG_SCREEN_HEIGHT>>1));
-
+                    ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight);
+                    ldBaseMove((ldBase_t *)kb,kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX,LD_CFG_SCREEN_HEIGHT);
                 }
                 else
                 {
-                    ldKeyboardMove((ldBase_t *)kb,0,0);
+                    ldBaseMove((ldBase_t *)kb,kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX,LD_CFG_SCREEN_HEIGHT - kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight);
                 }
             }
         }
@@ -145,6 +159,7 @@ ldLineEdit_t* ldLineEdit_init( ld_scene_t *ptScene,ldLineEdit_t *ptWidget, uint1
 
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotLineEditProcess);
     ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotEditEnd);
+    ldMsgConnect(ptWidget,SIGNAL_VALUE_CHANGED,slotTextChanged);
 
     LOG_INFO("[init][lineEdit] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
@@ -182,16 +197,16 @@ void ldLineEdit_on_load(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
 void ldLineEdit_on_frame_start(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    if(ptWidget->isEditing)
+    if(ptWidget->use_as__ldBase_t.isEditing)
     {
-        if(cursorBlinkCount>CURSOR_BLINK_TIMEOUT)
+        if(gCursorBlinkCount > CURSOR_BLINK_TIMEOUT)
         {
-            cursorBlinkCount=0;
-            cursorBlinkFlag=!cursorBlinkFlag;
+            gCursorBlinkCount = 0;
+            gCursorBlinkFlag = !gCursorBlinkFlag;
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
     }
-    ptWidget->_strSize=arm_lcd_printf_to_buffer(ptWidget->ptFont,"%s",ptWidget->pText);
+    ptWidget->_strSize = ldBaseLabelGetStringSize(ptWidget->pText, ptWidget->ptFont);
 }
 
 void ldLineEdit_on_frame_complete(ld_scene_t *ptScene, ldLineEdit_t *ptWidget)
@@ -245,9 +260,8 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 },
             };
 
-            if(ptWidget->isEditing)
+            if(ptWidget->use_as__ldBase_t.isEditing)
             {
-                //预留光标位置
                 tempRegion.tSize.iWidth-=CURSOR_WIDTH;
             }
 
@@ -269,7 +283,7 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
                 arm_2d_op_wait_async(NULL);
             }
 
-            if(cursorBlinkFlag&&ptWidget->isEditing)
+            if(gCursorBlinkFlag && ptWidget->use_as__ldBase_t.isEditing)
             {
                 arm_2d_region_t cursorRegion={
                     tempRegion.tLocation.iX+ptWidget->_strSize.iWidth,
@@ -299,13 +313,17 @@ void ldLineEdit_show(ld_scene_t *ptScene, ldLineEdit_t *ptWidget, const arm_2d_t
 void ldLineEditSetText(ldLineEdit_t* ptWidget,uint8_t *pText)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget == NULL || pText == NULL)
+    {
+        return;
+    }
+    uint16_t textLen=strlen((char*)pText);
+    if(textLen == 0)
     {
         return;
     }
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
 
-    uint16_t textLen=strlen((char*)pText);
     if(ptWidget->textMax==0)
     {
         ptWidget->pText=ldRealloc(ptWidget->pText,textLen+1);

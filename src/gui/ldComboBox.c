@@ -23,7 +23,7 @@
 #include "arm_2d_helper.h"
 #include <assert.h>
 #include <string.h>
-
+#include "ldGui.h"
 #include "ldComboBox.h"
 
 #if defined(__clang__)
@@ -127,10 +127,12 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
         if(ptWidget->isExpand)
         {
             ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->use_as__ldBase_t.tTempRegion.tSize.iHeight;
+            ptEditingWidget = ptWidget;
         }
         else
         {
             ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight=ptWidget->itemHeight;
+            ptEditingWidget = NULL;
         }
         ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
@@ -157,6 +159,14 @@ static bool slotComboBoxProcess(ld_scene_t *ptScene,ldMsg_t msg)
             ptWidget->itemPreSelect=clickItemNum-1;
             ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         }
+        break;
+    }
+    case SIGNAL_FINISHED:
+    {
+        ptWidget->isExpand=false;
+        ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight = ptWidget->itemHeight;
+        ptEditingWidget = NULL;
+        ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
         break;
     }
     default:
@@ -208,6 +218,7 @@ ldComboBox_t* ldComboBox_init(ld_scene_t *ptScene,ldComboBox_t *ptWidget, uint16
     ldMsgConnect(ptWidget,SIGNAL_PRESS,slotComboBoxProcess);
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotComboBoxProcess);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotComboBoxProcess);
+    ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotComboBoxProcess);
 
     LOG_INFO("[init][comboBox] id:%d, size:%d", nameId,(int)sizeof (*ptWidget));
     return ptWidget;
@@ -430,6 +441,45 @@ void ldComboBox_show(ld_scene_t *ptScene, ldComboBox_t *ptWidget, const arm_2d_t
     arm_2d_op_wait_async(NULL);
 }
 
+void ldComboBoxSetItems(ldComboBox_t* ptWidget, const uint8_t *pStrArray[], uint8_t arraySize)
+{
+    assert(NULL != ptWidget);
+    if(ptWidget==NULL)
+    {
+        return;
+    }
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+
+    if(ptWidget->isStatic == false)
+    {
+        for (uint8_t i = 0; i < ptWidget->itemCount; ++i)
+        {
+            ldFree(ptWidget->ppItemStrGroup[i]);
+        }
+        ldFree(ptWidget->ppItemStrGroup);
+    }
+
+    uint8_t **pGroup = (uint8_t **)ldCalloc(arraySize, sizeof(uint8_t *));
+    if(pGroup == NULL)
+    {
+        return;
+    }
+
+    for(uint8_t i = 0; i < arraySize; i++)
+    {
+        uint8_t len = strlen((const char *)pStrArray[i]) + 1;
+        pGroup[i] = (uint8_t *)ldMalloc(len);
+        if(pGroup[i] != NULL)
+        {
+            memcpy(pGroup[i], pStrArray[i], len);
+        }
+    }
+
+    ptWidget->ppItemStrGroup = pGroup;
+    ptWidget->itemCount = arraySize;
+    ptWidget->isStatic = false;
+}
+
 void ldComboBoxSetStaticItems(ldComboBox_t* ptWidget,uint8_t *pStrArray[],uint8_t arraySize)
 {
     assert(NULL != ptWidget);
@@ -437,13 +487,20 @@ void ldComboBoxSetStaticItems(ldComboBox_t* ptWidget,uint8_t *pStrArray[],uint8_
     {
         return;
     }
-    if(ptWidget->isStatic==false)//只要使用了动态就不能再使用静态
+
+    if(ptWidget->isStatic == false)
     {
-        return;
+        for (uint8_t i = 0; i < ptWidget->itemCount; ++i)
+        {
+            ldFree(ptWidget->ppItemStrGroup[i]);
+        }
+        ldFree(ptWidget->ppItemStrGroup);
     }
+
     ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
-    ptWidget->ppItemStrGroup=pStrArray;
-    ptWidget->itemCount=arraySize;
+    ptWidget->ppItemStrGroup = pStrArray;
+    ptWidget->itemCount = arraySize;
+    ptWidget->isStatic = true;
 }
 
 void ldComboBoxSetItemMax(ldComboBox_t *ptWidget, uint8_t itemMax)

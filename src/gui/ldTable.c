@@ -68,6 +68,7 @@ void _ldTableSelectItem(ldTable_t *ptWidget,ldTableItem_t *item)
             else
             {
                 ptWidget->ptItemInfo[y*ptWidget->columnCount+x].isSelect=false;
+                ptWidget->ptItemInfo[y*ptWidget->columnCount+x].isEditing=false;
             }
         }
     }
@@ -226,24 +227,27 @@ void _ldTabelShowKeyboard(ld_scene_t *ptScene,ldTable_t *ptWidget,ldTableItem_t 
     kb=ldBaseGetWidgetById(ptWidget->kbNameId);
     if(kb!=NULL)
     {
+        ptEditingWidget = (ldBase_t *)ptWidget;
+        ptEditingKeyboard = (ldBase_t *)kb;
         kb->editType=currentItem->editType;
         kb->ppStr=&currentItem->pText;
         kb->strMax=currentItem->textMax;
         kb->editorId=ptWidget->use_as__ldBase_t.nameId;
-        cursorBlinkFlag=true;
-        cursorBlinkCount=0;
-        ldKeyboardSetHidden((ldBase_t *)kb,false);
+        gCursorBlinkFlag=true;
+        gCursorBlinkCount=0;
+        currentItem->isEditing = true;
+        ldBaseSetHidden((ldBase_t *)kb,false);
 
         arm_2d_region_t itemRegion= _ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
 
         if((itemRegion.tLocation.iY+itemRegion.tSize.iHeight+ptWidget->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iY)>(LD_CFG_SCREEN_HEIGHT>>1))
         {
-            ldKeyboardMove((ldBase_t *)kb,0,LD_CFG_SCREEN_HEIGHT>>1);
-            ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-(LD_CFG_SCREEN_HEIGHT>>1));
+            ldBaseBgMove(ptScene,LD_CFG_SCREEN_WIDTH,LD_CFG_SCREEN_HEIGHT,0,-kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight);
+            ldBaseMove((ldBase_t *)kb,kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX,LD_CFG_SCREEN_HEIGHT);
         }
         else
         {
-            ldKeyboardMove((ldBase_t *)kb,0,0);
+            ldBaseMove((ldBase_t *)kb,kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tLocation.iX,LD_CFG_SCREEN_HEIGHT - kb->use_as__ldBase_t.use_as__arm_2d_control_node_t.tRegion.tSize.iHeight);
         }
     }
 }
@@ -314,7 +318,6 @@ static bool slotTableProcess(ld_scene_t *ptScene,ldMsg_t msg)
 
             if((tempTimer-ptWidget->timer)<500)
             {
-                currentItem->isEditing=true;
                 if(ptWidget->kbNameId)
                 {
                     ldTabelShowKeyboard(ptWidget,currentItem);
@@ -449,6 +452,26 @@ static bool slotEditEnd(ld_scene_t *ptScene,ldMsg_t msg)
     ldTable_t *ptWidget=msg.ptSender;
     ldTableItem_t *currentItem=ldTableGetItem(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
     currentItem->isEditing=false;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+    ptEditingWidget = NULL;
+    ptEditingKeyboard = NULL;
+    gCursorBlinkFlag = false;
+    gCursorBlinkCount = 0;
+    return false;
+}
+
+static bool slotTextChanged(ld_scene_t *ptScene,ldMsg_t msg)
+{
+    ldTable_t *ptWidget=msg.ptSender;
+    ldTableItem_t *currentItem=ldTableGetItem(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
+
+    if((currentItem!=NULL)&&(currentItem->pText!=NULL)&&(currentItem->ptFont!=NULL))
+    {
+        ptWidget->_strSize=ldBaseLabelGetStringSize(currentItem->pText,currentItem->ptFont);
+    }
+    gCursorBlinkFlag = true;
+    gCursorBlinkCount = 0;
+    ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
     return false;
 }
 
@@ -535,6 +558,7 @@ ldTable_t* ldTable_init( ld_scene_t *ptScene,ldTable_t *ptWidget, uint16_t nameI
     ldMsgConnect(ptWidget,SIGNAL_RELEASE,slotTableProcess);
     ldMsgConnect(ptWidget,SIGNAL_HOLD_DOWN,slotTableProcess);
     ldMsgConnect(ptWidget,SIGNAL_FINISHED,slotEditEnd);
+    ldMsgConnect(ptWidget,SIGNAL_VALUE_CHANGED,slotTextChanged);
 
     LOG_INFO("[init][table] id:%d, size:%d", nameId,(int)(sizeof (*ptWidget)+sizeof (ldTableItem_t)*columnCount*rowCount));
     return ptWidget;
@@ -587,7 +611,17 @@ void ldTable_on_load(ld_scene_t *ptScene, ldTable_t *ptWidget)
 void ldTable_on_frame_start(ld_scene_t *ptScene, ldTable_t *ptWidget)
 {
     assert(NULL != ptWidget);
-    
+    ldTableItem_t *currentItem=ldTableGetItem(ptWidget,ptWidget->currentRow,ptWidget->currentColumn);
+
+    if((currentItem!=NULL)&&(currentItem->isEditing))
+    {
+        if(gCursorBlinkCount > CURSOR_BLINK_TIMEOUT)
+        {
+            gCursorBlinkCount = 0;
+            gCursorBlinkFlag = !gCursorBlinkFlag;
+            ptWidget->use_as__ldBase_t.isDirtyRegionUpdate = true;
+        }
+    }
 }
 
 void ldTable_on_frame_complete(ld_scene_t *ptScene, ldTable_t *ptWidget)
@@ -672,18 +706,19 @@ void ldTable_show(ld_scene_t *ptScene, ldTable_t *ptWidget, const arm_2d_tile_t 
                                         ptWidget->use_as__ldBase_t.opacity);
                         }
 
-                        if(item->isEditing&&bIsNewFrame&&(cursorBlinkCount>CURSOR_BLINK_TIMEOUT))
-                        {
-                            cursorBlinkCount=0;
-                            cursorBlinkFlag=!cursorBlinkFlag;
-                            ldTableUpdate(ptWidget,_ldTableGetItemRegion(ptWidget,ptWidget->currentRow,ptWidget->currentColumn));
-                        }
-
-                        if(cursorBlinkFlag&&item->isEditing)
+                        if(gCursorBlinkFlag && item->isEditing)
                         {
                             if(bIsNewFrame)
                             {
-                                arm_2d_size_t strSize=arm_lcd_get_string_line_box((char*)item->pText,item->ptFont);
+                                arm_2d_size_t strSize;
+                                if((ptWidget->_strSize.iWidth!=0)||(ptWidget->_strSize.iHeight!=0))
+                                {
+                                    strSize=ptWidget->_strSize;
+                                }
+                                else
+                                {
+                                    strSize=ldBaseLabelGetStringSize(item->pText,item->ptFont);
+                                }
                                 arm_2d_region_t srtRegion={
                                     .tLocation={0,0},
                                     .tSize=strSize,
@@ -795,7 +830,7 @@ void ldTableSetItemHeight(ldTable_t *ptWidget,uint8_t row,int16_t height)
 void ldTableSetItemText(ldTable_t *ptWidget,uint8_t row,uint8_t column,uint8_t *pText)
 {
     assert(NULL != ptWidget);
-    if(ptWidget == NULL)
+    if(ptWidget == NULL || pText == NULL)
     {
         return;
     }
@@ -968,6 +1003,12 @@ void ldTableSetItemEditable(ldTable_t* ptWidget,uint8_t row,uint8_t column,bool 
     {
         ldFree(ptWidget->ptItemInfo[row*ptWidget->columnCount+column].pText);
         ptWidget->ptItemInfo[row*ptWidget->columnCount+column].pText=ldCalloc(1,sizeof (uint8_t)*textMax+1);
+        if(ptWidget->ptItemInfo[row*ptWidget->columnCount+column].pText==NULL)
+        {
+            ptWidget->ptItemInfo[row*ptWidget->columnCount+column].isEditable=false;
+            LOG_ERROR("[init failed][table] id:%d,row:%d,column:%d,set item editable failed",ptWidget->use_as__ldBase_t.nameId,row,column);
+            return;
+        }
         ptWidget->ptItemInfo[row*ptWidget->columnCount+column].textMax=textMax;
     }
 }
@@ -1031,6 +1072,10 @@ void ldTableSetExcelType(ldTable_t *ptWidget,arm_2d_font_t* ptFont)
         for(uint8_t column=1;column<ptWidget->columnCount;column++)
         {
             ldTableSetItemEditable(ptWidget,row,column,true,10);
+            if(ptFont!=NULL)
+            {
+                ldTableSetItemFont(ptWidget,row,column,ptFont);
+            }
         }
     }
     ldTableSetAlignGrid(ptWidget,true);

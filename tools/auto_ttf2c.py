@@ -1,6 +1,7 @@
 import os
 import yaml
 import subprocess
+import argparse
 from pathlib import Path
 import sys
 
@@ -62,6 +63,7 @@ def generate_font_data_for_each_config(fontYaml, output_dir):
     header_content=""
     generated_bin_files = []
     bin_info_list = []
+    current_xip_offset = 0
     for config in fontYaml:
         font_config = config.get('font', {})
         font_index = font_config.get('index', 0)
@@ -71,6 +73,10 @@ def generate_font_data_for_each_config(fontYaml, output_dir):
         text = font_config.get('text', " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~±")
         text = str(text)
         base_font_name = font_config.get('codeName', 'Default')
+        bold = font_config.get('bold', False)
+        italic = font_config.get('italic', False)
+        underline = font_config.get('underline', False)
+        strikeOut = font_config.get('strikeOut', False)
 
         font_name = ttf_path
 
@@ -87,6 +93,15 @@ def generate_font_data_for_each_config(fontYaml, output_dir):
         base_font_name = base_font_name.replace('-', '_')
         base_font_name = base_font_name.replace(' ', '_')
         base_font_name = base_font_name.replace('.', '_')
+
+        if bold:
+            base_font_name += '_Bold'
+        if italic:
+            base_font_name += '_Italic'
+        if underline:
+            base_font_name += '_Underline'
+        if strikeOut:
+            base_font_name += '_StrikeOut'
         output_c = f"{output_dir}/{base_font_name}_{pixel_size}.c"
         print('    size:',pixel_size)
 
@@ -103,7 +118,8 @@ def generate_font_data_for_each_config(fontYaml, output_dir):
         thisPyPath = os.path.dirname(os.path.abspath(__file__))
         command_args = [
             sys.executable, f"{thisPyPath}/ttfConvert.py", '-i', ttf_path, '-t', font_txt_path, '-o', output_c,
-            '-p', str(pixel_size), '-n', f'{base_font_name}_{pixel_size}'
+            '-p', str(pixel_size), '-n', f'{base_font_name}_{pixel_size}',
+            '--xip-offset', f'0x{current_xip_offset:08X}'
         ]
         if font_bit_width is not None:
             command_args.extend(['-s', str(font_bit_width)])
@@ -112,9 +128,11 @@ def generate_font_data_for_each_config(fontYaml, output_dir):
             command_args.extend(['--index', str(font_index)])
         subprocess.run(command_args)
 
+        bins_this_config = []
         if font_bit_width is not None:
             bin_file = f"{output_dir}/{base_font_name}_{pixel_size}_A{font_bit_width}.bin"
             if os.path.exists(bin_file):
+                bins_this_config.append(bin_file)
                 generated_bin_files.append(bin_file)
                 bin_info_list.append({
                     'name': f"{base_font_name}_{pixel_size}_A{font_bit_width}",
@@ -124,11 +142,16 @@ def generate_font_data_for_each_config(fontYaml, output_dir):
             for i in range(4):
                 bin_file = f"{output_dir}/{base_font_name}_{pixel_size}_A{2**i}.bin"
                 if os.path.exists(bin_file):
+                    bins_this_config.append(bin_file)
                     generated_bin_files.append(bin_file)
                     bin_info_list.append({
                         'name': f"{base_font_name}_{pixel_size}_A{2**i}",
                         'file': bin_file
                     })
+
+        for bin_file in bins_this_config:
+            bin_size = os.path.getsize(bin_file)
+            current_xip_offset += (bin_size + 3) & ~3
 
         if font_bit_width is not None:
             header_content += f"""
@@ -199,21 +222,30 @@ def merge_bin_files(output_dir, bin_info_list):
 
 
 def main(argv):
-    if not argv:
+    parser = argparse.ArgumentParser(description='Auto TTF to C converter')
+    parser.add_argument('output_dir', nargs='?', default=None, help='Output directory')
+    args = parser.parse_args(argv)
+
+    if args.output_dir is None:
         output_dir = os.path.dirname(os.path.abspath(__file__))
     else:
-        output_dir = argv[0]
-    if output_dir[-1] == '\\' or output_dir[-1] == '/':
+        output_dir = args.output_dir
+    if output_dir[-1] in ('\\', '/'):
         output_dir = output_dir[:-1]
 
     fontYamlData = read_font_yaml(f'{output_dir}/font.yaml')
+
+    if isinstance(fontYamlData, dict):
+        fontYamlData = fontYamlData.get('fonts', [])
+    elif not isinstance(fontYamlData, list):
+        fontYamlData = []
 
     font_txt_path=f"{output_dir}/font.txt"
     if not os.path.exists(font_txt_path):
         with open(font_txt_path, 'w', encoding='utf-8') as file:
             pass
 
-    generate_font_data_for_each_config(fontYamlData,output_dir)
+    generate_font_data_for_each_config(fontYamlData, output_dir)
     os.remove(font_txt_path)
 
 if __name__ == "__main__":

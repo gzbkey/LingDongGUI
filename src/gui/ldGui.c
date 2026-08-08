@@ -28,8 +28,12 @@ static volatile int16_t deltaMoveTime;
 static volatile arm_2d_location_t prevLocation;
 static void *prevWidget;
 static uint8_t pageNumNow=0;
-uint8_t cursorBlinkCount=0;
-bool cursorBlinkFlag=false;
+uint8_t gCursorBlinkCount = 0;
+bool gCursorBlinkFlag = false;
+static bool isFullWidgetUpdate=false;
+static ldTimer_t sysTimer=0;
+ldBase_t *ptEditingWidget = NULL;
+ldBase_t *ptEditingKeyboard = NULL;
 
 #if USE_SCENE_SWITCHING == 2
 bool isGuiSwthcnScene=false;
@@ -40,10 +44,6 @@ static ldPageFuncGroup_t *ptSysGuiFuncGroup[2]={0};
 #ifndef LD_EMIT_SIZE
 #define LD_EMIT_SIZE                    8
 #endif
-
-bool isFullWidgetUpdate=false;
-
-ldTimer_t sysTimer10ms=0;
 
 void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_t tLocation)
 {
@@ -77,6 +77,15 @@ void ldGuiClickedAction(ld_scene_t *ptScene,uint8_t touchSignal,arm_2d_location_
 
         if(ptWidget!=NULL)
         {
+            if(ptEditingWidget != NULL && ptWidget->widgetType != widgetTypeKeyboard && ptWidget != ptEditingWidget)
+            {
+                if(ptEditingKeyboard != NULL)
+                {
+                    ldKeyboardExit(ptEditingKeyboard);
+                    ptEditingKeyboard = NULL;
+                }
+                emit(ptEditingWidget->nameId, SIGNAL_FINISHED, 0);
+            }
             u64Temp=tLocation.iX;
             u64Temp<<=16;
             u64Temp+=tLocation.iY;
@@ -236,10 +245,10 @@ void ldGuiFrameStart(ld_scene_t *ptScene)
         ptScene->ldGuiFuncGroup->frameStart(ptScene);
     }
 
-    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer10ms))
+    if(ldTimeOut(SYS_TICK_CYCLE_MS,true,&sysTimer))
     {
         xBtnTick(SYS_TICK_CYCLE_MS,ptScene);
-        cursorBlinkCount++;
+        gCursorBlinkCount++;
     }
 
     if(ptScene->ldGuiFuncGroup!=NULL)
@@ -400,7 +409,7 @@ void before_scene_switching_handler(void *pTarget,arm_2d_scene_player_t *ptPlaye
 #if USE_LCD_TEST == 1
 static void _ldGuiFillRect(uint16_t xs,uint16_t ys,uint16_t w, uint16_t h,ldColor color)
 {
-    extern void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,const uint8_t *bitmap);
+    extern void Disp0_DrawBitmap (int16_t x,int16_t y,int16_t width,int16_t height,const uint8_t *bitmap);
     for(uint16_t y=0;y<h;y++)
     {
         for(uint16_t x=0;x<w;x++)

@@ -91,13 +91,6 @@ void ldIconSliderSetSpeed(ldIconSlider_t *ptWidget, uint8_t speed);
 #define ldIconSliderInit(nameId,parentNameId,x,y,width,height,iconWidth,iconSpace,columnCount,rowCount,pageMax,ptFont) \
         ldIconSlider_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,iconWidth,iconSpace,columnCount,rowCount,pageMax,ptFont)
 
-#define ldIconSliderSetHidden                ldBaseSetHidden
-#define ldIconSliderMove                     ldBaseMove
-#define ldIconSliderSetOpacity               ldBaseSetOpacity
-#define ldIconSliderhSetSelectable           ldBaseSetSelectable
-#define ldIconSliderhSetSelect               ldBaseSetSelect
-#define ldIconSliderhSetCorner               ldBaseSetCorner
-
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

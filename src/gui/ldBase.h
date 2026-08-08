@@ -61,6 +61,7 @@ typedef enum{
     widgetTypeCalendar,
     widgetTypeProgressWheel,
     widgetTypeClock,
+    widgetTypeSpectrum,
 }ldWidgetType_t;
 
 
@@ -113,8 +114,6 @@ typedef enum{
 #define GET_SIGNAL_VALUE_Y(dat)         (dat&0xFFFF)
 
 #define ldColor                         COLOUR_INT
-
-#define CURSOR_WIDTH                    (2)
 
 #define MEM_MODE_FREERTOS_HEAP4         (0)
 #define MEM_MODE_TLFS                   (1)
@@ -214,6 +213,7 @@ typedef struct {
     bool isSelected:1;
     bool isSelectable:1;
     bool isCorner:1;
+    bool isEditing:1;
 }ldBase_t;
 
 typedef enum{
@@ -254,6 +254,7 @@ bool __ldTimeOut(uint16_t ms, bool isReset, ldTimer_t *pTimer);
                                           __ldTimeOut(__ms, \
                                                       isReset, \
                                                       (&arm_2d_safe_name(s_lTimestamp),##__VA_ARGS__));})
+int32_t ldBaseGetTickMs(void);
 
 void ldBaseNodeAdd(arm_2d_control_node_t *parent, arm_2d_control_node_t *child);
 void ldBaseNodeRemove(arm_2d_control_node_t *ptNode);
@@ -265,6 +266,7 @@ void ldBaseColor(arm_2d_tile_t* ptTile, arm_2d_region_t* ptRegion, ldColor color
 void ldBaseImage(arm_2d_tile_t* ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t* ptImgTile, arm_2d_tile_t* ptMaskTile, ldColor color, uint8_t opacity);
 void ldBaseImageScale(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, arm_2d_tile_t *ptImgTile, arm_2d_tile_t *ptMaskTile,float scale,arm_2d_op_trans_msk_opa_t *ptOP,uint8_t opacity,bool bIsNewFrame);
 void ldBaseLabel(arm_2d_tile_t *ptTile, arm_2d_region_t *ptRegion, uint8_t *pStr, arm_2d_font_t *ptFont, arm_2d_align_t tAlign, ldColor textColor, uint8_t opacity);
+arm_2d_size_t ldBaseLabelGetStringSize(uint8_t *pStr, arm_2d_font_t *ptFont);
 ldWidgetType_t ldBaseGetWidgetType(ldBase_t *ptWidget);
 uint16_t ldBaseGetNameId(ldBase_t *ptWidget);
 uint16_t ldBaseGetOpacity(ldBase_t *ptWidget);

@@ -73,6 +73,8 @@ struct ldGauge_t
 };
 
 ldGauge_t* ldGauge_init(ld_scene_t *ptScene, ldGauge_t *ptWidget, uint16_t nameId, uint16_t parentNameId, int16_t x, int16_t y, int16_t width, int16_t height, arm_2d_tile_t *ptBgImgTile, arm_2d_tile_t *ptBgMaskTile, int16_t centreOffsetX, int16_t centreOffsetY);
+#define ldGaugeInit(nameId,parentNameId,x,y,width,height,ptBgImgTile,ptBgMaskTile,centreOffsetX,centreOffsetY) \
+        ldGauge_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptBgImgTile,ptBgMaskTile,centreOffsetX,centreOffsetY)
 void ldGauge_depose(ld_scene_t *pScene, ldGauge_t *ptWidget);
 void ldGauge_on_load(ld_scene_t *pScene, ldGauge_t *ptWidget);
 void ldGauge_on_frame_start(ld_scene_t *pScene, ldGauge_t *ptWidget);
@@ -85,16 +87,6 @@ void ldGaugeSetAngle(ldGauge_t *ptWidget, float angle);
 void ldGaugeSetTrail(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgTrailMaskTile,arm_2d_tile_t *ptPointerTrailMaskTile);
 void ldGaugeSetProgressBar(ldGauge_t *ptWidget,arm_2d_tile_t *ptBgProgressBarMaskTile,arm_2d_tile_t *ptPointerProgressBarMaskTile);
 void ldGaugeSetAutoMove(ldGauge_t *ptWidget, bool enable);
-
-#define ldGaugeInit(nameId,parentNameId,x,y,width,height,ptBgImgTile,ptBgMaskTile,centreOffsetX,centreOffsetY) \
-        ldGauge_init(ptScene,NULL,nameId,parentNameId,x,y,width,height,ptBgImgTile,ptBgMaskTile,centreOffsetX,centreOffsetY)
-
-#define ldGaugeSetHidden                ldBaseSetHidden
-#define ldGaugeMove                     ldBaseMove
-#define ldGaugeSetOpacity               ldBaseSetOpacity
-#define ldGaugeSetSelectable            ldBaseSetSelectable
-#define ldGaugeSetSelect                ldBaseSetSelect
-#define ldGaugeSetCorner                ldBaseSetCorner
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
