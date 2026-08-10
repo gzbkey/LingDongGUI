@@ -44,6 +44,13 @@ extern "C" {
 // <h>Screen and Framebuffer
 // =======================
 
+// <q> Only Use Nano mode
+// <i> Removes the scene player from this display adapter and only uses the nano mode.
+// <i> This feature is disabled by default.
+#ifndef __DISP0_CFG_NANO_ONLY__
+#   define __DISP0_CFG_NANO_ONLY__                                0
+#endif
+
 // <o> Select the screen colour solution
 //     <0=>     None
 //     <1=>     Monochrome
@@ -157,7 +164,7 @@ extern "C" {
 // <i> Configure the default navigation layer of this display adapter. 
 // <i> NOTE: Disable the navigation layer will also remove the real-time FPS display.
 #ifndef __DISP0_CFG_NAVIGATION_LAYER_MODE__
-#   define __DISP0_CFG_NAVIGATION_LAYER_MODE__                      0
+#   define __DISP0_CFG_NAVIGATION_LAYER_MODE__                      1
 #endif
 
 // <o>Number of iterations <0-2000>
@@ -171,7 +178,7 @@ extern "C" {
 //     <1=>     Real FPS
 // <i> Decide the meaning of the real time FPS display
 #ifndef __DISP0_CFG_FPS_CACULATION_MODE__
-#   define __DISP0_CFG_FPS_CACULATION_MODE__                        1
+#   define __DISP0_CFG_FPS_CACULATION_MODE__                        0
 #endif
 
 // <q> Enable Console
@@ -231,13 +238,13 @@ extern "C" {
 // <q>Enable the helper service for 3FB (LCD Direct Mode)
 // <i> You can select this option when your LCD controller supports direct mode
 #ifndef __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__
-#   define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                  1
+#   define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                  0
 #endif
 
 // <q>Disable the default scene
 // <i> Remove the default scene for this display adapter. We highly recommend you to disable the default scene when creating real applications.
 #ifndef __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                      1
+#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                      0
 #endif
 
 // <o>Maximum number of Virtual Resources used per API
@@ -340,10 +347,35 @@ extern "C" {
         };                                                                      \
         ARM_2D_SAFE_NAME(ret);})
 
+#define disp_adapter0_nano_prepare(...)                                         \
+            __disp_adapter0_nano_prepare((arm_2d_scene_t *)(NULL,##__VA_ARGS__))
+
+#if __DISP0_CFG_NANO_ONLY__
+#   define __DISP_ADAPTER0_NANO_DRAW_RESUME_FULL_FLUSH_FLAG__()                 \
+        arm_2d_helper_pfb_full_frame_refresh_mode(                              \
+                                    &DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t, \
+                                    DISP0_ADAPTER.__bTempflag)
+#else
+#   define __DISP_ADAPTER0_NANO_DRAW_RESUME_FULL_FLUSH_FLAG__()
+#endif
+
 #define DISP_ADAPTER0_NANO_DRAW()                                               \
-                                                                                \
+    arm_using(arm_2d_scene_t *ptScene = disp_adapter0_get_current_scene())      \
     arm_using(const arm_2d_tile_t *ptTile = NULL)                               \
-        arm_using(bool bIsNewFrame = true)                                      \
+        arm_using(bool bIsNewFrame = true,                                      \
+            {                                                                   \
+                if (ptScene->bUseDirtyRegionHelper) {                           \
+                    arm_2d_helper_dirty_region_on_frame_start(                  \
+                                                &ptScene->tDirtyRegionHelper);  \
+                }                                                               \
+                ARM_2D_INVOKE_RT_VOID(  ptScene->fnOnFrameStart,                \
+                                        ARM_2D_PARAM(ptScene));                 \
+            },                                                                  \
+            {                                                                   \
+                ARM_2D_INVOKE_RT_VOID(  ptScene->fnOnFrameCPL,                  \
+                                        ARM_2D_PARAM(ptScene));                 \
+                __DISP_ADAPTER0_NANO_DRAW_RESUME_FULL_FLUSH_FLAG__();           \
+            })                                                                  \
             for (__disp_adapter0_draw_t *ARM_2D_SAFE_NAME(ptUserDraw) = NULL;   \
                 (({ ARM_2D_SAFE_NAME(ptUserDraw)                                \
                         = __disp_adapter0_nano_draw();                          \
@@ -359,10 +391,37 @@ typedef struct {
     bool bIsNewFrame;
 } __disp_adapter0_draw_t;
 
+#if __DISP0_CFG_NANO_ONLY__
+struct disp_adapter0_t {
+    inherit(arm_2d_helper_pfb_t);                                               //!< inherit from arm_2d_helper_pfb_t
+
+    struct {
+        uint32_t wMin;
+        uint32_t wMax;
+        uint64_t dwTotal;
+        uint64_t dwRenderTotal;
+        uint32_t wAverage;
+        float fCPUUsage;
+        uint16_t hwIterations;
+        uint16_t hwFrameCounter;
+        uint32_t wLCDLatency;
+        int64_t lTimestamp;
+    } Benchmark;
+
+    uint8_t chPT;
+    bool __bTempflag;
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
+
 ARM_NOINIT
 extern
+#if __DISP0_CFG_NANO_ONLY__
+struct disp_adapter0_t DISP0_ADAPTER;
+#else
 arm_2d_scene_player_t DISP0_ADAPTER;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -373,13 +432,16 @@ extern
 arm_fsm_rt_t __disp_adapter0_task(void);
 
 extern
-arm_2d_scene_t *disp_adapter0_nano_prepare(void);
-
-extern
 __disp_adapter0_draw_t * __disp_adapter0_nano_draw(void);
 
 extern
+arm_2d_scene_t *__disp_adapter0_nano_prepare(arm_2d_scene_t *ptScene);
+
+extern
 arm_2d_scene_t *disp_adapter0_get_default_scene(void);
+
+extern
+arm_2d_scene_t *disp_adapter0_get_current_scene(void);
 
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 /*!

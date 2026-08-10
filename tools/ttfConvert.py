@@ -94,7 +94,7 @@ static const arm_2d_tile_t c_tileUTF8{0}A{5}Mask = {{
             .chScheme = ARM_2D_COLOUR_{5}BIT,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + FONT_{0}_A{5}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmpUTF8{0}A{5}Font,
@@ -201,7 +201,7 @@ static const arm_2d_tile_t c_tileUTF8{0}A{5}Mask = {{
             .chScheme = ARM_2D_COLOUR_{5}BIT,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + FONT_{0}_A{5}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmpUTF8{0}A{5}Font,

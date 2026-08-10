@@ -183,7 +183,7 @@ const arm_2d_tile_t c_tile{0}GRAY8 = {{
             .chScheme = ARM_2D_COLOUR_GRAY8,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmp{0}GRAY8,
@@ -210,7 +210,7 @@ const arm_2d_tile_t c_tile{0}RGB565 = {{
             .chScheme = ARM_2D_COLOUR_RGB565,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .phwBuffer = (uint16_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
 #else
     .phwBuffer = (uint16_t *)c_bmp{0}RGB565,
@@ -238,7 +238,7 @@ const arm_2d_tile_t c_tile{0}CCCN888 = {{
             .chScheme = ARM_2D_COLOUR_RGB888,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pwBuffer = (uint32_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
 #else
     .pwBuffer = (uint32_t *)c_bmp{0}CCCN888,
@@ -266,7 +266,7 @@ const arm_2d_tile_t c_tile{0}CCCA8888 = {{
             .chScheme = ARM_2D_COLOUR_BGRA8888,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pwBuffer = (uint32_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
 #else
     .pwBuffer = (uint32_t *)c_bmp{0}CCCA8888,
@@ -295,7 +295,7 @@ const arm_2d_tile_t c_tile{0}Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A8,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmp{0}Alpha,
@@ -322,7 +322,7 @@ const arm_2d_tile_t c_tile{0}A1Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A1,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmp{0}A1Alpha,
@@ -350,7 +350,7 @@ const arm_2d_tile_t c_tile{0}A2Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A2,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmp{0}A2Alpha,
@@ -377,7 +377,7 @@ const arm_2d_tile_t c_tile{0}A4Mask = {{
             .chScheme = ARM_2D_COLOUR_MASK_A4,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_bmp{0}A4Alpha,
@@ -405,7 +405,7 @@ const arm_2d_tile_t c_tile{0}Mask2 = {{
             .chScheme = ARM_2D_CHANNEL_8in32,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .nAddress = (intptr_t)(XIP_BASE + IMAGE_{3}_XIP_OFFSET) + 3,
 #else
     .nAddress = ((intptr_t)c_bmp{0}CCCA8888) + 3,
@@ -432,7 +432,7 @@ const arm_2d_tile_t c_tile{0}ZHRGB565 = {{
             .chScheme = ARM_2D_COLOUR_RGB565,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .phwBuffer = (uint16_t *)(XIP_BASE + IMAGE_{3}_XIP_OFFSET),
 #else
     .phwBuffer = (uint16_t *)c_zhrgb{0},
@@ -460,7 +460,7 @@ const arm_2d_tile_t c_tile{0}LMSK = {{
             .chScheme = ARM_2D_COLOUR_MASK_A8,
         }},
     }},
-#if defined(USE_XIP)
+#if (USE_XIP == 1)
     .pchBuffer = XIP_BASE + IMAGE_{3}_XIP_OFFSET,
 #else
     .pchBuffer = (uint8_t *)c_lmsk{0},

@@ -103,7 +103,7 @@ void Disp0_DrawBitmap (uint32_t x,uint32_t y,uint32_t width,uint32_t height,cons
     //填写 lcd_colorFill(x,y,width,height,(uint16_t *)bitmap);
 }
 
-#if 0
+#if __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ == 1
 void __disp_adapter0_request_async_flushing(
         void *pTarget,
         bool bIsNewFrame,
@@ -114,7 +114,6 @@ void __disp_adapter0_request_async_flushing(
         const COLOUR_INT *pBuffer)
 {
     VT_Fill_Multiple_Colors(iX, iY,iX+iWidth-1,iY+iHeight-1,(color_typedef*) pBuffer);
-    s_bRequestAsyncFlush = true;
 }
 #endif
 
